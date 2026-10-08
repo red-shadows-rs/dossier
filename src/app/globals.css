@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme tokens per DOSSIER_PLAN.md 5.8 — dark is the default */
+:root {
+  --background: #0b0b0f;
+  --surface: #14141a;
+  --border: #26262e;
+  --text: #ededf0;
+  --muted: #9a9aa6;
+  --primary: #e11d48;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+  color-scheme: dark;
+}
+
+.light {
+  --background: #ffffff;
+  --surface: #f6f6f8;
+  --border: #e4e4e9;
+  --text: #16161a;
+  --muted: #6b6b76;
+  color-scheme: light;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

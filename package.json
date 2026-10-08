@@ -1,0 +1,63 @@
+{
+  "name": "dossier",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Contracts & invoices platform by RED SHADOWS | RS — one dossier per project",
+  "author": "RED SHADOWS | RS",
+  "license": "MIT",
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "node .next/standalone/server.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "3.10.0",
+    "@node-rs/argon2": "^2.0.2",
+    "better-sqlite3": "11.10.0",
+    "clsx": "2.1.1",
+    "drizzle-orm": "^0.44.0",
+    "lucide-react": "0.263.1",
+    "next": "16.3.3",
+    "next-intl": "^4.3.0",
+    "nodemailer": "^7.0.0",
+    "playwright": "^1.53.0",
+    "qrcode": "^1.5.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-hook-form": "7.86.0",
+    "signature_pad": "^5.0.4",
+    "tailwind-merge": "2.6.1",
+    "zod": "3.25.76"
+  },
+  "allowScripts": {
+    "better-sqlite3@11.10.0": true,
+    "esbuild@0.18.20": true,
+    "esbuild@0.25.12": true,
+    "esbuild@0.28.2": true,
+    "@parcel/watcher@2.6.0": true,
+    "@swc/core@1.16.13": true
+  },
+  "devDependencies": {
+    "@next/eslint-plugin-next": "16.3.3",
+    "@playwright/test": "^1.53.0",
+    "@types/better-sqlite3": "7.6.13",
+    "@types/node": "20.19.43",
+    "@types/nodemailer": "^6.4.17",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "18.2.79",
+    "@types/react-dom": "18.2.25",
+    "autoprefixer": "10.5.4",
+    "drizzle-kit": "^0.31.0",
+    "eslint": "9.39.5",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "postcss": "8.5.26",
+    "prettier": "3.9.6",
+    "tailwindcss": "3.4.19",
+    "tsx": "^4.19.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.68.0",
+    "vitest": "^3.0.0"
+  }
+}

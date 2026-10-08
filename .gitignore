@@ -1,0 +1,53 @@
+# ─────────────────────────────────────────────
+# Dossier - Git Ignore
+# ─────────────────────────────────────────────
+
+# ── Dependencies ──
+node_modules/
+
+# ── Build Outputs ──
+.next/
+out/
+build/
+dist/
+
+# ── Environment Variables ──
+.env
+.env.*
+!.env.example
+
+# ── Debug Logs ──
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ── Editor & Tooling ──
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+.idea/
+*.swp
+*.swo
+*~
+.kilo/
+
+# ── Operating Systems ──
+.DS_Store
+Thumbs.db
+
+# ── TypeScript ──
+*.tsbuildinfo
+next-env.d.ts
+
+# ── Runtime Data ──
+data/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+tmp/
+
+# ── Testing ──
+coverage/
+playwright-report/
+test-results/
