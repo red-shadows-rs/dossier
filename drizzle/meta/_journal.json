@@ -1,0 +1,62 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1791475253701,
+      "tag": "0000_colossal_justice",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1791488456946,
+      "tag": "0001_integrity_audit",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1791492389300,
+      "tag": "0002_lethal_polaris",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1791494773606,
+      "tag": "0003_messy_blonde_phantom",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1791497613886,
+      "tag": "0004_strong_post",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1791497633530,
+      "tag": "0005_integrity_contracts",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1791529301944,
+      "tag": "0006_peaceful_layla_miller",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1791529513851,
+      "tag": "0007_integrity_invoices",
+      "breakpoints": true
+    }
+  ]
+}

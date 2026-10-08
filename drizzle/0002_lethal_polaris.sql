@@ -1,0 +1,30 @@
+CREATE TABLE `clients` (
+	`id` text PRIMARY KEY NOT NULL,
+	`type` text DEFAULT 'company' NOT NULL,
+	`name_ar` text,
+	`name_en` text,
+	`legal_name_ar` text,
+	`legal_name_en` text,
+	`email` text,
+	`phone` text,
+	`country` text,
+	`city` text,
+	`address_ar` text,
+	`address_en` text,
+	`tax_number` text,
+	`cr_number` text,
+	`rep_name_ar` text,
+	`rep_name_en` text,
+	`rep_title_ar` text,
+	`rep_title_en` text,
+	`preferred_language` text DEFAULT 'ar' NOT NULL,
+	`notes` text,
+	`archived_at` integer,
+	`created_by` text,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL,
+	FOREIGN KEY (`created_by`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE set null,
+	CONSTRAINT "clients_name_required" CHECK("clients"."name_ar" IS NOT NULL OR "clients"."name_en" IS NOT NULL)
+);
+--> statement-breakpoint
+CREATE INDEX `clients_archived_idx` ON `clients` (`archived_at`);
