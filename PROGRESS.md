@@ -36,3 +36,13 @@ Implementation log of `DOSSIER_PLAN.md`. One entry per task (see 0.3). Deviation
   - Production requires SMTP_USER/SMTP_PASS as the 4.3 table states ("Required: prod"); this means a production boot without SMTP credentials fails fast.
 - Manual verification: `npm run check` green (23 tests); `npm run build` green; `npm run format` clean.
 
+## T-004 — Database layer — 2026-10-08
+- Done: `src/db/index.ts` — creates `DATA_DIR` with mode 0700, opens better-sqlite3 with pragmas `journal_mode=WAL`, `foreign_keys=ON`, `busy_timeout=5000`, `synchronous=NORMAL`, exports the singleton `sqlite`, `db` (drizzle), `withTx` (bound to the singleton per 5.5), types `DbTx`/`DbInstance`, plus `openDb(path)` factory and `runMigrations(db, folder)` (no-op while `drizzle/meta/_journal.json` is absent). `src/db/migrate.ts` (script entry), `drizzle.config.ts` (sqlite dialect, schema `./src/db/schema.ts`, out `./drizzle`), `src/lib/constants.ts` (6.1 + `CURRENCIES` + `MAX_MINOR`), `src/db/test-db.ts` (`createTestDb()` → `:memory:` + migrations per 16.0), `tests/setup-env.ts` wired in `vitest.config.ts` (valid test env, `DATA_DIR` in tmp so tests never touch repo `data/`).
+- Files: src/db/index.ts, src/db/migrate.ts, src/db/test-db.ts, src/db/index.test.ts, src/lib/constants.ts, drizzle.config.ts, tests/setup-env.ts, vitest.config.ts.
+- Tests: `src/db/index.test.ts` (9) — file DB pragmas (`wal`, `foreign_keys=1`, `busy_timeout=5000`, `synchronous=1`); in-memory open; parent dir auto-created; `withTx` commit + rollback-on-throw; `createTestDb` usable + migrations no-op; `runMigrations` no-op without journal; singleton exposed.
+- Deviations:
+  - The app singleton `db` is opened at module import (per R28); test isolation comes from `tests/setup-env.ts` pointing `DATA_DIR` at a per-run tmp dir — tests never touch repo `data/`.
+  - `drizzle.config.ts` reads `DATA_DIR`/`DATABASE_PATH` directly (drizzle-kit is a CLI and does not load `.env` files; the 4.3 rule concerns app code) — mirrors `env.ts` defaults.
+  - DB file mode is not chmod'd to 0600: the 0700 `DATA_DIR` already restricts access and chmod would break containers with mounted volumes (EPERM). Covered by 9.9's directory rule.
+- Manual verification: `npm run check` green (32 tests); `npm run db:migrate` succeeds via tsx on a tmp DATA_DIR (also proves fail-fast env validation and tsx `@` alias resolution); repo has no `data/` after tests.
+
