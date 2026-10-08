@@ -62,9 +62,11 @@ Open http://localhost:3000. To add a user later:
 | `npm run check` | typecheck + lint + check:rtl + tests (run before every commit) |
 | `npm run db:generate` | Generate a Drizzle migration from the schema |
 | `npm run db:migrate` | Apply migrations to the database |
+| `npm run seed` | Create the bootstrap owner if there are no users |
+| `npm run user:create -- <email> <name> <password> [role]` | Create a user |
 
-Remaining scripts (`test:e2e`, `seed`, `user:create`, `worker`) are added as the
-corresponding tasks land — see `PROGRESS.md`.
+Remaining scripts (`test:e2e`, `worker`) are added as the corresponding tasks
+land — see `PROGRESS.md`.
 
 ## Environment variables
 
