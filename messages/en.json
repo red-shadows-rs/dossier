@@ -31,7 +31,8 @@
     "download": "Download",
     "preview": "Preview",
     "send": "Send",
-    "copy": "Copy"
+    "copy": "Copy",
+    "pagination": "Pagination"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -95,5 +96,21 @@
     "dark": "Dark",
     "light": "Light",
     "system": "System"
+  },
+  "account": {
+    "title": "Account",
+    "profile": "Profile",
+    "name": "Name",
+    "locale": "Language",
+    "theme": "Theme",
+    "signerTitleAr": "Signature title (Arabic)",
+    "signerTitleEn": "Signature title (English)",
+    "saved": "Changes saved",
+    "password": "Password",
+    "passwordChanged": "Password changed"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "placeholder": "Dashboard is under construction"
   }
 }

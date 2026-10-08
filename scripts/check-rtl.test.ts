@@ -39,6 +39,14 @@ describe("scripts/check-rtl.sh", () => {
     expect(() => runCheck(join(root, "src"))).not.toThrow();
   });
 
+  it("exits 0 for legitimate classes that merely contain a banned prefix", () => {
+    const root = makeFixture({
+      "ok.tsx":
+        'export default function Ok() { return <div className="rounded-lg rounded-md rounded-full border-red-500 border-border bg-surface" />; }\n',
+    });
+    expect(() => runCheck(join(root, "src"))).not.toThrow();
+  });
+
   it("exits 1 for margin/padding physical utilities", () => {
     for (const cls of ["ml-2", "mr-4", "pl-1", "pr-3"]) {
       const root = makeFixture({

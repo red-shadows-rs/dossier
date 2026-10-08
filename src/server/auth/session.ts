@@ -26,6 +26,10 @@ export type SessionUser = {
   signerTitleEn: string | null;
 };
 
+export function sessionIdFromToken(rawToken: string): string {
+  return hmacToken(rawToken, env.APP_SECRET);
+}
+
 export function sessionCookieOptions() {
   return {
     httpOnly: true,

@@ -18,8 +18,9 @@ fi
 
 # Word-boundary-aware: token must start after line start, space, quote or backtick.
 PATTERN_1="(^|[ \"'\`])(ml|mr|pl|pr|left|right)-[0-9a-z\[]"
-# Explicit compound offenders.
-PATTERN_2="(text-left|text-right|border-l|border-r|rounded-l|rounded-r|space-x-)"
+# Explicit compound offenders. The [lr] prefix must not be followed by a letter,
+# so legitimate classes like `rounded-lg` or `border-red-500` are not flagged.
+PATTERN_2="(text-left|text-right|border-[lr](\$|[^a-zA-Z])|rounded-[lr](\$|[^a-zA-Z])|space-x-)"
 
 STATUS=0
 
