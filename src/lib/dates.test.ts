@@ -8,6 +8,8 @@ import {
   isValidDateStr,
   nowMs,
   todayInTz,
+  utcEndOfDayMs,
+  utcStartOfDayMs,
 } from "@/lib/dates";
 
 afterEach(() => {
@@ -47,6 +49,22 @@ describe("compareDateStr / daysBetween", () => {
     expect(compareDateStr("2026-01-03", "2026-01-02")).toBe(1);
     expect(daysBetween("2026-01-01", "2026-01-31")).toBe(30);
     expect(daysBetween("2026-12-31", "2027-01-01")).toBe(1);
+  });
+});
+
+describe("utcStartOfDayMs / utcEndOfDayMs", () => {
+  it("returns the UTC day bounds", () => {
+    expect(utcStartOfDayMs("2026-10-07")).toBe(
+      Date.UTC(2026, 9, 7, 0, 0, 0, 0),
+    );
+    expect(utcEndOfDayMs("2026-10-07")).toBe(
+      Date.UTC(2026, 9, 7, 23, 59, 59, 999),
+    );
+  });
+
+  it("rejects invalid dates", () => {
+    expect(() => utcStartOfDayMs("2026-02-30")).toThrow();
+    expect(() => utcEndOfDayMs("nope")).toThrow();
   });
 });
 

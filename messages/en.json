@@ -32,7 +32,8 @@
     "preview": "Preview",
     "send": "Send",
     "copy": "Copy",
-    "pagination": "Pagination"
+    "pagination": "Pagination",
+    "retry": "Try again"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -112,5 +113,23 @@
   "dashboard": {
     "title": "Dashboard",
     "placeholder": "Dashboard is under construction"
+  },
+  "audit": {
+    "title": "Audit log",
+    "entityType": "Entity type",
+    "entityId": "Entity id",
+    "action": "Action",
+    "allActions": "All actions",
+    "actor": "Actor",
+    "entity": "Entity",
+    "ip": "IP",
+    "when": "When",
+    "from": "From",
+    "to": "To",
+    "actorType": {
+      "user": "User",
+      "signer": "Signer",
+      "system": "System"
+    }
   }
 }

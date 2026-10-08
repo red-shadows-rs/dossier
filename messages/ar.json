@@ -32,7 +32,8 @@
     "preview": "معاينة",
     "send": "إرسال",
     "copy": "نسخ",
-    "pagination": "ترقيم الصفحات"
+    "pagination": "ترقيم الصفحات",
+    "retry": "إعادة المحاولة"
   },
   "nav": {
     "dashboard": "لوحة التحكم",
@@ -112,5 +113,23 @@
   "dashboard": {
     "title": "لوحة التحكم",
     "placeholder": "لوحة التحكم قيد الإنشاء"
+  },
+  "audit": {
+    "title": "سجل النشاط",
+    "entityType": "نوع الكيان",
+    "entityId": "معرّف الكيان",
+    "action": "الإجراء",
+    "allActions": "كل الإجراءات",
+    "actor": "المنفّذ",
+    "entity": "الكيان",
+    "ip": "عنوان IP",
+    "when": "الوقت",
+    "from": "من",
+    "to": "إلى",
+    "actorType": {
+      "user": "مستخدم",
+      "signer": "موقّع",
+      "system": "النظام"
+    }
   }
 }

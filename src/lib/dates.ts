@@ -69,6 +69,16 @@ export function compareDateStr(a: string, b: string): number {
   return 0;
 }
 
+export function utcStartOfDayMs(dateStr: string): number {
+  const parts = parseDateStr(dateStr);
+  return Date.UTC(parts.year, parts.month - 1, parts.day, 0, 0, 0, 0);
+}
+
+export function utcEndOfDayMs(dateStr: string): number {
+  const parts = parseDateStr(dateStr);
+  return Date.UTC(parts.year, parts.month - 1, parts.day, 23, 59, 59, 999);
+}
+
 export function daysBetween(a: string, b: string): number {
   return Math.round(
     (utcMs(parseDateStr(b)) - utcMs(parseDateStr(a))) / MS_PER_DAY,
