@@ -334,5 +334,53 @@
     "titleVariable": "لا يجوز أن تحتوي عناوين البنود على متغيّرات.",
     "blockSequenceMismatch": "يجب أن تكون ترتيب الكتل متطابقاً في العربية والإنجليزية.",
     "signaturesBlockCount": "يجب أن يحتوي القالب على كتلة توقيعات واحدة فقط (الموجود {count})."
+  },
+  "contracts": {
+    "saved": "تم حفظ العقد",
+    "deleted": "تم حذف المسودة",
+    "cancelled": "تم إلغاء العقد",
+    "status": {
+      "draft": "مسودة",
+      "sent": "مرسل",
+      "declined": "مرفوض",
+      "expired": "منتهي",
+      "signed": "موقّع",
+      "completed": "مكتمل",
+      "terminated": "مفسوخ",
+      "cancelled": "ملغى"
+    },
+    "issue": {
+      "titleRequired": "عنوان العقد مفقود بالـ{lang}.",
+      "scopeRequired": "نطاق العمل مفقود بالـ{lang}.",
+      "companyNameRequired": "اسم الشركة مفقود بالـ{lang}.",
+      "clientNameRequired": "اسم العميل مفقود بالـ{lang}.",
+      "projectNameRequired": "اسم المشروع مفقود بالـ{lang}.",
+      "clauseTitleRequired": "البند {position} بلا عنوان بالـ{lang}.",
+      "clauseBodyRequired": "البند {position} بلا نص بالـ{lang}.",
+      "itemDescriptionRequired": "بند التسعير {position} بلا وصف بالـ{lang}.",
+      "currencyInvalid": "العملة غير مدعومة.",
+      "noItems": "يلزم بند تسعير واحد على الأقل.",
+      "totalZero": "يجب أن يكون إجمالي العقد أكبر من صفر.",
+      "feesNotAllowed": "لا يجوز أن يحتوي عقد بلا أتعاب على بنود تسعير أو دفعات.",
+      "noMilestones": "يلزم وجود دفعة واحدة على الأقل.",
+      "milestonesInvalid": "دفعات الدفع غير صحيحة.",
+      "startDateRequired": "تاريخ البدء مطلوب.",
+      "endBeforeStart": "لا يجوز أن يسبق تاريخ الانتهاء تاريخ البدء.",
+      "signingDeadlinePast": "موعد التوقيع النهائي في الماضي.",
+      "noClauses": "يلزم بند واحد على الأقل.",
+      "missingVariable": "المتغيّر {variable} في البند {position} بلا قيمة بالـ{lang}.",
+      "clientSignatoryRequired": "اسم الموقّع من العميل مطلوب.",
+      "clientEmailRequired": "بريد الموقّع من العميل مطلوب.",
+      "clientEmailInvalid": "بريد الموقّع من العميل غير صحيح.",
+      "providerSignerRequired": "اختر موقّعاً من الشركة مخوّلاً بالتوقيع.",
+      "blockSequenceMismatch": "ترتيب الكتل في البند {position} مختلف بين العربية والإنجليزية.",
+      "signaturesBlock": "يجب أن يحتوي العقد على كتلة توقيعات واحدة فقط (الموجود {count}).",
+      "paymentScheduleBlock": "يجب أن يتضمن عقد الأتعاب كتلة جدول دفعات.",
+      "companyTaxNumberMissing": "الرقم الضريبي للشركة فارغ.",
+      "clientTaxNumberMissing": "الرقم الضريبي للعميل فارغ.",
+      "endBeforeMilestone": "تاريخ الانتهاء قبل آخر تاريخ استحقاق لدفعة.",
+      "paragraphCountMismatch": "عدد الفقرات في البند {position} مختلف بين العربية والإنجليزية.",
+      "bankDetailsMissing": "بيانات البنك فارغة؛ ستفتقر الفواتير إلى تعليمات السداد."
+    }
   }
 }

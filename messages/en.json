@@ -334,5 +334,53 @@
     "titleVariable": "Clause titles cannot contain variables.",
     "blockSequenceMismatch": "Arabic and English blocks must be in the same order.",
     "signaturesBlockCount": "A template must have exactly one signatures block (found {count})."
+  },
+  "contracts": {
+    "saved": "Contract saved",
+    "deleted": "Draft deleted",
+    "cancelled": "Contract cancelled",
+    "status": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "declined": "Declined",
+      "expired": "Expired",
+      "signed": "Signed",
+      "completed": "Completed",
+      "terminated": "Terminated",
+      "cancelled": "Cancelled"
+    },
+    "issue": {
+      "titleRequired": "The contract title is missing in {lang}.",
+      "scopeRequired": "The scope is missing in {lang}.",
+      "companyNameRequired": "The company name is missing in {lang}.",
+      "clientNameRequired": "The client name is missing in {lang}.",
+      "projectNameRequired": "The project name is missing in {lang}.",
+      "clauseTitleRequired": "Clause {position} has no title in {lang}.",
+      "clauseBodyRequired": "Clause {position} has no body in {lang}.",
+      "itemDescriptionRequired": "Pricing item {position} has no description in {lang}.",
+      "currencyInvalid": "The currency is not supported.",
+      "noItems": "At least one pricing item is required.",
+      "totalZero": "The contract total must be greater than zero.",
+      "feesNotAllowed": "A contract without fees cannot have pricing items or milestones.",
+      "noMilestones": "At least one payment milestone is required.",
+      "milestonesInvalid": "The payment milestones are invalid.",
+      "startDateRequired": "A start date is required.",
+      "endBeforeStart": "The end date cannot be before the start date.",
+      "signingDeadlinePast": "The signing deadline is in the past.",
+      "noClauses": "At least one clause is required.",
+      "missingVariable": "The variable {variable} in clause {position} has no value in {lang}.",
+      "clientSignatoryRequired": "The client signatory name is required.",
+      "clientEmailRequired": "The client signatory email is required.",
+      "clientEmailInvalid": "The client signatory email is invalid.",
+      "providerSignerRequired": "Select a company signer who is allowed to sign.",
+      "blockSequenceMismatch": "Clause {position} has different block orders in Arabic and English.",
+      "signaturesBlock": "The contract must have exactly one signatures block (found {count}).",
+      "paymentScheduleBlock": "A contract with fees must include a payment schedule block.",
+      "companyTaxNumberMissing": "The company tax number is empty.",
+      "clientTaxNumberMissing": "The client tax number is empty.",
+      "endBeforeMilestone": "The end date is before the last milestone due date.",
+      "paragraphCountMismatch": "Clause {position} has a different number of paragraphs in Arabic and English.",
+      "bankDetailsMissing": "Bank details are empty; invoices will lack payment instructions."
+    }
   }
 }
