@@ -27,3 +27,12 @@ Implementation log of `DOSSIER_PLAN.md`. One entry per task (see 0.3). Deviation
   - CI pins Node 22 (spec fallback; task-board only documents ">= 20").
 - Manual verification: temporarily adding `className="... ml-2"` to `src/app/page.tsx` makes `npm run check:rtl` exit 1 with the file/line printed; reverting returns exit 0.
 
+## T-003 — Environment and logger — 2026-10-08
+- Done: `src/lib/env.ts` — Zod schema for every variable of 4.3, validated at module load, crashes at boot with a formatted, per-variable error message; exports typed `env` with resolved `DATABASE_PATH` (default `${DATA_DIR}/dossier.sqlite`). Enforced: `APP_URL` http(s), no trailing slash; `APP_SECRET` ≥ 64 hex chars (9.13); SMTP_HOST/PORT/SECURE/USER/PASS/FROM required when `NODE_ENV=production`; `BOOTSTRAP_OWNER_PASSWORD` ≥ 12 chars when set; empty strings treated as unset. `src/lib/logger.ts` — `logger.info|warn|error(event, fields?)` writes one JSON line to stdout `{ts, level, event, ...fields}`; recursive redactor drops keys matching `/token|secret|password|otp|signature|authorization|cookie/i` (15.5, R13).
+- Files: src/lib/env.ts, src/lib/logger.ts, src/lib/env.test.ts, src/lib/logger.test.ts.
+- Tests: `env.test.ts` (11) — missing APP_URL throws; APP_SECRET < 64 chars / non-hex throws; defaults; overrides; trailing-slash APP_URL rejected; empty string = unset; production SMTP required; production SMTP valid; BOOTSTRAP_OWNER_PASSWORD short/valid. `logger.test.ts` (6) — redactor drops `token`, `password`, `otp`, `signatureData`, `Authorization`, case-insensitive/substring matches, nested objects/arrays, scalars untouched; JSON-line shape and levels.
+- Deviations:
+  - Redaction is recursive (nested objects/arrays), not only top-level keys — hardening of R13, same regex.
+  - Production requires SMTP_USER/SMTP_PASS as the 4.3 table states ("Required: prod"); this means a production boot without SMTP credentials fails fast.
+- Manual verification: `npm run check` green (23 tests); `npm run build` green; `npm run format` clean.
+
