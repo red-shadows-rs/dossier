@@ -1,10 +1,12 @@
 import {
+  check,
   index,
   integer,
   sqliteTable,
   text,
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
 import * as C from "@/lib/constants";
 
 const pk = () => text("id").primaryKey();
@@ -117,6 +119,48 @@ export const numberSequences = sqliteTable(
   (t) => [uniqueIndex("number_sequences_uq").on(t.seqKey, t.year)],
 );
 
+// ───────── parties & projects ─────────
+export const clients = sqliteTable(
+  "clients",
+  {
+    id: pk(),
+    type: text("type", { enum: C.CLIENT_TYPES }).notNull().default("company"),
+    nameAr: text("name_ar"), // at least one required (service + CHECK)
+    nameEn: text("name_en"),
+    legalNameAr: text("legal_name_ar"),
+    legalNameEn: text("legal_name_en"),
+    email: text("email"),
+    phone: text("phone"),
+    country: text("country"), // ISO 3166-1 alpha-2
+    city: text("city"),
+    addressAr: text("address_ar"),
+    addressEn: text("address_en"),
+    taxNumber: text("tax_number"), // VAT no.
+    crNumber: text("cr_number"), // commercial registration
+    repNameAr: text("rep_name_ar"), // legal representative
+    repNameEn: text("rep_name_en"),
+    repTitleAr: text("rep_title_ar"),
+    repTitleEn: text("rep_title_en"),
+    preferredLanguage: text("preferred_language", { enum: C.LOCALES })
+      .notNull()
+      .default("ar"),
+    notes: text("notes"),
+    archivedAt: integer("archived_at"),
+    createdBy: text("created_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("clients_archived_idx").on(t.archivedAt),
+    check(
+      "clients_name_required",
+      sql`${t.nameAr} IS NOT NULL OR ${t.nameEn} IS NOT NULL`,
+    ),
+  ],
+);
+
 export const schema = {
   users,
   sessions,
@@ -124,4 +168,5 @@ export const schema = {
   files,
   auditLog,
   numberSequences,
+  clients,
 };
