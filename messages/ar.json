@@ -291,5 +291,48 @@
     },
     "noContracts": "لا توجد عقود لهذا المشروع بعد",
     "noInvoices": "لا توجد فواتير لهذا المشروع بعد"
+  },
+  "templates": {
+    "title": "القوالب",
+    "empty": "لا توجد قوالب بعد",
+    "emptyHint": "تُنشأ القوالب النظامية بأمر التهيئة.",
+    "name": "الاسم",
+    "typeLabel": "النوع",
+    "type": {
+      "contract": "عقد",
+      "nda": "اتفاقية عدم إفصاح",
+      "other": "أخرى"
+    },
+    "languageMode": "لغة المستند",
+    "languageModes": {
+      "ar": "العربية",
+      "en": "الإنجليزية",
+      "bilingual": "ثنائي اللغة"
+    },
+    "clauses": "البنود",
+    "source": "المصدر",
+    "system": "نظامي",
+    "custom": "مخصص",
+    "readOnly": "للقراءة فقط",
+    "details": "بيانات القالب",
+    "hasFees": "يتضمن أتعاباً",
+    "paymentTerms": "مدة السداد (أيام)",
+    "milestonePreset": "الدفعات الجاهزة",
+    "clauseList": "البنود",
+    "previewTitle": "معاينة",
+    "previewHint": "تُعرض ببيانات تجريبية. تظهر الكتل الخاصة كعناصر بديلة.",
+    "backToList": "رجوع إلى القوالب",
+    "yes": "نعم",
+    "no": "لا",
+    "legalNotice": "هذه نصوص مبدئية، ويجب أن يراجعها محامٍ مؤهل قبل الاستخدام الفعلي.",
+    "blockMisplaced": "استُخدمت كتلة خاصة داخل جملة.",
+    "unknownVariable": "متغيّر غير معروف {variable}.",
+    "feeVariableInNoFeeContract": "لا يُسمح بالمتغيّر {variable} في عقد بلا أتعاب.",
+    "feeBlockInNoFeeContract": "لا يُسمح بالكتلة {block} في عقد بلا أتعاب.",
+    "clauseCount": "يحتاج القالب إلى بند واحد على الأقل.",
+    "clauseIncomplete": "يحتاج كل بند إلى عنوان ونص بالعربية والإنجليزية.",
+    "titleVariable": "لا يجوز أن تحتوي عناوين البنود على متغيّرات.",
+    "blockSequenceMismatch": "يجب أن تكون ترتيب الكتل متطابقاً في العربية والإنجليزية.",
+    "signaturesBlockCount": "يجب أن يحتوي القالب على كتلة توقيعات واحدة فقط (الموجود {count})."
   }
 }

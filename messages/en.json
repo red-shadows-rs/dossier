@@ -291,5 +291,48 @@
     },
     "noContracts": "No contracts for this project yet",
     "noInvoices": "No invoices for this project yet"
+  },
+  "templates": {
+    "title": "Templates",
+    "empty": "No templates yet",
+    "emptyHint": "System templates are created by the seed command.",
+    "name": "Name",
+    "typeLabel": "Type",
+    "type": {
+      "contract": "Contract",
+      "nda": "NDA",
+      "other": "Other"
+    },
+    "languageMode": "Language mode",
+    "languageModes": {
+      "ar": "Arabic",
+      "en": "English",
+      "bilingual": "Bilingual"
+    },
+    "clauses": "Clauses",
+    "source": "Source",
+    "system": "System",
+    "custom": "Custom",
+    "readOnly": "Read-only",
+    "details": "Template details",
+    "hasFees": "Has fees",
+    "paymentTerms": "Payment terms (days)",
+    "milestonePreset": "Milestone preset",
+    "clauseList": "Clauses",
+    "previewTitle": "Preview",
+    "previewHint": "Rendered with sample data. Special blocks are shown as placeholders.",
+    "backToList": "Back to templates",
+    "yes": "Yes",
+    "no": "No",
+    "legalNotice": "These are starter texts. Have a qualified lawyer review them before real use.",
+    "blockMisplaced": "A special block is used inside a sentence.",
+    "unknownVariable": "Unknown variable {variable}.",
+    "feeVariableInNoFeeContract": "Fee variable {variable} is not allowed when the contract has no fees.",
+    "feeBlockInNoFeeContract": "Block {block} is not allowed when the contract has no fees.",
+    "clauseCount": "A template needs at least one clause.",
+    "clauseIncomplete": "Each clause needs Arabic and English titles and bodies.",
+    "titleVariable": "Clause titles cannot contain variables.",
+    "blockSequenceMismatch": "Arabic and English blocks must be in the same order.",
+    "signaturesBlockCount": "A template must have exactly one signatures block (found {count})."
   }
 }

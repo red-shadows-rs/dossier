@@ -1,10 +1,46 @@
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { settings, users } from "@/db/schema";
 import { nowMs } from "@/lib/dates";
 import { env } from "@/lib/env";
 import { newId } from "@/lib/ids";
+import {
+  SETTINGS_SCHEMAS,
+  type SettingsSection,
+} from "@/lib/validation/settings";
 import { assertPasswordPolicy, hashPassword } from "@/server/auth/password";
+import { seedSystemTemplates } from "@/server/services/templates";
+
+const SETTINGS_SECTIONS: SettingsSection[] = [
+  "company",
+  "defaults",
+  "numbering",
+  "signing",
+  "email",
+];
+
+function seedDefaultSettings(): number {
+  let inserted = 0;
+  const now = nowMs();
+  for (const section of SETTINGS_SECTIONS) {
+    const existing = db
+      .select({ key: settings.key })
+      .from(settings)
+      .where(eq(settings.key, section))
+      .get();
+    if (existing) continue;
+    const value = SETTINGS_SCHEMAS[section].parse({});
+    db.insert(settings)
+      .values({
+        key: section,
+        valueJson: JSON.stringify(value),
+        updatedAt: now,
+      })
+      .run();
+    inserted += 1;
+  }
+  return inserted;
+}
 
 async function seedBootstrapOwner(): Promise<void> {
   const count = db
@@ -48,6 +84,14 @@ async function seedBootstrapOwner(): Promise<void> {
 }
 
 async function main(): Promise<void> {
+  const settingsInserted = seedDefaultSettings();
+  console.log(`Default settings rows inserted: ${settingsInserted}`);
+
+  const templateResult = seedSystemTemplates();
+  console.log(
+    `System templates — inserted: ${templateResult.inserted}, updated: ${templateResult.updated}, skipped: ${templateResult.skipped}`,
+  );
+
   await seedBootstrapOwner();
 }
 

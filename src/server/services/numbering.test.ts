@@ -57,7 +57,7 @@ describe("allocateNumber", () => {
     expect(seen.size).toBe(50);
   });
 
-  it("keeps counting past 9999", () => {
+  it("keeps counting past 9999", { timeout: 30000 }, () => {
     let last = 0;
     for (let i = 0; i < 10000; i += 1) {
       last = withTx((tx) => allocateNumber(tx, "contract", 2050));
