@@ -239,5 +239,57 @@
     "noProjects": "No projects for this client yet",
     "noContracts": "No contracts for this client yet",
     "noInvoices": "No invoices for this client yet"
+  },
+  "projects": {
+    "title": "Projects",
+    "new": "New project",
+    "edit": "Edit project",
+    "saved": "Project saved",
+    "empty": "No projects yet",
+    "emptyHint": "Create a project for one of your clients.",
+    "details": "Project details",
+    "code": "Code",
+    "name": "Name",
+    "nameAr": "Name (Arabic)",
+    "nameEn": "Name (English)",
+    "client": "Client",
+    "selectClient": "Select a client",
+    "allClients": "All clients",
+    "statusLabel": "Status",
+    "allStatuses": "All statuses",
+    "statusChanged": "Status updated",
+    "status": {
+      "lead": "Lead",
+      "active": "Active",
+      "on_hold": "On hold",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "description": "Description",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "budget": "Budget",
+    "currency": "Currency",
+    "taskboardRef": "task-board reference",
+    "notes": "Notes",
+    "includeArchived": "Show archived",
+    "archive": "Archive",
+    "unarchive": "Restore",
+    "archiveConfirm": "Archiving hides this project from pickers and the default list. Documents keep working.",
+    "unarchiveConfirm": "Restore this project to the default list?",
+    "archivedToast": "Project archived",
+    "unarchived": "Project restored",
+    "archived": "Archived",
+    "tabs": {
+      "overview": "Overview",
+      "contracts": "Contracts",
+      "invoices": "Invoices"
+    },
+    "summary": {
+      "title": "Financial summary",
+      "placeholder": "Financial summary is under construction"
+    },
+    "noContracts": "No contracts for this project yet",
+    "noInvoices": "No invoices for this project yet"
   }
 }

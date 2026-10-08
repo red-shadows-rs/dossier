@@ -11,6 +11,7 @@ export const PROJECT_STATUSES = [
   "completed",
   "cancelled",
 ] as const;
+export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
 export const TEMPLATE_TYPES = ["contract", "nda", "other"] as const;
 export const CONTRACT_STATUSES = [
   "draft",

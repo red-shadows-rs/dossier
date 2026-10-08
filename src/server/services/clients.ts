@@ -85,6 +85,23 @@ export function getClient(id: string): ClientRow {
   return row;
 }
 
+export function listClientOptions(): {
+  id: string;
+  nameAr: string | null;
+  nameEn: string | null;
+}[] {
+  return db
+    .select({
+      id: clients.id,
+      nameAr: clients.nameAr,
+      nameEn: clients.nameEn,
+    })
+    .from(clients)
+    .where(isNull(clients.archivedAt))
+    .orderBy(clients.nameEn, clients.nameAr)
+    .all();
+}
+
 export function createClient(
   user: SessionUser,
   input: ClientInput,

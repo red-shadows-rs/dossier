@@ -161,6 +161,49 @@ export const clients = sqliteTable(
   ],
 );
 
+export const projects = sqliteTable(
+  "projects",
+  {
+    id: pk(),
+    code: text("code").notNull(), // 'P-0001', from sequence 'project'
+    clientId: text("client_id")
+      .notNull()
+      .references(() => clients.id, { onDelete: "restrict" }),
+    nameAr: text("name_ar"), // at least one required (service + CHECK)
+    nameEn: text("name_en"),
+    description: text("description"),
+    status: text("status", { enum: C.PROJECT_STATUSES })
+      .notNull()
+      .default("lead"),
+    startDate: text("start_date"), // 'YYYY-MM-DD'
+    endDate: text("end_date"),
+    budgetMinor: integer("budget_minor"), // optional
+    currency: text("currency").notNull(),
+    taskboardRef: text("taskboard_ref"), // Phase 4 optional link to task-board
+    notes: text("notes"),
+    archivedAt: integer("archived_at"),
+    createdBy: text("created_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    uniqueIndex("projects_code_uq").on(t.code),
+    index("projects_client_idx").on(t.clientId),
+    index("projects_status_idx").on(t.status),
+    check(
+      "projects_name_required",
+      sql`${t.nameAr} IS NOT NULL OR ${t.nameEn} IS NOT NULL`,
+    ),
+    check("projects_currency_len", sql`length(${t.currency}) = 3`),
+    check(
+      "projects_budget_nonneg",
+      sql`${t.budgetMinor} IS NULL OR ${t.budgetMinor} >= 0`,
+    ),
+  ],
+);
+
 export const schema = {
   users,
   sessions,
@@ -169,4 +212,5 @@ export const schema = {
   auditLog,
   numberSequences,
   clients,
+  projects,
 };

@@ -239,5 +239,57 @@
     "noProjects": "لا توجد مشاريع لهذا العميل بعد",
     "noContracts": "لا توجد عقود لهذا العميل بعد",
     "noInvoices": "لا توجد فواتير لهذا العميل بعد"
+  },
+  "projects": {
+    "title": "المشاريع",
+    "new": "مشروع جديد",
+    "edit": "تعديل المشروع",
+    "saved": "تم حفظ المشروع",
+    "empty": "لا توجد مشاريع بعد",
+    "emptyHint": "أنشئ مشروعاً لأحد عملائك.",
+    "details": "بيانات المشروع",
+    "code": "الرمز",
+    "name": "الاسم",
+    "nameAr": "الاسم (بالعربية)",
+    "nameEn": "الاسم (بالإنجليزية)",
+    "client": "العميل",
+    "selectClient": "اختر عميلاً",
+    "allClients": "كل العملاء",
+    "statusLabel": "الحالة",
+    "allStatuses": "كل الحالات",
+    "statusChanged": "تم تحديث الحالة",
+    "status": {
+      "lead": "فرصة",
+      "active": "نشط",
+      "on_hold": "معلّق",
+      "completed": "مكتمل",
+      "cancelled": "ملغى"
+    },
+    "description": "الوصف",
+    "startDate": "تاريخ البدء",
+    "endDate": "تاريخ الانتهاء",
+    "budget": "الميزانية",
+    "currency": "العملة",
+    "taskboardRef": "مرجع task-board",
+    "notes": "ملاحظات",
+    "includeArchived": "إظهار المؤرشف",
+    "archive": "أرشفة",
+    "unarchive": "استعادة",
+    "archiveConfirm": "ستؤدي الأرشفة إلى إخفاء هذا المشروع من قوائم الاختيار والقائمة الافتراضية. المستندات تبقى تعمل.",
+    "unarchiveConfirm": "استعادة هذا المشروع إلى القائمة الافتراضية؟",
+    "archivedToast": "تمت أرشفة المشروع",
+    "unarchived": "تمت استعادة المشروع",
+    "archived": "مؤرشف",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "contracts": "العقود",
+      "invoices": "الفواتير"
+    },
+    "summary": {
+      "title": "الملخص المالي",
+      "placeholder": "الملخص المالي قيد الإنشاء"
+    },
+    "noContracts": "لا توجد عقود لهذا المشروع بعد",
+    "noInvoices": "لا توجد فواتير لهذا المشروع بعد"
   }
 }
