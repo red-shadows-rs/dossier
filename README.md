@@ -36,6 +36,10 @@ npm run dev
 
 Open http://localhost:3000.
 
+> Note: the app validates its environment at boot (and while building), so
+> `npm run dev` / `npm run build` require a complete `.env.local`. In
+> `NODE_ENV=production` the SMTP variables are required too.
+
 > Note: npm 12 blocks install scripts of native packages by default. The needed
 > scripts are approved in `package.json` under `allowScripts`. If `npm install`
 > reports blocked scripts after adding a dependency, review and approve them
@@ -49,8 +53,15 @@ Open http://localhost:3000.
 | `npm run build` | Production build |
 | `npm start` | Start the production server (standalone output) |
 | `npm run typecheck` | TypeScript type checking |
+| `npm run lint` | ESLint |
+| `npm run check:rtl` | Reject physical-direction Tailwind utilities |
+| `npm run test` | Vitest unit/integration tests |
+| `npm run check` | typecheck + lint + check:rtl + tests (run before every commit) |
+| `npm run db:generate` | Generate a Drizzle migration from the schema |
+| `npm run db:migrate` | Apply migrations to the database |
 
-More scripts (`lint`, `check:rtl`, `test`, `db:*`, `seed`, `worker`) are added as the corresponding tasks land — see `PROGRESS.md`.
+Remaining scripts (`test:e2e`, `seed`, `user:create`, `worker`) are added as the
+corresponding tasks land — see `PROGRESS.md`.
 
 ## Environment variables
 

@@ -17,6 +17,10 @@
   color-scheme: dark;
 }
 
+.dark {
+  color-scheme: dark;
+}
+
 .light {
   --background: #ffffff;
   --surface: #f6f6f8;
@@ -26,11 +30,24 @@
   color-scheme: light;
 }
 
+/* "system" theme: SSR renders dark, then prefers-color-scheme adjusts */
+@media (prefers-color-scheme: light) {
+  :root:not(.dark):not(.light) {
+    --background: #ffffff;
+    --surface: #f6f6f8;
+    --border: #e4e4e9;
+    --text: #16161a;
+    --muted: #6b6b76;
+    color-scheme: light;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
   }
 }
