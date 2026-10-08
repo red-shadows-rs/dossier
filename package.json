@@ -9,7 +9,19 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "node .next/standalone/server.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "check:rtl": "bash scripts/check-rtl.sh",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "check": "npm run typecheck && npm run lint && npm run check:rtl && npm run test",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/db/migrate.ts",
+    "seed": "tsx scripts/seed.ts",
+    "user:create": "tsx scripts/create-user.ts",
+    "worker": "tsx scripts/worker.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "3.10.0",

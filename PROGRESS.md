@@ -16,3 +16,14 @@ Implementation log of `DOSSIER_PLAN.md`. One entry per task (see 0.3). Deviation
   - Placeholder page shows hardcoded AR/EN text; the real i18n system (R8) lands in T-007 and will replace it.
   - Playwright browsers for the pinned revision (chromium-1248) are not downloaded yet; needed by T-020 (PDF engine), not by T-001.
 
+## T-002 — Tooling and CI — 2026-10-08
+- Done: all npm scripts of 4.2 (`dev`, `build`, `start`, `typecheck`, `lint`, `check:rtl`, `test`, `test:e2e`, `check`, `db:generate`, `db:migrate`, `seed`, `user:create`, `worker`) + `format`/`format:check` helpers (mirror task-board); ESLint flat config mirroring task-board plus R4 rules as errors (`no-explicit-any`, `ban-ts-comment`, `no-non-null-assertion`); Prettier config (`.prettierrc`, `.prettierignore`) mirroring task-board; `vitest.config.ts` with `@` alias and e2e exclusion; `scripts/check-rtl.sh` (R7 patterns per 4.2, optional target-dir argument for testability) + `scripts/check-rtl.test.ts` (6 tests); `.github/workflows/ci.yml` (`npm ci` + `npm run check`, Node 22).
+- Files: package.json, eslint.config.mjs, .prettierrc, .prettierignore, vitest.config.ts, scripts/check-rtl.sh, scripts/check-rtl.test.ts, .github/workflows/ci.yml (replaced .gitkeep).
+- Tests: `scripts/check-rtl.test.ts` — clean tree → exit 0; `ml-2/mr-4/pl-1/pr-3`, `left-2/right-4/left-[5px]`, `text-left/text-right/border-l/border-r/rounded-l/rounded-r/space-x-4` → exit 1; only `*.tsx` scanned; missing target dir → exit 1.
+- Deviations:
+  - Added `format`/`format:check` scripts beyond the 4.2 list so the Prettier config (required by the card) is usable — same commands as task-board.
+  - `check:rtl.sh` accepts an optional target directory (defaults to `src`) so the test can run it against fixtures; behavior on `src` is identical to the spec.
+  - `vitest.config.ts` excludes `tests/e2e/**` (Playwright specs must not run under Vitest).
+  - CI pins Node 22 (spec fallback; task-board only documents ">= 20").
+- Manual verification: temporarily adding `className="... ml-2"` to `src/app/page.tsx` makes `npm run check:rtl` exit 1 with the file/line printed; reverting returns exit 0.
+
