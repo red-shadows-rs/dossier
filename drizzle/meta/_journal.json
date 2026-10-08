@@ -29,6 +29,20 @@
       "when": 1791494773606,
       "tag": "0003_messy_blonde_phantom",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1791497613886,
+      "tag": "0004_strong_post",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1791497633530,
+      "tag": "0005_integrity_contracts",
+      "breakpoints": true
     }
   ]
 }
