@@ -46,3 +46,12 @@ Implementation log of `DOSSIER_PLAN.md`. One entry per task (see 0.3). Deviation
   - DB file mode is not chmod'd to 0600: the 0700 `DATA_DIR` already restricts access and chmod would break containers with mounted volumes (EPERM). Covered by 9.9's directory rule.
 - Manual verification: `npm run check` green (32 tests); `npm run db:migrate` succeeds via tsx on a tmp DATA_DIR (also proves fail-fast env validation and tsx `@` alias resolution); repo has no `data/` after tests.
 
+## T-005 — Schema: identity and infrastructure — 2026-10-08
+- Done: added `users`, `sessions`, `settings`, `files`, `auditLog`, `numberSequences` to `src/db/schema.ts` per 6.2 (array form of `sqliteTable` third argument for drizzle-orm 0.44.7, verified); generated `drizzle/0000_colossal_justice.sql` (+ `meta/0000_snapshot.json`, `_journal.json`); created custom migration `drizzle/0001_integrity_audit.sql` with the two `audit_log_*` triggers of 6.3 (`--> statement-breakpoint` marker verified in the generated file). Wired the aggregate schema into the drizzle instance (`drizzle(sqlite, { schema })`, `BetterSQLite3Database<typeof schema>`) and made `runMigrations` generic over the schema. `npm run db:generate` now reports "No schema changes" (snapshot in sync).
+- Files: src/db/schema.ts, src/db/index.ts, src/db/schema.test.ts, drizzle/0000_colossal_justice.sql, drizzle/0001_integrity_audit.sql, drizzle/meta/{_journal.json,0000_snapshot.json,0001_snapshot.json}; removed drizzle/.gitkeep.
+- Tests: `src/db/schema.test.ts` (6) — unique email index rejects duplicates (and keeps 1 row); audit insert allowed; audit UPDATE and DELETE abort with "append-only"; `number_sequences` unique `(seqKey, year)`; same key in a different year and different keys allowed. All run through `createTestDb()`, i.e. the real generated migrations + triggers.
+- Deviations:
+  - A partial version of this task was found uncommitted in the working tree (schema.ts, the generated `0000` migration, and the schema wiring in `index.ts`). It was reviewed against 6.2, kept, and completed with the custom trigger migration and tests.
+  - `schema.ts` exports an aggregate `schema` object (not in the 6.2 snippet) and `index.ts` now passes it to `drizzle()` so the instance is schema-aware; `runMigrations` became generic accordingly. No behavior change for T-004 callers.
+- Manual verification: `npm run check` green (38 tests); `npm run db:generate` reports no pending changes.
+

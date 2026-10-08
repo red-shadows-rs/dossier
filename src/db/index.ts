@@ -6,11 +6,12 @@ import {
   type BetterSQLite3Database,
 } from "drizzle-orm/better-sqlite3";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
+import * as schema from "@/db/schema";
 import { env } from "@/lib/env";
 
 export type DbInstance = {
   sqlite: Database.Database;
-  db: BetterSQLite3Database;
+  db: BetterSQLite3Database<typeof schema>;
 };
 
 export function openDb(path: string): DbInstance {
@@ -22,7 +23,7 @@ export function openDb(path: string): DbInstance {
   sqlite.pragma("foreign_keys = ON");
   sqlite.pragma("busy_timeout = 5000");
   sqlite.pragma("synchronous = NORMAL");
-  const db = drizzle(sqlite);
+  const db = drizzle(sqlite, { schema });
   return { sqlite, db };
 }
 
@@ -39,8 +40,8 @@ export function withTx<T>(fn: (tx: DbTx) => T): T {
   return db.transaction((tx) => fn(tx));
 }
 
-export function runMigrations(
-  target: BetterSQLite3Database,
+export function runMigrations<TSchema extends Record<string, unknown>>(
+  target: BetterSQLite3Database<TSchema>,
   migrationsFolder: string,
 ): void {
   if (!existsSync(join(migrationsFolder, "meta", "_journal.json"))) {
