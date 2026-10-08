@@ -1,5 +1,4 @@
 import { LOCALES, type Locale } from "@/lib/constants";
-import { env } from "@/lib/env";
 
 export const LOCALE_COOKIE = "dossier_locale";
 export const THEME_COOKIE = "dossier_theme";
@@ -12,8 +11,11 @@ export function isLocale(value: unknown): value is Locale {
   );
 }
 
-export function resolveLocale(value: string | undefined): Locale {
-  return isLocale(value) ? value : env.DEFAULT_LOCALE;
+export function resolveLocale(
+  value: string | undefined,
+  fallback: Locale,
+): Locale {
+  return isLocale(value) ? value : fallback;
 }
 
 export function isTheme(value: unknown): value is Theme {

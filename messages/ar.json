@@ -54,6 +54,7 @@
     "signingIn": "جارٍ تسجيل الدخول…",
     "invalidCredentials": "بيانات الدخول غير صحيحة",
     "tooManyAttempts": "محاولات كثيرة جداً، حاول لاحقاً",
+    "signedInAs": "مسجّل الدخول باسم {name}",
     "changePassword": "تغيير كلمة المرور",
     "currentPassword": "كلمة المرور الحالية",
     "newPassword": "كلمة المرور الجديدة",

@@ -54,6 +54,7 @@
     "signingIn": "Signing in…",
     "invalidCredentials": "Invalid email or password",
     "tooManyAttempts": "Too many attempts, please try again later",
+    "signedInAs": "Signed in as {name}",
     "changePassword": "Change password",
     "currentPassword": "Current password",
     "newPassword": "New password",

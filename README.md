@@ -31,10 +31,13 @@ Implementation in progress. See `DOSSIER_PLAN.md` (the implementation specificat
 npm install
 cp .env.example .env.local
 # set APP_URL and APP_SECRET (openssl rand -hex 32)
+npm run db:migrate     # create/upgrade the SQLite schema
+npm run seed           # optional: create the bootstrap owner from BOOTSTRAP_OWNER_*
 npm run dev
 ```
 
-Open http://localhost:3000.
+Open http://localhost:3000. To add a user later:
+`npm run user:create -- <email> <name> <password> [owner|member|viewer]`.
 
 > Note: the app validates its environment at boot (and while building), so
 > `npm run dev` / `npm run build` require a complete `.env.local`. In
