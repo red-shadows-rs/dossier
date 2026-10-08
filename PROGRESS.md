@@ -55,3 +55,14 @@ Implementation log of `DOSSIER_PLAN.md`. One entry per task (see 0.3). Deviation
   - `schema.ts` exports an aggregate `schema` object (not in the 6.2 snippet) and `index.ts` now passes it to `drizzle()` so the instance is schema-aware; `runMigrations` became generic accordingly. No behavior change for T-004 callers.
 - Manual verification: `npm run check` green (38 tests); `npm run db:generate` reports no pending changes.
 
+## T-006 — Core pure utilities — 2026-10-08
+- Done: `src/lib/ids.ts` (`newId`, `newToken`, `generateCode`, `normalizeCode`, `formatCode`), `src/lib/crypto.ts` (`hmacToken`, `sha256Hex`, `safeEqualHex`), `src/lib/money.ts` (`normalizeDigits`, `parseMajorToMinor`, `formatMinor`, `formatMoney`, `mulDivRound`, `percentOfBp`, `allocateProportional`, `allocateByBp`), `src/lib/dates.ts` (`nowMs`, `isValidDateStr`, `addDays`, `todayInTz`, `compareDateStr`, `daysBetween`, `formatDateLong`, `formatInstant`), `src/lib/canonical-json.ts` (`canonicalize`), `src/lib/errors.ts` (`ERROR_CODES`, `ErrorCode`, `AppError`), `src/lib/result.ts` (`ActionResult<T>`). Added `Locale` type to `src/lib/constants.ts`.
+- Files: src/lib/{ids,crypto,money,dates,canonical-json,errors,result}.ts + colocated tests; src/lib/constants.ts.
+- Tests: 45 new (77 total). Every 16.1 vector for `mulDivRound`/`percentOfBp`, `parseMajorToMinor`, `formatMinor`/`formatMoney`, `allocateProportional`/`allocateByBp`, dates, canonical JSON and verification codes; plus a 500-iteration property test that `allocateProportional` parts are ≥ 0 and sum to `total` (all-zero weights → zeros).
+- Deviations:
+  - `parseMajorToMinor` also enforces `MAX_MINOR`/safe-integer (5.2: "enforced everywhere amounts enter the system"); `allocateByBp` rejects sums ≠ 10000 with `VALIDATION_FAILED`; `mulDivRound`/`allocateProportional` throw `INTERNAL` on unsafe products / invalid weights (spec only said "throws").
+  - `formatMinor`/`formatMoney` accept `locale` as required by the 5.2 signature but always emit Western digits with `en-US` grouping (per spec: same output for `ar` and `en`); the parameter is unused.
+  - `formatInstant(ms, tz, lang, mode?)` gained a `mode: "tz" | "utc"` argument to produce the certificate UTC variant (5.3 mentions both).
+  - `canonicalize` throws `INTERNAL` on non-integer numbers/unsupported values; `undefined` array elements are emitted as `null` (JSON semantics) while `undefined` object properties are omitted.
+- Manual verification: `npm run check` green (77 tests).
+

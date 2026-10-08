@@ -1,5 +1,6 @@
 export const ROLES = ["owner", "member", "viewer"] as const;
 export const LOCALES = ["ar", "en"] as const;
+export type Locale = (typeof LOCALES)[number];
 export const LANG_MODES = ["ar", "en", "bilingual"] as const;
 export const CLIENT_TYPES = ["company", "individual"] as const;
 export const PROJECT_STATUSES = [
