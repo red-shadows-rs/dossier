@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { AppError } from "@/lib/errors";
 import { assertCan } from "@/lib/permissions";
 import type { ActionResult } from "@/lib/result";
 import {
@@ -28,6 +29,7 @@ import {
   resolveDocLang,
 } from "@/server/services/contract-documents";
 import { getContract } from "@/server/services/contracts";
+import { generateSealedPdf } from "@/server/services/contract-finalize";
 import { sendContract, signAsProvider } from "@/server/services/contracts-send";
 import {
   sendContractInputSchema,
@@ -204,7 +206,27 @@ export async function signAsProviderAction(
     const id = String((raw as { id?: unknown })?.id ?? "");
     const input = signAsProviderInputSchema.parse(raw);
     const meta = await getRequestMeta();
-    signAsProvider(user, id, input, meta);
+    await signAsProvider(user, id, input, meta);
+    revalidateContract(id);
+    return null;
+  });
+}
+
+export async function retryFinalizeAction(
+  raw: unknown,
+): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "contracts.write");
+    const id = String((raw as { id?: unknown })?.id ?? "");
+    const contract = getContract(id);
+    if (contract.status !== "signed" || contract.finalPdfFileId !== null) {
+      throw new AppError(
+        "INVALID_STATE",
+        "Only a signed contract without a sealed PDF can be retried",
+      );
+    }
+    await generateSealedPdf(id);
     revalidateContract(id);
     return null;
   });

@@ -12,7 +12,14 @@ import {
   type EmailTemplateKey,
 } from "@/server/services/email";
 import { renderEmail } from "@/server/services/email-templates";
+import { readFile } from "@/server/services/files";
 import { getSettings } from "@/server/services/settings";
+
+export type MailAttachment = {
+  filename: string;
+  content: Buffer;
+  contentType: string;
+};
 
 export type OutgoingMail = {
   from: string;
@@ -20,6 +27,7 @@ export type OutgoingMail = {
   subject: string;
   text: string;
   html: string;
+  attachments?: MailAttachment[];
 };
 
 export type MailSender = {
@@ -79,6 +87,22 @@ function parsePayload(payloadJson: string): Record<string, unknown> {
   return {};
 }
 
+function loadAttachments(payload: Record<string, unknown>): MailAttachment[] {
+  const ids = payload.attachmentFileIds;
+  if (!Array.isArray(ids)) return [];
+  const attachments: MailAttachment[] = [];
+  for (const id of ids) {
+    if (typeof id !== "string") continue;
+    const file = readFile(id);
+    attachments.push({
+      filename: file.originalName ?? "document.pdf",
+      content: file.buffer,
+      contentType: file.mime,
+    });
+  }
+  return attachments;
+}
+
 function redactPayload(payloadJson: string): string {
   try {
     const parsed: unknown = JSON.parse(payloadJson);
@@ -95,9 +119,7 @@ function redactPayload(payloadJson: string): string {
     // Leave the payload untouched if it is not valid JSON.
   }
   return payloadJson;
-}
-
-// 15.1 — claim a row race-safely; returns the number of rows changed.
+}// 15.1 — claim a row race-safely; returns the number of rows changed.
 export function claimOutboxRow(id: string): number {
   return db
     .update(emailOutbox)
@@ -176,12 +198,15 @@ async function deliver(row: OutboxRow, sender: MailSender): Promise<void> {
       companyName,
     );
 
+    const attachments = loadAttachments(payload);
+
     await sender.sendMail({
       from: `${fromName} <${fromAddress}>`,
       to: row.toEmail,
       subject: rendered.subject,
       text: rendered.text,
       html: rendered.html,
+      ...(attachments.length > 0 ? { attachments } : {}),
     });
 
     withTx((tx) => {

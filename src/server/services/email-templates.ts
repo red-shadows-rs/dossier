@@ -188,6 +188,57 @@ function renderOtp(
   return { subject, html, text };
 }
 
+function renderSignedCopy(
+  locale: Locale,
+  payload: Record<string, unknown>,
+  companyName: string,
+): RenderedEmail {
+  const ar = locale === "ar";
+  const title = pickTitle(payload, locale);
+  const number = readText(payload, "number");
+  const code = readText(payload, "code");
+  const url = readText(payload, "url");
+  const name = readText(payload, "recipientName");
+
+  const subject = ar
+    ? `العقد الموقّع ${number}`
+    : `Signed contract ${number}`;
+
+  const greetingRaw = greeting(locale, name);
+  const leadRaw = ar
+    ? "وقّع جميع الأطراف على العقد. تجد النسخة الموقّعة مرفقة بهذا البريد."
+    : "All parties have signed the contract. The signed copy is attached to this email.";
+  const verifyRaw = code
+    ? ar
+      ? `رمز التحقق: ${code}`
+      : `Verification code: ${code}`
+    : "";
+
+  const html = shell(
+    locale,
+    [
+      `<p style="margin:0 0 16px;">${escapeHtml(greetingRaw)}</p>`,
+      `<p style="margin:0 0 16px;">${escapeHtml(leadRaw)}</p>`,
+      `<p style="margin:0 0 8px;font-weight:bold;">${escapeHtml(title)} (${escapeHtml(number)})</p>`,
+      verifyRaw
+        ? `<p style="margin:0 0 8px;color:#71717a;font-size:13px;">${escapeHtml(verifyRaw)}</p>`
+        : "",
+      url
+        ? `<p style="margin:0;color:#71717a;font-size:13px;" dir="ltr">${escapeHtml(url)}</p>`
+        : "",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+    companyName,
+  );
+
+  const text = [greetingRaw, "", leadRaw, `${title} (${number})`, verifyRaw, url]
+    .filter((line) => line !== "")
+    .join("\n");
+
+  return { subject, html, text };
+}
+
 function renderTestEmail(
   locale: Locale,
   payload: Record<string, unknown>,
@@ -227,6 +278,8 @@ export function renderEmail(
       return renderSigningLink(locale, payload, companyName);
     case "contract_otp":
       return renderOtp(locale, payload, companyName);
+    case "contract_signed_copy":
+      return renderSignedCopy(locale, payload, companyName);
     case "test_email":
       return renderTestEmail(locale, payload, companyName);
     default:

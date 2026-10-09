@@ -104,6 +104,43 @@ describe("renderEmail — test_email", () => {
   });
 });
 
+describe("renderEmail — contract_signed_copy", () => {
+  it("renders the number, code and URL in both languages", () => {
+    const en = renderEmail(
+      "contract_signed_copy",
+      "en",
+      {
+        titleEn: "Development Agreement",
+        number: "DOS-C-2026-0001",
+        code: "ABCDEFGH1234",
+        url: "https://example.test/v/ABCDEFGH1234",
+        recipientName: "Jane",
+      },
+      COMPANY,
+    );
+    expect(en.subject).toBe("Signed contract DOS-C-2026-0001");
+    expect(en.text).toContain("All parties have signed");
+    expect(en.text).toContain("ABCDEFGH1234");
+    expect(en.html).toContain('dir="ltr"');
+
+    const ar = renderEmail(
+      "contract_signed_copy",
+      "ar",
+      {
+        titleAr: "عقد تطوير",
+        number: "DOS-C-2026-0001",
+        code: "ABCDEFGH1234",
+        url: "https://example.test/v/ABCDEFGH1234",
+        recipientName: "خالد",
+      },
+      COMPANY,
+    );
+    expect(ar.subject).toBe("العقد الموقّع DOS-C-2026-0001");
+    expect(ar.html).toContain('dir="rtl"');
+    expect(ar.text).toContain("ABCDEFGH1234");
+  });
+});
+
 describe("renderEmail — unimplemented templates", () => {
   it("throws EMAIL_FAILED for keys not built yet", () => {
     try {

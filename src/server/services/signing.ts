@@ -15,6 +15,10 @@ import { AppError } from "@/lib/errors";
 import type { Locale } from "@/lib/constants";
 import type { RequestMeta } from "@/server/auth/session";
 import { audit } from "@/server/services/audit";
+import {
+  finalizeContractTx,
+  generateSealedPdf,
+} from "@/server/services/contract-finalize";
 import { enqueueEmail } from "@/server/services/email";
 import { saveFile } from "@/server/services/files";
 import { getSettings } from "@/server/services/settings";
@@ -327,12 +331,13 @@ function decodeSignaturePng(dataUrl: string): Buffer {
   return buffer;
 }
 
-// 7.7 step 6 — record the client signature. Finalization is T-032.
-export function submitClientSignature(
+// 7.7 step 6 / 7.8 — record the client signature, then finalize + seal when the
+// last signatory signs. PDF I/O happens after the transaction (R12).
+export async function submitClientSignature(
   rawToken: string,
   input: ClientSignInput,
   meta: RequestMeta,
-): { signed: true } {
+): Promise<{ signed: true; finalized: boolean }> {
   const { signatory, contract } = resolveSignatory(rawToken);
   const signing = getSettings("signing");
 
@@ -369,7 +374,7 @@ export function submitClientSignature(
   const now = nowMs();
   const consent = sha256Hex(input.consentText.normalize("NFC"));
 
-  withTx((tx) => {
+  const finalized = withTx((tx) => {
     const current = tx
       .select()
       .from(contractSignatories)
@@ -400,9 +405,15 @@ export function submitClientSignature(
       ip: meta.ip,
       userAgent: meta.userAgent,
     });
+
+    return finalizeContractTx(tx, contract.id, now);
   });
 
-  return { signed: true };
+  if (finalized) {
+    await generateSealedPdf(contract.id);
+  }
+
+  return { signed: true, finalized };
 }
 
 // 7.7 step 7 — decline; revoke the tokens and notify the creator.

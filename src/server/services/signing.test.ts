@@ -345,21 +345,22 @@ describe("requestSigningOtp / verifySigningOtp", () => {
 });
 
 describe("submitClientSignature", () => {
-  it("requires OTP verification when enabled", () => {
+  it("requires OTP verification when enabled", async () => {
     try {
-      submitClientSignature(clientToken, signInput(), META);
+      await submitClientSignature(clientToken, signInput(), META);
       throw new Error("expected throw");
     } catch (error) {
       expect((error as AppError).code).toBe("OTP_INVALID");
     }
   });
 
-  it("records the client signature and audit, leaving the contract sent (T-032 finalizes)", () => {
+  it("records the client signature and finalizes the contract (T-032)", async () => {
     requestSigningOtp(clientToken, META);
     verifySigningOtp(clientToken, readOtp(), META);
 
-    const result = submitClientSignature(clientToken, signInput(), META);
+    const result = await submitClientSignature(clientToken, signInput(), META);
     expect(result.signed).toBe(true);
+    expect(result.finalized).toBe(true);
 
     const signatory = db
       .select()
@@ -379,22 +380,31 @@ describe("submitClientSignature", () => {
       .all();
     expect(signed.some((row) => row.actorType === "signer")).toBe(true);
 
-    // Finalization (status signed, code, token revoke) is T-032.
+    // 7.8 — both parties signed, so the contract is finalized.
     const contract = db
       .select()
       .from(contracts)
       .where(eq(contracts.id, contractId))
       .get();
-    expect(contract?.status).toBe("sent");
+    expect(contract?.status).toBe("signed");
+    expect(contract?.verificationCode).not.toBeNull();
+    expect(contract?.signedAt).not.toBeNull();
+
+    const rows = db
+      .select()
+      .from(contractSignatories)
+      .where(eq(contractSignatories.contractId, contractId))
+      .all();
+    expect(rows.every((row) => row.tokenHash === null)).toBe(true);
   });
 
-  it("rejects a second submission with the same token", () => {
+  it("rejects a second submission with the same token", async () => {
     requestSigningOtp(clientToken, META);
     verifySigningOtp(clientToken, readOtp(), META);
-    submitClientSignature(clientToken, signInput(), META);
+    await submitClientSignature(clientToken, signInput(), META);
 
     try {
-      submitClientSignature(clientToken, signInput(), META);
+      await submitClientSignature(clientToken, signInput(), META);
       throw new Error("expected throw");
     } catch (error) {
       expect((error as AppError).code).toBe("TOKEN_INVALID");

@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { auditLog, emailOutbox } from "@/db/schema";
 import { nowMs } from "@/lib/dates";
 import { newId } from "@/lib/ids";
+import { saveFile } from "./files";
 import {
   claimOutboxRow,
   processOutbox,
@@ -158,6 +159,33 @@ describe("processOutbox", () => {
     expect(sent).toHaveLength(0);
     expect(getRow(id)?.attempts).toBe(1);
     expect(getRow(id)?.status).toBe("pending");
+  });
+
+  it("attaches files referenced by attachmentFileIds", async () => {
+    const file = saveFile({
+      kind: "contract_pdf",
+      buffer: Buffer.from("%PDF-1.4\n%%EOF"),
+      originalName: "DOS-C-2026-0001.pdf",
+      ownerType: "contract",
+      ownerId: "c1",
+    });
+    insertRow({
+      templateKey: "contract_signed_copy",
+      payloadJson: JSON.stringify({
+        number: "DOS-C-2026-0001",
+        code: "ABCDEFGH1234",
+        url: "https://example.test/v/ABCDEFGH1234",
+        attachmentFileIds: [file.id],
+      }),
+    });
+    const { sender, sent } = recordingSender();
+
+    await processOutbox(sender);
+
+    expect(sent).toHaveLength(1);
+    expect(sent[0].attachments).toHaveLength(1);
+    expect(sent[0].attachments?.[0].contentType).toBe("application/pdf");
+    expect(sent[0].attachments?.[0].filename).toBe("DOS-C-2026-0001.pdf");
   });
 });
 

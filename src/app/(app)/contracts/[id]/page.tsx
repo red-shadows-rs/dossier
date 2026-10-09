@@ -6,6 +6,7 @@ import { clients, projects } from "@/db/schema";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ContractDocumentViewer } from "@/components/forms/ContractDocumentViewer";
 import { ContractDraftActions } from "@/components/forms/ContractDraftActions";
+import { FinalizeRetryBanner } from "@/components/forms/FinalizeRetryBanner";
 import { Badge, contractStatusTone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -114,8 +115,15 @@ export default async function ContractDetailPage({
         ) : null}
       </div>
 
-      <nav className="flex gap-1 overflow-x-auto border-b border-border">
-        {TABS.map((value) => (
+      {contract.status === "signed" && contract.finalPdfFileId === null ? (
+        <FinalizeRetryBanner
+          contractId={contract.id}
+          attempts={contract.pdfAttempts}
+          canRetry={canWrite}
+        />
+      ) : null}
+
+      <nav className="flex gap-1 overflow-x-auto border-b border-border">        {TABS.map((value) => (
           <Link
             key={value}
             href={`/contracts/${contract.id}?tab=${value}`}

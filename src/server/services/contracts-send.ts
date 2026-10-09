@@ -14,6 +14,10 @@ import { AppError } from "@/lib/errors";
 import { newId, newToken } from "@/lib/ids";
 import type { SessionUser, RequestMeta } from "@/server/auth/session";
 import { audit } from "@/server/services/audit";
+import {
+  finalizeContractTx,
+  generateSealedPdf,
+} from "@/server/services/contract-finalize";
 import { enqueueEmail } from "@/server/services/email";
 import { saveFile } from "@/server/services/files";
 import { allocateNumber, formatDocNumber } from "@/server/services/numbering";
@@ -316,12 +320,12 @@ export function sendContract(
   return result;
 }
 
-export function signAsProvider(
+export async function signAsProvider(
   user: SessionUser,
   contractId: string,
   input: SignAsProviderInput,
   meta: RequestMeta,
-): void {
+): Promise<void> {
   const signatureError = validateSignature(input.signature);
   if (signatureError) {
     throw new AppError("VALIDATION_FAILED", "Invalid signature", {
@@ -349,7 +353,7 @@ export function signAsProvider(
   const now = nowMs();
   const consent = consentHash(input.consentText);
 
-  withTx((tx) => {
+  const finalized = withTx((tx) => {
     const contract = tx
       .select()
       .from(contracts)
@@ -400,7 +404,13 @@ export function signAsProvider(
       ip: meta.ip,
       userAgent: meta.userAgent,
     });
+
+    return finalizeContractTx(tx, contractId, now);
   });
+
+  if (finalized) {
+    await generateSealedPdf(contractId);
+  }
 }
 
 export function countContractSignatories(contractId: string): number {

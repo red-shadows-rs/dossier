@@ -7,9 +7,11 @@ import {
   processOutbox,
   type MailSender,
 } from "@/server/services/email-worker";
+import { retryPendingFinalizations } from "@/server/services/contract-finalize";
 import { setInternalSetting } from "@/server/services/settings";
 
 const OUTBOX_INTERVAL_MS = 5_000;
+const FINALIZE_INTERVAL_MS = 5 * 60 * 1000;
 const HEARTBEAT_INTERVAL_MS = 60_000;
 
 let stopping = false;
@@ -47,6 +49,17 @@ async function runOutboxJob(sender: MailSender | null): Promise<void> {
   }
 }
 
+async function runFinalizeJob(): Promise<void> {
+  try {
+    await retryPendingFinalizations();
+  } catch (error) {
+    logger.error("worker_job_failed", {
+      job: "retryPendingFinalizations",
+      message: errorMessage(error),
+    });
+  }
+}
+
 function start(sender: MailSender | null): void {
   logger.info("worker_started", { nodeEnv: env.NODE_ENV });
 
@@ -59,19 +72,29 @@ function start(sender: MailSender | null): void {
     });
   };
 
+  const scheduleFinalize = (): void => {
+    inFlight = inFlight.then(async () => {
+      if (stopping) return;
+      await runFinalizeJob();
+    });
+  };
+
   const outboxTimer = setInterval(scheduleOutbox, OUTBOX_INTERVAL_MS);
+  const finalizeTimer = setInterval(scheduleFinalize, FINALIZE_INTERVAL_MS);
   const heartbeatTimer = setInterval(() => {
     if (stopping) return;
     safeHeartbeat();
   }, HEARTBEAT_INTERVAL_MS);
 
   scheduleOutbox();
+  scheduleFinalize();
 
   const shutdown = (signal: string): void => {
     if (stopping) return;
     stopping = true;
     logger.info("worker_stopping", { signal });
     clearInterval(outboxTimer);
+    clearInterval(finalizeTimer);
     clearInterval(heartbeatTimer);
     inFlight
       .catch(() => undefined)

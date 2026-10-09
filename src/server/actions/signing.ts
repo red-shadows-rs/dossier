@@ -59,7 +59,7 @@ export async function verifySigningOtpAction(
 
 export async function submitClientSignatureAction(
   raw: unknown,
-): Promise<ActionResult<{ signed: true }>> {
+): Promise<ActionResult<{ signed: true; finalized: boolean }>> {
   return runAction(async () => {
     const { token, ...rest } = tokenSchema
       .merge(clientSignInputSchema)

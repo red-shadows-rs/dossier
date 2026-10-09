@@ -350,7 +350,7 @@ describe("sendContract (16.1 Send success)", () => {
 });
 
 describe("signAsProvider", () => {
-  it("records evidence for a pending provider signatory", () => {
+  it("records evidence for a pending provider signatory", async () => {
     updateSettings(
       "signing",
       {
@@ -369,7 +369,7 @@ describe("signAsProvider", () => {
       { ...input, signature: undefined, consent: false },
       META,
     );
-    signAsProvider(
+    await signAsProvider(
       user,
       id,
       {

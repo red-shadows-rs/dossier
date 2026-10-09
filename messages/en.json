@@ -409,6 +409,12 @@
     "saved": "Contract saved",
     "deleted": "Draft deleted",
     "cancelled": "Contract cancelled",
+    "finalize": {
+      "pending": "The signed copy is not ready yet. The worker will retry automatically.",
+      "attempts": "Failed attempts: {count}",
+      "retry": "Retry PDF",
+      "retryDone": "Sealed PDF generated"
+    },
     "title": "Contracts",
     "new": "New contract",
     "newTitle": "Create a draft contract",
