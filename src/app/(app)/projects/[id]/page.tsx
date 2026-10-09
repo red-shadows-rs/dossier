@@ -2,14 +2,23 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ProjectActions } from "@/components/forms/ProjectActions";
-import { Badge } from "@/components/ui/Badge";
+import { Badge, contractStatusTone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "@/components/ui/Table";
 import { cn } from "@/components/ui/cn";
 import { AppError } from "@/lib/errors";
 import { can } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
+import { listProjectContracts } from "@/server/services/contracts";
 import { getProjectWithClient } from "@/server/services/projects";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -26,6 +35,8 @@ export default async function ProjectDetailPage({
 }) {
   const user = await requireUserPage();
   const t = await getTranslations("projects");
+  const tc = await getTranslations("common");
+  const tcontracts = await getTranslations("contracts");
   const { id } = await params;
   const sp = await searchParams;
   const tabParam = Array.isArray(sp.tab) ? sp.tab[0] : sp.tab;
@@ -43,6 +54,7 @@ export default async function ProjectDetailPage({
 
   const { project, client } = data;
   const canWrite = can(user, "projects.write");
+  const contracts = listProjectContracts(id);
 
   return (
     <div className="flex flex-col gap-4">
@@ -179,7 +191,54 @@ export default async function ProjectDetailPage({
             <CardTitle>{t("tabs.contracts")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <EmptyState title={t("noContracts")} />
+            {contracts.length === 0 ? (
+              <EmptyState title={t("noContracts")} />
+            ) : (
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableHeaderCell>{tc("status")}</TableHeaderCell>
+                    <TableHeaderCell>{t("name")}</TableHeaderCell>
+                    <TableHeaderCell>{t("code")}</TableHeaderCell>
+                    <TableHeaderCell className="text-end">
+                      {tc("actions")}
+                    </TableHeaderCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {contracts.map((contract) => (
+                    <TableRow key={contract.id}>
+                      <TableCell>
+                        <Badge tone={contractStatusTone(contract.status)}>
+                          {tcontracts(`status.${contract.status}`)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          href={`/contracts/${contract.id}`}
+                          className="font-medium text-foreground hover:text-primary"
+                        >
+                          <span dir="rtl" lang="ar">
+                            {contract.titleAr ?? contract.titleEn ?? "—"}
+                          </span>
+                        </Link>
+                      </TableCell>
+                      <TableCell dir="ltr" className="text-start font-mono">
+                        {contract.number ?? "—"}
+                      </TableCell>
+                      <TableCell className="text-end">
+                        <Link
+                          href={`/contracts/${contract.id}`}
+                          className="text-sm text-muted-foreground hover:text-foreground"
+                        >
+                          {tc("preview")}
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
       ) : null}

@@ -29,7 +29,9 @@ import {
   createContractFromTemplate,
   deleteDraftContract,
   getContractDetail,
+  listContractVersions,
   listContracts,
+  listProjectContracts,
   saveClauses,
   saveContractItems,
   saveMilestones,
@@ -330,6 +332,69 @@ describe("draft guards and lifecycle", () => {
     cancelContract(user, draft, null, META);
     expect(listContracts({ status: "draft" }).total).toBe(1);
     expect(listContracts({ status: "cancelled" }).total).toBe(1);
+  });
+});
+
+describe("listContracts filters, sort whitelist and pagination", () => {
+  it("filters by project, client and search", () => {
+    const id = createValidContract();
+    const contract = getContractDetail(id).contract;
+    expect(listContracts({ projectId }).rows.map((r) => r.id)).toContain(id);
+    expect(listContracts({ clientId: contract.clientId }).total).toBe(1);
+    expect(listContracts({ projectId: "missing" }).total).toBe(0);
+
+    // Number search is only possible once a number is assigned.
+    db.update(contracts)
+      .set({ number: "DOS-C-2026-0042" })
+      .where(eq(contracts.id, id))
+      .run();
+    expect(listContracts({ q: "0042" }).rows.map((r) => r.id)).toEqual([id]);
+    expect(listContracts({ q: "DOS-C-2026" }).total).toBe(1);
+    expect(listContracts({ q: "zzz" }).total).toBe(0);
+  });
+
+  it("ignores an unknown sort field (falls back to createdAt desc)", () => {
+    const first = createFrom("web-development");
+    const second = createFrom("nda");
+    const rows = listContracts({ sort: "drop table; --" }).rows.map(
+      (r) => r.id,
+    );
+    // Newest first: the second created contract comes first.
+    expect(rows[0]).toBe(second);
+    expect(rows).toContain(first);
+  });
+
+  it("sorts by a whitelisted field and direction", () => {
+    const a = createValidContract();
+    const b = createFrom("nda");
+    const byNumberAsc = listContracts({ sort: "number", dir: "asc" }).rows;
+    // NULL numbers sort first in SQLite ascending order.
+    expect(byNumberAsc.length).toBeGreaterThanOrEqual(2);
+    expect(byNumberAsc.map((r) => r.id)).toContain(a);
+    expect(byNumberAsc.map((r) => r.id)).toContain(b);
+
+    const byTotalAsc = listContracts({ sort: "totalMinor", dir: "asc" }).rows;
+    expect(byTotalAsc[0].totalMinor).toBeLessThanOrEqual(
+      byTotalAsc[byTotalAsc.length - 1].totalMinor,
+    );
+  });
+
+  it("paginates 20 per page", () => {
+    for (let i = 0; i < 25; i += 1) createFrom("nda");
+    const first = listContracts({ page: 1 });
+    expect(first.rows).toHaveLength(20);
+    expect(first.total).toBe(25);
+    const second = listContracts({ page: 2 });
+    expect(second.rows).toHaveLength(5);
+  });
+
+  it("listProjectContracts and listContractVersions return the project's rows", () => {
+    const id = createValidContract();
+    const list = listProjectContracts(projectId);
+    expect(list.map((row) => row.id)).toEqual([id]);
+    expect(list[0].status).toBe("draft");
+
+    expect(listContractVersions(id)).toEqual([]);
   });
 });
 

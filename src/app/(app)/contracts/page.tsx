@@ -19,7 +19,10 @@ import {
 import { CONTRACT_STATUSES } from "@/lib/constants";
 import { can } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
-import { listContracts } from "@/server/services/contracts";
+import {
+  CONTRACT_SORT_FIELDS,
+  listContracts,
+} from "@/server/services/contracts";
 import { listProjectOptions } from "@/server/services/projects";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -48,22 +51,34 @@ export default async function ContractsPage({
     ? (statusParam as (typeof CONTRACT_STATUSES)[number])
     : undefined;
   const projectId = readParam(params.projectId);
+  const sortParam = readParam(params.sort);
+  const dirParam = readParam(params.dir);
   const pageParam = readParam(params.page);
 
   const { rows, total, page, pageSize } = listContracts({
     q,
     status,
     projectId,
+    sort: sortParam,
+    dir: dirParam,
     page: pageParam ? Number(pageParam) : 1,
   });
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const projects = listProjectOptions();
   const canWrite = can(user, "contracts.write");
+  const sort = (CONTRACT_SORT_FIELDS as readonly string[]).includes(
+    sortParam ?? "",
+  )
+    ? (sortParam as string)
+    : "createdAt";
+  const dir = dirParam === "asc" ? "asc" : "desc";
 
   const query: Record<string, string> = {};
   if (q) query.q = q;
   if (status) query.status = status;
   if (projectId) query.projectId = projectId;
+  if (sortParam) query.sort = sort;
+  if (dirParam) query.dir = dir;
 
   return (
     <div className="flex flex-col gap-4">
@@ -114,6 +129,31 @@ export default async function ContractsPage({
                     {project.code} — {project.nameAr ?? project.nameEn ?? ""}
                   </option>
                 ))}
+              </Select>
+            </Field>
+            <Field label={tc("sort")} htmlFor="contracts-sort">
+              <Select
+                id="contracts-sort"
+                name="sort"
+                defaultValue={sort}
+                className="w-40"
+              >
+                {CONTRACT_SORT_FIELDS.map((value) => (
+                  <option key={value} value={value}>
+                    {t(`sort.${value}`)}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <Field label={tc("direction")} htmlFor="contracts-dir">
+              <Select
+                id="contracts-dir"
+                name="dir"
+                defaultValue={dir}
+                className="w-32"
+              >
+                <option value="desc">{tc("desc")}</option>
+                <option value="asc">{tc("asc")}</option>
               </Select>
             </Field>
             <div className="flex gap-2 pb-0.5">

@@ -1,9 +1,19 @@
-import { and, asc, count, desc, eq, sql, type SQL } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  sql,
+  type AnyColumn,
+  type SQL,
+} from "drizzle-orm";
 import { db, withTx, type DbTx } from "@/db";
 import {
   clients,
   contractClauses,
   contractItems,
+  contractVersions,
   contracts,
   paymentMilestones,
   projects,
@@ -36,6 +46,7 @@ export type ContractRow = typeof contracts.$inferSelect;
 export type ContractStatus = (typeof CONTRACT_STATUSES)[number];
 export type ContractItemRow = typeof contractItems.$inferSelect;
 export type ContractClauseRow = typeof contractClauses.$inferSelect;
+export type ContractVersionRow = typeof contractVersions.$inferSelect;
 export type MilestoneRow = typeof paymentMilestones.$inferSelect;
 
 export type ContractDetail = {
@@ -45,11 +56,25 @@ export type ContractDetail = {
   clauses: ContractClauseRow[];
 };
 
+export type ContractSort =
+  "createdAt" | "updatedAt" | "number" | "status" | "totalMinor" | "startDate";
+
+export const CONTRACT_SORT_FIELDS: readonly ContractSort[] = [
+  "createdAt",
+  "updatedAt",
+  "number",
+  "status",
+  "totalMinor",
+  "startDate",
+];
+
 export type ContractFilters = {
   q?: string;
   status?: ContractStatus;
   projectId?: string;
   clientId?: string;
+  sort?: string;
+  dir?: string;
   page?: number;
 };
 
@@ -58,6 +83,15 @@ export type ContractPage = {
   total: number;
   page: number;
   pageSize: number;
+};
+
+const SORT_COLUMNS: Record<ContractSort, AnyColumn> = {
+  createdAt: contracts.createdAt,
+  updatedAt: contracts.updatedAt,
+  number: contracts.number,
+  status: contracts.status,
+  totalMinor: contracts.totalMinor,
+  startDate: contracts.startDate,
 };
 
 function escapeLike(input: string): string {
@@ -90,16 +124,60 @@ export function listContracts(filters: ContractFilters = {}): ContractPage {
       ? Math.floor(requestedPage)
       : 1;
 
+  const sort: ContractSort = (
+    CONTRACT_SORT_FIELDS as readonly string[]
+  ).includes(filters.sort ?? "")
+    ? (filters.sort as ContractSort)
+    : "createdAt";
+  const descending = filters.dir !== "asc";
+  const column = SORT_COLUMNS[sort];
+
   const rows = db
     .select()
     .from(contracts)
     .where(where)
-    .orderBy(desc(contracts.createdAt), desc(contracts.id))
+    .orderBy(descending ? desc(column) : asc(column), desc(contracts.id))
     .limit(CONTRACTS_PAGE_SIZE)
     .offset((page - 1) * CONTRACTS_PAGE_SIZE)
     .all();
 
   return { rows, total, page, pageSize: CONTRACTS_PAGE_SIZE };
+}
+
+export function listContractVersions(contractId: string): ContractVersionRow[] {
+  return db
+    .select()
+    .from(contractVersions)
+    .where(eq(contractVersions.contractId, contractId))
+    .orderBy(desc(contractVersions.versionNo))
+    .all();
+}
+
+export function listProjectContracts(
+  projectId: string,
+): {
+  id: string;
+  number: string | null;
+  status: ContractStatus;
+  titleAr: string | null;
+  titleEn: string | null;
+  totalMinor: number;
+  currency: string;
+}[] {
+  return db
+    .select({
+      id: contracts.id,
+      number: contracts.number,
+      status: contracts.status,
+      titleAr: contracts.titleAr,
+      titleEn: contracts.titleEn,
+      totalMinor: contracts.totalMinor,
+      currency: contracts.currency,
+    })
+    .from(contracts)
+    .where(eq(contracts.projectId, projectId))
+    .orderBy(desc(contracts.createdAt))
+    .all();
 }
 
 export function getContract(id: string): ContractRow {

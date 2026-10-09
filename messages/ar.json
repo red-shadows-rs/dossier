@@ -33,7 +33,11 @@
     "send": "إرسال",
     "copy": "نسخ",
     "pagination": "ترقيم الصفحات",
-    "retry": "إعادة المحاولة"
+    "retry": "إعادة المحاولة",
+    "sort": "الترتيب",
+    "direction": "الاتجاه",
+    "desc": "تنازلي",
+    "asc": "تصاعدي"
   },
   "nav": {
     "dashboard": "لوحة التحكم",
@@ -505,6 +509,38 @@
       "endBeforeMilestone": "تاريخ الانتهاء قبل آخر تاريخ استحقاق لدفعة.",
       "paragraphCountMismatch": "عدد الفقرات في البند {position} مختلف بين العربية والإنجليزية.",
       "bankDetailsMissing": "بيانات البنك فارغة؛ ستفتقر الفواتير إلى تعليمات السداد."
+    },
+    "previewPdf": "فتح PDF",
+    "downloadPdf": "تنزيل PDF",
+    "documentLoading": "جارٍ إنشاء المستند…",
+    "documentUnavailable": "معاينة المستند غير متاحة",
+    "signaturesPlaceholder": "تظهر التوقيعات هنا بعد إرسال العقد وتوقيعه.",
+    "totalsTitle": "الملخص المالي",
+    "tabs": {
+      "summary": "الملخص",
+      "document": "المستند",
+      "signatures": "التوقيعات",
+      "history": "السجل"
+    },
+    "sort": {
+      "createdAt": "تاريخ الإنشاء",
+      "updatedAt": "آخر تحديث",
+      "number": "الرقم",
+      "status": "الحالة",
+      "totalMinor": "الإجمالي",
+      "startDate": "تاريخ البدء"
+    },
+    "history": {
+      "versions": "الإصدارات",
+      "noVersions": "لا توجد إصدارات بعد",
+      "version": "الإصدار",
+      "hash": "تجزئة المحتوى",
+      "createdAt": "تاريخ الإنشاء",
+      "activity": "النشاط",
+      "noActivity": "لا يوجد نشاط بعد",
+      "when": "الوقت",
+      "action": "الإجراء",
+      "actor": "المنفّذ"
     }
   }
 }

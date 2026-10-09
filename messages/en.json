@@ -33,7 +33,11 @@
     "send": "Send",
     "copy": "Copy",
     "pagination": "Pagination",
-    "retry": "Try again"
+    "retry": "Try again",
+    "sort": "Sort",
+    "direction": "Order",
+    "desc": "Descending",
+    "asc": "Ascending"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -505,6 +509,38 @@
       "endBeforeMilestone": "The end date is before the last milestone due date.",
       "paragraphCountMismatch": "Clause {position} has a different number of paragraphs in Arabic and English.",
       "bankDetailsMissing": "Bank details are empty; invoices will lack payment instructions."
+    },
+    "previewPdf": "Open PDF",
+    "downloadPdf": "Download PDF",
+    "documentLoading": "Rendering document…",
+    "documentUnavailable": "Document preview unavailable",
+    "signaturesPlaceholder": "Signatures appear here after the contract is sent and signed.",
+    "totalsTitle": "Financial summary",
+    "tabs": {
+      "summary": "Summary",
+      "document": "Document",
+      "signatures": "Signatures",
+      "history": "History"
+    },
+    "sort": {
+      "createdAt": "Created",
+      "updatedAt": "Updated",
+      "number": "Number",
+      "status": "Status",
+      "totalMinor": "Total",
+      "startDate": "Start date"
+    },
+    "history": {
+      "versions": "Versions",
+      "noVersions": "No versions yet",
+      "version": "Version",
+      "hash": "Content hash",
+      "createdAt": "Created at",
+      "activity": "Activity",
+      "noActivity": "No activity yet",
+      "when": "When",
+      "action": "Action",
+      "actor": "Actor"
     }
   }
 }
