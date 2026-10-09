@@ -16,6 +16,9 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npm run check
+      # 9.11 — non-blocking dependency audit report.
+      - run: npm audit --omit=dev
+        continue-on-error: true
 
   e2e:
     runs-on: ubuntu-latest
