@@ -7,6 +7,7 @@ import { closeBrowser } from "./browser";
 import { getFontCss } from "./fonts";
 import { renderPdf } from "./render";
 import { renderContractHtml } from "./html/contract";
+import { renderInvoiceHtml } from "./html/invoice";
 import type { SignatureRender } from "./html/shared";
 
 const QA_DIR = join(process.cwd(), "tmp", "qa");
@@ -143,4 +144,74 @@ describe("renderPdf smoke", () => {
       writeFileSync(join(QA_DIR, "contract-sealed.pdf"), pdf);
     },
   );
+
+  for (const lang of ["ar", "en", "bilingual"] as const) {
+    it(`generates a ${lang} invoice PDF`, { timeout: 60000 }, async () => {
+      const html = renderInvoiceHtml({
+        invoice: {
+          id: "inv-1",
+          number: "DOS-I-2026-0001",
+          currency: "SAR",
+          languageMode: "bilingual",
+          status: "issued",
+          issueDate: "2026-10-20",
+          dueDate: "2026-11-03",
+          projectLabel: "P-0001 — Online Store",
+          contractNumber: "DOS-C-2026-0001",
+          subtotalMinor: 400001,
+          discountMinor: 0,
+          netMinor: 400001,
+          taxRateBp: 1500,
+          taxMinor: 60000,
+          totalMinor: 460001,
+          paidMinor: 100000,
+          notesAr: "ملاحظات",
+          notesEn: "Notes",
+          paymentInstructionsAr: "البنك: بنك المثال | الآيبان: SA00",
+          paymentInstructionsEn: "Bank: Example Bank | IBAN: SA00",
+        },
+        lines: [
+          {
+            position: 1,
+            descriptionAr: "عند التسليم",
+            descriptionEn: "On delivery",
+            qtyMilli: 1000,
+            unitPriceMinor: 400001,
+            lineTotalMinor: 400001,
+          },
+        ],
+        seller: {
+          nameAr: "ريد شادوز",
+          nameEn: "RED SHADOWS",
+          email: "h@example.com",
+        },
+        buyer: { nameAr: "شركة النور", nameEn: "Al-Noor Co." },
+        payments: [
+          {
+            paidOn: "2026-10-25",
+            amountMinor: 100000,
+            method: "bank_transfer",
+            reference: "TX1",
+            voided: false,
+          },
+        ],
+        lang,
+        isOverdue: false,
+        fonts: getFontCss(),
+        logoDataUri: null,
+        verification: {
+          code: "ABCDEF001111",
+          url: "https://dossier.example.com/v/ABCDEF001111",
+          qrDataUri: "data:image/svg+xml;base64,PHN2Zy8+",
+        },
+      });
+      const pdf = await renderPdf(html, {
+        docNumber: "DOS-I-2026-0001",
+        code: null,
+      });
+      expect(pdf.subarray(0, 5).toString("ascii")).toBe("%PDF-");
+      mkdirSync(QA_DIR, { recursive: true });
+      writeFileSync(join(QA_DIR, `invoice-${lang}.pdf`), pdf);
+    });
+  }
 });

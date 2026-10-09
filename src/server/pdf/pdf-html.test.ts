@@ -109,6 +109,40 @@ describe("renderContractHtml — escaping", () => {
     expect(html).not.toContain("<img src=x");
     expect(html).toContain("&lt;img");
   });
+
+  it("escapes item/milestone descriptions in single-language mode", () => {
+    const snapshot = fixture({
+      items: [
+        {
+          position: 1,
+          descriptionAr: null,
+          descriptionEn: "Evil <b>bold</b> item",
+          qtyMilli: 1000,
+          unitPriceMinor: 100,
+          lineTotalMinor: 100,
+        },
+      ],
+      milestones: [
+        {
+          position: 1,
+          titleAr: "",
+          titleEn: "Milestone <script>x</script>",
+          percentBp: 10000,
+          amountMinor: 100,
+          taxMinor: 0,
+          totalMinor: 100,
+          dueDate: null,
+          triggerNoteAr: null,
+          triggerNoteEn: null,
+        },
+      ],
+    });
+    const html = renderContractHtml(input({ snapshot, lang: "en" }));
+    expect(html).not.toContain("<b>bold</b>");
+    expect(html).not.toContain("<script>x</script>");
+    expect(html).toContain("&lt;b&gt;bold&lt;/b&gt;");
+    expect(html).toContain("&lt;script&gt;");
+  });
 });
 
 describe("renderContractHtml — modes", () => {

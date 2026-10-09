@@ -637,6 +637,16 @@
     "voidPayment": "إلغاء {amount}",
     "voidPaymentTitle": "إلغاء الدفعة",
     "voidPaymentMessage": "إلغاء الدفعة يخفض المبلغ المدفوع وقد يغيّر حالة الفاتورة.",
-    "amountLabel": "المبلغ"
+    "amountLabel": "المبلغ",
+    "languageModes": {
+      "ar": "العربية",
+      "en": "الإنجليزية",
+      "bilingual": "ثنائي اللغة"
+    },
+    "previewPdf": "فتح PDF",
+    "downloadPdf": "تنزيل PDF",
+    "documentLoading": "جارٍ إنشاء المستند…",
+    "documentUnavailable": "معاينة المستند غير متاحة",
+    "documentTitle": "المستند"
   }
 }

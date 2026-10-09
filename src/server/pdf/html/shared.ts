@@ -47,9 +47,9 @@ body { margin: 0; line-height: 1.6; }
 [lang="ar"], .ar { line-height: 1.85; }
 h1 { font-size: 18pt; margin: 0 0 4mm; }
 h2.clause { font-size: 11.5pt; margin: 6mm 0 2mm; break-after: avoid; color: #7f1d1d; }
-p { margin: 0 0 2.2mm; orphans: 3; widows: 3; }
+p { margin: 0 0 2.2mm; orphans: 3; widows: 3; overflow-wrap: anywhere; }
 table { width: 100%; border-collapse: collapse; }
-th, td { border: 0.3mm solid #d9d9de; padding: 1.6mm 2mm; vertical-align: top; }
+th, td { border: 0.3mm solid #d9d9de; padding: 1.6mm 2mm; vertical-align: top; overflow-wrap: anywhere; }
 thead { display: table-header-group; } tr { break-inside: avoid; }
 .num { font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; text-align: end; }
 .watermark { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 110px; font-weight: 800; color: rgba(0,0,0,.07); transform: rotate(-30deg); pointer-events: none; }
@@ -77,7 +77,19 @@ bdi { unicode-bidi: isolate; }
 .bilingual-clause .ar { text-align: start; direction: rtl; }
 .divider { border-inline-end: 0.3mm solid #d9d9de; }
 .unsigned-note { color: #b91c1c; font-weight: 600; }
-.paid-stamp { border: 0.6mm solid #16a34a; color: #16a34a; padding: 1mm 3mm; font-weight: 700; display: inline-block; }`;
+.paid-stamp { border: 0.6mm solid #16a34a; color: #16a34a; padding: 1mm 3mm; font-weight: 700; display: inline-block; }
+.doc-title { display: flex; align-items: baseline; justify-content: space-between; gap: 6mm; margin: 4mm 0; }
+.doc-title h1 { margin: 0; }
+.doc-number { font-family: monospace; font-size: 12pt; }
+.overdue-tag { color: #b91c1c; font-weight: 700; }
+.card { border: 0.3mm solid #d9d9de; border-radius: 2mm; padding: 2mm 3mm; margin: 3mm 0; break-inside: avoid; }
+.card h2 { font-size: 10.5pt; margin: 0 0 1.5mm; }
+.totals-wrap { display: flex; align-items: flex-end; justify-content: space-between; gap: 6mm; margin: 3mm 0; }
+.totals { width: 70mm; }
+.totals td { border: none; padding: 0.8mm 2mm; }
+.totals td:first-child { color: #555; }
+.totals .total-row td { font-weight: 700; border-top: 0.4mm solid #d9d9de; }
+.overflow-wrap { overflow-wrap: anywhere; }`;
 }
 
 export function documentShell(input: {
@@ -113,8 +125,8 @@ export function buildFooterTemplate(meta: {
 // ───────── block renderers (12.4) ─────────
 
 function pick(ar: string | null, en: string | null, lang: DocLang): string {
-  if (lang === "ar") return ar ?? "";
-  if (lang === "en") return en ?? "";
+  if (lang === "ar") return esc(ar ?? "");
+  if (lang === "en") return esc(en ?? "");
   const enText = en ?? "";
   const arText = ar ?? "";
   if (enText && arText && enText !== arText) {

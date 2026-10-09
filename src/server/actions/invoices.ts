@@ -23,6 +23,11 @@ import {
 import { runAction } from "./_run";
 import { previewTotals } from "@/server/services/contracts";
 import type { CalcInput, CalcOutput } from "@/server/services/contract-calc";
+import {
+  buildInvoiceHtml,
+  resolveInvoiceDocLang,
+} from "@/server/services/invoice-documents";
+import { getInvoice } from "@/server/services/invoices";
 
 function revalidateInvoice(id: string): void {
   revalidatePath("/invoices");
@@ -147,5 +152,23 @@ export async function previewInvoiceTotalsAction(
       discount: input.discount,
       taxRateBp: input.taxRateBp,
     } satisfies CalcInput);
+  });
+}
+
+export async function getInvoicePreviewHtmlAction(
+  raw: unknown,
+): Promise<ActionResult<{ html: string }>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "invoices.read");
+    const data = raw as { id?: unknown; lang?: unknown };
+    const id = String(data.id ?? "");
+    const invoice = getInvoice(id);
+    const lang = resolveInvoiceDocLang(
+      invoice,
+      data.lang ? String(data.lang) : undefined,
+    );
+    const html = await buildInvoiceHtml(id, lang);
+    return { html };
   });
 }

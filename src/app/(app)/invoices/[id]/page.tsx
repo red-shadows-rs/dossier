@@ -7,6 +7,7 @@ import {
   InvoiceActions,
   VoidPaymentButton,
 } from "@/components/forms/InvoiceActions";
+import { InvoiceDocumentViewer } from "@/components/forms/InvoiceDocumentViewer";
 import { Badge, invoiceStatusTone } from "@/components/ui/Badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -233,6 +234,19 @@ export default async function InvoiceDetailPage({
               </TableBody>
             </Table>
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("documentTitle")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <InvoiceDocumentViewer
+            id={invoice.id}
+            languageMode={invoice.languageMode}
+            canDownload={can(user, "invoices.read")}
+          />
         </CardContent>
       </Card>
     </div>

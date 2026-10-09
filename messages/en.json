@@ -637,6 +637,16 @@
     "voidPayment": "Void {amount}",
     "voidPaymentTitle": "Void payment",
     "voidPaymentMessage": "Voiding a payment reduces the paid amount and may change the invoice status.",
-    "amountLabel": "Amount"
+    "amountLabel": "Amount",
+    "languageModes": {
+      "ar": "Arabic",
+      "en": "English",
+      "bilingual": "Bilingual"
+    },
+    "previewPdf": "Open PDF",
+    "downloadPdf": "Download PDF",
+    "documentLoading": "Rendering document…",
+    "documentUnavailable": "Document preview unavailable",
+    "documentTitle": "Document"
   }
 }
