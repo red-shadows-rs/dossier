@@ -68,7 +68,7 @@ function storeSignatureFile(
   return saved.id;
 }
 
-function tokenExpiryMs(
+export function tokenExpiryMs(
   now: number,
   linkTtlDays: number,
   signingDeadline: string | null,

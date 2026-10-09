@@ -8,10 +8,12 @@ import {
   type MailSender,
 } from "@/server/services/email-worker";
 import { retryPendingFinalizations } from "@/server/services/contract-finalize";
+import { expireContracts } from "@/server/services/contracts-lifecycle";
 import { setInternalSetting } from "@/server/services/settings";
 
 const OUTBOX_INTERVAL_MS = 5_000;
 const FINALIZE_INTERVAL_MS = 5 * 60 * 1000;
+const EXPIRE_INTERVAL_MS = 60 * 60 * 1000;
 const HEARTBEAT_INTERVAL_MS = 60_000;
 
 let stopping = false;
@@ -60,6 +62,17 @@ async function runFinalizeJob(): Promise<void> {
   }
 }
 
+function runExpireJob(): void {
+  try {
+    expireContracts();
+  } catch (error) {
+    logger.error("worker_job_failed", {
+      job: "expireContracts",
+      message: errorMessage(error),
+    });
+  }
+}
+
 function start(sender: MailSender | null): void {
   logger.info("worker_started", { nodeEnv: env.NODE_ENV });
 
@@ -79,6 +92,11 @@ function start(sender: MailSender | null): void {
     });
   };
 
+  const expireTimer = setInterval(() => {
+    if (stopping) return;
+    runExpireJob();
+  }, EXPIRE_INTERVAL_MS);
+
   const outboxTimer = setInterval(scheduleOutbox, OUTBOX_INTERVAL_MS);
   const finalizeTimer = setInterval(scheduleFinalize, FINALIZE_INTERVAL_MS);
   const heartbeatTimer = setInterval(() => {
@@ -88,6 +106,7 @@ function start(sender: MailSender | null): void {
 
   scheduleOutbox();
   scheduleFinalize();
+  runExpireJob();
 
   const shutdown = (signal: string): void => {
     if (stopping) return;
@@ -95,6 +114,7 @@ function start(sender: MailSender | null): void {
     logger.info("worker_stopping", { signal });
     clearInterval(outboxTimer);
     clearInterval(finalizeTimer);
+    clearInterval(expireTimer);
     clearInterval(heartbeatTimer);
     inFlight
       .catch(() => undefined)

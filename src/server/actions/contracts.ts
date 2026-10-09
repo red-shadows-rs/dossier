@@ -29,6 +29,12 @@ import {
   resolveDocLang,
 } from "@/server/services/contract-documents";
 import { getContract } from "@/server/services/contracts";
+import {
+  completeContract,
+  regenerateSigningLink,
+  reviseContract,
+  terminateContract,
+} from "@/server/services/contracts-lifecycle";
 import { generateSealedPdf } from "@/server/services/contract-finalize";
 import { sendContract, signAsProvider } from "@/server/services/contracts-send";
 import {
@@ -227,6 +233,70 @@ export async function retryFinalizeAction(
       );
     }
     await generateSealedPdf(id);
+    revalidateContract(id);
+    return null;
+  });
+}
+
+export async function reviseContractAction(
+  raw: unknown,
+): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "contracts.write");
+    const id = String((raw as { id?: unknown })?.id ?? "");
+    const meta = await getRequestMeta();
+    reviseContract(user, id, meta);
+    revalidateContract(id);
+    return null;
+  });
+}
+
+export async function regenerateSigningLinkAction(
+  raw: unknown,
+): Promise<ActionResult<{ url: string }>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "contracts.send");
+    const data = raw as { id?: unknown; email?: unknown };
+    const id = String(data.id ?? "");
+    const meta = await getRequestMeta();
+    const result = regenerateSigningLink(
+      user,
+      id,
+      { email: data.email === true },
+      meta,
+    );
+    revalidateContract(id);
+    return result;
+  });
+}
+
+export async function completeContractAction(
+  raw: unknown,
+): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "contracts.write");
+    const id = String((raw as { id?: unknown })?.id ?? "");
+    const meta = await getRequestMeta();
+    completeContract(user, id, meta);
+    revalidateContract(id);
+    return null;
+  });
+}
+
+export async function terminateContractAction(
+  raw: unknown,
+): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "contracts.terminate");
+    const data = raw as { id?: unknown; reason?: unknown };
+    const id = String(data.id ?? "");
+    const reason = String(data.reason ?? "");
+    const meta = await getRequestMeta();
+    terminateContract(user, id, reason, meta);
     revalidateContract(id);
     return null;
   });

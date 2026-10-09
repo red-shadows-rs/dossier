@@ -449,6 +449,49 @@
     "saved": "Contract saved",
     "deleted": "Draft deleted",
     "cancelled": "Contract cancelled",
+    "revised": "Contract recalled to draft",
+    "completedDone": "Contract completed",
+    "terminatedDone": "Contract terminated",
+    "actions": {
+      "regenerateLink": "New signing link",
+      "revise": "Revise",
+      "complete": "Complete",
+      "terminate": "Terminate"
+    },
+    "reviseConfirmTitle": "Revise contract",
+    "reviseConfirm": "This recalls the contract to a draft so you can edit and resend it. The current signing links stop working.",
+    "terminateTitle": "Terminate contract",
+    "terminateHint": "Terminating is permanent. Issued invoices are unaffected, but un-invoiced milestones can no longer be invoiced.",
+    "terminateReason": "Reason",
+    "linkTitle": "New signing link",
+    "linkOnce": "Copy this link now — it is shown only once and invalidates the previous link.",
+    "linkLabel": "Signing link",
+    "signatures": {
+      "empty": "No signatories yet. They are created when the contract is sent.",
+      "role": "Role",
+      "name": "Name",
+      "status": "Status",
+      "viewedAt": "Viewed",
+      "otpAt": "Email verified",
+      "signedAt": "Signed",
+      "method": "Method",
+      "declinedAt": "Declined",
+      "reason": "Reason",
+      "roles": {
+        "provider": "Provider",
+        "client": "Client"
+      },
+      "statusLabel": {
+        "pending": "Pending",
+        "signed": "Signed",
+        "declined": "Declined"
+      },
+      "methodLabel": {
+        "drawn": "Drawn",
+        "typed": "Typed"
+      },
+      "dash": "—"
+    },
     "finalize": {
       "pending": "The signed copy is not ready yet. The worker will retry automatically.",
       "attempts": "Failed attempts: {count}",

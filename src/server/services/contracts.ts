@@ -13,6 +13,7 @@ import {
   clients,
   contractClauses,
   contractItems,
+  contractSignatories,
   contractVersions,
   contracts,
   paymentMilestones,
@@ -698,7 +699,38 @@ export function cancelContract(
 ): void {
   const now = nowMs();
   withTx((tx) => {
-    assertDraft(tx, id);
+    const contract = tx
+      .select()
+      .from(contracts)
+      .where(eq(contracts.id, id))
+      .get();
+    if (!contract) {
+      throw new AppError("NOT_FOUND", "Contract not found");
+    }
+    // 7.4 — draft, sent, declined and expired contracts can be cancelled.
+    const cancellable: ContractStatus[] = [
+      "draft",
+      "sent",
+      "declined",
+      "expired",
+    ];
+    if (!cancellable.includes(contract.status)) {
+      throw new AppError(
+        "INVALID_STATE",
+        "Only a draft, sent, declined or expired contract can be cancelled",
+      );
+    }
+
+    tx.update(contractSignatories)
+      .set({
+        tokenHash: null,
+        tokenExpiresAt: null,
+        otpHash: null,
+        otpExpiresAt: null,
+      })
+      .where(eq(contractSignatories.contractId, id))
+      .run();
+
     tx.update(contracts)
       .set({ status: "cancelled", cancelledAt: now, updatedAt: now })
       .where(eq(contracts.id, id))

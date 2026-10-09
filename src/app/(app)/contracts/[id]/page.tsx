@@ -6,6 +6,7 @@ import { clients, projects } from "@/db/schema";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ContractDocumentViewer } from "@/components/forms/ContractDocumentViewer";
 import { ContractDraftActions } from "@/components/forms/ContractDraftActions";
+import { ContractLifecycleActions } from "@/components/forms/ContractLifecycleActions";
 import { FinalizeRetryBanner } from "@/components/forms/FinalizeRetryBanner";
 import { Badge, contractStatusTone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -32,6 +33,7 @@ import {
   getContractDetail,
   listContractVersions,
 } from "@/server/services/contracts";
+import { listContractSignatories } from "@/server/services/contracts-lifecycle";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -78,6 +80,7 @@ export default async function ContractDetailPage({
   const currency = contract.currency as CurrencyCode;
 
   const versions = listContractVersions(id);
+  const signatories = listContractSignatories(id);
   const history = listAuditEntries({
     entityType: "contract",
     entityId: id,
@@ -112,7 +115,16 @@ export default async function ContractDetailPage({
               canDelete={contract.number === null}
             />
           </div>
-        ) : null}
+        ) : (
+          <ContractLifecycleActions
+            contractId={contract.id}
+            status={contract.status}
+            canWrite={canWrite}
+            canSend={can(user, "contracts.send")}
+            canCancel={can(user, "contracts.cancel")}
+            canTerminate={can(user, "contracts.terminate")}
+          />
+        )}
       </div>
 
       {contract.status === "signed" && contract.finalPdfFileId === null ? (
@@ -238,7 +250,70 @@ export default async function ContractDetailPage({
             <CardTitle>{t("tabs.signatures")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <EmptyState title={t("signaturesPlaceholder")} />
+            {signatories.length === 0 ? (
+              <EmptyState title={t("signatures.empty")} />
+            ) : (
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableHeaderCell>{t("signatures.role")}</TableHeaderCell>
+                    <TableHeaderCell>{t("signatures.name")}</TableHeaderCell>
+                    <TableHeaderCell>{t("signatures.status")}</TableHeaderCell>
+                    <TableHeaderCell>{t("signatures.viewedAt")}</TableHeaderCell>
+                    <TableHeaderCell>{t("signatures.otpAt")}</TableHeaderCell>
+                    <TableHeaderCell>{t("signatures.signedAt")}</TableHeaderCell>
+                    <TableHeaderCell>{t("signatures.method")}</TableHeaderCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {signatories.map((sig) => (
+                    <TableRow key={sig.id}>
+                      <TableCell>{t(`signatures.roles.${sig.role}`)}</TableCell>
+                      <TableCell>
+                        <span className="block">{sig.name}</span>
+                        {sig.title ? (
+                          <span className="block text-xs text-muted-foreground">
+                            {sig.title}
+                          </span>
+                        ) : null}
+                        {sig.status === "declined" && sig.declineReason ? (
+                          <span className="block text-xs text-destructive">
+                            {t("signatures.reason")}: {sig.declineReason}
+                          </span>
+                        ) : null}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          tone={sig.status === "signed" ? "green" : sig.status === "declined" ? "red" : "gray"}
+                        >
+                          {t(`signatures.statusLabel.${sig.status}`)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        {sig.viewedAt
+                          ? formatInstant(sig.viewedAt, "UTC", locale)
+                          : t("signatures.dash")}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        {sig.otpVerifiedAt
+                          ? formatInstant(sig.otpVerifiedAt, "UTC", locale)
+                          : t("signatures.dash")}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        {sig.signedAt
+                          ? formatInstant(sig.signedAt, "UTC", locale)
+                          : t("signatures.dash")}
+                      </TableCell>
+                      <TableCell>
+                        {sig.signatureMethod
+                          ? t(`signatures.methodLabel.${sig.signatureMethod}`)
+                          : t("signatures.dash")}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
       ) : null}
