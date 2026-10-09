@@ -275,3 +275,12 @@ Implementation log of `DOSSIER_PLAN.md`. One entry per task (see 0.3). Deviation
   - `listInvoices` computes `today` from the settings timezone by default and accepts an override for deterministic tests.
 - Manual verification: `npm run check` green (328 tests); `npm run build` green. (UI is T-026.)
 
+## T-025 — Payments — 2026-10-09
+- Done: `src/server/services/payments.ts` — `recordPayment` (guards: invoice `issued|partially_paid`, `amountMinor ≥ 1`, `amountMinor ≤ total − paid` else `PAYMENT_EXCEEDS_BALANCE`, `paidOn` valid and not in the future in the business tz; inserts the payment and recomputes `paidMinor = Σ non-voided` and status (`paid` + `paidAt` when settled, else `partially_paid`) in the same transaction), `voidPayment` (voids, recomputes status back to `issued`/`partially_paid`, clears `paidAt`), `listPayments`, `listPaymentsPaged`, `getPaymentDetail`. `src/server/actions/payments.ts` (`recordPaymentAction`, `voidPaymentAction`). Added `recordPaymentSchema`/`voidPaymentSchema`.
+- Files: src/server/services/payments.ts (+test), src/server/actions/payments.ts, src/lib/validation/invoices.ts.
+- Tests: 11 new (339 total) — the full 16.1 payment vector (pay 100000 → partially_paid/paidMinor 100000; pay 360001 → paid + paidAt; overpay → `PAYMENT_EXCEEDS_BALANCE`; void second → partially_paid + paidAt null; void first too → issued); payment on a draft rejected; zero amount and future `paidOn` rejected; list; void-invoice-with-active-payment rejected then allowed after voiding payments; double-void rejected; viewer cannot write / member cannot void.
+- Deviations:
+  - `recordPayment` additionally validates `amountMinor ≥ 1` in the service (the spec lists it as a guard; without it the DB CHECK would surface a raw `SqliteError` instead of an `AppError`).
+  - `voidPayment` takes the actor and enforces `payments.void` at the action layer (`assertCan`); the service itself does not re-check the role (consistent with the other services).
+- Manual verification: `npm run check` green (339 tests); `npm run build` green. (UI is T-026.)
+

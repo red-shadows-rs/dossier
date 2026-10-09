@@ -4,6 +4,7 @@ import {
   DISCOUNT_TYPES,
   LANG_MODES,
   MAX_MINOR,
+  PAYMENT_METHODS,
   type CurrencyCode,
 } from "@/lib/constants";
 import { isValidDateStr } from "@/lib/dates";
@@ -77,6 +78,28 @@ export const saveInvoiceLinesSchema = z.object({
 export type SaveInvoiceLinesInput = z.infer<typeof saveInvoiceLinesSchema>;
 
 export const voidInvoiceSchema = z.object({
+  reason: z.string().min(1, "errors.required").max(500, "errors.tooLong"),
+});
+
+export const recordPaymentSchema = z.object({
+  amountMinor: z
+    .number({
+      required_error: "errors.required",
+      invalid_type_error: "errors.invalid",
+    })
+    .int()
+    .min(1, "errors.invalid")
+    .max(MAX_MINOR),
+  paidOn: z
+    .string({ required_error: "errors.required" })
+    .refine((value) => isValidDateStr(value), "errors.invalid"),
+  method: z.enum(PAYMENT_METHODS),
+  reference: optText(200),
+  notes: optText(1000),
+});
+export type RecordPaymentInput = z.infer<typeof recordPaymentSchema>;
+
+export const voidPaymentSchema = z.object({
   reason: z.string().min(1, "errors.required").max(500, "errors.tooLong"),
 });
 
