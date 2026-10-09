@@ -16,11 +16,13 @@ import {
   cancelContract,
   createContractFromTemplate,
   deleteDraftContract,
+  previewTotals,
   saveClauses,
   saveContractItems,
   saveMilestones,
   updateContractBasics,
 } from "@/server/services/contracts";
+import type { CalcInput, CalcOutput } from "@/server/services/contract-calc";
 import { runAction } from "./_run";
 
 function revalidateContract(id: string): void {
@@ -129,5 +131,23 @@ export async function cancelContractAction(
     cancelContract(user, id, reason, meta);
     revalidateContract(id);
     return null;
+  });
+}
+
+export async function previewTotalsAction(
+  raw: unknown,
+): Promise<ActionResult<CalcOutput>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "contracts.write");
+    const input = saveItemsSchema.parse(raw);
+    return previewTotals({
+      items: input.items.map((item) => ({
+        unitPriceMinor: item.unitPriceMinor,
+        qtyMilli: item.qtyMilli,
+      })),
+      discount: input.discount,
+      taxRateBp: input.taxRateBp,
+    } satisfies CalcInput);
   });
 }

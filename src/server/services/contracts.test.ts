@@ -360,6 +360,32 @@ describe("saveMilestones / saveClauses", () => {
     ).toThrow(AppError);
   });
 
+  it("accepts explicit nulls for optional milestone fields (client payload shape)", () => {
+    const id = createValidContract();
+    saveMilestones(
+      user,
+      id,
+      {
+        mode: "percent",
+        rows: [
+          {
+            titleAr: "كامل",
+            titleEn: "Full",
+            percentBp: 10000,
+            amountMinor: null,
+            dueDate: null,
+            triggerNoteAr: null,
+            triggerNoteEn: null,
+          },
+        ],
+      },
+      META,
+    );
+    const milestones = getContractDetail(id).milestones;
+    expect(milestones).toHaveLength(1);
+    expect(milestones[0].dueDate).toBeNull();
+  });
+
   it("replaces clauses and rejects invalid ones", () => {
     const id = createValidContract();
     saveClauses(

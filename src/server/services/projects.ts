@@ -88,6 +88,27 @@ export function listProjects(filters: ProjectFilters = {}): ProjectPage {
   return { rows, total, page, pageSize: PROJECTS_PAGE_SIZE };
 }
 
+export function listProjectOptions(): {
+  id: string;
+  code: string;
+  nameAr: string | null;
+  nameEn: string | null;
+  clientId: string;
+}[] {
+  return db
+    .select({
+      id: projects.id,
+      code: projects.code,
+      nameAr: projects.nameAr,
+      nameEn: projects.nameEn,
+      clientId: projects.clientId,
+    })
+    .from(projects)
+    .where(isNull(projects.archivedAt))
+    .orderBy(projects.code)
+    .all();
+}
+
 export function getProject(id: string): ProjectRow {
   const row = db.select().from(projects).where(eq(projects.id, id)).get();
   if (!row) {

@@ -294,8 +294,7 @@ export function validateContractForSend(
     issues.push(error("providerSignerRequired", "providerSignerUserId"));
   }
 
-  // Rule 9 — company profile name per required language (covered in rule 1),
-  // plus rule 10 — template structure.
+  // Rule 10 — template structure.
   let signaturesCount = 0;
   let paymentScheduleCount = 0;
   for (const clause of clauses) {

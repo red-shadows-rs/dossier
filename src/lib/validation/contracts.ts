@@ -28,6 +28,23 @@ const optDate = z
   .transform((value) => (value && value.trim() ? value.trim() : null))
   .refine((value) => value === null || isValidDateStr(value), "errors.invalid");
 
+const nullableOptText = (max = 400) =>
+  z
+    .string()
+    .max(max, "errors.tooLong")
+    .nullable()
+    .optional()
+    .transform((value) => (value ? value : null))
+    .optional();
+
+const nullableOptDate = z
+  .string()
+  .nullable()
+  .optional()
+  .transform((value) => (value && value.trim() ? value.trim() : null))
+  .refine((value) => value === null || isValidDateStr(value), "errors.invalid")
+  .optional();
+
 export const createContractSchema = z.object({
   projectId: z
     .string({ required_error: "errors.required" })
@@ -82,9 +99,9 @@ export const milestoneRowSchema = z.object({
   titleEn: z.string().min(1, "errors.required").max(120, "errors.tooLong"),
   percentBp: z.number().int().min(1).max(10000).nullable().optional(),
   amountMinor: z.number().int().min(1).max(MAX_MINOR).nullable().optional(),
-  dueDate: optDate.optional(),
-  triggerNoteAr: optText(200).optional(),
-  triggerNoteEn: optText(200).optional(),
+  dueDate: nullableOptDate,
+  triggerNoteAr: nullableOptText(200),
+  triggerNoteEn: nullableOptText(200),
 });
 export type MilestoneRowInput = z.infer<typeof milestoneRowSchema>;
 

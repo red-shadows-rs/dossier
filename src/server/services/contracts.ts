@@ -1,6 +1,7 @@
-import { and, asc, count, desc, eq, isNull, sql, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, sql, type SQL } from "drizzle-orm";
 import { db, withTx, type DbTx } from "@/db";
 import {
+  clients,
   contractClauses,
   contractItems,
   contracts,
@@ -25,9 +26,9 @@ import type {
 import type { RequestMeta, SessionUser } from "@/server/auth/session";
 import { audit } from "@/server/services/audit";
 import { getSettings } from "@/server/services/settings";
+import { validateTemplateClauses } from "@/server/templating/validate";
 import { calcTotals, type CalcInput, type CalcOutput } from "./contract-calc";
 import { planMilestones } from "./milestones";
-import { validateTemplateClauses } from "@/server/templating/validate";
 
 export const CONTRACTS_PAGE_SIZE = 20;
 
@@ -35,7 +36,14 @@ export type ContractRow = typeof contracts.$inferSelect;
 export type ContractStatus = (typeof CONTRACT_STATUSES)[number];
 export type ContractItemRow = typeof contractItems.$inferSelect;
 export type ContractClauseRow = typeof contractClauses.$inferSelect;
-export type PaymentMilestoneRow = typeof paymentMilestones.$inferSelect;
+export type MilestoneRow = typeof paymentMilestones.$inferSelect;
+
+export type ContractDetail = {
+  contract: ContractRow;
+  items: ContractItemRow[];
+  milestones: MilestoneRow[];
+  clauses: ContractClauseRow[];
+};
 
 export type ContractFilters = {
   q?: string;
@@ -59,8 +67,9 @@ function escapeLike(input: string): string {
 export function listContracts(filters: ContractFilters = {}): ContractPage {
   const conditions: SQL[] = [];
   if (filters.status) conditions.push(eq(contracts.status, filters.status));
-  if (filters.projectId)
+  if (filters.projectId) {
     conditions.push(eq(contracts.projectId, filters.projectId));
+  }
   if (filters.clientId)
     conditions.push(eq(contracts.clientId, filters.clientId));
   const q = filters.q?.trim();
@@ -101,13 +110,6 @@ export function getContract(id: string): ContractRow {
   return row;
 }
 
-export type ContractDetail = {
-  contract: ContractRow;
-  items: ContractItemRow[];
-  milestones: PaymentMilestoneRow[];
-  clauses: ContractClauseRow[];
-};
-
 export function getContractDetail(id: string): ContractDetail {
   const contract = getContract(id);
   const items = db
@@ -142,30 +144,51 @@ function assertDraft(tx: DbTx, id: string): ContractRow {
   return row;
 }
 
-function writeItems(
+function insertItems(
   tx: DbTx,
   contractId: string,
-  input: CalcInput,
-): CalcOutput {
-  const result = calcTotals(input);
-  tx.delete(contractItems)
-    .where(eq(contractItems.contractId, contractId))
-    .run();
+  input: SaveItemsInput,
+  lineTotals: number[],
+): void {
   input.items.forEach((item, index) => {
     tx.insert(contractItems)
       .values({
         id: newId(),
         contractId,
         position: index + 1,
-        descriptionAr: null,
-        descriptionEn: null,
+        descriptionAr: item.descriptionAr ?? null,
+        descriptionEn: item.descriptionEn ?? null,
         qtyMilli: item.qtyMilli,
         unitPriceMinor: item.unitPriceMinor,
-        lineTotalMinor: result.lineTotals[index],
+        lineTotalMinor: lineTotals[index] ?? 0,
       })
       .run();
   });
-  return result;
+}
+
+function insertMilestones(
+  tx: DbTx,
+  contractId: string,
+  rows: ReturnType<typeof planMilestones>,
+): void {
+  rows.forEach((row) => {
+    tx.insert(paymentMilestones)
+      .values({
+        id: newId(),
+        contractId,
+        position: row.position,
+        titleAr: row.titleAr,
+        titleEn: row.titleEn,
+        percentBp: row.percentBp,
+        amountMinor: row.amountMinor,
+        taxMinor: row.taxMinor,
+        totalMinor: row.totalMinor,
+        dueDate: row.dueDate,
+        triggerNoteAr: row.triggerNoteAr,
+        triggerNoteEn: row.triggerNoteEn,
+      })
+      .run();
+  });
 }
 
 function replanMilestones(
@@ -183,7 +206,7 @@ function replanMilestones(
     .all();
   if (existing.length === 0) return;
 
-  const baseRows = existing.map((row) => ({
+  const base = existing.map((row) => ({
     titleAr: row.titleAr,
     titleEn: row.titleEn,
     percentBp: row.percentBp,
@@ -196,21 +219,25 @@ function replanMilestones(
   let plan;
   if (mode === "percent") {
     const bps = existing.map((row) => row.percentBp ?? 0);
-    const sum = bps.reduce((acc, value) => acc + value, 0);
-    if (bps.some((value) => value < 1) || sum !== 10000) return;
-    plan = planMilestones({ net, tax, mode: "percent", rows: baseRows });
+    if (
+      bps.some((value) => value < 1) ||
+      bps.reduce((a, b) => a + b, 0) !== 10000
+    ) {
+      return;
+    }
+    plan = planMilestones({ net, tax, mode: "percent", rows: base });
   } else {
     const amounts = existing.map((row) => row.amountMinor);
-    const sum = amounts.reduce((acc, value) => acc + value, 0);
+    const sum = amounts.reduce((a, b) => a + b, 0);
     if (sum === net) {
-      plan = planMilestones({ net, tax, mode: "fixed", rows: baseRows });
+      plan = planMilestones({ net, tax, mode: "fixed", rows: base });
     } else if (sum > 0) {
       const scaled = allocateProportional(net, amounts);
       plan = planMilestones({
         net,
         tax,
         mode: "fixed",
-        rows: baseRows.map((row, index) => ({
+        rows: base.map((row, index) => ({
           ...row,
           amountMinor: scaled[index],
         })),
@@ -223,24 +250,7 @@ function replanMilestones(
   tx.delete(paymentMilestones)
     .where(eq(paymentMilestones.contractId, contractId))
     .run();
-  for (const milestone of plan) {
-    tx.insert(paymentMilestones)
-      .values({
-        id: newId(),
-        contractId,
-        position: milestone.position,
-        titleAr: milestone.titleAr,
-        titleEn: milestone.titleEn,
-        percentBp: milestone.percentBp,
-        amountMinor: milestone.amountMinor,
-        taxMinor: milestone.taxMinor,
-        totalMinor: milestone.totalMinor,
-        dueDate: milestone.dueDate,
-        triggerNoteAr: milestone.triggerNoteAr,
-        triggerNoteEn: milestone.triggerNoteEn,
-      })
-      .run();
-  }
+  insertMilestones(tx, contractId, plan);
 }
 
 export function previewTotals(input: CalcInput): CalcOutput {
@@ -448,22 +458,10 @@ export function saveContractItems(
       discount: input.discount,
       taxRateBp: input.taxRateBp,
     };
-    const result = writeItems(tx, id, calcInput);
-    // Preserve item descriptions (writeItems only writes money columns).
-    input.items.forEach((item, index) => {
-      tx.update(contractItems)
-        .set({
-          descriptionAr: item.descriptionAr,
-          descriptionEn: item.descriptionEn,
-        })
-        .where(
-          and(
-            eq(contractItems.contractId, id),
-            eq(contractItems.position, index + 1),
-          ),
-        )
-        .run();
-    });
+    const result = calcTotals(calcInput);
+
+    tx.delete(contractItems).where(eq(contractItems.contractId, id)).run();
+    insertItems(tx, id, input, result.lineTotals);
 
     tx.update(contracts)
       .set({
@@ -522,24 +520,7 @@ export function saveMilestones(
     tx.delete(paymentMilestones)
       .where(eq(paymentMilestones.contractId, id))
       .run();
-    for (const milestone of plan) {
-      tx.insert(paymentMilestones)
-        .values({
-          id: newId(),
-          contractId: id,
-          position: milestone.position,
-          titleAr: milestone.titleAr,
-          titleEn: milestone.titleEn,
-          percentBp: milestone.percentBp,
-          amountMinor: milestone.amountMinor,
-          taxMinor: milestone.taxMinor,
-          totalMinor: milestone.totalMinor,
-          dueDate: milestone.dueDate,
-          triggerNoteAr: milestone.triggerNoteAr,
-          triggerNoteEn: milestone.triggerNoteEn,
-        })
-        .run();
-    }
+    insertMilestones(tx, id, plan);
     tx.update(contracts)
       .set({ milestoneMode: input.mode, updatedAt: now })
       .where(eq(contracts.id, id))
@@ -570,8 +551,7 @@ export function saveClauses(
     if (issues.length > 0) {
       const fieldErrors: Record<string, string> = {};
       issues.forEach((issue, index) => {
-        fieldErrors[`clauses.${issue.clausePosition ?? index}.${issue.code}`] =
-          issue.messageKey;
+        fieldErrors[`clauses.${index}`] = issue.messageKey;
       });
       throw new AppError("VALIDATION_FAILED", "Invalid clauses", fieldErrors);
     }
@@ -660,12 +640,11 @@ export function cancelContract(
   });
 }
 
-export function countActiveDrafts(): number {
-  return (
-    db
-      .select({ value: count() })
-      .from(contracts)
-      .where(and(eq(contracts.status, "draft"), isNull(contracts.number)))
-      .get()?.value ?? 0
-  );
+export function clientNameForContract(contract: ContractRow): string {
+  const client = db
+    .select()
+    .from(clients)
+    .where(eq(clients.id, contract.clientId))
+    .get();
+  return client?.nameAr ?? client?.nameEn ?? "";
 }
