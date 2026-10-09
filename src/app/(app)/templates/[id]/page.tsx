@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
+import { TemplateActions } from "@/components/forms/TemplateActions";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { AppError } from "@/lib/errors";
 import { isLocale } from "@/lib/i18n";
+import { can } from "@/lib/permissions";
 import { templateDefaultsSchema } from "@/lib/validation/template";
 import { requireUserPage } from "@/server/auth/require-user";
 import { SAMPLE_SNAPSHOT } from "@/server/templating/sample-snapshot";
@@ -17,7 +19,7 @@ export default async function TemplateDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireUserPage();
+  const user = await requireUserPage();
   const t = await getTranslations("templates");
   const { id } = await params;
 
@@ -55,12 +57,30 @@ export default async function TemplateDetailPage({
             <Badge tone="gray">{t("readOnly")}</Badge>
           ) : null}
         </div>
-        <Link href="/templates">
-          <Button type="button" variant="secondary">
-            {t("backToList")}
-          </Button>
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          {can(user, "templates.write") && !template.isSystem ? (
+            <Link href={`/templates/${id}/edit`}>
+              <Button type="button" variant="secondary">
+                {t("edit")}
+              </Button>
+            </Link>
+          ) : null}
+          {can(user, "templates.write") ? (
+            <TemplateActions templateId={id} isSystem={template.isSystem} />
+          ) : null}
+          <Link href="/templates">
+            <Button type="button" variant="secondary">
+              {t("backToList")}
+            </Button>
+          </Link>
+        </div>
       </div>
+
+      {template.isSystem ? (
+        <p className="text-sm text-muted-foreground">
+          {t("systemReadOnlyNotice")}
+        </p>
+      ) : null}
 
       <Card>
         <CardHeader>

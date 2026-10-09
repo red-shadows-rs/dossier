@@ -16,9 +16,15 @@ import { AppError } from "@/lib/errors";
 import { newId } from "@/lib/ids";
 import { canonicalize } from "@/lib/canonical-json";
 import { sha256Hex } from "@/lib/crypto";
+import { templateInputSchema } from "@/lib/validation/template";
 import type { SessionUser } from "@/server/auth/session";
 import { createTestUser } from "@/server/auth/test-utils";
-import { seedSystemTemplates } from "@/server/services/templates";
+import {
+  duplicateTemplate,
+  getTemplate,
+  seedSystemTemplates,
+  updateTemplate,
+} from "@/server/services/templates";
 import { getSettings, updateSettings } from "@/server/services/settings";
 import {
   buildContractSnapshot,
@@ -238,6 +244,45 @@ describe("createContractFromTemplate", () => {
         expect(bps, key).toBe(10000);
       }
     }
+  });
+
+  it("keeps a contract's clauses unchanged after its template is edited", () => {
+    const copyId = duplicateTemplate(user, templateIdByKey("web-development"), META);
+    const contractId = createContractFromTemplate(
+      user,
+      { projectId, templateId: copyId },
+      META,
+    );
+    const before = getContractDetail(contractId).clauses.map((clause) => ({
+      titleEn: clause.titleEn,
+      bodyEn: clause.bodyEn,
+    }));
+
+    const copy = getTemplate(copyId);
+    const input = templateInputSchema.parse({
+      type: copy.template.type,
+      nameAr: copy.template.nameAr,
+      nameEn: copy.template.nameEn,
+      descriptionAr: copy.template.descriptionAr ?? "",
+      descriptionEn: copy.template.descriptionEn ?? "",
+      defaultLanguageMode: copy.template.defaultLanguageMode,
+      defaults: JSON.parse(copy.template.defaultsJson),
+      clauses: copy.clauses.map((clause, index) => ({
+        key: clause.key,
+        titleAr: clause.titleAr,
+        titleEn: index === 0 ? "Edited Title" : clause.titleEn,
+        bodyAr: clause.bodyAr,
+        bodyEn: clause.bodyEn,
+      })),
+    });
+    updateTemplate(user, copyId, input, META);
+
+    const after = getContractDetail(contractId).clauses.map((clause) => ({
+      titleEn: clause.titleEn,
+      bodyEn: clause.bodyEn,
+    }));
+    expect(after).toEqual(before);
+    expect(after[0].titleEn).not.toBe("Edited Title");
   });
 
   it("re-plans preset milestones to net once items are saved", () => {

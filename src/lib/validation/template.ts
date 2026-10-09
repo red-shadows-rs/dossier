@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LANG_MODES, TEMPLATE_TYPES } from "@/lib/constants";
 
 export const templateMilestoneRowSchema = z.object({
   titleAr: z.string().min(1).max(120),
@@ -35,3 +36,45 @@ export const templateDefaultsSchema = z
   });
 
 export type TemplateDefaults = z.infer<typeof templateDefaultsSchema>;
+
+const optText = (max = 300) =>
+  z
+    .string()
+    .trim()
+    .max(max, "errors.tooLong")
+    .optional()
+    .transform((value) => (value ? value : null));
+
+export const templateClauseInputSchema = z.object({
+  key: z.string().trim().max(60).nullable().optional(),
+  titleAr: z.string().trim().min(1, "errors.required").max(200, "errors.tooLong"),
+  titleEn: z.string().trim().min(1, "errors.required").max(200, "errors.tooLong"),
+  bodyAr: z
+    .string()
+    .trim()
+    .min(1, "errors.required")
+    .max(20000, "errors.tooLong"),
+  bodyEn: z
+    .string()
+    .trim()
+    .min(1, "errors.required")
+    .max(20000, "errors.tooLong"),
+});
+
+export type TemplateClauseInput = z.infer<typeof templateClauseInputSchema>;
+
+export const templateInputSchema = z.object({
+  type: z.enum(TEMPLATE_TYPES).default("contract"),
+  nameAr: z.string().trim().min(1, "errors.required").max(200, "errors.tooLong"),
+  nameEn: z.string().trim().min(1, "errors.required").max(200, "errors.tooLong"),
+  descriptionAr: optText(),
+  descriptionEn: optText(),
+  defaultLanguageMode: z.enum(LANG_MODES).default("bilingual"),
+  defaults: templateDefaultsSchema,
+  clauses: z
+    .array(templateClauseInputSchema)
+    .min(1, "errors.required")
+    .max(60, "errors.tooLong"),
+});
+
+export type TemplateInput = z.infer<typeof templateInputSchema>;

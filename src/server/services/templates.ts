@@ -4,8 +4,15 @@ import { templateClauses, templates } from "@/db/schema";
 import { nowMs } from "@/lib/dates";
 import { AppError } from "@/lib/errors";
 import { newId } from "@/lib/ids";
-import { templateDefaultsSchema } from "@/lib/validation/template";
+import {
+  templateDefaultsSchema,
+  type TemplateClauseInput,
+  type TemplateInput,
+} from "@/lib/validation/template";
+import type { RequestMeta, SessionUser } from "@/server/auth/session";
+import { audit } from "@/server/services/audit";
 import { TEMPLATES, clauseDefsFor } from "@/server/templating/seed-templates";
+import { validateTemplateClauses } from "@/server/templating/validate";
 
 export const TEMPLATES_PAGE_SIZE = 20;
 
@@ -154,4 +161,229 @@ export function seedSystemTemplates(): {
   });
 
   return { inserted, updated, skipped };
+}
+
+function insertClauses(
+  tx: DbTx,
+  templateId: string,
+  clauses: TemplateClauseInput[],
+): void {
+  clauses.forEach((clause, index) => {
+    tx.insert(templateClauses)
+      .values({
+        id: newId(),
+        templateId,
+        position: index + 1,
+        key: clause.key ?? null,
+        titleAr: clause.titleAr,
+        titleEn: clause.titleEn,
+        bodyAr: clause.bodyAr,
+        bodyEn: clause.bodyEn,
+      })
+      .run();
+  });
+}
+
+// Save-time rules from 11.6 + the signatures/sequence rules from 7.5 rule 10.
+function assertValidClauses(
+  clauses: TemplateClauseInput[],
+  hasFees: boolean,
+): void {
+  const issues = validateTemplateClauses(clauses, hasFees);
+  if (issues.length === 0) return;
+  const fieldErrors: Record<string, string> = {};
+  for (const issue of issues) {
+    const key =
+      issue.clausePosition !== undefined
+        ? `clauses.${issue.clausePosition - 1}`
+        : "_";
+    if (!(key in fieldErrors)) fieldErrors[key] = issue.messageKey;
+  }
+  throw new AppError("VALIDATION_FAILED", "Invalid template", fieldErrors);
+}
+
+export function createTemplate(
+  user: SessionUser,
+  input: TemplateInput,
+  meta: RequestMeta,
+): string {
+  assertValidClauses(input.clauses, input.defaults.hasFees);
+  const id = newId();
+  const now = nowMs();
+  withTx((tx) => {
+    tx.insert(templates)
+      .values({
+        id,
+        type: input.type,
+        key: null,
+        nameAr: input.nameAr,
+        nameEn: input.nameEn,
+        descriptionAr: input.descriptionAr,
+        descriptionEn: input.descriptionEn,
+        defaultLanguageMode: input.defaultLanguageMode,
+        defaultsJson: JSON.stringify(input.defaults),
+        isSystem: false,
+        archivedAt: null,
+        createdBy: user.id,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .run();
+    insertClauses(tx, id, input.clauses);
+    audit(tx, {
+      actorType: "user",
+      actorId: user.id,
+      action: "template.created",
+      entityType: "template",
+      entityId: id,
+      ip: meta.ip,
+      userAgent: meta.userAgent,
+    });
+  });
+  return id;
+}
+
+export function updateTemplate(
+  user: SessionUser,
+  id: string,
+  input: TemplateInput,
+  meta: RequestMeta,
+): void {
+  assertValidClauses(input.clauses, input.defaults.hasFees);
+  const now = nowMs();
+  withTx((tx) => {
+    const existing = tx
+      .select()
+      .from(templates)
+      .where(eq(templates.id, id))
+      .get();
+    if (!existing) {
+      throw new AppError("NOT_FOUND", "Template not found");
+    }
+    if (existing.isSystem) {
+      throw new AppError("INVALID_STATE", "System templates are read-only");
+    }
+    tx.update(templates)
+      .set({
+        type: input.type,
+        nameAr: input.nameAr,
+        nameEn: input.nameEn,
+        descriptionAr: input.descriptionAr,
+        descriptionEn: input.descriptionEn,
+        defaultLanguageMode: input.defaultLanguageMode,
+        defaultsJson: JSON.stringify(input.defaults),
+        updatedAt: now,
+      })
+      .where(eq(templates.id, id))
+      .run();
+    tx.delete(templateClauses).where(eq(templateClauses.templateId, id)).run();
+    insertClauses(tx, id, input.clauses);
+    audit(tx, {
+      actorType: "user",
+      actorId: user.id,
+      action: "template.updated",
+      entityType: "template",
+      entityId: id,
+      ip: meta.ip,
+      userAgent: meta.userAgent,
+    });
+  });
+}
+
+export function duplicateTemplate(
+  user: SessionUser,
+  id: string,
+  meta: RequestMeta,
+): string {
+  const source = db.select().from(templates).where(eq(templates.id, id)).get();
+  if (!source) {
+    throw new AppError("NOT_FOUND", "Template not found");
+  }
+  const sourceClauses = db
+    .select()
+    .from(templateClauses)
+    .where(eq(templateClauses.templateId, id))
+    .orderBy(asc(templateClauses.position))
+    .all();
+  const newTemplateId = newId();
+  const now = nowMs();
+  withTx((tx) => {
+    tx.insert(templates)
+      .values({
+        id: newTemplateId,
+        type: source.type,
+        key: null,
+        nameAr: source.nameAr,
+        nameEn: source.nameEn,
+        descriptionAr: source.descriptionAr,
+        descriptionEn: source.descriptionEn,
+        defaultLanguageMode: source.defaultLanguageMode,
+        defaultsJson: source.defaultsJson,
+        isSystem: false,
+        archivedAt: null,
+        createdBy: user.id,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .run();
+    sourceClauses.forEach((clause, index) => {
+      tx.insert(templateClauses)
+        .values({
+          id: newId(),
+          templateId: newTemplateId,
+          position: index + 1,
+          key: clause.key,
+          titleAr: clause.titleAr,
+          titleEn: clause.titleEn,
+          bodyAr: clause.bodyAr,
+          bodyEn: clause.bodyEn,
+        })
+        .run();
+    });
+    audit(tx, {
+      actorType: "user",
+      actorId: user.id,
+      action: "template.duplicated",
+      entityType: "template",
+      entityId: newTemplateId,
+      meta: { sourceId: id },
+      ip: meta.ip,
+      userAgent: meta.userAgent,
+    });
+  });
+  return newTemplateId;
+}
+
+export function archiveTemplate(
+  user: SessionUser,
+  id: string,
+  meta: RequestMeta,
+): void {
+  const now = nowMs();
+  withTx((tx) => {
+    const existing = tx
+      .select()
+      .from(templates)
+      .where(eq(templates.id, id))
+      .get();
+    if (!existing) {
+      throw new AppError("NOT_FOUND", "Template not found");
+    }
+    if (existing.isSystem) {
+      throw new AppError("INVALID_STATE", "System templates are read-only");
+    }
+    tx.update(templates)
+      .set({ archivedAt: now, updatedAt: now })
+      .where(eq(templates.id, id))
+      .run();
+    audit(tx, {
+      actorType: "user",
+      actorId: user.id,
+      action: "template.archived",
+      entityType: "template",
+      entityId: id,
+      ip: meta.ip,
+      userAgent: meta.userAgent,
+    });
+  });
 }

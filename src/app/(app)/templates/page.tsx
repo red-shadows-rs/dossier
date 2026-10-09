@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import {
@@ -11,11 +12,12 @@ import {
   TableHeaderCell,
   TableRow,
 } from "@/components/ui/Table";
+import { can } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
 import { listTemplates } from "@/server/services/templates";
 
 export default async function TemplatesPage() {
-  await requireUserPage();
+  const user = await requireUserPage();
   const t = await getTranslations("templates");
   const tc = await getTranslations("common");
   const { rows } = listTemplates();
@@ -24,6 +26,11 @@ export default async function TemplatesPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
+        {can(user, "templates.write") ? (
+          <Link href="/templates/new">
+            <Button type="button">{t("new")}</Button>
+          </Link>
+        ) : null}
       </div>
 
       <Card>
