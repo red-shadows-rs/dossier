@@ -173,6 +173,48 @@ export function isOverdue(invoice: InvoiceRow, today: string): boolean {
   );
 }
 
+export function listInvoiceableMilestones(): {
+  milestoneId: string;
+  contractId: string;
+  projectId: string;
+  label: string;
+}[] {
+  const rows = db
+    .select({
+      milestoneId: paymentMilestones.id,
+      contractId: contracts.id,
+      projectId: contracts.projectId,
+      titleAr: paymentMilestones.titleAr,
+      titleEn: paymentMilestones.titleEn,
+      position: paymentMilestones.position,
+      amountMinor: paymentMilestones.amountMinor,
+      currency: contracts.currency,
+      contractNumber: contracts.number,
+      projectCode: projects.code,
+    })
+    .from(paymentMilestones)
+    .innerJoin(contracts, eq(paymentMilestones.contractId, contracts.id))
+    .innerJoin(projects, eq(contracts.projectId, projects.id))
+    .where(
+      and(
+        sql`${contracts.status} IN ('signed','completed')`,
+        sql`NOT EXISTS (SELECT 1 FROM invoices i WHERE i.milestone_id = ${paymentMilestones.id} AND i.status <> 'void')`,
+      ),
+    )
+    .orderBy(asc(contracts.createdAt), asc(paymentMilestones.position))
+    .all();
+  return rows.map((row) => ({
+    milestoneId: row.milestoneId,
+    contractId: row.contractId,
+    projectId: row.projectId,
+    label: `${row.projectCode} · ${row.contractNumber ?? ""} · #${row.position} ${row.titleEn} — ${formatMinorForLabel(row.amountMinor, row.currency)}`,
+  }));
+}
+
+function formatMinorForLabel(amountMinor: number, currency: string): string {
+  return `${(amountMinor / 100).toFixed(2)} ${currency}`;
+}
+
 function assertDraft(tx: DbTx, id: string): InvoiceRow {
   const row = tx.select().from(invoices).where(eq(invoices.id, id)).get();
   if (!row) throw new AppError("NOT_FOUND", "Invoice not found");

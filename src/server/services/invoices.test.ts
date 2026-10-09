@@ -21,6 +21,7 @@ import {
   getInvoiceDetail,
   isOverdue,
   issueInvoice,
+  listInvoiceableMilestones,
   listInvoices,
   saveInvoiceLines,
   updateInvoiceDraft,
@@ -416,5 +417,16 @@ describe("isOverdue (16.1 vectors)", () => {
     ).rows.map((r) => r.id);
     expect(rows).toEqual([overdue]);
     void contractId;
+  });
+});
+
+describe("listInvoiceableMilestones", () => {
+  it("returns milestones of signed contracts with no active invoice", () => {
+    const before = listInvoiceableMilestones();
+    expect(before.some((row) => row.contractId === contractId)).toBe(true);
+
+    createInvoiceFromMilestone(user, milestoneIds[0], META);
+    const after = listInvoiceableMilestones();
+    expect(after).toHaveLength(before.length - 1);
   });
 });

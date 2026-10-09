@@ -21,6 +21,8 @@ import {
   voidInvoice,
 } from "@/server/services/invoices";
 import { runAction } from "./_run";
+import { previewTotals } from "@/server/services/contracts";
+import type { CalcInput, CalcOutput } from "@/server/services/contract-calc";
 
 function revalidateInvoice(id: string): void {
   revalidatePath("/invoices");
@@ -127,5 +129,23 @@ export async function deleteDraftInvoiceAction(
     deleteDraftInvoice(user, id, meta);
     revalidatePath("/invoices");
     return null;
+  });
+}
+
+export async function previewInvoiceTotalsAction(
+  raw: unknown,
+): Promise<ActionResult<CalcOutput>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "invoices.write");
+    const input = saveInvoiceLinesSchema.parse(raw);
+    return previewTotals({
+      items: input.lines.map((line) => ({
+        unitPriceMinor: line.unitPriceMinor,
+        qtyMilli: line.qtyMilli,
+      })),
+      discount: input.discount,
+      taxRateBp: input.taxRateBp,
+    } satisfies CalcInput);
   });
 }
