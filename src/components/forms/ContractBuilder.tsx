@@ -8,6 +8,8 @@ import { ContractBasicsStep } from "./ContractBasicsStep";
 import { ContractPricingStep } from "./ContractPricingStep";
 import { ContractScheduleStep } from "./ContractScheduleStep";
 import { ContractClausesStep } from "./ContractClausesStep";
+import { ContractReviewStep } from "./ContractReviewStep";
+import type { Issue } from "@/lib/validation/issues";
 
 export type BuilderBasics = {
   languageMode: "ar" | "en" | "bilingual";
@@ -81,10 +83,16 @@ export type BuilderDetail = {
   preset: BuilderPreset;
 };
 
-const STEPS = ["basics", "pricing", "schedule", "clauses"] as const;
+const STEPS = ["basics", "pricing", "schedule", "clauses", "review"] as const;
 type Step = (typeof STEPS)[number];
 
-export function ContractBuilder({ detail }: { detail: BuilderDetail }) {
+export function ContractBuilder({
+  detail,
+  issues,
+}: {
+  detail: BuilderDetail;
+  issues: Issue[];
+}) {
   const t = useTranslations("contracts");
   const router = useRouter();
   const [step, setStep] = useState<Step>("basics");
@@ -162,6 +170,14 @@ export function ContractBuilder({ detail }: { detail: BuilderDetail }) {
           initial={detail.clauses}
           hasFees={detail.hasFees}
           onSaved={refresh}
+        />
+      ) : null}
+      {step === "review" ? (
+        <ContractReviewStep
+          id={detail.id}
+          languageMode={detail.basics.languageMode}
+          issues={issues}
+          onJump={setStep}
         />
       ) : null}
     </div>

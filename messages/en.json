@@ -413,7 +413,8 @@
         "basics": "Basics",
         "pricing": "Pricing",
         "schedule": "Payment schedule",
-        "clauses": "Clauses"
+        "clauses": "Clauses",
+        "review": "Review & Send"
       },
       "basicsTitle": "Basics",
       "pricingTitle": "Pricing",
@@ -421,6 +422,18 @@
       "totalsHint": "Enter valid item prices to see the totals.",
       "scheduleTitle": "Payment schedule",
       "clausesTitle": "Clauses"
+    },
+    "review": {
+      "issuesTitle": "Validation issues",
+      "noIssues": "No issues found. The contract is ready to send.",
+      "errors": "Errors (must fix before sending)",
+      "warnings": "Warnings (recommended)",
+      "jump": "Fix",
+      "previewTitle": "Document preview",
+      "loading": "Rendering preview…",
+      "previewUnavailable": "Preview unavailable",
+      "send": "Send contract",
+      "sendHint": "Sending is enabled in a later step."
     },
     "item": {
       "descriptionAr": "Description (Arabic)",

@@ -1,7 +1,10 @@
 import type { CurrencyCode, Locale } from "@/lib/constants";
 import { formatMoney } from "@/lib/money";
+import type { DocLang } from "@/lib/doc-lang";
 import { FONT_STACK } from "@/server/pdf/fonts";
 import type { ContractSnapshotV1 } from "@/server/templating/variables";
+
+export type { DocLang } from "@/lib/doc-lang";
 
 // 12.1 — single escaping helper used by every dynamic string.
 export const esc = (s: string): string =>
@@ -11,8 +14,6 @@ export const esc = (s: string): string =>
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
-
-export type DocLang = "ar" | "en" | "bilingual";
 
 export function isRtl(lang: DocLang): boolean {
   return lang === "ar";

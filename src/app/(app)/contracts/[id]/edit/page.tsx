@@ -11,6 +11,7 @@ import { assertCan } from "@/lib/permissions";
 import { templateDefaultsSchema } from "@/lib/validation/template";
 import { requireUserPage } from "@/server/auth/require-user";
 import { getContractDetail } from "@/server/services/contracts";
+import { validateContractForSend } from "@/server/services/contracts-validate";
 
 export default async function ContractEditPage({
   params,
@@ -121,7 +122,10 @@ export default async function ContractEditPage({
           {detail.contract.number ?? ""}
         </span>
       </div>
-      <ContractBuilder detail={builderDetail} />
+      <ContractBuilder
+        detail={builderDetail}
+        issues={validateContractForSend(id)}
+      />
     </div>
   );
 }

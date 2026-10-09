@@ -23,6 +23,11 @@ import {
   updateContractBasics,
 } from "@/server/services/contracts";
 import type { CalcInput, CalcOutput } from "@/server/services/contract-calc";
+import {
+  buildContractHtml,
+  resolveDocLang,
+} from "@/server/services/contract-documents";
+import { getContract } from "@/server/services/contracts";
 import { runAction } from "./_run";
 
 function revalidateContract(id: string): void {
@@ -149,5 +154,23 @@ export async function previewTotalsAction(
       discount: input.discount,
       taxRateBp: input.taxRateBp,
     } satisfies CalcInput);
+  });
+}
+
+export async function getContractPreviewHtmlAction(
+  raw: unknown,
+): Promise<ActionResult<{ html: string }>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "contracts.read");
+    const data = raw as { id?: unknown; lang?: unknown };
+    const id = String(data.id ?? "");
+    const contract = getContract(id);
+    const lang = resolveDocLang(
+      contract,
+      data.lang ? String(data.lang) : undefined,
+    );
+    const html = await buildContractHtml(id, lang, "preview");
+    return { html };
   });
 }
