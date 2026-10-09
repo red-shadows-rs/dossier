@@ -153,9 +153,7 @@ export function listContractVersions(contractId: string): ContractVersionRow[] {
     .all();
 }
 
-export function listProjectContracts(
-  projectId: string,
-): {
+export function listProjectContracts(projectId: string): {
   id: string;
   number: string | null;
   status: ContractStatus;

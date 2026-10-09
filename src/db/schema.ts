@@ -487,6 +487,134 @@ export const contractSignatories = sqliteTable(
     uniqueIndex("signatories_token_uq").on(t.tokenHash),
   ],
 );
+// ───────── invoices & payments ─────────
+export const invoices = sqliteTable(
+  "invoices",
+  {
+    id: pk(),
+    number: text("number"), // assigned at ISSUE; NULL for drafts
+    verificationCode: text("verification_code"), // assigned at ISSUE
+    clientId: text("client_id")
+      .notNull()
+      .references(() => clients.id, { onDelete: "restrict" }),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "restrict" }),
+    contractId: text("contract_id").references(() => contracts.id, {
+      onDelete: "restrict",
+    }), // optional
+    milestoneId: text("milestone_id").references(() => paymentMilestones.id, {
+      onDelete: "restrict",
+    }),
+    status: text("status", { enum: C.INVOICE_STATUSES })
+      .notNull()
+      .default("draft"),
+    languageMode: text("language_mode", { enum: C.LANG_MODES })
+      .notNull()
+      .default("bilingual"),
+    currency: text("currency").notNull(),
+    issueDate: text("issue_date"),
+    dueDate: text("due_date"),
+    discountType: text("discount_type", { enum: C.DISCOUNT_TYPES })
+      .notNull()
+      .default("none"),
+    discountValue: integer("discount_value").notNull().default(0),
+    subtotalMinor: money("subtotal_minor"),
+    discountMinor: money("discount_minor"),
+    netMinor: money("net_minor"),
+    taxRateBp: integer("tax_rate_bp").notNull().default(0),
+    taxMinor: money("tax_minor"),
+    totalMinor: money("total_minor"),
+    paidMinor: money("paid_minor"), // cached sum of non-voided payments
+    notesAr: text("notes_ar"),
+    notesEn: text("notes_en"),
+    paymentInstructionsAr: text("payment_instructions_ar"),
+    paymentInstructionsEn: text("payment_instructions_en"),
+    sellerSnapshotJson: text("seller_snapshot_json"), // frozen at issue
+    buyerSnapshotJson: text("buyer_snapshot_json"), // frozen at issue
+    issuedAt: integer("issued_at"),
+    paidAt: integer("paid_at"),
+    voidedAt: integer("voided_at"),
+    voidReason: text("void_reason"),
+    lastReminderAt: integer("last_reminder_at"),
+    createdBy: text("created_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    uniqueIndex("invoices_number_uq").on(t.number),
+    uniqueIndex("invoices_vcode_uq").on(t.verificationCode),
+    // one ACTIVE invoice per milestone (voiding frees the milestone):
+    uniqueIndex("invoices_milestone_active_uq")
+      .on(t.milestoneId)
+      .where(sql`milestone_id IS NOT NULL AND status <> 'void'`),
+    index("invoices_project_idx").on(t.projectId),
+    index("invoices_client_idx").on(t.clientId),
+    index("invoices_contract_idx").on(t.contractId),
+    index("invoices_status_idx").on(t.status),
+    index("invoices_due_idx").on(t.dueDate),
+    check("invoices_currency_len", sql`length(${t.currency}) = 3`),
+    check(
+      "invoices_money_nonneg",
+      sql`${t.subtotalMinor} >= 0 AND ${t.discountMinor} >= 0 AND ${t.netMinor} >= 0 AND ${t.taxMinor} >= 0 AND ${t.totalMinor} >= 0 AND ${t.paidMinor} >= 0`,
+    ),
+    check("invoices_tax_rate_range", sql`${t.taxRateBp} BETWEEN 0 AND 10000`),
+  ],
+);
+
+export const invoiceLines = sqliteTable(
+  "invoice_lines",
+  {
+    id: pk(),
+    invoiceId: text("invoice_id")
+      .notNull()
+      .references(() => invoices.id, { onDelete: "cascade" }),
+    position: integer("position").notNull(),
+    descriptionAr: text("description_ar"),
+    descriptionEn: text("description_en"),
+    qtyMilli: integer("qty_milli").notNull().default(1000),
+    unitPriceMinor: integer("unit_price_minor").notNull(),
+    lineTotalMinor: integer("line_total_minor").notNull(),
+  },
+  (t) => [
+    uniqueIndex("invoice_lines_pos_uq").on(t.invoiceId, t.position),
+    check("invoice_lines_position_pos", sql`${t.position} >= 1`),
+    check("invoice_lines_qty_pos", sql`${t.qtyMilli} > 0`),
+    check(
+      "invoice_lines_money_nonneg",
+      sql`${t.unitPriceMinor} >= 0 AND ${t.lineTotalMinor} >= 0`,
+    ),
+  ],
+);
+
+export const payments = sqliteTable(
+  "payments",
+  {
+    id: pk(),
+    invoiceId: text("invoice_id")
+      .notNull()
+      .references(() => invoices.id, { onDelete: "restrict" }),
+    amountMinor: integer("amount_minor").notNull(), // > 0
+    paidOn: text("paid_on").notNull(), // 'YYYY-MM-DD'
+    method: text("method", { enum: C.PAYMENT_METHODS })
+      .notNull()
+      .default("bank_transfer"),
+    reference: text("reference"),
+    notes: text("notes"),
+    voidedAt: integer("voided_at"),
+    voidReason: text("void_reason"),
+    createdBy: text("created_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index("payments_invoice_idx").on(t.invoiceId),
+    check("payments_amount_pos", sql`${t.amountMinor} > 0`),
+  ],
+);
 
 // ───────── outbound email queue ─────────
 export const emailOutbox = sqliteTable(
@@ -532,5 +660,8 @@ export const schema = {
   paymentMilestones,
   contractVersions,
   contractSignatories,
+  invoices,
+  invoiceLines,
+  payments,
   emailOutbox,
 };
