@@ -287,14 +287,39 @@
     "tabs": {
       "overview": "نظرة عامة",
       "contracts": "العقود",
-      "invoices": "الفواتير"
+      "invoices": "الفواتير",
+      "files": "الملفات",
+      "activity": "النشاط"
     },
     "summary": {
       "title": "الملخص المالي",
-      "placeholder": "الملخص المالي قيد الإنشاء"
+      "empty": "لا توجد عقود موقّعة أو فواتير بعد",
+      "contracted": "المتعاقد",
+      "invoiced": "المفوتر",
+      "paid": "المدفوع",
+      "outstanding": "المستحق",
+      "overdue": "المتأخر",
+      "remaining": "المتبقي للفوترة"
     },
     "noContracts": "لا توجد عقود لهذا المشروع بعد",
-    "noInvoices": "لا توجد فواتير لهذا المشروع بعد"
+    "noInvoices": "لا توجد فواتير لهذا المشروع بعد",
+    "milestonesToInvoice": "دفعات بانتظار الفاتورة",
+    "noMilestonesToInvoice": "لا توجد دفعات بانتظار الفاتورة",
+    "milestone": "الدفعة",
+    "amount": "المبلغ",
+    "createInvoice": "إنشاء فاتورة",
+    "files": {
+      "upload": "رفع",
+      "empty": "لا توجد مرفقات بعد",
+      "noFile": "اختر ملفاً أولاً",
+      "uploaded": "تم رفع المرفق",
+      "deleted": "تم حذف المرفق",
+      "delete": "حذف"
+    },
+    "noActivity": "لا يوجد نشاط بعد",
+    "activityWhen": "الوقت",
+    "activityAction": "الإجراء",
+    "activityEntity": "الكيان"
   },
   "templates": {
     "title": "القوالب",

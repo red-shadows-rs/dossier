@@ -173,12 +173,19 @@ export function isOverdue(invoice: InvoiceRow, today: string): boolean {
   );
 }
 
-export function listInvoiceableMilestones(): {
+export function listInvoiceableMilestones(projectId?: string): {
   milestoneId: string;
   contractId: string;
   projectId: string;
   label: string;
 }[] {
+  const conditions: SQL[] = [
+    sql`${contracts.status} IN ('signed','completed')`,
+    sql`NOT EXISTS (SELECT 1 FROM invoices i WHERE i.milestone_id = ${paymentMilestones.id} AND i.status <> 'void')`,
+  ];
+  if (projectId) {
+    conditions.push(eq(contracts.projectId, projectId));
+  }
   const rows = db
     .select({
       milestoneId: paymentMilestones.id,
@@ -195,12 +202,7 @@ export function listInvoiceableMilestones(): {
     .from(paymentMilestones)
     .innerJoin(contracts, eq(paymentMilestones.contractId, contracts.id))
     .innerJoin(projects, eq(contracts.projectId, projects.id))
-    .where(
-      and(
-        sql`${contracts.status} IN ('signed','completed')`,
-        sql`NOT EXISTS (SELECT 1 FROM invoices i WHERE i.milestone_id = ${paymentMilestones.id} AND i.status <> 'void')`,
-      ),
-    )
+    .where(and(...conditions))
     .orderBy(asc(contracts.createdAt), asc(paymentMilestones.position))
     .all();
   return rows.map((row) => ({

@@ -1,8 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { CreateInvoiceFromMilestoneButton } from "@/components/forms/CreateInvoiceFromMilestoneButton";
 import { ProjectActions } from "@/components/forms/ProjectActions";
-import { Badge, contractStatusTone } from "@/components/ui/Badge";
+import { ProjectFiles } from "@/components/forms/ProjectFiles";
+import {
+  Badge,
+  contractStatusTone,
+  invoiceStatusTone,
+} from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -15,15 +21,34 @@ import {
   TableRow,
 } from "@/components/ui/Table";
 import { cn } from "@/components/ui/cn";
+import type { CurrencyCode } from "@/lib/constants";
+import { formatInstant } from "@/lib/dates";
 import { AppError } from "@/lib/errors";
+import { isLocale } from "@/lib/i18n";
+import { formatMoney } from "@/lib/money";
 import { can } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
 import { listProjectContracts } from "@/server/services/contracts";
+import {
+  getProjectSummary,
+  listProjectActivity,
+  listProjectAttachments,
+} from "@/server/services/project-summary";
+import {
+  listInvoiceableMilestones,
+  listInvoices,
+} from "@/server/services/invoices";
 import { getProjectWithClient } from "@/server/services/projects";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
-const TABS = ["overview", "contracts", "invoices"] as const;
+const TABS = [
+  "overview",
+  "contracts",
+  "invoices",
+  "files",
+  "activity",
+] as const;
 type Tab = (typeof TABS)[number];
 
 export default async function ProjectDetailPage({
@@ -37,6 +62,7 @@ export default async function ProjectDetailPage({
   const t = await getTranslations("projects");
   const tc = await getTranslations("common");
   const tcontracts = await getTranslations("contracts");
+  const tinvoices = await getTranslations("invoices");
   const { id } = await params;
   const sp = await searchParams;
   const tabParam = Array.isArray(sp.tab) ? sp.tab[0] : sp.tab;
@@ -55,6 +81,13 @@ export default async function ProjectDetailPage({
   const { project, client } = data;
   const canWrite = can(user, "projects.write");
   const contracts = listProjectContracts(id);
+  const summary = getProjectSummary(id);
+  const milestones = listInvoiceableMilestones(id);
+  const projectInvoices = listInvoices({ projectId: id, page: 1 }).rows;
+  const attachments = listProjectAttachments(id);
+  const activity = listProjectActivity(id);
+  const rawLocale = await getLocale();
+  const locale = isLocale(rawLocale) ? rawLocale : "ar";
 
   return (
     <div className="flex flex-col gap-4">
@@ -116,70 +149,118 @@ export default async function ProjectDetailPage({
             </CardHeader>
             <CardContent>
               <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <div className="flex flex-col gap-0.5">
-                  <dt className="text-xs text-muted-foreground">
-                    {t("client")}
-                  </dt>
-                  <dd className="text-sm text-foreground">
-                    <Link
-                      href={`/clients/${client.id}`}
-                      className="hover:text-primary"
-                    >
-                      {client.nameAr ?? client.nameEn ?? client.id}
-                    </Link>
-                  </dd>
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <dt className="text-xs text-muted-foreground">
-                    {t("currency")}
-                  </dt>
-                  <dd dir="ltr" className="text-sm text-foreground">
-                    {project.currency}
-                  </dd>
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <dt className="text-xs text-muted-foreground">
-                    {t("statusLabel")}
-                  </dt>
-                  <dd className="text-sm text-foreground">
-                    {t(`status.${project.status}`)}
-                  </dd>
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <dt className="text-xs text-muted-foreground">
-                    {t("startDate")}
-                  </dt>
-                  <dd className="text-sm text-foreground">
-                    {project.startDate ?? "—"}
-                  </dd>
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <dt className="text-xs text-muted-foreground">
-                    {t("endDate")}
-                  </dt>
-                  <dd className="text-sm text-foreground">
-                    {project.endDate ?? "—"}
-                  </dd>
-                </div>
+                <Field label={t("client")}>
+                  <Link
+                    href={`/clients/${client.id}`}
+                    className="hover:text-primary"
+                  >
+                    {client.nameAr ?? client.nameEn ?? client.id}
+                  </Link>
+                </Field>
+                <Field label={t("currency")} ltr>
+                  {project.currency}
+                </Field>
+                <Field label={t("statusLabel")}>
+                  {t(`status.${project.status}`)}
+                </Field>
+                <Field label={t("startDate")} ltr>
+                  {project.startDate ?? "—"}
+                </Field>
+                <Field label={t("endDate")} ltr>
+                  {project.endDate ?? "—"}
+                </Field>
                 {project.description ? (
-                  <div className="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
-                    <dt className="text-xs text-muted-foreground">
-                      {t("description")}
-                    </dt>
-                    <dd className="whitespace-pre-wrap text-sm text-foreground">
+                  <Field
+                    label={t("description")}
+                    className="sm:col-span-2 lg:col-span-3"
+                  >
+                    <span className="whitespace-pre-wrap">
                       {project.description}
-                    </dd>
-                  </div>
+                    </span>
+                  </Field>
                 ) : null}
               </dl>
             </CardContent>
           </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>{t("summary.title")}</CardTitle>
             </CardHeader>
             <CardContent>
-              <EmptyState title={t("summary.placeholder")} />
+              {summary.length === 0 ? (
+                <EmptyState title={t("summary.empty")} />
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {summary.map((row) => {
+                    const currency = row.currency as CurrencyCode;
+                    const money = (minor: number) =>
+                      formatMoney(minor, currency, "en");
+                    return (
+                      <dl
+                        key={row.currency}
+                        className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6"
+                        dir="ltr"
+                      >
+                        <Field label={t("summary.contracted")}>
+                          {money(row.contractedMinor)}
+                        </Field>
+                        <Field label={t("summary.invoiced")}>
+                          {money(row.invoicedMinor)}
+                        </Field>
+                        <Field label={t("summary.paid")}>
+                          {money(row.paidMinor)}
+                        </Field>
+                        <Field label={t("summary.outstanding")}>
+                          {money(row.outstandingMinor)}
+                        </Field>
+                        <Field label={t("summary.overdue")}>
+                          {money(row.overdueMinor)}
+                        </Field>
+                        <Field label={t("summary.remaining")}>
+                          {money(row.remainingToInvoiceMinor)}
+                        </Field>
+                      </dl>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("milestonesToInvoice")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {milestones.length === 0 ? (
+                <EmptyState title={t("noMilestonesToInvoice")} />
+              ) : (
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableHeaderCell>{t("milestone")}</TableHeaderCell>
+                      <TableHeaderCell className="text-end">
+                        {tc("actions")}
+                      </TableHeaderCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {milestones.map((milestone) => (
+                      <TableRow key={milestone.milestoneId}>
+                        <TableCell>{milestone.label}</TableCell>
+                        <TableCell className="text-end">
+                          {can(user, "invoices.write") ? (
+                            <CreateInvoiceFromMilestoneButton
+                              milestoneId={milestone.milestoneId}
+                            />
+                          ) : null}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -249,10 +330,134 @@ export default async function ProjectDetailPage({
             <CardTitle>{t("tabs.invoices")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <EmptyState title={t("noInvoices")} />
+            {projectInvoices.length === 0 ? (
+              <EmptyState title={t("noInvoices")} />
+            ) : (
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableHeaderCell>{tinvoices("number")}</TableHeaderCell>
+                    <TableHeaderCell>{tc("status")}</TableHeaderCell>
+                    <TableHeaderCell>{tinvoices("total")}</TableHeaderCell>
+                    <TableHeaderCell>{tinvoices("dueDate")}</TableHeaderCell>
+                    <TableHeaderCell className="text-end">
+                      {tc("actions")}
+                    </TableHeaderCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {projectInvoices.map((invoice) => (
+                    <TableRow key={invoice.id}>
+                      <TableCell dir="ltr" className="text-start font-mono">
+                        {invoice.number ?? "—"}
+                      </TableCell>
+                      <TableCell>
+                        <Badge tone={invoiceStatusTone(invoice.status)}>
+                          {tinvoices(`status.${invoice.status}`)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell dir="ltr" className="text-start tabular-nums">
+                        {formatMoney(
+                          invoice.totalMinor,
+                          invoice.currency as CurrencyCode,
+                          "en",
+                        )}
+                      </TableCell>
+                      <TableCell dir="ltr" className="text-start">
+                        {invoice.dueDate ?? "—"}
+                      </TableCell>
+                      <TableCell className="text-end">
+                        <Link
+                          href={`/invoices/${invoice.id}`}
+                          className="text-sm text-muted-foreground hover:text-foreground"
+                        >
+                          {tc("preview")}
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
       ) : null}
+
+      {tab === "files" ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("tabs.files")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ProjectFiles
+              projectId={project.id}
+              attachments={attachments.map((attachment) => ({
+                id: attachment.id,
+                originalName: attachment.originalName,
+                sizeBytes: attachment.sizeBytes,
+              }))}
+              canWrite={canWrite}
+            />
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {tab === "activity" ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("tabs.activity")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {activity.length === 0 ? (
+              <EmptyState title={t("noActivity")} />
+            ) : (
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableHeaderCell>{t("activityWhen")}</TableHeaderCell>
+                    <TableHeaderCell>{t("activityAction")}</TableHeaderCell>
+                    <TableHeaderCell>{t("activityEntity")}</TableHeaderCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {activity.map((row) => (
+                    <TableRow key={row.id}>
+                      <TableCell className="whitespace-nowrap">
+                        {formatInstant(row.ts, "UTC", locale)}
+                      </TableCell>
+                      <TableCell dir="ltr">{row.action}</TableCell>
+                      <TableCell dir="ltr" className="text-start text-xs">
+                        {row.entityType}:{row.entityId}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+      ) : null}
+    </div>
+  );
+}
+
+function Field({
+  label,
+  children,
+  ltr,
+  className,
+}: {
+  label: string;
+  children: React.ReactNode;
+  ltr?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={cn("flex flex-col gap-0.5", className)}>
+      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dd className="text-sm text-foreground" dir={ltr ? "ltr" : undefined}>
+        {children}
+      </dd>
     </div>
   );
 }

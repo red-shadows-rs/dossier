@@ -287,14 +287,39 @@
     "tabs": {
       "overview": "Overview",
       "contracts": "Contracts",
-      "invoices": "Invoices"
+      "invoices": "Invoices",
+      "files": "Files",
+      "activity": "Activity"
     },
     "summary": {
       "title": "Financial summary",
-      "placeholder": "Financial summary is under construction"
+      "empty": "No signed contracts or invoices yet",
+      "contracted": "Contracted",
+      "invoiced": "Invoiced",
+      "paid": "Paid",
+      "outstanding": "Outstanding",
+      "overdue": "Overdue",
+      "remaining": "Remaining to invoice"
     },
     "noContracts": "No contracts for this project yet",
-    "noInvoices": "No invoices for this project yet"
+    "noInvoices": "No invoices for this project yet",
+    "milestonesToInvoice": "Milestones to invoice",
+    "noMilestonesToInvoice": "No milestones waiting for an invoice",
+    "milestone": "Milestone",
+    "amount": "Amount",
+    "createInvoice": "Create invoice",
+    "files": {
+      "upload": "Upload",
+      "empty": "No attachments yet",
+      "noFile": "Choose a file first",
+      "uploaded": "Attachment uploaded",
+      "deleted": "Attachment deleted",
+      "delete": "Delete"
+    },
+    "noActivity": "No activity yet",
+    "activityWhen": "When",
+    "activityAction": "Action",
+    "activityEntity": "Entity"
   },
   "templates": {
     "title": "Templates",
