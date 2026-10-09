@@ -473,6 +473,7 @@ export function declineContract(
           titleAr: contract.titleAr,
           titleEn: contract.titleEn,
           reason: reason ?? null,
+          declinedByName: signatory.name,
           recipientName: creator.name,
         },
         entityType: "contract",

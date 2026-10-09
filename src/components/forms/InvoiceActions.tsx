@@ -16,6 +16,7 @@ import { formatMoney, parseMajorToMinor } from "@/lib/money";
 import {
   deleteDraftInvoiceAction,
   issueInvoiceAction,
+  sendInvoiceEmailAction,
   voidInvoiceAction,
 } from "@/server/actions/invoices";
 import {
@@ -70,6 +71,13 @@ export function InvoiceActions({
     }
   }
 
+  async function onSendEmail() {
+    if (await run(() => sendInvoiceEmailAction({ id: invoiceId }))) {
+      toast({ title: t("invoices.emailQueued"), tone: "success" });
+      router.refresh();
+    }
+  }
+
   async function onConfirm() {
     if (confirm === "delete") {
       const ok = await run(() => deleteDraftInvoiceAction({ id: invoiceId }));
@@ -120,6 +128,20 @@ export function InvoiceActions({
         {status === "draft" && canIssue ? (
           <Button type="button" onClick={onIssue} loading={pending}>
             {t("invoices.issueAction")}
+          </Button>
+        ) : null}
+
+        {(status === "issued" ||
+          status === "partially_paid" ||
+          status === "paid") &&
+        canIssue ? (
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onSendEmail}
+            loading={pending}
+          >
+            {t("invoices.sendEmail")}
           </Button>
         ) : null}
 

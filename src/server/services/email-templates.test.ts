@@ -141,10 +141,133 @@ describe("renderEmail — contract_signed_copy", () => {
   });
 });
 
+describe("renderEmail — invoice_issued", () => {
+  it("renders the amount, due date and bank line in both languages", () => {
+    const en = renderEmail(
+      "invoice_issued",
+      "en",
+      {
+        number: "DOS-I-2026-0001",
+        amountFormatted: "5,750.00 SAR",
+        dueDate: "2026-10-30",
+        bankLine: "IBAN: SA0000000000000000000000",
+        recipientName: "Jane",
+      },
+      COMPANY,
+    );
+    expect(en.subject).toBe("Invoice DOS-I-2026-0001 from RED SHADOWS");
+    expect(en.text).toContain("5,750.00 SAR");
+    expect(en.text).toContain("2026-10-30");
+    expect(en.text).toContain("IBAN: SA0000000000000000000000");
+    expect(en.html).toContain('dir="ltr"');
+
+    const ar = renderEmail(
+      "invoice_issued",
+      "ar",
+      {
+        number: "DOS-I-2026-0001",
+        amountFormatted: "5,750.00 SAR",
+        dueDate: "2026-10-30",
+        bankLine: "رقم الآيبان: SA0000000000000000000000",
+        recipientName: "خالد",
+      },
+      COMPANY,
+    );
+    expect(ar.subject).toBe("فاتورة DOS-I-2026-0001 من RED SHADOWS");
+    expect(ar.html).toContain('dir="rtl"');
+    expect(ar.text).toContain("5,750.00 SAR");
+  });
+
+  it("escapes hostile values in the HTML", () => {
+    const email = renderEmail(
+      "invoice_issued",
+      "en",
+      {
+        number: "<script>x</script>",
+        amountFormatted: "1.00 SAR",
+        bankLine: "<b>bank</b>",
+      },
+      COMPANY,
+    );
+    expect(email.html).not.toContain("<script>");
+    expect(email.html).toContain("&lt;script&gt;");
+  });
+});
+
+describe("renderEmail — invoice_overdue_reminder", () => {
+  it("renders the balance and due date in both languages", () => {
+    const en = renderEmail(
+      "invoice_overdue_reminder",
+      "en",
+      {
+        number: "DOS-I-2026-0002",
+        balanceFormatted: "2,000.00 SAR",
+        dueDate: "2026-09-01",
+        recipientName: "Jane",
+      },
+      COMPANY,
+    );
+    expect(en.subject).toBe("Reminder: invoice DOS-I-2026-0002 is overdue");
+    expect(en.text).toContain("2,000.00 SAR");
+    expect(en.text).toContain("2026-09-01");
+
+    const ar = renderEmail(
+      "invoice_overdue_reminder",
+      "ar",
+      {
+        number: "DOS-I-2026-0002",
+        balanceFormatted: "2,000.00 SAR",
+        dueDate: "2026-09-01",
+        recipientName: "خالد",
+      },
+      COMPANY,
+    );
+    expect(ar.subject).toBe("تذكير: الفاتورة DOS-I-2026-0002 متأخرة السداد");
+    expect(ar.html).toContain('dir="rtl"');
+  });
+});
+
+describe("renderEmail — contract_declined_notice", () => {
+  it("renders who declined and the reason in both languages", () => {
+    const en = renderEmail(
+      "contract_declined_notice",
+      "en",
+      {
+        titleEn: "Development Agreement",
+        number: "DOS-C-2026-0001",
+        reason: "Price too high",
+        declinedByName: "Jane Doe",
+        recipientName: "Owner",
+      },
+      COMPANY,
+    );
+    expect(en.subject).toBe("Contract DOS-C-2026-0001 was declined");
+    expect(en.text).toContain("Jane Doe declined the contract.");
+    expect(en.text).toContain("Reason: Price too high");
+
+    const ar = renderEmail(
+      "contract_declined_notice",
+      "ar",
+      {
+        titleAr: "عقد تطوير",
+        number: "DOS-C-2026-0001",
+        reason: "السعر مرتفع",
+        declinedByName: "خالد النور",
+        recipientName: "المالك",
+      },
+      COMPANY,
+    );
+    expect(ar.subject).toBe("تم رفض العقد DOS-C-2026-0001");
+    expect(ar.html).toContain('dir="rtl"');
+    expect(ar.text).toContain("خالد النور");
+    expect(ar.text).toContain("السعر مرتفع");
+  });
+});
+
 describe("renderEmail — unimplemented templates", () => {
   it("throws EMAIL_FAILED for keys not built yet", () => {
     try {
-      renderEmail("invoice_issued", "en", {}, COMPANY);
+      renderEmail("internal_notice", "en", {}, COMPANY);
       throw new Error("expected throw");
     } catch (error) {
       expect((error as AppError).code).toBe("EMAIL_FAILED");

@@ -825,6 +825,8 @@
     "milestoneLocked": "This invoice is generated from a contract milestone: lines, discount and tax are locked. Issue date, due date, notes and language remain editable.",
     "issueAction": "Issue invoice",
     "issued": "Invoice issued",
+    "sendEmail": "Email invoice",
+    "emailQueued": "Invoice email queued",
     "recordPayment": "Record payment",
     "paymentRecorded": "Payment recorded",
     "voidAction": "Void invoice",

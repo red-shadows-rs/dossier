@@ -3,9 +3,11 @@ import { and, asc, eq, lte } from "drizzle-orm";
 import { db, withTx } from "@/db";
 import { emailOutbox } from "@/db/schema";
 import { nowMs } from "@/lib/dates";
+import { isDocLang, type DocLang } from "@/lib/doc-lang";
 import { env } from "@/lib/env";
 import { AppError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
+import { renderPdf } from "@/server/pdf/render";
 import { audit } from "@/server/services/audit";
 import {
   isEmailTemplateKey,
@@ -13,6 +15,7 @@ import {
 } from "@/server/services/email";
 import { renderEmail } from "@/server/services/email-templates";
 import { readFile } from "@/server/services/files";
+import { resolveInvoicePdf } from "@/server/services/invoice-documents";
 import { getSettings } from "@/server/services/settings";
 
 export type MailAttachment = {
@@ -35,6 +38,16 @@ export type MailSender = {
 };
 
 export type OutboxRow = typeof emailOutbox.$inferSelect;
+
+// Injectable so tests can avoid launching Chromium; the worker uses the real
+// renderer. 15.1/7.9: the invoice PDF is rendered at send time, never inside a
+// transaction.
+export type OutboxDeps = {
+  renderInvoiceAttachment?: (
+    invoiceId: string,
+    docLang: DocLang,
+  ) => Promise<MailAttachment>;
+};
 
 const BATCH_SIZE = 10;
 const MAX_ATTEMPTS = 5;
@@ -87,19 +100,51 @@ function parsePayload(payloadJson: string): Record<string, unknown> {
   return {};
 }
 
-function loadAttachments(payload: Record<string, unknown>): MailAttachment[] {
-  const ids = payload.attachmentFileIds;
-  if (!Array.isArray(ids)) return [];
+async function defaultRenderInvoiceAttachment(
+  invoiceId: string,
+  docLang: DocLang,
+): Promise<MailAttachment> {
+  const source = await resolveInvoicePdf(invoiceId, docLang);
+  const pdf = await renderPdf(source.html, {
+    docNumber: source.docNumber,
+    code: null,
+  });
+  return {
+    filename: source.filename,
+    content: pdf,
+    contentType: "application/pdf",
+  };
+}
+
+async function loadAttachments(
+  payload: Record<string, unknown>,
+  deps: OutboxDeps,
+): Promise<MailAttachment[]> {
   const attachments: MailAttachment[] = [];
-  for (const id of ids) {
-    if (typeof id !== "string") continue;
-    const file = readFile(id);
-    attachments.push({
-      filename: file.originalName ?? "document.pdf",
-      content: file.buffer,
-      contentType: file.mime,
-    });
+
+  const ids = payload.attachmentFileIds;
+  if (Array.isArray(ids)) {
+    for (const id of ids) {
+      if (typeof id !== "string") continue;
+      const file = readFile(id);
+      attachments.push({
+        filename: file.originalName ?? "document.pdf",
+        content: file.buffer,
+        contentType: file.mime,
+      });
+    }
   }
+
+  const invoiceId = payload.invoiceId;
+  if (typeof invoiceId === "string" && invoiceId) {
+    const docLang: DocLang = isDocLang(payload.docLang)
+      ? payload.docLang
+      : "bilingual";
+    const render =
+      deps.renderInvoiceAttachment ?? defaultRenderInvoiceAttachment;
+    attachments.push(await render(invoiceId, docLang));
+  }
+
   return attachments;
 }
 
@@ -174,7 +219,11 @@ function handleFailure(row: OutboxRow, error: unknown, now: number): void {
   });
 }
 
-async function deliver(row: OutboxRow, sender: MailSender): Promise<void> {
+async function deliver(
+  row: OutboxRow,
+  sender: MailSender,
+  deps: OutboxDeps,
+): Promise<void> {
   const now = nowMs();
   try {
     if (!isEmailTemplateKey(row.templateKey)) {
@@ -198,7 +247,7 @@ async function deliver(row: OutboxRow, sender: MailSender): Promise<void> {
       companyName,
     );
 
-    const attachments = loadAttachments(payload);
+    const attachments = await loadAttachments(payload, deps);
 
     await sender.sendMail({
       from: `${fromName} <${fromAddress}>`,
@@ -228,6 +277,7 @@ async function deliver(row: OutboxRow, sender: MailSender): Promise<void> {
 // 15.1 — send up to 10 due pending rows; returns how many were claimed.
 export async function processOutbox(
   sender: MailSender | null,
+  deps: OutboxDeps = {},
 ): Promise<number> {
   const resolved = resolveSender(sender);
   const rows = db
@@ -247,7 +297,7 @@ export async function processOutbox(
   for (const row of rows) {
     if (claimOutboxRow(row.id) === 0) continue;
     processed += 1;
-    await deliver(row, resolved);
+    await deliver(row, resolved, deps);
   }
   return processed;
 }

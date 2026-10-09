@@ -21,7 +21,8 @@ import {
 import { addDays, nowMs, todayInTz } from "@/lib/dates";
 import { AppError } from "@/lib/errors";
 import { generateCode, newId } from "@/lib/ids";
-import type { INVOICE_STATUSES, Locale } from "@/lib/constants";
+import { formatMoney } from "@/lib/money";
+import type { CurrencyCode, INVOICE_STATUSES, Locale } from "@/lib/constants";
 import type {
   CreateInvoiceInput,
   SaveInvoiceLinesInput,
@@ -29,6 +30,7 @@ import type {
 } from "@/lib/validation/invoices";
 import type { RequestMeta, SessionUser } from "@/server/auth/session";
 import { audit } from "@/server/services/audit";
+import { enqueueEmail } from "@/server/services/email";
 import {
   buildPaymentInstructions,
   getSettings,
@@ -701,6 +703,96 @@ export function voidInvoice(
       entityType: "invoice",
       entityId: id,
       meta: { reason },
+      ip: meta.ip,
+      userAgent: meta.userAgent,
+    });
+  });
+}
+
+// 15.1 — invoices use the invoice language rule; bilingual → client preference.
+export function localeForInvoice(
+  mode: "ar" | "en" | "bilingual",
+  preferredLanguage: Locale,
+): Locale {
+  if (mode === "ar") return "ar";
+  if (mode === "en") return "en";
+  return preferredLanguage;
+}
+
+export type SendInvoiceEmailOptions = { toEmail?: string };
+
+// 7.9 / actions table — enqueue `invoice_issued` (PDF rendered by the worker at
+// send time); status unchanged.
+export function sendInvoiceEmail(
+  user: SessionUser,
+  id: string,
+  options: SendInvoiceEmailOptions,
+  meta: RequestMeta,
+): void {
+  const invoice = db.select().from(invoices).where(eq(invoices.id, id)).get();
+  if (!invoice) {
+    throw new AppError("NOT_FOUND", "Invoice not found");
+  }
+  if (invoice.status === "draft" || invoice.status === "void") {
+    throw new AppError(
+      "INVALID_STATE",
+      "Only an issued invoice can be emailed",
+    );
+  }
+  const client = db
+    .select()
+    .from(clients)
+    .where(eq(clients.id, invoice.clientId))
+    .get();
+  if (!client) {
+    throw new AppError("INTERNAL", "Invoice references a missing client");
+  }
+
+  const toEmail = (options.toEmail?.trim() || client.email || "").trim();
+  if (!toEmail) {
+    throw new AppError(
+      "VALIDATION_FAILED",
+      "The client has no email address",
+      { toEmail: "errors.required" },
+    );
+  }
+
+  const locale = localeForInvoice(
+    invoice.languageMode,
+    client.preferredLanguage,
+  );
+  const currency = invoice.currency as CurrencyCode;
+  const bankLine =
+    (locale === "ar"
+      ? invoice.paymentInstructionsAr
+      : invoice.paymentInstructionsEn) ?? "";
+  const recipientName = client.nameAr ?? client.nameEn ?? "";
+
+  withTx((tx) => {
+    enqueueEmail(tx, {
+      toEmail,
+      toName: recipientName || null,
+      locale,
+      templateKey: "invoice_issued",
+      payload: {
+        number: invoice.number,
+        amountFormatted: formatMoney(invoice.totalMinor, currency, locale),
+        dueDate: invoice.dueDate,
+        bankLine,
+        invoiceId: invoice.id,
+        docLang: invoice.languageMode,
+        recipientName,
+      },
+      entityType: "invoice",
+      entityId: id,
+    });
+    audit(tx, {
+      actorType: "user",
+      actorId: user.id,
+      action: "invoice.sent",
+      entityType: "invoice",
+      entityId: id,
+      meta: { number: invoice.number },
       ip: meta.ip,
       userAgent: meta.userAgent,
     });

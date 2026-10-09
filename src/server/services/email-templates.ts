@@ -239,6 +239,180 @@ function renderSignedCopy(
   return { subject, html, text };
 }
 
+function renderDeclinedNotice(
+  locale: Locale,
+  payload: Record<string, unknown>,
+  companyName: string,
+): RenderedEmail {
+  const ar = locale === "ar";
+  const title = pickTitle(payload, locale);
+  const number = readText(payload, "number");
+  const reason = readText(payload, "reason");
+  const declinedBy = readText(payload, "declinedByName");
+  const name = readText(payload, "recipientName");
+
+  const subject = ar
+    ? `تم رفض العقد ${number}`
+    : `Contract ${number} was declined`;
+
+  const greetingRaw = greeting(locale, name);
+  const whoRaw = declinedBy
+    ? ar
+      ? `رفض ${declinedBy} العقد.`
+      : `${declinedBy} declined the contract.`
+    : ar
+      ? "تم رفض العقد من قبل أحد الأطراف."
+      : "A party declined the contract.";
+  const reasonRaw = reason
+    ? ar
+      ? `السبب: ${reason}`
+      : `Reason: ${reason}`
+    : "";
+
+  const html = shell(
+    locale,
+    [
+      `<p style="margin:0 0 16px;">${escapeHtml(greetingRaw)}</p>`,
+      `<p style="margin:0 0 8px;font-weight:bold;">${escapeHtml(title)} (${escapeHtml(number)})</p>`,
+      `<p style="margin:0 0 8px;">${escapeHtml(whoRaw)}</p>`,
+      reasonRaw
+        ? `<p style="margin:0;color:#71717a;font-size:13px;">${escapeHtml(reasonRaw)}</p>`
+        : "",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+    companyName,
+  );
+
+  const text = [greetingRaw, "", `${title} (${number})`, whoRaw, reasonRaw]
+    .filter((line) => line !== "")
+    .join("\n");
+
+  return { subject, html, text };
+}
+
+function renderInvoiceIssued(
+  locale: Locale,
+  payload: Record<string, unknown>,
+  companyName: string,
+): RenderedEmail {
+  const ar = locale === "ar";
+  const number = readText(payload, "number");
+  const amount = readText(payload, "amountFormatted");
+  const dueDate = readText(payload, "dueDate");
+  const bankLine = readText(payload, "bankLine");
+  const name = readText(payload, "recipientName");
+
+  const subject = ar
+    ? `فاتورة ${number} من ${companyName}`
+    : `Invoice ${number} from ${companyName}`;
+
+  const greetingRaw = greeting(locale, name);
+  const leadRaw = ar
+    ? "تجد مرفقاً فاتورة جديدة."
+    : "Please find your invoice attached.";
+  const amountRaw = amount
+    ? ar
+      ? `المبلغ: ${amount}`
+      : `Amount: ${amount}`
+    : "";
+  const dueRaw = dueDate
+    ? ar
+      ? `تاريخ الاستحقاق: ${dueDate}`
+      : `Due date: ${dueDate}`
+    : "";
+
+  const html = shell(
+    locale,
+    [
+      `<p style="margin:0 0 16px;">${escapeHtml(greetingRaw)}</p>`,
+      `<p style="margin:0 0 8px;">${escapeHtml(leadRaw)}</p>`,
+      `<p style="margin:0 0 8px;font-weight:bold;">${escapeHtml(number)}</p>`,
+      amountRaw
+        ? `<p style="margin:0 0 8px;">${escapeHtml(amountRaw)}</p>`
+        : "",
+      dueRaw
+        ? `<p style="margin:0 0 8px;">${escapeHtml(dueRaw)}</p>`
+        : "",
+      bankLine
+        ? `<p style="margin:0;color:#71717a;font-size:13px;">${escapeHtml(bankLine)}</p>`
+        : "",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+    companyName,
+  );
+
+  const text = [
+    greetingRaw,
+    "",
+    leadRaw,
+    number,
+    amountRaw,
+    dueRaw,
+    bankLine,
+  ]
+    .filter((line) => line !== "")
+    .join("\n");
+
+  return { subject, html, text };
+}
+
+function renderInvoiceOverdueReminder(
+  locale: Locale,
+  payload: Record<string, unknown>,
+  companyName: string,
+): RenderedEmail {
+  const ar = locale === "ar";
+  const number = readText(payload, "number");
+  const balance = readText(payload, "balanceFormatted");
+  const dueDate = readText(payload, "dueDate");
+  const name = readText(payload, "recipientName");
+
+  const subject = ar
+    ? `تذكير: الفاتورة ${number} متأخرة السداد`
+    : `Reminder: invoice ${number} is overdue`;
+
+  const greetingRaw = greeting(locale, name);
+  const leadRaw = ar
+    ? "نودّ تذكيركم بأن الفاتورة التالية متأخرة السداد."
+    : "This is a reminder that the following invoice is overdue.";
+  const balanceRaw = balance
+    ? ar
+      ? `الرصيد المستحق: ${balance}`
+      : `Outstanding balance: ${balance}`
+    : "";
+  const dueRaw = dueDate
+    ? ar
+      ? `تاريخ الاستحقاق: ${dueDate}`
+      : `Due date: ${dueDate}`
+    : "";
+
+  const html = shell(
+    locale,
+    [
+      `<p style="margin:0 0 16px;">${escapeHtml(greetingRaw)}</p>`,
+      `<p style="margin:0 0 8px;">${escapeHtml(leadRaw)}</p>`,
+      `<p style="margin:0 0 8px;font-weight:bold;">${escapeHtml(number)}</p>`,
+      balanceRaw
+        ? `<p style="margin:0 0 8px;">${escapeHtml(balanceRaw)}</p>`
+        : "",
+      dueRaw
+        ? `<p style="margin:0;color:#71717a;font-size:13px;">${escapeHtml(dueRaw)}</p>`
+        : "",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+    companyName,
+  );
+
+  const text = [greetingRaw, "", leadRaw, number, balanceRaw, dueRaw]
+    .filter((line) => line !== "")
+    .join("\n");
+
+  return { subject, html, text };
+}
+
 function renderTestEmail(
   locale: Locale,
   payload: Record<string, unknown>,
@@ -280,6 +454,12 @@ export function renderEmail(
       return renderOtp(locale, payload, companyName);
     case "contract_signed_copy":
       return renderSignedCopy(locale, payload, companyName);
+    case "contract_declined_notice":
+      return renderDeclinedNotice(locale, payload, companyName);
+    case "invoice_issued":
+      return renderInvoiceIssued(locale, payload, companyName);
+    case "invoice_overdue_reminder":
+      return renderInvoiceOverdueReminder(locale, payload, companyName);
     case "test_email":
       return renderTestEmail(locale, payload, companyName);
     default:

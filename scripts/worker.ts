@@ -9,11 +9,13 @@ import {
 } from "@/server/services/email-worker";
 import { retryPendingFinalizations } from "@/server/services/contract-finalize";
 import { expireContracts } from "@/server/services/contracts-lifecycle";
+import { runDailyJobs } from "@/server/services/daily-jobs";
 import { setInternalSetting } from "@/server/services/settings";
 
 const OUTBOX_INTERVAL_MS = 5_000;
 const FINALIZE_INTERVAL_MS = 5 * 60 * 1000;
 const EXPIRE_INTERVAL_MS = 60 * 60 * 1000;
+const DAILY_INTERVAL_MS = 15 * 60 * 1000;
 const HEARTBEAT_INTERVAL_MS = 60_000;
 
 let stopping = false;
@@ -73,6 +75,17 @@ function runExpireJob(): void {
   }
 }
 
+function runDailyJob(): void {
+  try {
+    runDailyJobs();
+  } catch (error) {
+    logger.error("worker_job_failed", {
+      job: "runDailyJobs",
+      message: errorMessage(error),
+    });
+  }
+}
+
 function start(sender: MailSender | null): void {
   logger.info("worker_started", { nodeEnv: env.NODE_ENV });
 
@@ -99,6 +112,10 @@ function start(sender: MailSender | null): void {
 
   const outboxTimer = setInterval(scheduleOutbox, OUTBOX_INTERVAL_MS);
   const finalizeTimer = setInterval(scheduleFinalize, FINALIZE_INTERVAL_MS);
+  const dailyTimer = setInterval(() => {
+    if (stopping) return;
+    runDailyJob();
+  }, DAILY_INTERVAL_MS);
   const heartbeatTimer = setInterval(() => {
     if (stopping) return;
     safeHeartbeat();
@@ -107,6 +124,7 @@ function start(sender: MailSender | null): void {
   scheduleOutbox();
   scheduleFinalize();
   runExpireJob();
+  runDailyJob();
 
   const shutdown = (signal: string): void => {
     if (stopping) return;
@@ -115,6 +133,7 @@ function start(sender: MailSender | null): void {
     clearInterval(outboxTimer);
     clearInterval(finalizeTimer);
     clearInterval(expireTimer);
+    clearInterval(dailyTimer);
     clearInterval(heartbeatTimer);
     inFlight
       .catch(() => undefined)
