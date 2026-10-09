@@ -7,6 +7,7 @@ import { formatMoney } from "@/lib/money";
 import { logger } from "@/lib/logger";
 import { workerStateSchema } from "@/lib/validation/settings";
 import { audit } from "@/server/services/audit";
+import { runBackup } from "@/server/services/backups";
 import { enqueueEmail } from "@/server/services/email";
 import { localeForInvoice } from "@/server/services/invoices";
 import {
@@ -16,6 +17,7 @@ import {
 } from "@/server/services/settings";
 
 const REMINDER_HOUR = 8;
+const BACKUP_HOUR = 3;
 
 function dateInTz(ms: number, tz: string): string {
   return new Intl.DateTimeFormat("en-CA", {
@@ -125,9 +127,9 @@ export function sendOverdueReminders(
   return sent;
 }
 
-// 15.2 — runs every 15 min; reminder pass once per business-tz date at hour 08.
-// The 03:00 backup pass is implemented in T-038.
-export function runDailyJobs(atMs: number = nowMs()): void {
+// 15.2 — runs every 15 min. Reminders once per business-tz date at hour 08;
+// the DB/files backup once per date at hour 03.
+export async function runDailyJobs(atMs: number = nowMs()): Promise<void> {
   const tz = getSettings("defaults").timezone;
   const today = dateInTz(atMs, tz);
   const hour = hourInTz(atMs, tz);
@@ -140,5 +142,11 @@ export function runDailyJobs(atMs: number = nowMs()): void {
     const sent = sendOverdueReminders(today, atMs);
     setInternalSetting("worker_state", { ...state, lastReminderDate: today });
     logger.info("daily_reminders", { sent, date: today });
+  }
+
+  if (hour === BACKUP_HOUR && state.lastBackupDate !== today) {
+    await runBackup(atMs);
+    setInternalSetting("worker_state", { ...state, lastBackupDate: today });
+    logger.info("daily_backup", { date: today });
   }
 }

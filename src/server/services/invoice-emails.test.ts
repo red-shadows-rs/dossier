@@ -318,11 +318,11 @@ describe("runDailyJobs", () => {
     seedInvoice(clientId, projectId, { dueDate: "2026-06-14" });
 
     const atHour8 = Date.UTC(2026, 5, 15, 8, 30, 0);
-    runDailyJobs(atHour8);
+    await runDailyJobs(atHour8);
     expect(outboxRows()).toHaveLength(1);
 
     // Second run at 08:45 the same date does not enqueue again.
-    runDailyJobs(Date.UTC(2026, 5, 15, 8, 45, 0));
+    await runDailyJobs(Date.UTC(2026, 5, 15, 8, 45, 0));
     expect(outboxRows()).toHaveLength(1);
   });
 
@@ -332,7 +332,7 @@ describe("runDailyJobs", () => {
     const projectId = seedProject(clientId);
     seedInvoice(clientId, projectId, { dueDate: "2026-06-14" });
 
-    runDailyJobs(Date.UTC(2026, 5, 15, 9, 0, 0));
+    await runDailyJobs(Date.UTC(2026, 5, 15, 9, 0, 0));
     expect(outboxRows()).toHaveLength(0);
   });
 });

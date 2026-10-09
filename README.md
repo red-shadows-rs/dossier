@@ -68,6 +68,29 @@ Open http://localhost:3000. To add a user later:
 Remaining scripts (`test:e2e`, `worker`) are added as the corresponding tasks
 land — see `PROGRESS.md`.
 
+## Backups and restore
+
+The worker takes an online SQLite snapshot every day at 03:00 business time to
+`${DATA_DIR}/backups/dossier-YYYYMMDD-HHmm.sqlite` (better-sqlite3 backup API),
+and additionally archives `files/` to `files-YYYYMMDD.tar.gz` every Sunday.
+Backups older than `BACKUP_RETENTION_DAYS` (default 30) are deleted, always
+keeping the 3 newest. Each run is recorded in the audit log
+(`backup.completed` / `backup.failed`).
+
+To restore:
+
+1. Stop the app and the worker.
+2. Copy the chosen snapshot to `${DATA_DIR}/dossier.sqlite` and delete any stale
+   `dossier.sqlite-wal` / `dossier.sqlite-shm` files.
+3. Restore `files/` from the matching `files-YYYYMMDD.tar.gz`
+   (`tar -xzf files-YYYYMMDD.tar.gz -C ${DATA_DIR}`).
+4. Start the app, run `npm run db:migrate` (a no-op if already current), and
+   verify a sample contract/PDF.
+
+Off-site copies and encryption are the host's responsibility (e.g. `rsync` /
+`rclone` to an encrypted volume, or `age`). They are intentionally not part of
+the app.
+
 ## Environment variables
 
 Copy `.env.example` to `.env.local` and fill in the values. Every variable is validated at boot by `src/lib/env.ts`; required ones missing → the app refuses to start with a clear message.

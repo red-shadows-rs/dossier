@@ -75,9 +75,9 @@ function runExpireJob(): void {
   }
 }
 
-function runDailyJob(): void {
+async function runDailyJob(): Promise<void> {
   try {
-    runDailyJobs();
+    await runDailyJobs();
   } catch (error) {
     logger.error("worker_job_failed", {
       job: "runDailyJobs",
@@ -105,6 +105,13 @@ function start(sender: MailSender | null): void {
     });
   };
 
+  const scheduleDaily = (): void => {
+    inFlight = inFlight.then(async () => {
+      if (stopping) return;
+      await runDailyJob();
+    });
+  };
+
   const expireTimer = setInterval(() => {
     if (stopping) return;
     runExpireJob();
@@ -112,10 +119,7 @@ function start(sender: MailSender | null): void {
 
   const outboxTimer = setInterval(scheduleOutbox, OUTBOX_INTERVAL_MS);
   const finalizeTimer = setInterval(scheduleFinalize, FINALIZE_INTERVAL_MS);
-  const dailyTimer = setInterval(() => {
-    if (stopping) return;
-    runDailyJob();
-  }, DAILY_INTERVAL_MS);
+  const dailyTimer = setInterval(scheduleDaily, DAILY_INTERVAL_MS);
   const heartbeatTimer = setInterval(() => {
     if (stopping) return;
     safeHeartbeat();
@@ -124,7 +128,7 @@ function start(sender: MailSender | null): void {
   scheduleOutbox();
   scheduleFinalize();
   runExpireJob();
-  runDailyJob();
+  scheduleDaily();
 
   const shutdown = (signal: string): void => {
     if (stopping) return;
