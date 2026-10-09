@@ -8,7 +8,7 @@ import { ContractBasicsStep } from "./ContractBasicsStep";
 import { ContractPricingStep } from "./ContractPricingStep";
 import { ContractScheduleStep } from "./ContractScheduleStep";
 import { ContractClausesStep } from "./ContractClausesStep";
-import { ContractReviewStep } from "./ContractReviewStep";
+import { ContractReviewStep, type SendContext } from "./ContractReviewStep";
 import type { Issue } from "@/lib/validation/issues";
 
 export type BuilderBasics = {
@@ -89,9 +89,11 @@ type Step = (typeof STEPS)[number];
 export function ContractBuilder({
   detail,
   issues,
+  sendContext,
 }: {
   detail: BuilderDetail;
   issues: Issue[];
+  sendContext: SendContext;
 }) {
   const t = useTranslations("contracts");
   const router = useRouter();
@@ -177,6 +179,7 @@ export function ContractBuilder({
           id={detail.id}
           languageMode={detail.basics.languageMode}
           issues={issues}
+          sendContext={sendContext}
           onJump={setStep}
         />
       ) : null}

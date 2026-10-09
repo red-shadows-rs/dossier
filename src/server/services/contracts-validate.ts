@@ -22,6 +22,42 @@ import { buildVariableMap } from "@/server/templating/variables";
 
 export type SendValidationOptions = Partial<SendContractInput>;
 
+export const CONTRACT_ISSUE_CODES = [
+  "titleRequired",
+  "scopeRequired",
+  "companyNameRequired",
+  "clientNameRequired",
+  "projectNameRequired",
+  "clauseTitleRequired",
+  "clauseBodyRequired",
+  "itemDescriptionRequired",
+  "currencyInvalid",
+  "noItems",
+  "totalZero",
+  "feesNotAllowed",
+  "noMilestones",
+  "milestonesInvalid",
+  "startDateRequired",
+  "endBeforeStart",
+  "signingDeadlinePast",
+  "noClauses",
+  "missingVariable",
+  "clientSignatoryRequired",
+  "clientEmailRequired",
+  "clientEmailInvalid",
+  "providerSignerRequired",
+  "blockSequenceMismatch",
+  "signaturesBlock",
+  "paymentScheduleBlock",
+  "companyTaxNumberMissing",
+  "clientTaxNumberMissing",
+  "endBeforeMilestone",
+  "paragraphCountMismatch",
+  "bankDetailsMissing",
+] as const;
+
+type IssueCode = (typeof CONTRACT_ISSUE_CODES)[number];
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function requiredLanguages(mode: "ar" | "en" | "bilingual"): Locale[] {
@@ -31,7 +67,7 @@ function requiredLanguages(mode: "ar" | "en" | "bilingual"): Locale[] {
 }
 
 function error(
-  code: string,
+  code: IssueCode,
   field: string,
   params?: Record<string, string | number>,
 ): Issue {
@@ -45,7 +81,7 @@ function error(
 }
 
 function warning(
-  code: string,
+  code: IssueCode,
   field: string,
   params?: Record<string, string | number>,
 ): Issue {

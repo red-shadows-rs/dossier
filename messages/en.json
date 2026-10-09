@@ -462,7 +462,8 @@
       "loading": "Rendering preview…",
       "previewUnavailable": "Preview unavailable",
       "send": "Send contract",
-      "sendHint": "Sending is enabled in a later step."
+      "sendHint": "Sending is enabled in a later step.",
+      "fixErrorsHint": "Fix the errors before sending."
     },
     "item": {
       "descriptionAr": "Description (Arabic)",
@@ -566,6 +567,21 @@
       "when": "When",
       "action": "Action",
       "actor": "Actor"
+    },
+    "send": {
+      "title": "Send contract",
+      "providerSigner": "Company signer",
+      "providerName": "Name",
+      "providerTitle": "Title",
+      "clientSignatory": "Client signatory",
+      "clientName": "Name",
+      "clientTitle": "Title",
+      "clientEmail": "Email",
+      "drawn": "Draw",
+      "typed": "Type",
+      "typedName": "Typed name",
+      "submit": "Send",
+      "sent": "Contract sent"
     }
   },
   "invoices": {

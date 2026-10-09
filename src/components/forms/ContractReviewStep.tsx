@@ -13,6 +13,14 @@ import {
 } from "@/lib/doc-lang";
 import type { Issue } from "@/lib/validation/issues";
 import { getContractPreviewHtmlAction } from "@/server/actions/contracts";
+import { SendContractDialog, type SignerOption } from "./SendContractDialog";
+
+export type SendContext = {
+  signers: SignerOption[];
+  clientDefaults: { name: string; title: string; email: string };
+  consentText: string;
+  requireProviderSignature: boolean;
+};
 
 type BuilderStep = "basics" | "pricing" | "schedule" | "clauses";
 
@@ -38,18 +46,22 @@ export function ContractReviewStep({
   id,
   languageMode,
   issues,
+  sendContext,
   onJump,
 }: {
   id: string;
   languageMode: LanguageMode;
   issues: Issue[];
+  sendContext: SendContext;
   onJump: (step: BuilderStep) => void;
 }) {
   const t = useTranslations("contracts");
+  const tRoot = useTranslations();
   const langs = allowedDocLangs(languageMode);
   const [lang, setLang] = useState<DocLang>(defaultDocLang(languageMode));
   const [html, setHtml] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [sendOpen, setSendOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -82,7 +94,7 @@ export function ContractReviewStep({
             issue.severity === "error" ? "text-destructive" : "text-amber-600"
           }
         >
-          {t(issue.messageKey, issue.params)}
+          {tRoot(issue.messageKey, issue.params)}
         </span>
         <button
           type="button"
@@ -170,11 +182,30 @@ export function ContractReviewStep({
       </Card>
 
       <div className="flex items-center justify-end gap-3">
-        <p className="text-sm text-muted-foreground">{t("review.sendHint")}</p>
-        <Button type="button" disabled title={t("review.sendHint")}>
+        {errors.length > 0 ? (
+          <p className="text-sm text-muted-foreground">
+            {t("review.fixErrorsHint")}
+          </p>
+        ) : null}
+        <Button
+          type="button"
+          disabled={errors.length > 0}
+          onClick={() => setSendOpen(true)}
+        >
           {t("review.send")}
         </Button>
       </div>
+
+      <SendContractDialog
+        open={sendOpen}
+        onClose={() => setSendOpen(false)}
+        contractId={id}
+        signers={sendContext.signers}
+        languageMode={languageMode}
+        clientDefaults={sendContext.clientDefaults}
+        consentText={sendContext.consentText}
+        requireProviderSignature={sendContext.requireProviderSignature}
+      />
     </div>
   );
 }

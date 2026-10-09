@@ -462,7 +462,8 @@
       "loading": "جارٍ إنشاء المعاينة…",
       "previewUnavailable": "المعاينة غير متاحة",
       "send": "إرسال العقد",
-      "sendHint": "سيتم تمكين الإرسال في خطوة لاحقة."
+      "sendHint": "سيتم تمكين الإرسال في خطوة لاحقة.",
+      "fixErrorsHint": "أصلح الأخطاء قبل الإرسال."
     },
     "item": {
       "descriptionAr": "الوصف (بالعربية)",
@@ -566,6 +567,21 @@
       "when": "الوقت",
       "action": "الإجراء",
       "actor": "المنفّذ"
+    },
+    "send": {
+      "title": "إرسال العقد",
+      "providerSigner": "الموقّع من الشركة",
+      "providerName": "الاسم",
+      "providerTitle": "المسمى",
+      "clientSignatory": "الموقّع من العميل",
+      "clientName": "الاسم",
+      "clientTitle": "المسمى",
+      "clientEmail": "البريد الإلكتروني",
+      "drawn": "رسم",
+      "typed": "كتابة",
+      "typedName": "الاسم المكتوب",
+      "submit": "إرسال",
+      "sent": "تم إرسال العقد"
     }
   },
   "invoices": {

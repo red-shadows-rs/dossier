@@ -28,6 +28,11 @@ import {
   resolveDocLang,
 } from "@/server/services/contract-documents";
 import { getContract } from "@/server/services/contracts";
+import { sendContract, signAsProvider } from "@/server/services/contracts-send";
+import {
+  sendContractInputSchema,
+  signAsProviderInputSchema,
+} from "@/lib/validation/signing";
 import { runAction } from "./_run";
 
 function revalidateContract(id: string): void {
@@ -172,5 +177,35 @@ export async function getContractPreviewHtmlAction(
     );
     const html = await buildContractHtml(id, lang, "preview");
     return { html };
+  });
+}
+
+export async function sendContractAction(
+  raw: unknown,
+): Promise<ActionResult<{ clientToken: string }>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "contracts.send");
+    const id = String((raw as { id?: unknown })?.id ?? "");
+    const input = sendContractInputSchema.parse(raw);
+    const meta = await getRequestMeta();
+    const result = sendContract(user, id, input, meta);
+    revalidateContract(id);
+    return result;
+  });
+}
+
+export async function signAsProviderAction(
+  raw: unknown,
+): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "contracts.sign_provider");
+    const id = String((raw as { id?: unknown })?.id ?? "");
+    const input = signAsProviderInputSchema.parse(raw);
+    const meta = await getRequestMeta();
+    signAsProvider(user, id, input, meta);
+    revalidateContract(id);
+    return null;
   });
 }

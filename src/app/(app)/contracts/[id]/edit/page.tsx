@@ -1,17 +1,22 @@
 import { notFound, redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
+import { getLocale } from "next-intl/server";
 import { db } from "@/db";
 import { clients, projects, templates } from "@/db/schema";
 import {
   ContractBuilder,
   type BuilderDetail,
 } from "@/components/forms/ContractBuilder";
+import type { SendContext } from "@/components/forms/ContractReviewStep";
 import { AppError } from "@/lib/errors";
+import { isLocale } from "@/lib/i18n";
 import { assertCan } from "@/lib/permissions";
 import { templateDefaultsSchema } from "@/lib/validation/template";
 import { requireUserPage } from "@/server/auth/require-user";
 import { getContractDetail } from "@/server/services/contracts";
+import { listCompanySigners } from "@/server/services/contracts-send";
 import { validateContractForSend } from "@/server/services/contracts-validate";
+import { getSettings } from "@/server/services/settings";
 
 export default async function ContractEditPage({
   params,
@@ -112,6 +117,38 @@ export default async function ContractEditPage({
     preset: defaults?.milestonePreset ?? null,
   };
 
+  const signing = getSettings("signing");
+  const rawLocale = await getLocale();
+  const locale = isLocale(rawLocale) ? rawLocale : "ar";
+  const clientRow = client;
+  const clientName =
+    (locale === "ar"
+      ? clientRow?.repNameAr || clientRow?.repNameEn
+      : clientRow?.repNameEn || clientRow?.repNameAr) ??
+    clientRow?.nameAr ??
+    clientRow?.nameEn ??
+    "";
+  const clientTitle =
+    (locale === "ar" ? clientRow?.repTitleAr : clientRow?.repTitleEn) ?? "";
+  const signers = listCompanySigners().map((signer) => ({
+    id: signer.id,
+    name: signer.name,
+    titleAr: signer.titleAr,
+    titleEn: signer.titleEn,
+    isSelf: signer.id === user.id,
+  }));
+  const sendContext: SendContext = {
+    signers,
+    clientDefaults: {
+      name: clientName,
+      title: clientTitle,
+      email: clientRow?.email ?? "",
+    },
+    consentText:
+      locale === "ar" ? signing.consentTextAr : signing.consentTextEn,
+    requireProviderSignature: signing.requireProviderSignatureBeforeSend,
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -125,6 +162,7 @@ export default async function ContractEditPage({
       <ContractBuilder
         detail={builderDetail}
         issues={validateContractForSend(id)}
+        sendContext={sendContext}
       />
     </div>
   );

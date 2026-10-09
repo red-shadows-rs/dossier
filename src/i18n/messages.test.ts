@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import ar from "../../messages/ar.json";
 import en from "../../messages/en.json";
 import { ERROR_CODES } from "@/lib/errors";
+import { CONTRACT_ISSUE_CODES } from "@/server/services/contracts-validate";
 
 type Messages = Record<string, unknown>;
 
@@ -57,6 +58,13 @@ describe("messages", () => {
     for (const code of ERROR_CODES) {
       expect(enKeys.has(`errors.${code}`), `en.errors.${code}`).toBe(true);
       expect(arKeys.has(`errors.${code}`), `ar.errors.${code}`).toBe(true);
+    }
+  });
+
+  it("defines a message for every contract issue code", () => {
+    for (const code of CONTRACT_ISSUE_CODES) {
+      expect(enKeys.has(`contracts.issue.${code}`), `en ${code}`).toBe(true);
+      expect(arKeys.has(`contracts.issue.${code}`), `ar ${code}`).toBe(true);
     }
   });
 });
