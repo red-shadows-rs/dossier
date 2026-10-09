@@ -98,6 +98,46 @@
     "declinedTitle": "You declined this contract",
     "declinedBody": "The sender has been notified. You can close this page."
   },
+  "verification": {
+    "title": "Verify a document",
+    "subtitle": "Enter the verification code printed on the document, or scan its QR code.",
+    "codeLabel": "Verification code",
+    "verify": "Verify",
+    "notFound": "No document matches this code. Check the code and try again.",
+    "found": "Document verified",
+    "viewDetails": "View details",
+    "rateLimited": "Too many requests. Please try again in a minute.",
+    "contract": {
+      "heading": "Contract"
+    },
+    "invoice": {
+      "heading": "Invoice"
+    },
+    "states": {
+      "valid": "Valid",
+      "terminated": "Terminated",
+      "void": "Void"
+    },
+    "fields": {
+      "number": "Number",
+      "title": "Title",
+      "provider": "Provider",
+      "client": "Client",
+      "signedAt": "Signed at",
+      "contentHash": "Content hash (SHA-256)",
+      "issuer": "Issuer",
+      "issueDate": "Issue date",
+      "total": "Total"
+    },
+    "pdfTitle": "Check a PDF copy",
+    "pdfHint": "Upload the PDF you received to confirm it matches the signed original. The file is not stored.",
+    "pdfCheck": "Check file",
+    "pdfResult": {
+      "match": "The file matches the signed original.",
+      "mismatch": "The file does not match the signed original.",
+      "unknown": "No sealed file is available for this code."
+    }
+  },
   "errors": {
     "UNAUTHENTICATED": "You must sign in to continue",
     "FORBIDDEN": "You do not have permission to perform this action",
