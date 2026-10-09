@@ -4,15 +4,23 @@ import { emailOutbox } from "@/db/schema";
 import { nowMs } from "@/lib/dates";
 import type { Locale } from "@/lib/constants";
 
-export type EmailTemplateKey =
-  | "contract_signing_link"
-  | "contract_otp"
-  | "contract_signed_copy"
-  | "contract_declined_notice"
-  | "contract_expired_notice"
-  | "invoice_issued"
-  | "invoice_overdue_reminder"
-  | "internal_notice";
+export const EMAIL_TEMPLATE_KEYS = [
+  "contract_signing_link",
+  "contract_otp",
+  "contract_signed_copy",
+  "contract_declined_notice",
+  "contract_expired_notice",
+  "invoice_issued",
+  "invoice_overdue_reminder",
+  "internal_notice",
+  "test_email",
+] as const;
+
+export type EmailTemplateKey = (typeof EMAIL_TEMPLATE_KEYS)[number];
+
+export function isEmailTemplateKey(value: string): value is EmailTemplateKey {
+  return (EMAIL_TEMPLATE_KEYS as readonly string[]).includes(value);
+}
 
 export type EnqueueEmailInput = {
   toEmail: string;

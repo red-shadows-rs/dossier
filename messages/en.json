@@ -189,6 +189,15 @@
       "fromName": "From name",
       "overdueRemindersEnabled": "Send overdue reminders",
       "overdueReminderDays": "Overdue reminder days"
+    },
+    "worker": {
+      "title": "Worker status",
+      "running": "Worker is running",
+      "stale": "Worker has not checked in for over 5 minutes",
+      "never": "Worker has never checked in",
+      "hint": "The background worker sends queued emails. Keep exactly one instance running.",
+      "testEmail": "Send test email",
+      "testEmailQueued": "Test email queued"
     }
   },
   "clients": {

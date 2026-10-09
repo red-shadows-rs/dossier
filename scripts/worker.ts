@@ -1,0 +1,105 @@
+import { sqlite } from "@/db";
+import { nowMs } from "@/lib/dates";
+import { env } from "@/lib/env";
+import { logger } from "@/lib/logger";
+import {
+  createTransport,
+  processOutbox,
+  type MailSender,
+} from "@/server/services/email-worker";
+import { setInternalSetting } from "@/server/services/settings";
+
+const OUTBOX_INTERVAL_MS = 5_000;
+const HEARTBEAT_INTERVAL_MS = 60_000;
+
+let stopping = false;
+let inFlight: Promise<void> = Promise.resolve();
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function writeHeartbeat(): void {
+  const ts = nowMs();
+  setInternalSetting("worker_heartbeat", { ts });
+  logger.info("worker_heartbeat", { ts });
+}
+
+function safeHeartbeat(): void {
+  try {
+    writeHeartbeat();
+  } catch (error) {
+    logger.error("worker_job_failed", {
+      job: "heartbeat",
+      message: errorMessage(error),
+    });
+  }
+}
+
+async function runOutboxJob(sender: MailSender | null): Promise<void> {
+  try {
+    await processOutbox(sender);
+  } catch (error) {
+    logger.error("worker_job_failed", {
+      job: "processOutbox",
+      message: errorMessage(error),
+    });
+  }
+}
+
+function start(sender: MailSender | null): void {
+  logger.info("worker_started", { nodeEnv: env.NODE_ENV });
+
+  safeHeartbeat();
+
+  const scheduleOutbox = (): void => {
+    inFlight = inFlight.then(async () => {
+      if (stopping) return;
+      await runOutboxJob(sender);
+    });
+  };
+
+  const outboxTimer = setInterval(scheduleOutbox, OUTBOX_INTERVAL_MS);
+  const heartbeatTimer = setInterval(() => {
+    if (stopping) return;
+    safeHeartbeat();
+  }, HEARTBEAT_INTERVAL_MS);
+
+  scheduleOutbox();
+
+  const shutdown = (signal: string): void => {
+    if (stopping) return;
+    stopping = true;
+    logger.info("worker_stopping", { signal });
+    clearInterval(outboxTimer);
+    clearInterval(heartbeatTimer);
+    inFlight
+      .catch(() => undefined)
+      .finally(() => {
+        try {
+          sqlite.close();
+        } catch (error) {
+          logger.error("worker_close_failed", { message: errorMessage(error) });
+        }
+        process.exit(0);
+      });
+  };
+
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+  process.on("SIGINT", () => shutdown("SIGINT"));
+}
+
+function main(): void {
+  const sender = createTransport();
+  if (env.NODE_ENV === "production" && sender === null) {
+    throw new Error("SMTP configuration is required in production (worker)");
+  }
+  start(sender);
+}
+
+try {
+  main();
+} catch (error) {
+  logger.error("worker_start_failed", { message: errorMessage(error) });
+  process.exit(1);
+}

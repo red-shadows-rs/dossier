@@ -6,6 +6,7 @@ import type { ActionResult } from "@/lib/result";
 import { assertCan } from "@/lib/permissions";
 import { requireUser } from "@/server/auth/require-user";
 import { audit, getRequestMeta } from "@/server/services/audit";
+import { enqueueEmail } from "@/server/services/email";
 import { saveFile } from "@/server/services/files";
 import { getSettings, updateSettings } from "@/server/services/settings";
 import { withTx } from "@/db";
@@ -108,6 +109,27 @@ export async function updateEmailAction(
     assertCan(user, "settings.write");
     const meta = await getRequestMeta();
     updateSettings("email", raw, user, meta);
+    revalidateSettings();
+    return null;
+  });
+}
+
+// 15.1 — enqueue a test email for the current user (the worker sends it).
+export async function sendTestEmailAction(): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "settings.write");
+    withTx((tx) => {
+      enqueueEmail(tx, {
+        toEmail: user.email,
+        toName: user.name,
+        locale: user.locale,
+        templateKey: "test_email",
+        payload: { recipientName: user.name },
+        entityType: "user",
+        entityId: user.id,
+      });
+    });
     revalidateSettings();
     return null;
   });

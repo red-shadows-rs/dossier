@@ -288,6 +288,9 @@ export function sendContract(
       payload: {
         contractId,
         signatoryId: clientSignatoryId,
+        number,
+        titleAr: current.titleAr,
+        titleEn: current.titleEn,
         url: linkUrl,
         token: clientToken,
         expiresAt,
