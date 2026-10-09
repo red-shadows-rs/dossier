@@ -162,7 +162,8 @@
     "tooShort": "Value is too short",
     "discountExceedsSubtotal": "The discount exceeds the subtotal",
     "milestonesSumMismatch": "The milestones do not sum to the net amount",
-    "invalidCredentials": "Invalid email or password"
+    "invalidCredentials": "Invalid email or password",
+    "emailInUse": "This email is already in use"
   },
   "locale": {
     "ar": "العربية",
@@ -885,5 +886,43 @@
     "documentLoading": "Rendering document…",
     "documentUnavailable": "Document preview unavailable",
     "documentTitle": "Document"
+  },
+  "users": {
+    "title": "Users",
+    "new": "New user",
+    "create": "Create user",
+    "empty": "No users yet.",
+    "name": "Name",
+    "email": "Email",
+    "roleLabel": "Role",
+    "role": {
+      "owner": "Owner",
+      "member": "Member",
+      "viewer": "Viewer"
+    },
+    "canSignForCompany": "Can sign for the company",
+    "status": "Status",
+    "active": "Active",
+    "disabled": "Disabled",
+    "lastLogin": "Last sign-in",
+    "createdAt": "Created",
+    "yes": "Yes",
+    "no": "No",
+    "profile": "Profile",
+    "editTitle": "Edit user",
+    "password": "Password",
+    "passwordTitle": "Set a new password",
+    "newPassword": "New password",
+    "setPassword": "Set password",
+    "passwordResetHint": "Setting a password signs this user out everywhere. Share the new password securely.",
+    "enable": "Enable",
+    "disable": "Disable",
+    "enableConfirm": "Enable this user and allow them to sign in again?",
+    "disableConfirm": "Disable this user? All their sessions end immediately.",
+    "createdToast": "User created",
+    "savedToast": "User saved",
+    "passwordResetToast": "Password updated",
+    "enabledToast": "User enabled",
+    "disabledToast": "User disabled"
   }
 }

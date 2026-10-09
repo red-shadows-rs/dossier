@@ -162,7 +162,8 @@
     "tooShort": "النص قصير جداً",
     "discountExceedsSubtotal": "الخصم يتجاوز المجموع الفرعي",
     "milestonesSumMismatch": "مجموع الدفعات لا يطابق الصافي",
-    "invalidCredentials": "بيانات الدخول غير صحيحة"
+    "invalidCredentials": "بيانات الدخول غير صحيحة",
+    "emailInUse": "هذا البريد الإلكتروني مستخدم بالفعل"
   },
   "locale": {
     "ar": "العربية",
@@ -885,5 +886,43 @@
     "documentLoading": "جارٍ إنشاء المستند…",
     "documentUnavailable": "معاينة المستند غير متاحة",
     "documentTitle": "المستند"
+  },
+  "users": {
+    "title": "المستخدمون",
+    "new": "مستخدم جديد",
+    "create": "إنشاء مستخدم",
+    "empty": "لا يوجد مستخدمون بعد.",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "roleLabel": "الدور",
+    "role": {
+      "owner": "مالك",
+      "member": "عضو",
+      "viewer": "مُطّلع"
+    },
+    "canSignForCompany": "يمكنه التوقيع نيابة عن الشركة",
+    "status": "الحالة",
+    "active": "نشط",
+    "disabled": "معطّل",
+    "lastLogin": "آخر دخول",
+    "createdAt": "أُنشئ في",
+    "yes": "نعم",
+    "no": "لا",
+    "profile": "الملف",
+    "editTitle": "تعديل المستخدم",
+    "password": "كلمة المرور",
+    "passwordTitle": "تعيين كلمة مرور جديدة",
+    "newPassword": "كلمة المرور الجديدة",
+    "setPassword": "تعيين كلمة المرور",
+    "passwordResetHint": "تعيين كلمة مرور يُنهي جلسات هذا المستخدم في كل الأجهزة. شارك كلمة المرور الجديدة بطريقة آمنة.",
+    "enable": "تفعيل",
+    "disable": "تعطيل",
+    "enableConfirm": "تفعيل هذا المستخدم والسماح له بتسجيل الدخول مجدداً؟",
+    "disableConfirm": "تعطيل هذا المستخدم؟ ستنتهي كل جلساته فوراً.",
+    "createdToast": "تم إنشاء المستخدم",
+    "savedToast": "تم حفظ المستخدم",
+    "passwordResetToast": "تم تحديث كلمة المرور",
+    "enabledToast": "تم تفعيل المستخدم",
+    "disabledToast": "تم تعطيل المستخدم"
   }
 }
