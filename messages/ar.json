@@ -384,6 +384,7 @@
     "budget": "الميزانية",
     "currency": "العملة",
     "taskboardRef": "مرجع task-board",
+    "taskboardOpen": "فتح في task-board",
     "notes": "ملاحظات",
     "includeArchived": "إظهار المؤرشف",
     "archive": "أرشفة",

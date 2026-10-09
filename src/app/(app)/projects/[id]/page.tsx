@@ -23,9 +23,11 @@ import {
 import { cn } from "@/components/ui/cn";
 import type { CurrencyCode } from "@/lib/constants";
 import { formatInstant } from "@/lib/dates";
+import { env } from "@/lib/env";
 import { AppError } from "@/lib/errors";
 import { isLocale } from "@/lib/i18n";
 import { formatMoney } from "@/lib/money";
+import { resolveTaskboardUrl } from "@/lib/taskboard";
 import { can } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
 import { listProjectContracts } from "@/server/services/contracts";
@@ -88,6 +90,10 @@ export default async function ProjectDetailPage({
   const activity = listProjectActivity(id);
   const rawLocale = await getLocale();
   const locale = isLocale(rawLocale) ? rawLocale : "ar";
+  const taskboardHref = resolveTaskboardUrl(
+    project.taskboardRef,
+    env.TASKBOARD_API_URL,
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -169,6 +175,23 @@ export default async function ProjectDetailPage({
                 <Field label={t("endDate")} ltr>
                   {project.endDate ?? "—"}
                 </Field>
+                {project.taskboardRef ? (
+                  <Field label={t("taskboardRef")} ltr>
+                    {taskboardHref ? (
+                      <a
+                        href={taskboardHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={t("taskboardOpen")}
+                        className="text-primary hover:underline"
+                      >
+                        {project.taskboardRef}
+                      </a>
+                    ) : (
+                      project.taskboardRef
+                    )}
+                  </Field>
+                ) : null}
                 {project.description ? (
                   <Field
                     label={t("description")}

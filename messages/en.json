@@ -384,6 +384,7 @@
     "budget": "Budget",
     "currency": "Currency",
     "taskboardRef": "task-board reference",
+    "taskboardOpen": "Open in task-board",
     "notes": "Notes",
     "includeArchived": "Show archived",
     "archive": "Archive",
