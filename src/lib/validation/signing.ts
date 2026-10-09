@@ -44,6 +44,32 @@ export const signAsProviderInputSchema = z.object({
 
 export type SignAsProviderInput = z.infer<typeof signAsProviderInputSchema>;
 
+// 7.7 client side (public signing link).
+export const clientSignInputSchema = z.object({
+  fullName: z
+    .string()
+    .trim()
+    .min(1, "errors.required")
+    .max(200, "errors.tooLong"),
+  signature: providerSignatureSchema,
+  consent: z.boolean().default(false),
+  consentText: z.string().min(1, "errors.required").max(2000),
+});
+
+export type ClientSignInput = z.infer<typeof clientSignInputSchema>;
+
+export const otpCodeSchema = z.object({
+  code: z.string().trim().regex(/^\d{6}$/, "errors.invalid"),
+});
+
+export type OtpCodeInput = z.infer<typeof otpCodeSchema>;
+
+export const declineInputSchema = z.object({
+  reason: z.string().trim().max(500, "errors.tooLong").optional(),
+});
+
+export type DeclineInput = z.infer<typeof declineInputSchema>;
+
 export function validateSignature(
   signature: z.infer<typeof providerSignatureSchema>,
 ): string | null {

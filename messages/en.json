@@ -66,6 +66,38 @@
     "newPassword": "New password",
     "passwordTooShort": "Password is too short"
   },
+  "signing": {
+    "invalidTitle": "This link is invalid or has expired",
+    "invalidBody": "Please ask the sender for a new signing link.",
+    "documentLanguage": "Document language",
+    "documentTitle": "Contract document",
+    "downloadPdf": "Download PDF",
+    "language": {
+      "ar": "Arabic",
+      "en": "English",
+      "bilingual": "Bilingual"
+    },
+    "otpTitle": "Verify your email",
+    "otpHint": "We will email you a 6-digit code to confirm it is you.",
+    "sendCode": "Send me a code",
+    "resendCode": "Resend code",
+    "codeSent": "Code sent",
+    "code": "Verification code",
+    "verify": "Verify",
+    "signTitle": "Review and sign",
+    "fullName": "Full name",
+    "drawn": "Draw",
+    "typed": "Type",
+    "typedName": "Type your full name",
+    "sign": "Sign contract",
+    "decline": "Decline",
+    "declineReason": "Reason (optional)",
+    "declineConfirm": "Confirm decline",
+    "signedTitle": "Thank you — your signature was recorded",
+    "signedBody": "The sender will be notified. A copy of the signed contract will be emailed to you when it is ready.",
+    "declinedTitle": "You declined this contract",
+    "declinedBody": "The sender has been notified. You can close this page."
+  },
   "errors": {
     "UNAUTHENTICATED": "You must sign in to continue",
     "FORBIDDEN": "You do not have permission to perform this action",
