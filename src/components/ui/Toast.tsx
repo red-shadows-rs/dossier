@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "./cn";
 
 export type ToastTone = "info" | "success" | "error";
@@ -36,6 +37,7 @@ const TONES: Record<ToastTone, string> = {
 let nextId = 1;
 
 export function ToastProvider({ children }: { children: ReactNode }) {
+  const t = useTranslations("common");
   const [items, setItems] = useState<ToastItem[]>([]);
 
   const dismiss = useCallback((id: number) => {
@@ -76,7 +78,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <span>{item.title}</span>
               <button
                 type="button"
-                aria-label="Dismiss"
+                aria-label={t("dismiss")}
                 onClick={() => dismiss(item.id)}
                 className="text-muted-foreground hover:text-foreground"
               >
