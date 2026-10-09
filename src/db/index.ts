@@ -27,17 +27,42 @@ export function openDb(path: string): DbInstance {
   return { sqlite, db };
 }
 
-mkdirSync(env.DATA_DIR, { recursive: true, mode: 0o700 });
+let instance: DbInstance | null = null;
 
-const instance = openDb(env.DATABASE_PATH);
+// The connection is opened lazily on first use. This keeps `next build`'s
+// page-data workers from opening SQLite just by importing a page module
+// (better-sqlite3's native teardown asserts under Node 24 when a worker exits
+// with an open connection).
+function getInstance(): DbInstance {
+  if (instance === null) {
+    mkdirSync(env.DATA_DIR, { recursive: true, mode: 0o700 });
+    instance = openDb(env.DATABASE_PATH);
+  }
+  return instance;
+}
 
-export const sqlite = instance.sqlite;
-export const db = instance.db;
+// Proxy so every existing `db` / `sqlite` usage keeps working unchanged while
+// the underlying connection is created on first access.
+export const sqlite = new Proxy({} as Database.Database, {
+  get(_target, property) {
+    const target = getInstance().sqlite;
+    const value = Reflect.get(target, property);
+    return typeof value === "function" ? value.bind(target) : value;
+  },
+});
+
+export const db = new Proxy({} as BetterSQLite3Database<typeof schema>, {
+  get(_target, property) {
+    const target = getInstance().db;
+    const value = Reflect.get(target, property);
+    return typeof value === "function" ? value.bind(target) : value;
+  },
+});
 
 export type DbTx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 export function withTx<T>(fn: (tx: DbTx) => T): T {
-  return db.transaction((tx) => fn(tx));
+  return getInstance().db.transaction((tx) => fn(tx));
 }
 
 export function runMigrations<TSchema extends Record<string, unknown>>(

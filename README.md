@@ -64,9 +64,42 @@ Open http://localhost:3000. To add a user later:
 | `npm run db:migrate` | Apply migrations to the database |
 | `npm run seed` | Create the bootstrap owner if there are no users |
 | `npm run user:create -- <email> <name> <password> [role]` | Create a user |
+| `npm run worker` | Run the background worker (outbox, scheduler, backups) |
+| `npm run test:e2e` | Playwright end-to-end tests |
 
-Remaining scripts (`test:e2e`, `worker`) are added as the corresponding tasks
-land — see `PROGRESS.md`.
+## Deployment (Docker)
+
+The image is built from `Dockerfile` (multi-stage, based on the Playwright
+image so Chromium is available for PDFs). `docker-compose.yml` runs two
+services from the same image: **app** (Next.js standalone server) and
+**worker** (outbox + scheduler + backups). They share the `./data` volume.
+
+> Run **exactly one** worker replica. The worker owns the email outbox, the
+> daily scheduler and backups; scaling it would duplicate jobs.
+
+### First deployment checklist (section 17.4)
+
+1. `cp .env.example .env` and fill it in:
+   - `APP_SECRET`: at least 64 hex chars — `openssl rand -hex 32`.
+   - `APP_URL`: the public HTTPS URL, no trailing slash.
+   - `SMTP_*` (required in production) and `DEFAULT_LOCALE`.
+   - `BOOTSTRAP_OWNER_*` for the first owner.
+2. Make `./data` writable by the container user (`pwuser`, UID/GID **1001** in
+   the Playwright image): `mkdir -p data && sudo chown -R 1001:1001 data`.
+3. `docker compose build && docker compose up -d`.
+4. Seed the first owner, templates and default settings:
+   `docker compose exec app npm run seed`.
+5. Log in, change the password, and fill **Settings → Company / Defaults /
+   Signing / Email**; send the test email.
+6. Create a test client → project → contract and complete the whole flow
+   (sign, finalize, invoice, payment) with a test email address.
+7. Remove `BOOTSTRAP_OWNER_PASSWORD` from `.env`.
+8. Confirm backups appear under `data/backups` after the first 03:00 business
+   time run (or trigger `runBackup` manually).
+
+`nginx/dossier.conf` is a starting point for TLS termination and rate limiting;
+put the real certificates where it points and include it inside the `http {}`
+block.
 
 ## Backups and restore
 

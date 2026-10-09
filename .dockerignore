@@ -16,6 +16,10 @@ docker-compose.yml
 playwright-report
 test-results
 coverage
+tests
+nginx
+.github
+*.md
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
