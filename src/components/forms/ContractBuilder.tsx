@@ -110,7 +110,7 @@ export function ContractBuilder({
     <div className="flex flex-col gap-4">
       <nav
         aria-label={t("builder.steps")}
-        className="sticky top-14 z-30 flex gap-1 overflow-x-auto border-b border-border bg-background/95 py-2 backdrop-blur"
+        className="sticky top-14 z-30 flex gap-1 overflow-x-auto border-b border-border bg-background py-2"
       >
         {STEPS.map((value, index) => {
           const disabled = stepDisabled(value);

@@ -1,6 +1,7 @@
 {
   "common": {
     "tagline": "Contracts & invoices platform",
+    "skipToContent": "Skip to content",
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",

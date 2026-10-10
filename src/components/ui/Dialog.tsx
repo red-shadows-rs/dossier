@@ -92,11 +92,11 @@ export function Dialog({
         if (event.target === ref.current) onClose();
       }}
       className={cn(
-        "w-[min(32rem,calc(100vw-2rem))] rounded-lg border border-border bg-surface p-0 text-foreground backdrop:bg-black/60",
+        "max-h-[calc(100dvh-2rem)] w-[min(32rem,calc(100vw-2rem))] rounded-lg border border-border bg-surface p-0 text-foreground backdrop:bg-black/60",
         className,
       )}
     >
-      <div className="flex flex-col gap-4 p-5">
+      <div className="flex max-h-[calc(100dvh-2rem)] flex-col gap-4 overflow-y-auto p-5">
         <div className="flex flex-col gap-1">
           <h2 id={titleId} className="text-lg font-semibold">
             {title}

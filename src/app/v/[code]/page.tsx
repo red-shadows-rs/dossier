@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
+import { Badge } from "@/components/ui/Badge";
 import type { Locale } from "@/lib/constants";
 import { formatInstant } from "@/lib/dates";
 import { env } from "@/lib/env";
@@ -181,15 +182,5 @@ function InvoiceCard({
 }
 
 function StateBadge({ label, valid }: { label: string; valid: boolean }) {
-  return (
-    <span
-      className={
-        valid
-          ? "rounded-full border border-green-600/40 bg-green-600/10 px-3 py-0.5 text-xs font-medium text-green-700"
-          : "rounded-full border border-destructive/40 bg-destructive/10 px-3 py-0.5 text-xs font-medium text-destructive"
-      }
-    >
-      {label}
-    </span>
-  );
+  return <Badge tone={valid ? "green" : "red"}>{label}</Badge>;
 }

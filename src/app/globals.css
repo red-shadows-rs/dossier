@@ -67,3 +67,22 @@
     font-family: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
   }
 }
+
+@media (pointer: coarse) {
+  button,
+  [role="button"],
+  summary,
+  select,
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea {
+    min-height: 2.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 1rem;
+  }
+}
