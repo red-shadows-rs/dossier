@@ -118,6 +118,12 @@ The current shadcn registry is **Tailwind v4-first**. The project is **Tailwind 
 
 Nothing installed; no source file changed. Stopped per rule 8/9.
 
+### Decision
+
+User chose **option 1: upgrade Tailwind 3 → 4, then shadcn**. Authorized the Tailwind major upgrade and the shadcn install. Execution order: Tailwind v4 upgrade (verify visual parity) → shadcn init → add primitives → migrate incrementally.
+
+## Phase 6 — Tailwind v4 upgrade (T-001a)
+
 ## Rollback
 
 ```
