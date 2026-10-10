@@ -20,7 +20,9 @@ export async function UserMenu({ user }: { user: SessionUser }) {
           type="button"
           className="flex cursor-pointer items-center gap-2 rounded-md border border-border px-3 py-1.5 text-sm text-foreground hover:bg-surface focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <span className="max-w-[10rem] truncate">{user.name}</span>
+          <span className="hidden max-w-[10rem] truncate sm:inline">
+            {user.name}
+          </span>
           <ChevronDown size={16} aria-hidden="true" />
         </button>
       </DropdownMenuTrigger>
