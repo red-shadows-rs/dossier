@@ -124,6 +124,41 @@ User chose **option 1: upgrade Tailwind 3 → 4, then shadcn**. Authorized the T
 
 ## Phase 6 — Tailwind v4 upgrade (T-001a)
 
+## Phase 6 — execution (actual)
+
+Commits on `ui-redesign` (after the docs):
+
+| Commit | What |
+| --- | --- |
+| `3c7f156` | Tailwind 4.3.3 upgrade (`@tailwindcss/postcss`, `@import "tailwindcss"`, `@config`), `darkMode:"class"`, autoprefixer dropped from PostCSS. Baseline re-verified (typecheck/lint/rtl 0, 494 tests, build 0 warnings). Visual parity probed: body bg `#0b0b0f`/`#ffffff`, text `#ededf0`/`#16161a`, primary `#e11d48`, font Cairo. |
+| `9145d29` | shadcn setup: `components.json` (style radix-nova, rtl), `src/lib/utils.ts` (`cn` from the `cn` pkg), globals.css tokens (`--foreground/--card/--popover/--secondary/--accent/--input/--ring/--radius`), tailwind.config `popover`+`secondary` colors and one `--radius` token, `tw-animate-css`. Added shadcn: button, card, input, textarea, select, label, checkbox, switch, radio-group, badge, alert, skeleton, separator, dialog, alert-dialog, dropdown-menu, sheet, tabs, table, tooltip, popover. `Button.tsx` extended to accept shadcn API (`default/outline/destructive/link`, `icon*` sizes, `asChild` via `radix-ui` Slot) while keeping the app API (`primary/secondary/danger/ghost`, `sm/md`, `loading`). |
+| `dc90aa0` | Mobile nav (U-001): extracted `nav.ts` (NAV + `navEntries` + `isActive`), `MobileNav.tsx` using shadcn `Sheet` (side follows `dir`), wired into `TopBar`. Probe: 375px × en/ar × dark/light → 9 nav links in the sheet, `dir` correct. |
+| `b2baf34` | a11y/consistency: skip link + `#main`; `Dialog` `max-h`/scroll (U-007); `pointer:coarse` ≥44px targets + 16px mobile inputs (U-006); removed `backdrop-blur` on builder bar (U-010); `v/[code]` StateBadge → `Badge` (U-004). i18n keys added: `nav.menu`, `common.skipToContent` (en+ar). |
+| `8dff98f` | `UserMenu` → shadcn `DropdownMenu` (Escape/click-outside/keyboard); probe: 2 items, Escape closes (U-008). |
+| `24167e2` | Responsive header: locale/theme moved into the mobile drawer, user name hidden `<sm`. Fixed a **real** 320px page overflow (header forced 482px doc). Re-probe: 0 overflow at 320/375/768 on all listing pages. |
+
+### Key decision (documented, not silent)
+
+The shadcn `radix-nova` registry is Tailwind v4-first and collides by filename-casing with the app's primitives (`Button.tsx` vs `button.tsx`, …) and diverges in API (`input.tsx` has no `forwardRef` → would break react-hook-form in 24 files; `card.tsx`/`badge.tsx` are rounder/heavier than the minimal target; `select.tsx`/`table.tsx`/`dialog.tsx` are different APIs). To avoid breaking working code (hard rule 1/2), we **kept the app's equivalent primitives** for Button/Card/Input/Textarea/Select/Table/Badge/Dialog and **adopted shadcn** for the additions and a11y-critical pieces (Sheet, DropdownMenu, Tooltip, Popover, AlertDialog, Label, Checkbox, Switch, RadioGroup, Alert, Skeleton, Separator, Tabs). This keeps exactly one UI library and preserves all tests/RTL. Revisit if a deeper visual swap is wanted.
+
+### Finding status
+
+- U-001 fixed (mobile nav). U-004 fixed. U-006 fixed. U-007 fixed. U-008 fixed. U-009 fixed. U-010 fixed. U-003 fixed (one `--radius` token).
+- U-002 corrected + resolved: the page-level overflow was the **mobile header** (constant 482px doc), now 0; tables scroll inside their own container (allowed by §4.2).
+- U-005 (Badge/Toast raw palette) partially addressed (kept `tone` API, status colors meaningful); left as-is deliberately to preserve status semantics — noted.
+- U-011 (`max-w-[1280px]`) and U-012 (standalone static copy) left as-is.
+
+### Verification (final)
+
+- `npm run check` → typecheck 0, lint 0, check:rtl 0, **494/494 tests**.
+- `npm run build` → exit 0, zero warnings.
+- Overflow probe: 0 page-level overflow at 320/375/768 (dark+light, en+ar).
+- Mobile nav probe: 9 links, sheet side follows `dir`.
+- User menu probe: 2 items, Escape closes.
+- Slop re-scan: no second UI library; no gradients; `shadow-lg`/`backdrop-blur-xs` only on shadcn overlays; only raw color is `SignaturePad` `#111111` (canvas ink).
+- After screenshots: `tmp/ui-shots/after/` (96 PNGs).
+- `UNVERIFIED:` visual inspection by a vision model (this model cannot read images).
+
 ## Rollback
 
 ```

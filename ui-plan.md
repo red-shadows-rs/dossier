@@ -202,3 +202,27 @@ Group commit prefixes: `style:` · `refactor(ui):` · `a11y:` · `chore:`.
   - Expected: equal or better than baseline; no unintended files; no secrets.
   - Rollback: `git reset --hard pre-ui-redesign`.
   - Depends on: all
+---
+
+## Execution status (actual)
+
+- [x] T-001 install/init → superseded: **Tailwind 4.3.3 upgrade first** (commit `3c7f156`), then shadcn init + `components.json` + `lib/utils` + tokens (commit `9145d29`).
+- [x] T-002 one radius token (`--radius`) — done (`9145d29`).
+- [~] T-003 status tones: kept `tone` API intentionally; not tokenized (documented).
+- [~] T-004 overlay-only shadow: satisfied by shadcn overlays; app primitives already flat.
+- [x] T-005 mobile navigation via shadcn `Sheet` (`dc90aa0`).
+- [x] T-006 skip link + `#main` (`b2baf34`).
+- [ ] T-007 named content-width token — not done (kept `max-w-[1280px]`).
+- [x] T-008 dialog overflow (`b2baf34`).
+- [x] T-009 touch targets (`b2baf34`).
+- [x] T-010 UserMenu → DropdownMenu (`8dff98f`).
+- [x] T-011 remove `backdrop-blur` (`b2baf34`).
+- [x] T-012..T-016 responsive: real fix was the **mobile header** (`24167e2`) → 0 page overflow at 320/375/768; tables scroll in-container (allowed).
+- [x] T-017 verification badge → `Badge` (`b2baf34`).
+- [x] T-018 responsive pass (probe all listing pages, dark+light, en+ar).
+- [x] T-019 RTL/dark: `check:rtl` 0, RTL probes pass.
+- [x] T-020 a11y pass: skip link, dialog scroll, touch targets, dropdown menu.
+- [ ] T-021 removal: kept app primitives deliberately (see ui-log "Key decision"); shadcn duplicates removed.
+- [x] T-022 final verification: `npm run check` (494/494), build 0 warnings, 96 after-screenshots, slop re-scan clean.
+
+Superseded/kept items are explained in `ui-log.md`.
