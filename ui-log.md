@@ -85,6 +85,39 @@
 
 - (none yet — no source file modified, nothing installed)
 
+## Phase 6 — T-001 attempt (BLOCKED, decision needed)
+
+User approved: **option A (full shadcn/ui migration)** + network install.
+
+- CLI check: `npx shadcn@latest --help` ok; `shadcn@latest` = **4.21.4**; `shadcn info` detects Next 16.3.3, Tailwind **v3**, `src/app/globals.css`, alias `@`.
+- Backed up `src/app/globals.css` and `tailwind.config.ts` to `tmp/ui-shots/pre-init/`.
+- `shadcn init --base radix --rtl --css-variables --preset nova --yes --no-monorepo`:
+  - Wrote `components.json` (`style: "radix-nova"`, `tailwind.config: tailwind.config.ts`, `cssVariables: true`, `rtl: true`, aliases `utils: @/lib/utils`, `ui: @/components/ui`).
+  - **Failed** at `npm install`: `EALLOWSCRIPTS` — npm 12 rejects the CLI's project-scoped `--allow-scripts` flag (the repo declares `allowScripts` in `package.json`). No packages were installed; `package.json`/lock unchanged.
+  - Reverted the partial `components.json` to keep the tree clean.
+
+### Root blocker (concrete evidence)
+
+`npx shadcn@latest view button` returns the **Tailwind v4** registry source for `radix-nova`:
+
+```
+import { cn } from "cn"                                  // npm "cn" package, not @/lib/utils
+focus-visible:ring-3 ...                                  // v4 ring scale (v3 has no ring-3)
+bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)]   // v4 oklch arbitrary value
+has-data-[icon=inline-end]:pr-2 ... in-data-[slot=button-group]:rounded-lg  // v4 variants
+dependencies: ["cn"], plus tw-animate-css, radix-ui       // tw-animate-css is v4-only
+```
+
+The current shadcn registry is **Tailwind v4-first**. The project is **Tailwind 3.4.19**; the generated components would render broken (missing `ring-3`, wrong `cn`, `tw-animate-css`). `radix-ui@*` itself supports React 18, so Radix is not the problem — Tailwind v4 is.
+
+### Options (user decision required)
+
+1. **Upgrade Tailwind 3 → 4** (recommended if we stay on shadcn): add `tailwindcss@4` + `@tailwindcss/postcss`, convert `@tailwind base/components/utilities` → `@import "tailwindcss"` + `@theme inline` in `globals.css`, retire `tailwind.config.ts` (or keep via `@config`), map the existing custom tokens. Then the registry works as designed. Scope: dependency major bump + config rewrite (presentation/config only, no business logic). Risk: utility behaviour shifts (ring width, border defaults) → full visual re-verify against the 62 before-screenshots. Needs a new approval because it is a package upgrade (rule 6).
+2. **Keep Tailwind v3, hand-author the shadcn-style primitives** (cva + `@radix-ui/*` + the v3 token set). Compatible with the current stack, but components are not produced by the CLI (still shadcn's ownable-source model). More manual work; no v4 churn.
+3. **Switch library** to one not coupled to Tailwind (Ant Design — Appendix C, best for a data-heavy admin; or Mantine — Appendix D). Larger: replaces Tailwind styling inside components.
+
+Nothing installed; no source file changed. Stopped per rule 8/9.
+
 ## Rollback
 
 ```
