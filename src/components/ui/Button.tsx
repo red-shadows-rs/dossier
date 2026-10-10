@@ -77,7 +77,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const classes = cn(BASE, VARIANTS[variant], SIZES[size], className);
 
     if (asChild) {
-      return <Slot.Root ref={ref} data-slot="button" className={classes} {...props} />;
+      const forced = disabled || loading ? true : undefined;
+      return (
+        <Slot.Root
+          ref={ref}
+          data-slot="button"
+          aria-busy={loading ? "true" : undefined}
+          {...(forced ? { disabled: forced } : {})}
+          className={classes}
+          {...props}
+        />
+      );
     }
 
     return (
