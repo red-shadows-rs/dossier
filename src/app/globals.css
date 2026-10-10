@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 @config "../../tailwind.config.ts";
 
 /* Theme tokens per DOSSIER_PLAN.md 5.8 — dark is the default */
@@ -13,6 +14,22 @@
   --success: #22c55e;
   --warning: #f59e0b;
   --info: #3b82f6;
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary-foreground: #ffffff;
+  --secondary: var(--surface);
+  --secondary-foreground: var(--text);
+  --accent: var(--surface);
+  --accent-foreground: var(--text);
+  --muted-foreground: var(--muted);
+  --destructive: var(--danger);
+  --destructive-foreground: #ffffff;
+  --input: var(--border);
+  --ring: var(--primary);
+  --radius: 0.5rem;
   color-scheme: dark;
 }
 
