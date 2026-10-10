@@ -51,7 +51,8 @@
     "users": "Users",
     "audit": "Audit log",
     "account": "Account",
-    "logout": "Log out"
+    "logout": "Log out",
+    "menu": "Open navigation"
   },
   "auth": {
     "loginTitle": "Sign in",
