@@ -91,7 +91,7 @@ export function ContractReviewStep({
       >
         <span
           className={
-            issue.severity === "error" ? "text-destructive" : "text-amber-600"
+            issue.severity === "error" ? "text-destructive" : "text-warning"
           }
         >
           {tRoot(issue.messageKey, issue.params)}
@@ -115,7 +115,7 @@ export function ContractReviewStep({
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {errors.length === 0 && warnings.length === 0 ? (
-            <p className="text-sm text-green-600">{t("review.noIssues")}</p>
+            <p className="text-sm text-success">{t("review.noIssues")}</p>
           ) : null}
 
           {errors.length > 0 ? (
@@ -129,7 +129,7 @@ export function ContractReviewStep({
 
           {warnings.length > 0 ? (
             <div className="flex flex-col gap-2">
-              <h3 className="text-sm font-semibold text-amber-600">
+              <h3 className="text-sm font-semibold text-warning">
                 {t("review.warnings")}
               </h3>
               <ul className="flex flex-col gap-2">

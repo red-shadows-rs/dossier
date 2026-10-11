@@ -105,7 +105,7 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
         ) : (
           <div
             role="status"
-            className="rounded-md border border-green-600/40 bg-green-600/10 p-4 text-sm text-foreground"
+            className="rounded-md border border-success/40 bg-success/10 p-4 text-sm text-foreground"
           >
             <p className="font-medium">{t("found")}</p>
             <p className="mt-1 text-muted-foreground">
@@ -148,7 +148,7 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
             <span
               className={
                 pdfCheck === "match"
-                  ? "text-sm font-medium text-green-700"
+                  ? "text-sm font-medium text-success"
                   : pdfCheck === "mismatch"
                     ? "text-sm font-medium text-destructive"
                     : "text-sm text-muted-foreground"
