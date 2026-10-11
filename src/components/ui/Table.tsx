@@ -4,7 +4,13 @@ import type {
   TdHTMLAttributes,
   ThHTMLAttributes,
 } from "react";
-import { cn } from "./cn";
+import MuiTable from "@mui/material/Table";
+import MuiTableBody from "@mui/material/TableBody";
+import MuiTableCell from "@mui/material/TableCell";
+import type { TableCellProps } from "@mui/material/TableCell";
+import MuiTableContainer from "@mui/material/TableContainer";
+import MuiTableHead from "@mui/material/TableHead";
+import MuiTableRow from "@mui/material/TableRow";
 
 export function Table({
   className,
@@ -12,14 +18,11 @@ export function Table({
   ...props
 }: HTMLAttributes<HTMLTableElement>) {
   return (
-    <div className="w-full overflow-x-auto">
-      <table
-        className={cn("w-full border-collapse text-sm", className)}
-        {...props}
-      >
+    <MuiTableContainer>
+      <MuiTable size="small" className={className} {...props}>
         {children}
-      </table>
-    </div>
+      </MuiTable>
+    </MuiTableContainer>
   );
 }
 
@@ -29,12 +32,9 @@ export function TableHead({
   ...props
 }: HTMLAttributes<HTMLTableSectionElement>) {
   return (
-    <thead
-      className={cn("border-b border-border text-muted-foreground", className)}
-      {...props}
-    >
+    <MuiTableHead className={className} {...props}>
       {children}
-    </thead>
+    </MuiTableHead>
   );
 }
 
@@ -44,9 +44,9 @@ export function TableBody({
   ...props
 }: HTMLAttributes<HTMLTableSectionElement>) {
   return (
-    <tbody className={cn("divide-y divide-border", className)} {...props}>
+    <MuiTableBody className={className} {...props}>
       {children}
-    </tbody>
+    </MuiTableBody>
   );
 }
 
@@ -56,9 +56,9 @@ export function TableRow({
   ...props
 }: HTMLAttributes<HTMLTableRowElement>) {
   return (
-    <tr className={cn("hover:bg-background/60", className)} {...props}>
+    <MuiTableRow hover className={className} {...props}>
       {children}
-    </tr>
+    </MuiTableRow>
   );
 }
 
@@ -68,13 +68,15 @@ export function TableHeaderCell({
   ...props
 }: ThHTMLAttributes<HTMLTableCellElement>) {
   return (
-    <th
+    <MuiTableCell
+      component="th"
       scope="col"
-      className={cn("px-3 py-2 text-start font-medium", className)}
-      {...props}
+      className={className}
+      sx={{ fontWeight: 500, color: "text.secondary" }}
+      {...(props as unknown as TableCellProps)}
     >
       {children}
-    </th>
+    </MuiTableCell>
   );
 }
 
@@ -84,9 +86,9 @@ export function TableCell({
   ...props
 }: TdHTMLAttributes<HTMLTableCellElement>) {
   return (
-    <td className={cn("px-3 py-2 align-middle", className)} {...props}>
+    <MuiTableCell className={className} {...(props as unknown as TableCellProps)}>
       {children}
-    </td>
+    </MuiTableCell>
   );
 }
 
@@ -98,13 +100,14 @@ export function TableEmpty({
   children: ReactNode;
 }) {
   return (
-    <tr>
-      <td
+    <MuiTableRow>
+      <MuiTableCell
         colSpan={colSpan}
-        className="px-3 py-8 text-center text-muted-foreground"
+        align="center"
+        sx={{ py: 4, color: "text.secondary" }}
       >
         {children}
-      </td>
-    </tr>
+      </MuiTableCell>
+    </MuiTableRow>
   );
 }

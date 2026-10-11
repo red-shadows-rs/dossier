@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import { cn } from "./cn";
+import MuiFormControl from "@mui/material/FormControl";
+import MuiFormHelperText from "@mui/material/FormHelperText";
+import MuiFormLabel from "@mui/material/FormLabel";
 
 export type FieldProps = {
   label: ReactNode;
@@ -21,24 +23,19 @@ export function Field({
   children,
 }: FieldProps) {
   return (
-    <div className={cn("flex flex-col gap-1", className)}>
-      <label htmlFor={htmlFor} className="text-sm font-medium text-foreground">
-        {label}
-        {required ? (
-          <span aria-hidden="true" className="text-destructive">
-            {" *"}
-          </span>
-        ) : null}
-      </label>
+    <MuiFormControl
+      fullWidth
+      size="small"
+      error={Boolean(error)}
+      required={required}
+      className={className}
+    >
+      <MuiFormLabel htmlFor={htmlFor}>{label}</MuiFormLabel>
       {children}
-      {hint && !error ? (
-        <p className="text-xs text-muted-foreground">{hint}</p>
-      ) : null}
+      {hint && !error ? <MuiFormHelperText>{hint}</MuiFormHelperText> : null}
       {error ? (
-        <p role="alert" className="text-xs text-destructive">
-          {error}
-        </p>
+        <MuiFormHelperText role="alert">{error}</MuiFormHelperText>
       ) : null}
-    </div>
+    </MuiFormControl>
   );
 }

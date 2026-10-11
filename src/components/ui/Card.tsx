@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
-import { cn } from "./cn";
+import MuiBox from "@mui/material/Box";
+import MuiCard from "@mui/material/Card";
+import MuiCardContent from "@mui/material/CardContent";
+import MuiTypography from "@mui/material/Typography";
 
 export function Card({
   className,
@@ -9,14 +12,9 @@ export function Card({
   children: ReactNode;
 }) {
   return (
-    <section
-      className={cn(
-        "rounded-lg border border-border bg-surface text-foreground",
-        className,
-      )}
-    >
+    <MuiCard component="section" variant="outlined" className={className}>
       {children}
-    </section>
+    </MuiCard>
   );
 }
 
@@ -28,14 +26,22 @@ export function CardHeader({
   children: ReactNode;
 }) {
   return (
-    <header
-      className={cn(
-        "flex items-center justify-between gap-3 border-b border-border px-4 py-3",
-        className,
-      )}
+    <MuiBox
+      component="header"
+      className={className}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 1.5,
+        px: 2,
+        py: 1.5,
+        borderBottom: "1px solid",
+        borderColor: "divider",
+      }}
     >
       {children}
-    </header>
+    </MuiBox>
   );
 }
 
@@ -47,7 +53,14 @@ export function CardTitle({
   children: ReactNode;
 }) {
   return (
-    <h2 className={cn("text-base font-semibold", className)}>{children}</h2>
+    <MuiTypography
+      component="h2"
+      variant="subtitle1"
+      className={className}
+      sx={{ fontWeight: 600 }}
+    >
+      {children}
+    </MuiTypography>
   );
 }
 
@@ -58,7 +71,11 @@ export function CardContent({
   className?: string;
   children: ReactNode;
 }) {
-  return <div className={cn("p-4", className)}>{children}</div>;
+  return (
+    <MuiCardContent className={className} sx={{ p: 2, "&:last-child": { pb: 2 } }}>
+      {children}
+    </MuiCardContent>
+  );
 }
 
 export function CardFooter({
@@ -69,13 +86,21 @@ export function CardFooter({
   children: ReactNode;
 }) {
   return (
-    <footer
-      className={cn(
-        "flex items-center justify-end gap-2 border-t border-border px-4 py-3",
-        className,
-      )}
+    <MuiBox
+      component="footer"
+      className={className}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        gap: 1,
+        px: 2,
+        py: 1.5,
+        borderTop: "1px solid",
+        borderColor: "divider",
+      }}
     >
       {children}
-    </footer>
+    </MuiBox>
   );
 }
