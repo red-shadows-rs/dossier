@@ -39,12 +39,7 @@ export function MobileNav({
       >
         <MenuIcon size={18} aria-hidden="true" />
       </MuiIconButton>
-      <MuiDrawer
-        anchor={side}
-        open={open}
-        onClose={() => setOpen(false)}
-        ModalProps={{ keepMounted: true }}
-      >
+      <MuiDrawer anchor={side} open={open} onClose={() => setOpen(false)}>
         <MuiBox
           sx={{
             width: 256,
