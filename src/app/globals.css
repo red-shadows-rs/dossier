@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@config "../../tailwind.config.ts";
+@config "../../tailwind.config.mjs";
 
 /* Theme tokens per DOSSIER_PLAN.md 5.8 — dark is the default */
 :root {
