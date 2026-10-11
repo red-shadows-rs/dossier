@@ -288,3 +288,8 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
   - Screenshots + overflow: `tmp/ui-shots/mui/` (28 PNGs = dashboard, clients, login × 320/768/1440 × dark/light × en/ar). Automated overflow probe: **no horizontal overflow** (>1px) at any width/theme/locale.
   - `UNVERIFIED:` pixel-level visual inspection — this model cannot read image input; screenshots are artifacts for human/vision review. Correctness rests on the automated overflow probe + behavioral `rtl.spec.ts`.
   - `git status`: only `ui-*.md` modified + untracked `.briefwright/` (external tool). `git diff --stat pre-mui-migration..HEAD`: presentation files only (components/ui, components/layout, forms touched for tokens/raw buttons, `Providers.tsx`, `theme.ts`, `layout.tsx`, `globals.css`, `tailwind.config.ts`, package files, docs). No `.env`, no `src/server`, `src/db`, services, or stores changed.
+
+## Post-review fix (`/review unpushed`)
+
+- Code review of the 13 unpushed commits (base = tag `pre-mui-migration`; no upstream/default base branch exists in this repo). Six tracks assessed; one **WARNING** found: `MobileNav.tsx:46` `ModalProps={{ keepMounted: true }}` kept the closed drawer subtree mounted on every page/viewport (a new always-on cost vs the lazy Radix `Sheet`).
+- Fixed (`5fb0208`): removed `keepMounted` so the temporary drawer mounts on demand. Verify: `typecheck` 0 · `build` 0 warnings · `test:e2e` **3/3**. Approved with that single non-blocking issue.
