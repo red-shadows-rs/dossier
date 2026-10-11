@@ -1,18 +1,37 @@
-import { forwardRef, type SelectHTMLAttributes } from "react";
-import { cn } from "./cn";
+import {
+  forwardRef,
+  type ComponentType,
+  type ReactNode,
+  type SelectHTMLAttributes,
+} from "react";
+import MuiSelectBase from "@mui/material/Select";
+
+type LooseSelectProps = Record<string, unknown> & { children?: ReactNode };
+
+const MuiSelect = MuiSelectBase as unknown as ComponentType<LooseSelectProps>;
 
 export const Select = forwardRef<
   HTMLSelectElement,
   SelectHTMLAttributes<HTMLSelectElement>
->(function Select({ className, ...props }, ref) {
+>(function Select(
+  { className, children, value, onChange, defaultValue, id, disabled, ...props },
+  ref,
+) {
   return (
-    <select
-      ref={ref}
-      className={cn(
-        "h-10 w-full rounded-md border border-border bg-surface px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60",
-        className,
-      )}
-      {...props}
-    />
+    <MuiSelect
+      native
+      variant="outlined"
+      size="small"
+      fullWidth
+      className={className}
+      id={id}
+      disabled={disabled}
+      value={value}
+      defaultValue={defaultValue}
+      onChange={onChange}
+      inputProps={{ ...(props as object), ref }}
+    >
+      {children}
+    </MuiSelect>
   );
 });
