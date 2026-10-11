@@ -44,6 +44,7 @@ export function createAppTheme(direction: AppDirection) {
     components: {
       MuiButton: {
         defaultProps: { disableElevation: true },
+        styleOverrides: { root: { gap: 8 } },
       },
       MuiPaper: {
         defaultProps: { elevation: 0 },

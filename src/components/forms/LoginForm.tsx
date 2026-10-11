@@ -3,6 +3,8 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { LogIn, Lock, Mail } from "lucide-react";
+import InputAdornment from "@mui/material/InputAdornment";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import type { ErrorCode } from "@/lib/errors";
@@ -63,6 +65,11 @@ export function LoginForm() {
           autoComplete="email"
           required
           dir="ltr"
+          startAdornment={
+            <InputAdornment position="start">
+              <Mail size={16} aria-hidden="true" />
+            </InputAdornment>
+          }
         />
       </div>
 
@@ -77,10 +84,16 @@ export function LoginForm() {
           autoComplete="current-password"
           required
           dir="ltr"
+          startAdornment={
+            <InputAdornment position="start">
+              <Lock size={16} aria-hidden="true" />
+            </InputAdornment>
+          }
         />
       </div>
 
       <Button type="submit" loading={pending}>
+        {pending ? null : <LogIn size={16} aria-hidden="true" />}
         {pending ? t("auth.signingIn") : t("auth.signIn")}
       </Button>
     </form>

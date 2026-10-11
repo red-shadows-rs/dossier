@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -35,7 +36,10 @@ export default async function UsersPage() {
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
         <Link href="/users/new">
-          <Button type="button">{t("new")}</Button>
+          <Button type="button">
+            <Plus size={16} aria-hidden="true" />
+            {t("new")}
+          </Button>
         </Link>
       </div>
 

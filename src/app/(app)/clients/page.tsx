@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -59,7 +60,10 @@ export default async function ClientsPage({
         <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
         {canWrite ? (
           <Link href="/clients/new">
-            <Button type="button">{t("new")}</Button>
+            <Button type="button">
+              <Plus size={16} aria-hidden="true" />
+              {t("new")}
+            </Button>
           </Link>
         ) : null}
       </div>

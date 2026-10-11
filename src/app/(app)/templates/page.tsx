@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -28,7 +29,10 @@ export default async function TemplatesPage() {
         <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
         {can(user, "templates.write") ? (
           <Link href="/templates/new">
-            <Button type="button">{t("new")}</Button>
+            <Button type="button">
+            <Plus size={16} aria-hidden="true" />
+            {t("new")}
+          </Button>
           </Link>
         ) : null}
       </div>
