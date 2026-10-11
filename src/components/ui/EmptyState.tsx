@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import { cn } from "./cn";
+import MuiBox from "@mui/material/Box";
+import MuiStack from "@mui/material/Stack";
+import MuiTypography from "@mui/material/Typography";
 
 export function EmptyState({
   icon,
@@ -15,22 +17,38 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <div
-      className={cn(
-        "flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border px-6 py-12 text-center",
-        className,
-      )}
+    <MuiStack
+      spacing={1.5}
+      className={className}
+      sx={{
+        alignItems: "center",
+        justifyContent: "center",
+        border: "1px dashed",
+        borderColor: "divider",
+        borderRadius: (theme) => theme.shape.borderRadius,
+        px: 3,
+        py: 6,
+        textAlign: "center",
+      }}
     >
       {icon ? (
-        <div className="text-muted-foreground" aria-hidden="true">
+        <MuiBox sx={{ color: "text.secondary" }} aria-hidden="true">
           {icon}
-        </div>
+        </MuiBox>
       ) : null}
-      <p className="text-base font-medium text-foreground">{title}</p>
+      <MuiTypography variant="body1" sx={{ fontWeight: 500 }}>
+        {title}
+      </MuiTypography>
       {description ? (
-        <p className="max-w-md text-sm text-muted-foreground">{description}</p>
+        <MuiTypography
+          variant="body2"
+          color="text.secondary"
+          sx={{ maxWidth: "28rem" }}
+        >
+          {description}
+        </MuiTypography>
       ) : null}
       {action}
-    </div>
+    </MuiStack>
   );
 }

@@ -1,28 +1,11 @@
 "use client";
 
-import {
-  useEffect,
-  useId,
-  useRef,
-  type KeyboardEvent,
-  type ReactNode,
-} from "react";
-import { cn } from "./cn";
-
-const FOCUSABLE_SELECTOR = [
-  "a[href]",
-  "button:not([disabled])",
-  "textarea:not([disabled])",
-  "input:not([disabled])",
-  "select:not([disabled])",
-  '[tabindex]:not([tabindex="-1"])',
-].join(",");
-
-function focusableWithin(root: HTMLElement): HTMLElement[] {
-  return Array.from(
-    root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
-  ).filter((element) => !element.hasAttribute("hidden"));
-}
+import { useId, type ReactNode } from "react";
+import MuiDialog from "@mui/material/Dialog";
+import MuiDialogActions from "@mui/material/DialogActions";
+import MuiDialogContent from "@mui/material/DialogContent";
+import MuiDialogContentText from "@mui/material/DialogContentText";
+import MuiDialogTitle from "@mui/material/DialogTitle";
 
 export type DialogProps = {
   open: boolean;
@@ -43,75 +26,27 @@ export function Dialog({
   footer,
   className,
 }: DialogProps) {
-  const ref = useRef<HTMLDialogElement>(null);
-  const titleId = useId();
   const descriptionId = useId();
 
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-    if (open && !element.open) {
-      element.showModal();
-    } else if (!open && element.open) {
-      element.close();
-    }
-  }, [open]);
-
-  // Explicit focus trap: keep Tab cycling inside the dialog even if the
-  // browser's native modal trap is bypassed (e.g. dev overlays).
-  function onKeyDown(event: KeyboardEvent<HTMLDialogElement>) {
-    if (event.key !== "Tab") return;
-    const root = ref.current;
-    if (!root) return;
-    const items = focusableWithin(root);
-    if (items.length === 0) return;
-    const first = items[0];
-    const last = items[items.length - 1];
-    const active = document.activeElement;
-    const inside = active instanceof HTMLElement && root.contains(active);
-    if (event.shiftKey) {
-      if (!inside || active === first) {
-        event.preventDefault();
-        last.focus();
-      }
-    } else if (!inside || active === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  }
-
   return (
-    <dialog
-      ref={ref}
-      aria-labelledby={titleId}
-      aria-describedby={description ? descriptionId : undefined}
+    <MuiDialog
+      open={open}
       onClose={onClose}
-      onCancel={onClose}
-      onKeyDown={onKeyDown}
-      onClick={(event) => {
-        if (event.target === ref.current) onClose();
-      }}
-      className={cn(
-        "max-h-[calc(100dvh-2rem)] w-[min(32rem,calc(100vw-2rem))] rounded-lg border border-border bg-surface p-0 text-foreground backdrop:bg-black/60",
-        className,
-      )}
+      fullWidth
+      maxWidth="sm"
+      className={className}
+      aria-describedby={description ? descriptionId : undefined}
     >
-      <div className="flex max-h-[calc(100dvh-2rem)] flex-col gap-4 overflow-y-auto p-5">
-        <div className="flex flex-col gap-1">
-          <h2 id={titleId} className="text-lg font-semibold">
-            {title}
-          </h2>
-          {description ? (
-            <p id={descriptionId} className="text-sm text-muted-foreground">
-              {description}
-            </p>
-          ) : null}
-        </div>
-        {children}
-        {footer ? (
-          <div className="flex items-center justify-end gap-2">{footer}</div>
+      <MuiDialogTitle>{title}</MuiDialogTitle>
+      <MuiDialogContent>
+        {description ? (
+          <MuiDialogContentText id={descriptionId} sx={{ mb: children ? 2 : 0 }}>
+            {description}
+          </MuiDialogContentText>
         ) : null}
-      </div>
-    </dialog>
+        {children}
+      </MuiDialogContent>
+      {footer ? <MuiDialogActions>{footer}</MuiDialogActions> : null}
+    </MuiDialog>
   );
 }

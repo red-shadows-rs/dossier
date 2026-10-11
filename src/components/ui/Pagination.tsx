@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { cn } from "./cn";
+import MuiBox from "@mui/material/Box";
+import MuiButton from "@mui/material/Button";
+import MuiTypography from "@mui/material/Typography";
 
 export function Pagination({
   page,
@@ -27,47 +29,57 @@ export function Pagination({
   }
 
   return (
-    <nav
+    <MuiBox
+      component="nav"
       aria-label={t("pagination")}
-      className="flex items-center justify-between gap-3 pt-2"
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 1.5,
+        pt: 1,
+      }}
     >
       {safePage > 1 ? (
-        <Link
+        <MuiButton
+          component={Link}
           href={href(safePage - 1)}
-          className="rounded-md border border-border px-3 py-1 text-sm text-foreground hover:bg-surface"
+          variant="outlined"
+          color="inherit"
+          size="small"
         >
           {t("previous")}
-        </Link>
+        </MuiButton>
       ) : (
-        <span
-          aria-disabled="true"
-          className={cn(
-            "rounded-md border border-border px-3 py-1 text-sm text-muted-foreground opacity-50",
-          )}
-        >
+        <MuiButton variant="outlined" color="inherit" size="small" disabled>
           {t("previous")}
-        </span>
+        </MuiButton>
       )}
 
-      <span className="text-sm text-muted-foreground tabular-nums" dir="ltr">
+      <MuiTypography
+        variant="body2"
+        color="text.secondary"
+        dir="ltr"
+        sx={{ fontVariantNumeric: "tabular-nums" }}
+      >
         {safePage} / {totalPages}
-      </span>
+      </MuiTypography>
 
       {safePage < totalPages ? (
-        <Link
+        <MuiButton
+          component={Link}
           href={href(safePage + 1)}
-          className="rounded-md border border-border px-3 py-1 text-sm text-foreground hover:bg-surface"
+          variant="outlined"
+          color="inherit"
+          size="small"
         >
           {t("next")}
-        </Link>
+        </MuiButton>
       ) : (
-        <span
-          aria-disabled="true"
-          className="rounded-md border border-border px-3 py-1 text-sm text-muted-foreground opacity-50"
-        >
+        <MuiButton variant="outlined" color="inherit" size="small" disabled>
           {t("next")}
-        </span>
+        </MuiButton>
       )}
-    </nav>
+    </MuiBox>
   );
 }
