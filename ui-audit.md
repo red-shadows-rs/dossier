@@ -1,6 +1,8 @@
 # UI Audit — Dossier
 
-Read-only inventory + findings. Evidence is exact file paths and line numbers (branch `ui-redesign`, HEAD `1d27711`).
+> **Two runs in this file.** The inventory and findings below are from **Run 1 (shadcn/ui)** and remain valid (they are library-agnostic). **Run 2 (MUI) is ACTIVE:** the user set `UI_LIBRARY: mui` while the project already uses shadcn/ui, so this run pivots to a MUI migration. MUI-specific findings are in the **"MUI migration audit (active)"** section at the end.
+
+Read-only inventory + findings. Evidence is exact file paths and line numbers. (Run 1: branch `ui-redesign`, HEAD `1d27711`. Run 2 baseline: HEAD `20313cb`, see `ui-log.md`.)
 
 > Summary: the UI is already **flat, tokenized, RTL-clean, single-font (Cairo), i18n-complete, no emoji, no gradients, no fake data**. It does NOT have the usual "AI slop". The real defects are **structural (mobile navigation is missing)** and **consistency** (radius scale, status-color tokens, touch targets, dialog overflow).
 
@@ -195,3 +197,114 @@ Client, Project, Contract builder (6 steps), Invoice lines/meta, Template, Setti
 - States present: loading (`Button loading`), empty (`TableEmpty`, `EmptyState`), error (`error.tsx`, form alerts), success (`Toast`). Missing: route-level `loading.tsx` skeleton.
 - Extremes to test: long client name (`max-w-[10rem] truncate` in `UserMenu.tsx:13`), long unbroken strings in tables (`ellipsis`?), 0/1/many rows, multi-currency amounts (`dir="ltr" tabular-nums`), Arabic + English mixed (`BilingualField`, `ClientName`), Arabic-Indic vs Western digits.
 - RTL/LTR: both supported; keep `check:rtl` + `rtl.spec.ts` green.
+
+---
+
+# MUI migration audit (active) — Run 2
+
+Scope: move the project from **shadcn/ui** to **MUI (Material UI)** as the single component library, keeping Tailwind for layout (extension §8). Findings use the same template. Baseline and inventory deltas are in `ui-log.md` (MUI RUN section).
+
+## M-001
+- Severity: High
+- Category: Slop / Inconsistency (second library)
+- File: `components.json`, `package.json:41` (`radix-ui`), `src/components/ui/*` (shadcn files), `src/lib/utils.ts`
+- Evidence: the project ships shadcn/ui + Radix (`sheet`, `dropdown-menu`, and 11 dead shadcn files) as a component library while MUI is the required single library.
+- Why it is a problem: §11 allows exactly ONE component library. Two component systems (shadcn/Radix + MUI) must never coexist.
+- Exact fix: after the MUI primitives/overlays are in place, remove the shadcn/Radix layer (files + deps + `components.json`) with a `grep` proof (see `ui-plan.md` T-M20).
+- Verification command and expected result: `grep -rEn "from ['\"](radix-ui|@radix-ui)" src` returns nothing; `npx shadcn`/registry files gone; build+lint+test green.
+- Risk of the fix: medium (removal only after proof; one file per commit).
+
+## M-002
+- Severity: High
+- Category: Slop / Inconsistency
+- File: `src/components/layout/MobileNav.tsx:8-13` (shadcn `Sheet`), `src/components/layout/UserMenu.tsx` (shadcn `DropdownMenu`)
+- Evidence: the only live shadcn usage is the mobile nav (Radix Dialog based) and the user menu (Radix DropdownMenu based).
+- Why it is a problem: Radix libs must be replaced by MUI `Drawer` / `Menu` to satisfy M-001 while keeping behavior (focus trap, Escape, RTL side).
+- Exact fix: reimplement both with MUI `Drawer` (`temporary`) and `Menu`/`MenuItem`; keep the same entries/props and the side-follows-`dir` behavior.
+- Verification command and expected result: at 375px the drawer opens with all nav entries and closes on Escape/backdrop; user menu opens/keys/Escape; RTL side correct.
+- Risk of the fix: low–medium (behavior must match Run 1 probes: 9 nav links, 2 menu items).
+
+## M-003
+- Severity: High
+- Category: Dead code
+- File: `src/components/ui/{alert,alert-dialog,checkbox,label,popover,radio-group,separator,skeleton,switch,tabs,table,badge,tooltip}.tsx`
+- Evidence: these files are never imported (`grep -rIl "components/ui/<name>" src` = 0). `class-variance-authority` is used only by `tabs`/`alert`; `@/lib/utils` only by dead shadcn files.
+- Why it is a problem: dead UI code and unused deps (§2.1; Phase 8).
+- Exact fix: remove them and the now-unused deps **after** proving zero references (one removal per commit).
+- Verification command and expected result: no references; `class-variance-authority`, `tw-animate-css` reachable only if still used; build+lint+test green.
+- Risk of the fix: low.
+
+## M-004
+- Severity: High
+- Category: Inconsistency (theme single source of truth)
+- File: new `src/theme.ts`; `src/app/globals.css`; `tailwind.config.ts`
+- Evidence: tokens live in `globals.css` CSS variables; components use Tailwind utilities and inline `className`; MUI has no theme yet.
+- Why it is a problem: §3.2 requires ONE theme definition for palette/typography/spacing/radius/shadows/breakpoints/component defaults/light+dark/direction. Without it, MUI defaults (Material palette, Roboto, elevation) would leak in and diverge from the existing look.
+- Exact fix: create `src/theme.ts` (`createTheme`) with `cssVariables`, `colorSchemes.light/dark`, `colorSchemeSelector: 'class'`, `shape.borderRadius: 6`, `typography.fontFamily` = Cairo var, flat `MuiPaper`/`MuiCard`/`MuiAppBar`/`MuiButton` defaults; map `--primary #e11d48`, neutral surfaces, and status colors. Align `globals.css` to the same values.
+- Verification command and expected result: body bg/text/primary match the Run 1 parity probe (`#0b0b0f`/`#ffffff`, `#ededf0`/`#16161a`, `#e11d48`); no MUI default purple anywhere.
+- Risk of the fix: medium (both themes must be re-checked).
+
+## M-005
+- Severity: High
+- Category: Accessibility / Responsive (RTL)
+- File: `src/app/layout.tsx:32-36`; new providers
+- Evidence: app is RTL by default (`dir` from locale); MUI needs an Emotion cache with `stylis-plugin-rtl` to flip logical CSS per direction.
+- Why it is a problem: without the RTL cache, MUI components (Drawer/Menu/Dialog/Tabs/Autocomplete) render LTR internally while the page is RTL — broken layout.
+- Exact fix: add a client providers component that builds `createCache({ key, stylisPlugins: [prefixer, rtlPlugin] })` for `ar` and a default cache for `en`, switching on the current locale; verify against the official MUI RTL guide for the installed version (`UNVERIFIED:` interaction with `cssVariables`).
+- Verification command and expected result: `check:rtl` 0; `rtl.spec.ts` green; Drawer/Menu/Dialog open on the correct side in `ar`; chevrons/back arrows mirror (logos/numbers do not).
+- Risk of the fix: medium–high.
+
+## M-006
+- Severity: High
+- Category: Bug (SSR/App Router integration)
+- File: `src/app/layout.tsx`; new providers; `next.config.ts`
+- Evidence: Next.js 16 App Router; MUI needs its App Router cache provider; `styled-components` is not used, so the Emotion engine applies.
+- Why it is a problem: without `AppRouterCacheProvider`, MUI styles can flash/mis-order; without `InitColorSchemeScript`, the color scheme flashes on load.
+- Exact fix: add `@mui/material-nextjs` `AppRouterCacheProvider` and `InitColorSchemeScript` per the official Next.js integration guide; import path depends on the Next version (`v15-appRouter` for Next 15; **Next 16 path `UNVERIFIED:`**).
+- Verification command and expected result: no style flash; browser console has no MUI hydration/ordering warnings; build green.
+- Risk of the fix: medium (must confirm the exact import path for Next 16).
+
+## M-007
+- Severity: Medium
+- Category: Inconsistency (status color tokens)
+- File: `src/components/ui/Badge.tsx:8-14`, `src/components/ui/Toast.tsx:33-34`, `src/components/forms/ContractReviewStep.tsx:94,118,132`, `src/components/forms/VerificationForm.tsx:108,151`
+- Evidence: raw Tailwind palette (`blue/green/red/amber/teal-500`) for status instead of semantic tokens; same as Run 1 U-005.
+- Why it is a problem: colors must come from the theme (§3.2); raw palette can fail contrast in one theme.
+- Exact fix: express tones from MUI palette/status colors (`success`/`warning`/`error`/`info`) keeping the same `BadgeTone` union, `contractStatusTone`/`invoiceStatusTone` mapping, and the same visual meaning.
+- Verification command and expected result: light+dark status badges ≥ 4.5:1 text contrast; no raw palette utilities left in `ui/`/the two forms.
+- Risk of the fix: low–medium.
+
+## M-008
+- Severity: Medium
+- Category: Consistency (elevation)
+- File: `src/components/ui/Toast.tsx:73` (`shadow-lg`); shadcn overlays
+- Evidence: a single overlay shadow; shadcn overlays carry their own shadows/`backdrop-blur-xs`.
+- Why it is a problem: §2.2 allows exactly one elevation level, overlays only, from the theme.
+- Exact fix: map overlay elevation to MUI defaults (`Snackbar`/`Popover`/`Dialog` elevation); `MuiPaper` flat with `backgroundImage: 'none'`.
+- Verification command and expected result: `grep` shows no literal shadows in app code; only MUI overlay elevation remains.
+- Risk of the fix: low.
+
+## M-009
+- Severity: Low
+- Category: Inconsistency
+- File: `src/app/(app)/layout.tsx:26` (`max-w-[1280px]`)
+- Evidence: arbitrary content-width magic number (Run 1 U-011).
+- Why it is a problem: magic number instead of a token; wide 1920/2560 targets.
+- Exact fix: express the content width via MUI `Container maxWidth` or a theme token (or keep a named Tailwind token).
+- Verification command and expected result: 1440/1920/2560 screenshots keep readable line length and centered content.
+- Risk of the fix: low.
+
+## M-010
+- Severity: Low
+- Category: Accessibility
+- File: `src/components/forms/SignaturePad.tsx:39` (`penColor: "#111111"`)
+- Evidence: raw hex for canvas ink.
+- Why it is a problem: none — functional (signature ink must be a fixed dark color on the white pad), not decoration.
+- Exact fix: keep as-is; justified item.
+- Verification command and expected result: n/a.
+- Risk of the fix: n/a.
+
+## MUI audit — component mapping (target)
+
+- Button/IconButton → `Button`/`IconButton`; Inputs → `TextField`/`Select`/`Autocomplete`/`Checkbox`/`Radio`/`Switch`; forms → `FormControl`+`FormLabel`+`FormHelperText`; Modal → `Dialog` (`fullScreen` on `sm`); Menus → `Menu`; Drawer → `Drawer` (temporary < `md`, permanent ≥ `md`); Nav → `AppBar`/`Toolbar` + `List`/`ListItemButton`; Tabs → `Tabs`/`Tab`; Table → `Table` inside `TableContainer` (+ card list `<sm`); Pagination → `Pagination`/`TablePagination`; Status → `Chip`/`Alert`; Loading → `Skeleton`/`CircularProgress`/`LinearProgress`; Toasts → `Snackbar`+`Alert`; layout → `Container`/`Stack`/`Grid`/`Box`.
+- Broken imports to keep fixed: icons must be path imports (`@mui/icons-material/Add`), never the barrel.

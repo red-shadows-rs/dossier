@@ -1,7 +1,9 @@
 # UI Redesign — Log
 
 > Presentation-layer only. No business logic, API, routing, data shape, state, or env changes.
-> Status: **Phase 0–5 complete, stopped at CHECKPOINT (waiting for user approval).**
+> Status: **Two runs in this file.** Run 1 (shadcn/ui) is historical. **Run 2 (MUI) is ACTIVE** and was stopped at its CHECKPOINT. The ACTIVE settings/plan/findings are in the "MUI RUN (ACTIVE)" sections at the end; Run 1 is kept for history.
+
+> Run 1 settings: `UI_LIBRARY: auto` → shadcn/ui. Run 2 settings: **`UI_LIBRARY: mui`, `APPROVAL: always`**.
 
 ## Settings
 
@@ -164,3 +166,78 @@ The shadcn `radix-nova` registry is Tailwind v4-first and collides by filename-c
 ```
 git reset --hard pre-ui-redesign      # or: git checkout t-044-deps-upgrade
 ```
+
+---
+
+# MUI RUN (ACTIVE)
+
+> `UI_LIBRARY: mui` · `APPROVAL: always` · stopped at Phase 5 CHECKPOINT (no source file edited, nothing installed).
+
+## Conflict resolution (§3.0 rule 1)
+
+- The request sets `UI_LIBRARY: mui`, but the project **already uses shadcn/ui** (a different one of the four libraries). Per §3.0 rule 1 → **stop and ask**.
+- Confirmed facts: `components.json` (shadcn schema), `radix-ui` in deps, shadcn files in `src/components/ui`, `src/lib/utils.ts`. `@mui/*` and `@emotion/*` are **not installed**.
+- Asked the user. **Decision: migrate to MUI as requested.** This supersedes the Run 1 shadcn plan (kept for history).
+
+## Phase 0 — safety net + baseline (verification this run)
+
+| Step | Command | Result |
+| --- | --- | --- |
+| Working dir | `pwd` | `/home/shadow-x7/Projects/Websites/Typescript/Next.js/Dossier` |
+| Git state | `git status` | branch `ui-redesign`; only untracked `.briefwright/` (external tool artifact; left untouched, not committed) |
+| Existing tag | `git tag` | `pre-ui-redesign` at `1d27711` (pre-shadcn) |
+| Safety tag | `git tag -a pre-mui-migration` | created at HEAD `20313cb` (post-shadcn) = rollback point for this attempt |
+| Install | `npm install` | exit 0, “up to date, audited 561 packages”; 14 vulnerabilities (5 moderate, 6 high, 3 critical) — pre-existing (T-043), out of scope |
+| Typecheck | `npm run typecheck` | **exit 0** |
+| Lint | `npm run lint` | **exit 0** |
+| RTL | `npm run check:rtl` | **exit 0** |
+| Tests | `npm run test` | **59 files / 494 passed** |
+| Build | `npm run build` | **exit 0** (36 routes) |
+| Start | `node .next/standalone/server.js` | boots; `/api/health` = **200** on host `fedora:3000` (standalone binds to hostname, not 127.0.0.1) |
+
+Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 494/494 · `build` 0 warnings · `/api/health` 200.
+
+`UNVERIFIED:` before-screenshots for this run were **not** re-captured; Run 1 artifacts remain at `tmp/ui-shots/before/` + `after/` (git-ignored). Re-capture at Phase 6 execution.
+
+## Phase 1 — inventory (read-only deltas)
+
+- Counts: **36 pages**, **72 components**, **37 form files**, **27 `ui/*`**.
+- Actually-imported primitives (files): `Button` 51 · `Card` 33 · `Toast` 30 · `Field` 26 · `Input` 24 · `Select` 20 · `Badge` 15 · `Textarea` 11 · `Table` 11 · `EmptyState` 10 · `ConfirmDialog` 7 · `Pagination` 5 · `Dialog` 3 · `cn` 12. Shadcn: `sheet` 1 (`MobileNav`), `dropdown-menu` 1 (`UserMenu`).
+- **Dead shadcn files** (never imported): `alert`, `alert-dialog`, `checkbox`, `label`, `popover`, `radio-group`, `separator`, `skeleton`, `switch`, `tabs`, `table`, `badge`, `tooltip`.
+- Dependency proof: `radix-ui` imported by `Button.tsx` (Slot) + 11 dead shadcn files; `@/lib/utils` only by dead shadcn files; `class-variance-authority` only by dead shadcn files (`tabs`, `alert`); `tw-animate-css` only in `globals.css`; `lucide-react` in 6 files.
+- Tokens / theme / font — unchanged from Run 1: `globals.css` CSS variables (dark default + `.light` + `prefers-color-scheme`), `--radius: 0.5rem`, Cairo via `next/font/local`, class-based theme (`dossier_theme` cookie), RTL by default (`dir` from locale).
+
+## Phase 2 — AI-slop scan (current, MUI criteria)
+
+- Gradients: **none**. Literal `box-shadow`: **none**. Gradients/blur: only `backdrop-blur-xs` in shadcn overlays (`alert-dialog.tsx:39`, `sheet.tsx:40`) — dead/overlay.
+- Raw hex in components: only `SignaturePad.tsx:39` (`penColor: "#111111"`, canvas ink) — justified, keep.
+- Raw palette status colors (to move to tokens/palette): `Badge.tsx:8-14`, `Toast.tsx:33-34`, `ContractReviewStep.tsx:94,118,132`, `VerificationForm.tsx:108,151`.
+- Elevation: `shadow-lg` (`Toast.tsx:73`) + shadcn overlay shadows — overlay-only, allowed → map to MUI elevation.
+- No emoji, no hover-lift/scale, no fade-up, no fake data/buzzwords.
+
+## Phase 3 — library selection (MUI)
+
+- **Selected: MUI (Material UI)** — explicit user instruction; alternatives (keep shadcn, or the other three) offered and rejected by the user. Recorded, not silent.
+- **Installed now: none** (`@mui/*`, `@emotion/*` absent). Installation is a planned task pending checkpoint approval.
+- Packages to install (versions `UNVERIFIED:` until resolved against the registry + official docs at execution time):
+  - `@mui/material`, `@emotion/react`, `@emotion/styled`, `@mui/icons-material`, `@mui/material-nextjs` (App Router cache provider), and RTL: `stylis` + `stylis-plugin-rtl`.
+  - Target major **MUI v7**; must verify peer support for React **18.3.1** and the `@mui/material-nextjs` import path for **Next 16** (`UNVERIFIED:`).
+- `@mui/styles`, `@mui/joy`, `@mui/base` are **not** used and will **not** be added. `@mui/styles` is absent (no migration finding).
+
+## Key decisions (recorded)
+
+1. **Adapter strategy (Option A).** Reimplement the app's 15 `ui/*` primitives as thin MUI-backed components that preserve their existing public API (`variant`/`size`/`loading`, `forwardRef`, prop names), so the **67 consumers and all 494 tests keep working**; use MUI directly for overlays (`Drawer`, `Menu`, `Dialog`, `Snackbar`). Rationale: safety rules 1/2/13 (small verified steps, never break working code, preserve every feature). Option B (rewrite all 67 consumers to import directly from `@mui/material`) is far larger and riskier.
+2. **Tailwind coexistence.** Tailwind stays as the existing utility/layout engine; MUI is the single **component** library (§11 refers to component libraries). MUI components are styled via `sx`/theme only, never re-styled with utility classes (§8). One theme source of truth: `src/theme.ts`.
+3. **Theme mode.** Reuse the existing class-based theme (`.dark`/`.light` + cookie) via MUI v7 `cssVariables` + `colorSchemeSelector: 'class'` so MUI and Tailwind read the same classes (`UNVERIFIED:` exact selector value for the installed version).
+
+## Needs user decision (checkpoint)
+
+1. Approve the network **install** of the MUI/Emotion/RTL packages above.
+2. Approve **Option A** (adapter) vs **Option B** (direct-MUI rewrite of all consumers).
+3. Approve **keeping Tailwind** for layout alongside MUI.
+4. `UNVERIFIED:` MUI major (v7) vs Next 16 `@mui/material-nextjs` path + React 18 peer support — decide whether to pin a version after I query the registry at execution time.
+5. Confirm rollback point = tag **`pre-mui-migration`** (current HEAD, post-shadcn). The older `pre-ui-redesign` predates the shadcn work.
+
+## Changes log (this run)
+
+- (none yet — no source file modified, nothing installed; only `ui-*.md` updated and tag `pre-mui-migration` created)
