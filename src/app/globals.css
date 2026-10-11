@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 @config "../../tailwind.config.ts";
 
 /* Theme tokens per DOSSIER_PLAN.md 5.8 — dark is the default */
