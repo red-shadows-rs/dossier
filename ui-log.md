@@ -293,3 +293,14 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 
 - Code review of the 13 unpushed commits (base = tag `pre-mui-migration`; no upstream/default base branch exists in this repo). Six tracks assessed; one **WARNING** found: `MobileNav.tsx:46` `ModalProps={{ keepMounted: true }}` kept the closed drawer subtree mounted on every page/viewport (a new always-on cost vs the lazy Radix `Sheet`).
 - Fixed (`5fb0208`): removed `keepMounted` so the temporary drawer mounts on demand. Verify: `typecheck` 0 · `build` 0 warnings · `test:e2e` **3/3**. Approved with that single non-blocking issue.
+
+## Follow-ups (after the review)
+
+- **Node typeless warning fixed** (`295e65c`): `next dev` printed `[MODULE_TYPELESS_PACKAGE_JSON]` for `tailwind.config.ts`. Fixed with the low-blast-radius option (no global `"type": "module"`): renamed `tailwind.config.ts` → **`tailwind.config.mjs`** (explicit ESM) and updated `@config` in `globals.css`. Verified: warning count 0, `/login` 200, `typecheck`/`build` green. (Earlier `next dev` failures were a **stale `.next` Turbopack cache** holding the removed `tw-animate-css` import + a stuck dev server; cleared `.next`.)
+- **Icons added** (`0e0efd1`): used **`lucide-react`** (the project's existing single icon set — `@mui/icons-material` stays removed).
+  - `Input` primitive extended with optional `startAdornment`/`endAdornment` (forwards to `OutlinedInput`).
+  - Login: `Mail`/`Lock` adornments on the email/password fields and a `LogIn` icon on the submit button.
+  - List pages (clients, contracts, invoices, projects, templates, users): a `Plus` icon on the "new" button.
+  - Theme `MuiButton` gained `styleOverrides.root.gap: 8` so an icon + label are spaced.
+  - Verify: `npm run check` (typecheck/lint/rtl 0, 494/494) · `build` 0 warnings · `test:e2e` 3/3 · runtime DOM shows `lucide-mail/lock/log-in` + `MuiInputAdornment-root` on `/login`.
+  - Remaining icon opportunities (empty states, secondary actions) are not added yet to respect the restraint rule (§2.2).
