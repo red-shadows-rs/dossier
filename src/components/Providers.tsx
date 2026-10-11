@@ -31,7 +31,7 @@ export function Providers({
   const theme = useMemo(() => createAppTheme(dir), [dir]);
 
   return (
-    <AppRouterCacheProvider options={options}>
+    <AppRouterCacheProvider key={dir} options={options}>
       <ThemeProvider theme={theme}>{children}</ThemeProvider>
     </AppRouterCacheProvider>
   );

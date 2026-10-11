@@ -26,6 +26,7 @@ export function Sidebar({
     <MuiDrawer
       variant="permanent"
       open
+      slotProps={{ paper: { component: "aside" } }}
       sx={{
         display: { xs: "none", md: "block" },
         width: WIDTH,

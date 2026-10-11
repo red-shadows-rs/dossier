@@ -25,7 +25,7 @@ export function EmptyState({
         justifyContent: "center",
         border: "1px dashed",
         borderColor: "divider",
-        borderRadius: (theme) => theme.shape.borderRadius,
+        borderRadius: "var(--mui-shape-borderRadius)",
         px: 3,
         py: 6,
         textAlign: "center",
