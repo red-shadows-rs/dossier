@@ -9,6 +9,7 @@ export type FieldProps = {
   error?: string | null;
   hint?: string;
   required?: boolean;
+  requiredMark?: ReactNode;
   className?: string;
   children: ReactNode;
 };
@@ -19,6 +20,7 @@ export function Field({
   error,
   hint,
   required,
+  requiredMark,
   className,
   children,
 }: FieldProps) {
@@ -30,7 +32,19 @@ export function Field({
       required={required}
       className={className}
     >
-      <MuiFormLabel htmlFor={htmlFor}>{label}</MuiFormLabel>
+      <MuiFormLabel
+        htmlFor={htmlFor}
+        sx={{ "& .MuiFormLabel-asterisk": { display: "none" } }}
+      >
+        {label}
+        {required ? (
+          requiredMark ?? (
+            <span aria-hidden="true" className="text-destructive">
+              {" *"}
+            </span>
+          )
+        ) : null}
+      </MuiFormLabel>
       {children}
       {hint && !error ? <MuiFormHelperText>{hint}</MuiFormHelperText> : null}
       {error ? (
