@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import localFont from "next/font/local";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { Providers } from "@/components/Providers";
 import { resolveTheme, THEME_COOKIE, themeClass } from "@/lib/i18n";
 import "./globals.css";
 
@@ -27,17 +28,20 @@ export default async function RootLayout({
   const messages = await getMessages();
   const store = await cookies();
   const theme = resolveTheme(store.get(THEME_COOKIE)?.value);
+  const dir = locale === "ar" ? "rtl" : "ltr";
 
   return (
     <html
       lang={locale}
-      dir={locale === "ar" ? "rtl" : "ltr"}
+      dir={dir}
       className={`${cairo.variable} ${themeClass(theme)}`}
     >
       <body>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
-        </NextIntlClientProvider>
+        <Providers dir={dir}>
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            {children}
+          </NextIntlClientProvider>
+        </Providers>
       </body>
     </html>
   );
