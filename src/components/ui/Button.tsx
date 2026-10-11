@@ -1,6 +1,12 @@
-import { forwardRef, type ButtonHTMLAttributes } from "react";
-import { Slot } from "radix-ui";
-import { cn } from "./cn";
+import {
+  cloneElement,
+  forwardRef,
+  isValidElement,
+  type ButtonHTMLAttributes,
+  type ReactElement,
+} from "react";
+import MuiButton from "@mui/material/Button";
+import MuiIconButton from "@mui/material/IconButton";
 
 export type ButtonVariant =
   | "primary"
@@ -22,83 +28,109 @@ export type ButtonSize =
   | "icon-sm"
   | "icon-xs";
 
-const BASE =
-  "inline-flex items-center justify-center gap-2 rounded-md font-medium whitespace-nowrap outline-none transition-colors focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-60";
+type NativeProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "color">;
 
-const VARIANTS: Record<ButtonVariant, string> = {
-  primary:
-    "bg-primary text-primary-foreground hover:opacity-90 focus-visible:ring-primary",
-  default:
-    "bg-primary text-primary-foreground hover:opacity-90 focus-visible:ring-primary",
-  secondary:
-    "border border-border bg-surface text-foreground hover:border-muted-foreground focus-visible:ring-primary",
-  outline:
-    "border border-border bg-surface text-foreground hover:border-muted-foreground focus-visible:ring-primary",
-  danger:
-    "bg-destructive text-destructive-foreground hover:opacity-90 focus-visible:ring-destructive",
-  destructive:
-    "bg-destructive text-destructive-foreground hover:opacity-90 focus-visible:ring-destructive",
-  ghost:
-    "text-muted-foreground hover:bg-surface hover:text-foreground focus-visible:ring-primary",
-  link: "text-primary underline-offset-4 hover:underline focus-visible:ring-primary",
-};
-
-const SIZES: Record<ButtonSize, string> = {
-  md: "h-10 px-4 text-sm",
-  default: "h-10 px-4 text-sm",
-  sm: "h-8 px-3 text-sm",
-  xs: "h-7 px-2 text-xs",
-  lg: "h-11 px-5 text-sm",
-  icon: "h-10 w-10",
-  "icon-sm": "h-8 w-8",
-  "icon-xs": "h-7 w-7",
-};
-
-export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+export type ButtonProps = NativeProps & {
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
   asChild?: boolean;
 };
 
+const ICON_SIZES: Record<"icon" | "icon-sm" | "icon-xs", "small" | "medium"> = {
+  icon: "medium",
+  "icon-sm": "small",
+  "icon-xs": "small",
+};
+
+const TEXT_SIZES: Record<string, "small" | "medium" | "large"> = {
+  xs: "small",
+  sm: "small",
+  md: "medium",
+  default: "medium",
+  lg: "large",
+};
+
+function toMuiVariant(variant: ButtonVariant): {
+  variant: "contained" | "outlined" | "text";
+  color: "primary" | "error" | "inherit";
+} {
+  switch (variant) {
+    case "secondary":
+    case "outline":
+      return { variant: "outlined", color: "inherit" };
+    case "danger":
+    case "destructive":
+      return { variant: "contained", color: "error" };
+    case "ghost":
+      return { variant: "text", color: "inherit" };
+    case "link":
+      return { variant: "text", color: "primary" };
+    default:
+      return { variant: "contained", color: "primary" };
+  }
+}
+
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   function Button(
     {
-      className,
       variant = "primary",
       size = "md",
       loading,
       disabled,
       asChild,
+      className,
+      children,
+      type,
       ...props
     },
     ref,
   ) {
-    const classes = cn(BASE, VARIANTS[variant], SIZES[size], className);
+    const busy = loading ? true : undefined;
 
-    if (asChild) {
-      const forced = disabled || loading ? true : undefined;
+    if (asChild && isValidElement(children)) {
+      const child = children as ReactElement<{ className?: string }>;
+      return cloneElement(child, {
+        className: [className, child.props.className]
+          .filter(Boolean)
+          .join(" "),
+      });
+    }
+
+    if (size === "icon" || size === "icon-sm" || size === "icon-xs") {
       return (
-        <Slot.Root
+        <MuiIconButton
           ref={ref}
           data-slot="button"
-          aria-busy={loading ? "true" : undefined}
-          {...(forced ? { disabled: forced } : {})}
-          className={classes}
+          size={ICON_SIZES[size]}
+          disabled={disabled || loading}
+          aria-busy={busy}
+          className={className}
           {...props}
-        />
+        >
+          {children}
+        </MuiIconButton>
       );
     }
 
+    const { variant: muiVariant, color } = toMuiVariant(variant);
+
     return (
-      <button
+      <MuiButton
         ref={ref}
         data-slot="button"
-        disabled={disabled || loading}
-        aria-busy={loading ? "true" : undefined}
-        className={classes}
+        type={type ?? "button"}
+        variant={muiVariant}
+        color={color}
+        size={TEXT_SIZES[size] ?? "medium"}
+        loading={loading}
+        disabled={disabled}
+        aria-busy={busy}
+        className={className}
         {...props}
-      />
+      >
+        {children}
+      </MuiButton>
     );
   },
 );
