@@ -39,8 +39,11 @@ export function Field({
         {label}
         {required ? (
           requiredMark ?? (
-            <span aria-hidden="true" className="text-destructive">
-              {" *"}
+            <span
+              aria-hidden="true"
+              className="ms-1 align-super text-xs text-primary"
+            >
+              *
             </span>
           )
         ) : null}
