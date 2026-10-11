@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { cn } from "@/components/ui/cn";
+import MuiListItemButton from "@mui/material/ListItemButton";
+import MuiListItemIcon from "@mui/material/ListItemIcon";
 import type { NavEntry } from "./nav";
 
 export function NavItem({
@@ -17,19 +18,28 @@ export function NavItem({
 }) {
   const Icon = entry.icon;
   return (
-    <Link
+    <MuiListItemButton
+      component={Link}
       href={entry.href}
       aria-current={active ? "page" : undefined}
       onClick={onNavigate}
-      className={cn(
-        "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
-        active
-          ? "bg-primary text-primary-foreground"
-          : "text-muted-foreground hover:bg-background hover:text-foreground",
-      )}
+      selected={active}
+      sx={{
+        gap: 1,
+        py: 1,
+        borderRadius: (theme) => theme.shape.borderRadius,
+        color: "text.secondary",
+        "&.Mui-selected": {
+          bgcolor: "primary.main",
+          color: "primary.contrastText",
+          "&:hover": { bgcolor: "primary.main" },
+        },
+      }}
     >
-      <Icon size={16} aria-hidden="true" className="shrink-0" />
+      <MuiListItemIcon sx={{ minWidth: 0, color: "inherit", fontSize: 0 }}>
+        <Icon size={16} aria-hidden="true" />
+      </MuiListItemIcon>
       <span>{label}</span>
-    </Link>
+    </MuiListItemButton>
   );
 }

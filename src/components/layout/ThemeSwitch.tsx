@@ -2,6 +2,7 @@
 
 import { useId } from "react";
 import { useTranslations } from "next-intl";
+import MuiSelect from "@mui/material/Select";
 import type { Theme } from "@/lib/i18n";
 import { THEMES } from "@/lib/i18n";
 import { setTheme } from "@/server/actions/preferences";
@@ -15,19 +16,25 @@ export function ThemeSwitch({ current }: { current: Theme }) {
       <label htmlFor={id} className="sr-only">
         {t("label")}
       </label>
-      <select
+      <MuiSelect
+        native
+        size="small"
+        variant="outlined"
         id={id}
         name="theme"
         defaultValue={current}
-        onChange={(event) => event.currentTarget.form?.requestSubmit()}
-        className="rounded-md border border-border bg-surface px-2 py-1 text-sm text-foreground"
+        onChange={(event) => {
+          const form = (event.target as unknown as HTMLSelectElement).form;
+          form?.requestSubmit();
+        }}
+        sx={{ minWidth: 96 }}
       >
         {THEMES.map((theme) => (
           <option key={theme} value={theme}>
             {t(theme)}
           </option>
         ))}
-      </select>
+      </MuiSelect>
     </form>
   );
 }

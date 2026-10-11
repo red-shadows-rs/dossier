@@ -1,46 +1,63 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import MuiButton from "@mui/material/Button";
+import MuiMenu from "@mui/material/Menu";
+import MuiMenuItem from "@mui/material/MenuItem";
+import { useTheme } from "@mui/material/styles";
 import { logoutAction } from "@/server/actions/auth";
 import type { SessionUser } from "@/server/auth/session";
 
-export async function UserMenu({ user }: { user: SessionUser }) {
-  const t = await getTranslations("nav");
+export function UserMenu({ user }: { user: SessionUser }) {
+  const t = useTranslations("nav");
+  const theme = useTheme();
+  const horizontal = theme.direction === "rtl" ? "left" : "right";
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const open = Boolean(anchorEl);
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          className="flex cursor-pointer items-center gap-2 rounded-md border border-border px-3 py-1.5 text-sm text-foreground hover:bg-surface focus-visible:ring-2 focus-visible:ring-ring"
+    <>
+      <MuiButton
+        type="button"
+        onClick={(event) => setAnchorEl(event.currentTarget)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        variant="outlined"
+        color="inherit"
+        size="small"
+        endIcon={<ChevronDown size={16} aria-hidden="true" />}
+      >
+        <span className="hidden max-w-[10rem] truncate sm:inline">
+          {user.name}
+        </span>
+      </MuiButton>
+      <MuiMenu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={() => setAnchorEl(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal }}
+        transformOrigin={{ vertical: "top", horizontal }}
+      >
+        <MuiMenuItem
+          component={Link}
+          href="/account"
+          onClick={() => setAnchorEl(null)}
         >
-          <span className="hidden max-w-[10rem] truncate sm:inline">
-            {user.name}
-          </span>
-          <ChevronDown size={16} aria-hidden="true" />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem asChild>
-          <Link href="/account">{t("account")}</Link>
-        </DropdownMenuItem>
-        <form action={logoutAction} className="w-full">
-          <DropdownMenuItem asChild>
-            <button
-              type="submit"
-              className="w-full cursor-pointer text-start text-destructive focus:text-destructive"
-            >
-              {t("logout")}
-            </button>
-          </DropdownMenuItem>
+          {t("account")}
+        </MuiMenuItem>
+        <form action={logoutAction}>
+          <MuiMenuItem
+            component="button"
+            type="submit"
+            sx={{ width: "100%", color: "error.main" }}
+          >
+            {t("logout")}
+          </MuiMenuItem>
         </form>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </MuiMenu>
+    </>
   );
 }

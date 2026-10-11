@@ -1,4 +1,7 @@
 import { cookies } from "next/headers";
+import MuiAppBar from "@mui/material/AppBar";
+import MuiBox from "@mui/material/Box";
+import MuiToolbar from "@mui/material/Toolbar";
 import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { ThemeSwitch } from "@/components/layout/ThemeSwitch";
@@ -11,22 +14,55 @@ export async function TopBar({ user }: { user: SessionUser }) {
   const theme = resolveTheme(store.get(THEME_COOKIE)?.value);
 
   return (
-    <header className="flex h-14 items-center justify-between gap-3 border-b border-border bg-surface px-4">
-      <div className="flex items-center gap-2 md:hidden">
-        <MobileNav
-          role={user.role}
-          canSignForCompany={user.canSignForCompany}
-          theme={theme}
-        />
-        <span className="text-lg font-bold text-primary">Dossier</span>
-      </div>
-      <div className="ms-auto flex items-center gap-3">
-        <div className="hidden items-center gap-3 md:flex">
-          <LocaleSwitch />
-          <ThemeSwitch current={theme} />
-        </div>
-        <UserMenu user={user} />
-      </div>
-    </header>
+    <MuiAppBar
+      position="static"
+      elevation={0}
+      color="inherit"
+      sx={{
+        borderBottom: "1px solid",
+        borderColor: "divider",
+        bgcolor: "background.paper",
+        backgroundImage: "none",
+      }}
+    >
+      <MuiToolbar
+        sx={{ minHeight: 56, gap: 1.5, justifyContent: "space-between" }}
+      >
+        <MuiBox
+          sx={{
+            display: { xs: "flex", md: "none" },
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          <MobileNav
+            role={user.role}
+            canSignForCompany={user.canSignForCompany}
+            theme={theme}
+          />
+          <span className="text-lg font-bold text-primary">Dossier</span>
+        </MuiBox>
+        <MuiBox
+          sx={{
+            marginInlineStart: "auto",
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+          }}
+        >
+          <MuiBox
+            sx={{
+              display: { xs: "none", md: "flex" },
+              alignItems: "center",
+              gap: 1.5,
+            }}
+          >
+            <LocaleSwitch />
+            <ThemeSwitch current={theme} />
+          </MuiBox>
+          <UserMenu user={user} />
+        </MuiBox>
+      </MuiToolbar>
+    </MuiAppBar>
   );
 }

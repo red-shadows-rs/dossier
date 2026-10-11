@@ -3,14 +3,11 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Menu as MenuIcon } from "lucide-react";
+import MuiBox from "@mui/material/Box";
+import MuiDrawer from "@mui/material/Drawer";
+import MuiIconButton from "@mui/material/IconButton";
+import MuiList from "@mui/material/List";
 import type { Theme } from "@/lib/i18n";
 import { LocaleSwitch } from "./LocaleSwitch";
 import { NavItem } from "./NavItem";
@@ -34,37 +31,77 @@ export function MobileNav({
   const side = locale === "ar" ? "right" : "left";
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          aria-label={t("menu")}
+    <>
+      <MuiIconButton
+        onClick={() => setOpen(true)}
+        aria-label={t("menu")}
+        sx={{ display: { xs: "inline-flex", md: "none" } }}
+      >
+        <MenuIcon size={18} aria-hidden="true" />
+      </MuiIconButton>
+      <MuiDrawer
+        anchor={side}
+        open={open}
+        onClose={() => setOpen(false)}
+        ModalProps={{ keepMounted: true }}
+      >
+        <MuiBox
+          sx={{
+            width: 256,
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+          }}
         >
-          <Menu size={18} aria-hidden="true" />
-        </Button>
-      </SheetTrigger>
-      <SheetContent side={side} className="w-64 gap-0 p-0">
-        <SheetTitle className="flex h-14 shrink-0 items-center border-b border-border px-4 text-lg font-bold text-primary">
-          Dossier
-        </SheetTitle>
-        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-2">
-          {entries.map((entry) => (
-            <NavItem
-              key={entry.key}
-              entry={entry}
-              label={t(entry.key)}
-              active={isActive(pathname, entry.href)}
-              onNavigate={() => setOpen(false)}
-            />
-          ))}
-        </nav>
-        <div className="flex items-center justify-between gap-2 border-t border-border p-3">
-          <LocaleSwitch />
-          <ThemeSwitch current={theme} />
-        </div>
-      </SheetContent>
-    </Sheet>
+          <MuiBox
+            sx={{
+              display: "flex",
+              height: 56,
+              alignItems: "center",
+              px: 2,
+              borderBottom: "1px solid",
+              borderColor: "divider",
+            }}
+          >
+            <span className="text-lg font-bold text-primary">Dossier</span>
+          </MuiBox>
+          <MuiList
+            component="nav"
+            sx={{
+              p: 1,
+              display: "flex",
+              flexDirection: "column",
+              gap: 0.5,
+              flex: 1,
+              overflowY: "auto",
+            }}
+          >
+            {entries.map((entry) => (
+              <NavItem
+                key={entry.key}
+                entry={entry}
+                label={t(entry.key)}
+                active={isActive(pathname, entry.href)}
+                onNavigate={() => setOpen(false)}
+              />
+            ))}
+          </MuiList>
+          <MuiBox
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 1,
+              p: 1.5,
+              borderTop: "1px solid",
+              borderColor: "divider",
+            }}
+          >
+            <LocaleSwitch />
+            <ThemeSwitch current={theme} />
+          </MuiBox>
+        </MuiBox>
+      </MuiDrawer>
+    </>
   );
 }
