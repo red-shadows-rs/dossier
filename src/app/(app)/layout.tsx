@@ -23,7 +23,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <TopBar user={user} />
           <main
             id="main"
-            className="mx-auto w-full max-w-[1280px] flex-1 p-4 md:p-6"
+            className="mx-auto w-full max-w-content flex-1 p-4 md:p-6"
           >
             {children}
           </main>
