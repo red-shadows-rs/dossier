@@ -241,3 +241,50 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 ## Changes log (this run)
 
 - (none yet — no source file modified, nothing installed; only `ui-*.md` updated and tag `pre-mui-migration` created)
+
+## Execution log (MUI run)
+
+- **T-M01 done** (commit `bf852fc`, docs pivot `d769b2b`). User approved install + strategy (a). Verified against official docs (v9): Next path `@mui/material-nextjs/v16-appRouter`, RTL plugin `@mui/stylis-plugin-rtl`, `cssVariables: { colorSchemeSelector: 'class' }`, `InitColorSchemeScript attribute="class"`, `enableCssLayer: true` recommended with Tailwind.
+- Installed (exact): `@mui/material` 9.5.0, `@mui/material-nextjs` 9.5.0, `@mui/icons-material` 9.5.0, `@mui/stylis-plugin-rtl` 9.5.0, `@emotion/react` 11.14.0, `@emotion/styled` 11.14.1, `@emotion/cache` 11.14.0, `stylis` 4.4.0 (`+49 packages`, 610 audited; vulnerabilities unchanged at 14).
+- Created `src/theme.ts` (`createAppTheme(direction)`): `cssVariables + colorSchemeSelector:'class'`, light/dark palettes mapped to the existing tokens (`#e11d48` primary, `#0b0b0f`/`#14141a` dark, `#ffffff`/`#f6f6f8` light), `shape.borderRadius: 6`, Cairo font, flat component defaults.
+- Verify: `npm run typecheck` exit 0 · `npm run build` exit 0 (36 routes). No source behavior changed (theme not yet wired).
+- **T-M02 done** (commit `fcb8ea9`). Added `src/components/Providers.tsx` (`'use client'`): `AppRouterCacheProvider` (import path **`@mui/material-nextjs/v16-appRouter`**, verified) with `enableCssLayer: true` (Tailwind interop) + per-direction Emotion cache (`key: 'muirtl'` + `stylisPlugins: [prefixer, rtlPlugin]` from `@mui/stylis-plugin-rtl` for `ar`), and `ThemeProvider theme={createAppTheme(dir)}`. Wired into `src/app/layout.tsx` (`dir` computed server-side, passed as a serializable prop). Chose NOT to add `CssBaseline`/`InitColorSchemeScript` to avoid overriding the existing cookie+class theme (`dossier_theme`) — rule 13. Added dev dep `@types/stylis` 4.2.7 (types for `stylis`).
+- T-M02 verify: `typecheck` 0 · `build` 0 warnings · `check:rtl` 0 · `test` 494/494 · runtime `/login` 200; SSR HTML contains `@layer mui` and the `muirtl` key (RTL cache active for the default `ar` locale).
+- **T-M03 done** (commit `0cf7e6b`). `Button.tsx` reimplemented on MUI `Button`/`IconButton`, preserving `variant`/`size`/`loading`/`asChild`/`forwardRef`/`data-slot`/`aria-busy`. `loading` maps to MUI's built-in `loading` (verified in v9 `Button.d.ts`). Variant map: primary/default→contained(primary), secondary/outline→outlined(inherit), danger/destructive→contained(error), ghost→text(inherit), link→text(primary). `asChild` implemented via `cloneElement` (unused in live code; only dead `alert-dialog.tsx`).
+- T-M03 verify: `typecheck` 0 · `build` 0 warnings · `test` 494/494. Runtime: `/login` renders with MUI theme vars (`--mui-*`) present.
+- Note (new finding, folded into plan T-M23a): 18 raw `<button>` across 13 files (custom buttons where MUI exists); e.g. `LoginForm.tsx` submit button is a raw `<button>` with Tailwind classes. Tracked for Phase D.
+- **T-M04..T-M15 done** (commits `8276257`, `a2d60d8`, `6cd8abe`). Adapter primitives reimplemented on MUI, public APIs preserved:
+  - `Input` → `OutlinedInput` (`inputRef`, native props via spread; `react-hook-form` is NOT used in `src`, all forms are FormData-based, so `name` on the inner input is what matters — preserved).
+  - `Textarea` → `OutlinedInput multiline`.
+  - `Select` → `Select native` (keeps native `<option>`; native attrs + `name` passed via `inputProps`; loose `SelectProps` alias to avoid the union-type friction).
+  - `Field` → `FormControl`+`FormLabel`+`FormHelperText` (`error`/`required`/`htmlFor` preserved; error keeps `role="alert"`).
+  - `Card` family → `Card`+`CardContent`+`Typography`+`Box` (semantic `section`/`header`/`footer` preserved).
+  - `Badge` → `Chip` (tone→color map: gray→default, blue→info, green→success, red→error, amber→warning, **teal→success** (minor visual merge — MUI has no teal); `BadgeTone` + `contractStatusTone`/`invoiceStatusTone` unchanged).
+  - `Table` family → `Table`+`TableContainer`+`TableHead/Body/Row/Cell` (keeps `th scope="col"`, `TableEmpty`, `TableContainer` overflow scroll).
+  - `Dialog` → MUI `Dialog` (built-in focus trap/Escape/backdrop/`aria-labelledby`; fixes U-007/M-… overflow via `DialogContent` scroll).
+  - `ConfirmDialog` — unchanged (delegates to the new Dialog + Button).
+  - `Toast` → MUI `Box` + `Alert` in a fixed `insetInlineEnd` stack (RTL-safe logical property); kept `ToastProvider`/`useToast`/`ToastInput`/`ToastTone` + auto-dismiss. Deviation from the Snackbar suggestion to keep correct multi-toast stacking (documented).
+  - `EmptyState` → `Stack`+`Typography`+`Box`.
+  - `Pagination` → MUI `Button` with `component={Link}` (client component; server-less link nav preserved) + `Typography` page indicator.
+- T-M04..T-M15 verify (after each group): `typecheck` 0 · `build` 0 warnings · `test` 494/494.
+- **T-M16..T-M21 done** (commit `45951cf`; fixes `9c593bb`). App shell migrated to MUI:
+  - `Sidebar` → `Drawer variant="permanent"` + `List`; paper rendered as `<aside>` (semantic landmark + keeps `rtl.spec.ts`).
+  - `NavItem` → `ListItemButton`/`ListItemIcon` (keeps `aria-current`, active = primary bg).
+  - `MobileNav` → `Drawer variant="temporary"` with anchor following `dir` (Sheet/Radix removed).
+  - `UserMenu` → now a **client** component (`useTranslations`) with `Button`+`Menu`/`MenuItem` (DropdownMenu/Radix removed); `anchorOrigin` horizontal derived from `theme.direction` (MUI v9 rejects `"end"`).
+  - `TopBar` → `AppBar`+`Toolbar` (flat, bordered); `LocaleSwitch`/`ThemeSwitch` → MUI `Button`/`Select native` (server actions + cookie behavior unchanged → MUI reads the same `.dark`/`.light` classes).
+- **Runtime/e2e regression caught and fixed** (this is why e2e matters):
+  1. `EmptyState` passed `borderRadius: (theme) => …` (a function) in `sx` from a **Server Component** → Next.js "Functions cannot be passed directly to Client Components" → `invoices/[id]` crashed → full-flow "Issue invoice" failed. Fixed by using `var(--mui-shape-borderRadius)` (no function).
+  2. `rtl.spec.ts` expects an `aside` landmark and right-side placement in RTL. Root cause of wrong placement: `AppRouterCacheProvider` builds its Emotion cache once (`useState`) so the RTL stylis plugin never activated on a runtime locale switch. Fixed by keying `AppRouterCacheProvider` with `dir` (rebuild cache per direction).
+- **e2e verify**: `npm run test:e2e` → **3/3 passed** (contract signing→invoice→payment full flow; verification page; Arabic RTL sidebar). This exercises real end-to-end behavior, not just types.
+- **T-M22 done** (`46d3c3f`): `max-w-[1280px]` → named token `max-w-content` (80rem) in `tailwind.config.ts` (M-009).
+- **T-M23a partial** (`46d3c3f`): `LoginForm.tsx` migrated — two raw `<input>` → `Input`, raw submit `<button>` → `Button loading`. Remaining raw `<button>` (~16 across 9 files) documented as follow-up (some may be intentional controls).
+- **T-M26 done** (commit after `46d3c3f`): removed the shadcn/Radix layer — 13 dead shadcn files (`alert-dialog, alert, checkbox, dropdown-menu, label, popover, radio-group, separator, sheet, skeleton, switch, tooltip, tabs`; `table.tsx`/`badge.tsx` never existed — casing collision), `src/lib/utils.ts`, `components.json`, the `tw-animate-css` import, and uninstalled `radix-ui`, `class-variance-authority`, `tw-animate-css`, `@mui/icons-material` (unused). Proof: no external references to any removed file; `radix-ui`/`@/lib/utils`/`class-variance-authority` only appeared inside the removed files.
+- T-M26 verify: `npm run check` → typecheck 0, lint 0, check:rtl 0, **494/494**; `build` 0 warnings; `test:e2e` **3/3**. `cn.ts` kept (still used by 10 files); `lucide-react` kept (icons).
+- **M-007 completed** (`54f7025`): `ContractReviewStep` (`text-amber-600`→`text-warning`, `text-green-600`→`text-success`) and `VerificationForm` (`green-600/700`→`success` tokens). Raw-palette re-scan now returns **none**.
+- **T-M27 final verification**:
+  - Full baseline: `npm run check` (typecheck 0, lint 0, check:rtl 0, **494/494**) · `build` 0 warnings · `test:e2e` **3/3** — equal to baseline.
+  - Slop re-scan: no gradients/blur/glow; no second library (`antd|@mantine|@chakra-ui|react-bootstrap|radix-ui` → none); no barrel icon imports; no raw palette utilities; only raw hex is `SignaturePad #111111` (canvas ink, justified M-010).
+  - Screenshots + overflow: `tmp/ui-shots/mui/` (28 PNGs = dashboard, clients, login × 320/768/1440 × dark/light × en/ar). Automated overflow probe: **no horizontal overflow** (>1px) at any width/theme/locale.
+  - `UNVERIFIED:` pixel-level visual inspection — this model cannot read image input; screenshots are artifacts for human/vision review. Correctness rests on the automated overflow probe + behavioral `rtl.spec.ts`.
+  - `git status`: only `ui-*.md` modified + untracked `.briefwright/` (external tool). `git diff --stat pre-mui-migration..HEAD`: presentation files only (components/ui, components/layout, forms touched for tokens/raw buttons, `Providers.tsx`, `theme.ts`, `layout.tsx`, `globals.css`, `tailwind.config.ts`, package files, docs). No `.env`, no `src/server`, `src/db`, services, or stores changed.
