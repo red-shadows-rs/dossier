@@ -36,7 +36,7 @@ export function createAppTheme(direction: AppDirection) {
         },
       },
     },
-    shape: { borderRadius: 6 },
+    shape: { borderRadius: 4 },
     typography: {
       fontFamily: "var(--font-cairo), 'Cairo', system-ui, sans-serif",
       button: { textTransform: "none", fontWeight: 500 },

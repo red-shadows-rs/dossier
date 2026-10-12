@@ -28,7 +28,7 @@
   --destructive-foreground: #ffffff;
   --input: var(--border);
   --ring: var(--primary);
-  --radius: 0.5rem;
+  --radius: 0.25rem;
   color-scheme: dark;
 }
 
