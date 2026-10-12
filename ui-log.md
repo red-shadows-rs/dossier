@@ -311,3 +311,9 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - **Logo + login redesign** (`0933cfa`/`4be39ff` lineage): new `Logo` component (SVG folder mark + wordmark) and `src/app/icon.svg` favicon; logo applied in login header, Sidebar, TopBar (mobile), and the mobile drawer. Login page is a single unified background (no borders/colors between areas): header = logo (start) + single **locale toggle** button (end, `LocaleSwitch variant="toggle"`), footer = `common.tagline`.
 - **Custom required status message** (`4be39ff`): the login form now sets `noValidate` and, on submit with empty fields, shows a custom inline message (`auth.requiredFields`, added to ar/en) instead of the browser's native validation bubble. `required` attributes kept for a11y. Verified with Playwright: `novalidate` present, alert text = "يرجى تعبئة جميع الحقول المطلوبة", no native popup. (Note: native bubble replacement currently applies to the login form only.)
 - Verify for this batch: `typecheck/lint/check:rtl 0 · test 494/494 · build 0 · e2e 3/3`.
+
+## Login footer + favicon (follow-up)
+
+- **Two-sided footer** (`966d9c3`): login footer now uses `flex justify-between` — copyright (`common.rights` = "© {year} Dossier …", dynamic year) on the start side (right in RTL) and a team credit on the end side: new `RedShadowsMark` (RS monogram SVG) + "RED SHADOWS | RS" (`dir="ltr"` for mixed bidi), linking to https://red-shadows-rs.com/ with `target="_blank" rel="noopener noreferrer"`. Verified via DOM: link href/target/rel correct; in RTL copyright center x≈1145 (right), team x≈97 (left) at 1280px.
+- **Favicon transparent** (`966d9c3`): `src/app/icon.svg` is now a filled accent folder with no background rect (transparent).
+- Verify: `check` 494/494 · `build` 0 · `e2e` 3/3.
