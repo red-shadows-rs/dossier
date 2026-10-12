@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import MuiAppBar from "@mui/material/AppBar";
 import MuiBox from "@mui/material/Box";
 import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
+import { HeaderSearch } from "@/components/layout/HeaderSearch";
 import { Logo } from "@/components/layout/Logo";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { ThemeSwitch } from "@/components/layout/ThemeSwitch";
@@ -52,7 +53,17 @@ export async function TopBar({ user }: { user: SessionUser }) {
         </MuiBox>
         <MuiBox
           sx={{
-            marginInlineStart: "auto",
+            display: { xs: "none", sm: "flex" },
+            flex: 1,
+            justifyContent: "center",
+            px: 2,
+          }}
+        >
+          <HeaderSearch />
+        </MuiBox>
+        <MuiBox
+          sx={{
+            marginInlineStart: { xs: "auto", sm: 0 },
             display: "flex",
             alignItems: "center",
             gap: 1.5,
