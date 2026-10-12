@@ -48,7 +48,7 @@ export function LocaleSwitch({
               variant={isActive ? "contained" : "text"}
               color={isActive ? "primary" : "inherit"}
               size="small"
-              sx={{ minWidth: 0 }}
+              sx={{ height: 32, minWidth: 0 }}
             >
               {t(locale)}
             </MuiButton>

@@ -1,7 +1,6 @@
 import { cookies } from "next/headers";
 import MuiAppBar from "@mui/material/AppBar";
 import MuiBox from "@mui/material/Box";
-import MuiToolbar from "@mui/material/Toolbar";
 import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
 import { Logo } from "@/components/layout/Logo";
 import { MobileNav } from "@/components/layout/MobileNav";
@@ -26,8 +25,16 @@ export async function TopBar({ user }: { user: SessionUser }) {
         backgroundImage: "none",
       }}
     >
-      <MuiToolbar
-        sx={{ minHeight: 56, gap: 1.5, justifyContent: "space-between" }}
+      <MuiBox
+        component="div"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 1.5,
+          height: 56,
+          px: 2,
+        }}
       >
         <MuiBox
           sx={{
@@ -63,7 +70,7 @@ export async function TopBar({ user }: { user: SessionUser }) {
           </MuiBox>
           <UserMenu user={user} />
         </MuiBox>
-      </MuiToolbar>
+      </MuiBox>
     </MuiAppBar>
   );
 }

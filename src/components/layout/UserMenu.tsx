@@ -28,6 +28,7 @@ export function UserMenu({ user }: { user: SessionUser }) {
         variant="outlined"
         color="inherit"
         size="small"
+        sx={{ height: 32 }}
         endIcon={<ChevronDown size={16} aria-hidden="true" />}
       >
         <span className="hidden max-w-[10rem] truncate sm:inline">
