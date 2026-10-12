@@ -102,6 +102,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         <MuiIconButton
           ref={ref}
           data-slot="button"
+          type={type ?? "button"}
           size={ICON_SIZES[size]}
           disabled={disabled || loading}
           aria-busy={busy}

@@ -104,8 +104,8 @@ export function endDateIso(): string {
 
 export async function login(page: Page): Promise<void> {
   await page.goto("/login");
-  await page.getByLabel("Email").fill(OWNER_EMAIL);
-  await page.getByLabel("Password").fill(OWNER_PASSWORD);
+  await page.locator('input[name="email"]').fill(OWNER_EMAIL);
+  await page.locator('input[name="password"]').fill(OWNER_PASSWORD);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
 }

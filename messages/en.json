@@ -63,6 +63,8 @@
     "signIn": "Sign in",
     "signingIn": "Signing in…",
     "requiredFields": "Please fill in all required fields",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "invalidCredentials": "Invalid email or password",
     "tooManyAttempts": "Too many attempts, please try again later",
     "signedInAs": "Signed in as {name}",
