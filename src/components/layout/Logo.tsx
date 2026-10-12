@@ -12,8 +12,8 @@ export function Logo({
         .join(" ")}
     >
       <svg
-        width="28"
-        height="28"
+        width="32"
+        height="32"
         viewBox="0 0 32 32"
         fill="none"
         className="shrink-0 text-primary"
@@ -22,15 +22,13 @@ export function Logo({
         aria-label={showWordmark ? undefined : "Dossier"}
       >
         <path
-          d="M5 10.5C5 8.57 6.57 7 8.5 7h3.9c.66 0 1.3.26 1.77.73L15.9 9h7.6C25.43 9 27 10.57 27 12.5v9C27 23.43 25.43 25 23.5 25h-15C6.57 25 5 23.43 5 21.5z"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinejoin="round"
+          d="M1 10.2C1 8.03 2.76 6.28 4.93 6.28h6.06c.83 0 1.62.33 2.2.91l1.5 1.5h12.38C29.24 8.69 31 10.44 31 12.61v12.66c0 2.17-1.76 3.92-3.93 3.92H4.93C2.76 29.19 1 27.44 1 25.27z"
+          fill="currentColor"
         />
         <path
-          d="M10 16.5h12"
-          stroke="currentColor"
-          strokeWidth="2"
+          d="M7.4 17.9h17.2"
+          style={{ stroke: "var(--primary-foreground)" }}
+          strokeWidth="2.6"
           strokeLinecap="round"
         />
       </svg>

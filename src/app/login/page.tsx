@@ -24,8 +24,8 @@ export default async function LoginPage() {
     <div className="flex min-h-dvh flex-col bg-background px-6 py-5 sm:px-8">
       <header className="flex items-center justify-between gap-3">
         <Logo />
-        <div className="flex items-center gap-1">
-          <ThemeSwitch current={theme} variant="icon" />
+        <div className="flex items-center gap-3">
+          <ThemeSwitch current={theme} />
           <LocaleSwitch variant="toggle" />
         </div>
       </header>
@@ -46,7 +46,7 @@ export default async function LoginPage() {
             alt=""
             width={512}
             height={353}
-            className="h-5 w-auto dark:brightness-0 dark:invert"
+            className="h-5 w-auto"
           />
           <span dir="ltr">RED SHADOWS | RS</span>
         </a>
