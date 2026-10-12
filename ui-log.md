@@ -304,3 +304,10 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
   - Theme `MuiButton` gained `styleOverrides.root.gap: 8` so an icon + label are spaced.
   - Verify: `npm run check` (typecheck/lint/rtl 0, 494/494) · `build` 0 warnings · `test:e2e` 3/3 · runtime DOM shows `lucide-mail/lock/log-in` + `MuiInputAdornment-root` on `/login`.
   - Remaining icon opportunities (empty states, secondary actions) are not added yet to respect the restraint rule (§2.2).
+
+## Custom auth UI (follow-up)
+
+- **Field required mark** (`c536cd1`, `a3800bc`): the default MUI asterisk is hidden (`& .MuiFormLabel-asterisk { display:none }`) and a custom, accent-colored superscript `*` is shown; overridable per field via `requiredMark`. Verified by DOM computed styles (default `display:none`; custom `color rgb(225,29,72)`, `vertical-align super`, `font-size 12px`).
+- **Logo + login redesign** (`0933cfa`/`4be39ff` lineage): new `Logo` component (SVG folder mark + wordmark) and `src/app/icon.svg` favicon; logo applied in login header, Sidebar, TopBar (mobile), and the mobile drawer. Login page is a single unified background (no borders/colors between areas): header = logo (start) + single **locale toggle** button (end, `LocaleSwitch variant="toggle"`), footer = `common.tagline`.
+- **Custom required status message** (`4be39ff`): the login form now sets `noValidate` and, on submit with empty fields, shows a custom inline message (`auth.requiredFields`, added to ar/en) instead of the browser's native validation bubble. `required` attributes kept for a11y. Verified with Playwright: `novalidate` present, alert text = "يرجى تعبئة جميع الحقول المطلوبة", no native popup. (Note: native bubble replacement currently applies to the login form only.)
+- Verify for this batch: `typecheck/lint/check:rtl 0 · test 494/494 · build 0 · e2e 3/3`.
