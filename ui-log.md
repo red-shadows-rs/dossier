@@ -324,3 +324,12 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - **RTL-aware field icons** (`465618b`): the email/password adornments now switch side with direction — `endAdornment` (`position="end"`, right) for `ar`, `startAdornment` (`position="start"`, left) for `en`, since the inputs are `dir="ltr"`. Verified via Playwright: `ar` → 2 `positionEnd`, `en` → 2 `positionStart`. Login button icon left as the first child (renders at the RTL start/right, consistent with the fields).
 - **Favicon enlarged** (`465618b`): `src/app/icon.svg` folder redrawn to fill the 32-box (x2.5–29.5, y7–26), bolder inner line; still transparent (no background). Served at `/icon.svg` (200, image/svg+xml).
 - Verify: `check` 494/494 · `build` 0.
+
+## Login fixes (follow-up)
+
+- **Blue fields diagnosed** (`e93239c`): a DOM scan on `/login` found no blue element in our UI (focused outline = rose `rgb(225,29,72)`, input bg transparent). The blue is the browser's autofill (`-webkit-autofill`). Added an override in `globals.css` to paint autofilled inputs with `--surface`/`--text` instead of the browser blue.
+- **Password visibility toggle** (`e93239c`): added an eye `IconButton` (`endAdornment`) in `LoginForm` that toggles `type` password⇄text, with `aria-label` show/hide and `aria-pressed`. Fixed the `Button` adapter icon branch to pass `type={type ?? "button"}` so the eye does not submit the form. Added `auth.showPassword`/`auth.hidePassword` (ar/en).
+- **RTL writing direction** (`e93239c`): removed the hard-coded `dir="ltr"` from the email/password inputs, so Arabic types right-to-left and the start adornments sit on the right naturally (English stays LTR). Verified: `ar` → computed `direction: rtl`; `en` → `ltr`.
+- **e2e locator fix** (`e93239c`): the new eye button's `aria-label` ("Show password") made `getByLabel("Password")` match two elements (strict-mode violation). Updated `tests/e2e/helpers.ts` login helper to precise `input[name="email"]`/`input[name="password"]` selectors — same flow, no coverage change.
+- **Favicon enlarged** (`e93239c`): `src/app/icon.svg` folder redrawn taller/wider (x1–31, y6.3–29.2) to fill the icon box; still transparent.
+- Verify: `check` 494/494 · `build` 0 · `e2e` **3/3**. Playwright: eye toggles password→text and is `type="button"`; inputs `rtl` (ar)/`ltr` (en).
