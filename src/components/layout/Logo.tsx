@@ -12,8 +12,8 @@ export function Logo({
         .join(" ")}
     >
       <svg
-        width="32"
-        height="32"
+        width="24"
+        height="24"
         viewBox="0 0 32 32"
         fill="none"
         className="shrink-0 text-primary"
@@ -33,7 +33,7 @@ export function Logo({
         />
       </svg>
       {showWordmark ? (
-        <span className="text-lg font-bold tracking-tight text-foreground">
+        <span className="text-xl font-bold tracking-tight text-foreground">
           Dossier
         </span>
       ) : null}

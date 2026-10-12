@@ -14,6 +14,9 @@ const cairo = localFont({
   display: "swap",
 });
 
+const themeScript =
+  '(function(){try{var e=document.documentElement;if(!e.classList.contains("dark")&&!e.classList.contains("light")){e.classList.add(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");}}catch(_){}})();';
+
 export const metadata: Metadata = {
   title: "Dossier",
   description: "Contracts & invoices platform",
@@ -45,9 +48,11 @@ export default async function RootLayout({
       lang={locale}
       dir={dir}
       className={`${cairo.variable} ${themeClass(theme)}`}
+      suppressHydrationWarning
     >
       <body>
-        <Providers dir={dir}>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <Providers dir={dir} colorTheme={theme}>
           <NextIntlClientProvider locale={locale} messages={messages}>
             {children}
           </NextIntlClientProvider>

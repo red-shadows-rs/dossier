@@ -1,40 +1,46 @@
 "use client";
 
-import { useId } from "react";
 import { useTranslations } from "next-intl";
-import MuiSelect from "@mui/material/Select";
+import { Monitor, Moon, Sun } from "lucide-react";
+import MuiBox from "@mui/material/Box";
+import MuiIconButton from "@mui/material/IconButton";
 import type { Theme } from "@/lib/i18n";
-import { THEMES } from "@/lib/i18n";
 import { setTheme } from "@/server/actions/preferences";
+
+const ORDER: Theme[] = ["light", "system", "dark"];
+
+const ICONS = {
+  light: Sun,
+  system: Monitor,
+  dark: Moon,
+} as const;
 
 export function ThemeSwitch({ current }: { current: Theme }) {
   const t = useTranslations("theme");
-  const id = useId();
 
   return (
-    <form action={setTheme} className="flex items-center gap-2">
-      <label htmlFor={id} className="sr-only">
-        {t("label")}
-      </label>
-      <MuiSelect
-        native
-        size="small"
-        variant="outlined"
-        id={id}
-        name="theme"
-        defaultValue={current}
-        onChange={(event) => {
-          const form = (event.target as unknown as HTMLSelectElement).form;
-          form?.requestSubmit();
-        }}
-        sx={{ minWidth: 110 }}
-      >
-        {THEMES.map((theme) => (
-          <option key={theme} value={theme}>
-            {t(theme)}
-          </option>
-        ))}
-      </MuiSelect>
-    </form>
+    <MuiBox sx={{ display: "flex", alignItems: "center" }}>
+      {ORDER.map((theme) => {
+        const Icon = ICONS[theme];
+        const active = theme === current;
+        return (
+          <form key={theme} action={setTheme}>
+            <input type="hidden" name="theme" value={theme} />
+            <MuiIconButton
+              type="submit"
+              size="small"
+              aria-label={t(theme)}
+              aria-pressed={active}
+              sx={{
+                color: active ? "text.primary" : "text.secondary",
+                "&:hover": { color: "text.primary" },
+              }}
+            >
+              <Icon size={16} aria-hidden="true" />
+            </MuiIconButton>
+          </form>
+        );
+      })}
+    </MuiBox>
   );
 }
