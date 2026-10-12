@@ -380,3 +380,13 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - `TopBar` used MUI `Toolbar`, whose responsive `min-height` (64 at ≥600px) overrode our 56 → the dashboard bar was **65px** while the sidebar header is 56, and control heights varied (locale/user 31, theme icons 32). Replaced the `Toolbar` with a fixed **56px** flex `Box` (px:2) matching the sidebar header, and gave every control a fixed **32px** height (theme icons, locale group, user menu).
 - Verified at 1280 and 390: toolbar content 56 (box 57 incl. 1px border) = sidebar header 56; all controls `h=32`, centered at the content center (c=28).
 - `npm run check` 494/494 · `test:e2e` **3/3**.
+
+## Global search (approved feature)
+
+- User approved adding a global search (a routing/logic addition, outside the pure presentation layer).
+- **Service** `src/server/services/search.ts`: `searchAll(user, q, locale)` reuses the existing list services (`listClients/Projects/Contracts/Invoices`, each already `?q=`), caps at 5 hits per entity, and respects permissions via `can(user, "<entity>.read")` (only returns what the user may read).
+- **Page** `src/app/(app)/search/page.tsx`: reads `?q=`, renders grouped results (Clients/Projects/Contracts/Invoices, headings from `nav`) as links to each entity, with an empty state and a prompt.
+- **Header** `HeaderSearch` (client): a controlled search input (our `Input` + search icon) in the dashboard `TopBar` (visible from `sm` up, centered) that navigates to `/search?q=…` via the router.
+- Added a `search` message namespace (ar/en): title, placeholder, prompt, forQuery, noResults, noResultsHint.
+- Verified end-to-end (Playwright): header input exists → submitting goes to `/search?q=test`; `/search` renders (h1 "بحث"); with a seeded client, `?q=Test` renders the Clients group with the match (Arabic name under `ar` locale).
+- `npm run check` 494/494 · `test:e2e` **3/3**.
