@@ -339,3 +339,8 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
   - `src/app/layout.tsx`: `metadata.manifest = "/site.webmanifest"` and `metadata.icons` = ico(48) + svg + 16/32 PNG, `apple` 180.
   - Verified served head: `rel=manifest`, `rel=icon` (ico 48, svg, 16/32 png), `rel=apple-touch-icon` 180; all assets 200 with correct content types; `site.webmanifest` → `application/manifest+json`.
   - `check` 494/494 · `build` 0 · `e2e` 3/3.
+## Icon transparency + dev login (follow-up)
+
+- **Apple/Android icons transparent** (`37001dd`): regenerated `apple-touch-icon.png` (180), `android-chrome-192x192.png`, `android-chrome-512x512.png` from the transparent source (no accent badge) — corner alphas are 0. (Note: on iOS/Android a transparent touch icon is composited over the launcher background.)
+- **"اليوزر والباش خطأ" root cause = uninitialized dev DB**: the running `next dev` used `DATA_DIR=./data`, whose `data/dossier.sqlite` had **no tables** (never migrated/seeded), so every login returned "بيانات الدخول غير صحيحة". Fixed by initializing the dev DB: `tsx src/db/migrate.ts` then `tsx scripts/seed.ts` (run with `.env`+`.env.local` merged, since the scripts do not auto-load env). Result: `Default settings rows inserted: 5`, `System templates inserted: 4`, `Created bootstrap owner: owner@example.com`. Re-tested login in a real browser → redirects to `/` (dashboard). No app/source change was needed for this; it is local dev data setup.
+- Verify: `npm run check` → typecheck 0, lint 0, check:rtl 0, 494/494.
