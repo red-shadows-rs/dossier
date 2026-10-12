@@ -398,3 +398,18 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - Profile is now an **icon** `IconButton` (lucide `User`) that opens the same menu (Account / Log out).
 - Verified (Playwright): search is at the start; typing shows the dropdown with the seeded client (Arabic name + email); the profile icon opens a menu with the log-out item.
 - `npm run check` 494/494 · `test:e2e` **3/3**.
+
+## Dashboard redesign + footer (follow-up)
+
+- **Rounding → MUI-like**: `shape.borderRadius` 6→4 (`src/theme.ts`), `--radius` 0.5rem→0.25rem (`globals.css`), Tailwind `md`/`lg` = `var(--radius)` and `sm` = `--radius - 2px` (`tailwind.config.mjs`). MUI default is 4px.
+- **Footer** (`src/components/layout/Footer.tsx`): shared, MUI-based, two-sided (© + RED SHADOWS | RS). Placed in the app shell (`src/app/(app)/layout.tsx`, `bordered` with a top divider) and reused on login (`bordered={false}` for the "one piece" login look); removed the duplicated inline login footer.
+- **Dashboard rebuilt with MUI** (`src/app/(app)/page.tsx`): `Stack`/`Grid` (`size` prop) / `Card` / `Typography` / `Divider` / `Chip` / `Alert`.
+  - Finance KPIs: Outstanding, Overdue (count + per-currency), Collected this month (+ last month), Invoiced this month (count).
+  - Operations KPIs: Awaiting signature, Active contracts (+ signed 30d), Active projects (+ drafts), Clients (+ new this month).
+  - Contracts-by-status and Invoices-by-status breakdowns.
+  - Tables: awaiting signature, due within 7 days, ending within 30 days, recent activity.
+  - Worker-offline notice now a MUI `Alert`.
+- **New read-only KPIs** (`src/server/services/dashboard.ts`, additive): `clientsTotal`, `clientsNewThisMonth`, `projectsActive`, `contractsActive`, `contractsByStatus`, `invoicesByStatus`, `issuedThisMonth`. Existing metrics unchanged; existing dashboard tests still pass.
+- **Translations** rewritten concise and product-ready for a documents/invoices system (`dashboard` namespace, ar/en).
+- Fixed a hydration warning (a `<div>` inside a `<p>`); dashboard now renders with a clean console.
+- Verified in a real session: 14 cards, h1 "لوحة المعلومات", footer present, no horizontal overflow, no console errors. `npm run check` 494/494 · `test:e2e` 3/3.
