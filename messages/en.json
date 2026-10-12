@@ -61,6 +61,7 @@
     "password": "Password",
     "signIn": "Sign in",
     "signingIn": "Signing in…",
+    "requiredFields": "Please fill in all required fields",
     "invalidCredentials": "Invalid email or password",
     "tooManyAttempts": "Too many attempts, please try again later",
     "signedInAs": "Signed in as {name}",

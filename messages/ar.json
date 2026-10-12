@@ -61,6 +61,7 @@
     "password": "كلمة المرور",
     "signIn": "تسجيل الدخول",
     "signingIn": "جارٍ تسجيل الدخول…",
+    "requiredFields": "يرجى تعبئة جميع الحقول المطلوبة",
     "invalidCredentials": "بيانات الدخول غير صحيحة",
     "tooManyAttempts": "محاولات كثيرة جداً، حاول لاحقاً",
     "signedInAs": "مسجّل الدخول باسم {name}",

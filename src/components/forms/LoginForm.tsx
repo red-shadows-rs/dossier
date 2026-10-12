@@ -14,16 +14,25 @@ export function LoginForm() {
   const t = useTranslations();
   const router = useRouter();
   const [error, setError] = useState<ErrorCode | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const email = String(data.get("email") ?? "");
+    const password = String(data.get("password") ?? "");
+    if (!email.trim() || !password) {
+      setError(null);
+      setStatus(t("auth.requiredFields"));
+      return;
+    }
+    setStatus(null);
     setPending(true);
     setError(null);
     const result = await loginAction({
-      email: String(data.get("email") ?? ""),
-      password: String(data.get("password") ?? ""),
+      email,
+      password,
     });
     if (result.ok) {
       router.replace("/");
@@ -43,14 +52,20 @@ export function LoginForm() {
           ? t("auth.invalidCredentials")
           : null;
 
+  const displayed = status ?? message;
+
   return (
-    <form onSubmit={onSubmit} className="flex w-full max-w-sm flex-col gap-4">
-      {message ? (
+    <form
+      onSubmit={onSubmit}
+      noValidate
+      className="flex w-full max-w-sm flex-col gap-4"
+    >
+      {displayed ? (
         <p
           role="alert"
           className="rounded-md border border-border bg-surface px-3 py-2 text-sm text-destructive"
         >
-          {message}
+          {displayed}
         </p>
       ) : null}
 
