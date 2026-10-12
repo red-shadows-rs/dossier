@@ -368,3 +368,9 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
   - `Providers` now takes `colorTheme` and, for `system`, applies/lstens to the media query at runtime (so switching to system re-applies the class).
   - Verified with Playwright (colorScheme dark/light): after selecting system, `html` gets `dark`/`light` respectively and `--mui-palette-primary-main` = `#e11d48`, `--mui-palette-background-default` = `#0b0b0f`/`#ffffff`.
 - Verify: `npm run check` 494/494 · `test:e2e` **3/3**.
+
+## Header alignment + script warning (follow-up)
+
+- **React script warning fixed**: the pre-paint theme script was a raw `<script>` inside the layout component (React: "Encountered a script tag while rendering React component"). Switched to `next/script` with `strategy="beforeInteractive"` (`src/app/layout.tsx`). Verified: no console warnings on `/login`.
+- **Header inline/aligned**: theme icon buttons and the locale button now share a fixed **32px** height (`ThemeSwitch`, `LocaleSwitch` small variant), the logo wordmark uses `leading-none`, the mark `<svg>` is `block`, and the favicon folder path is vertically centered in its box via `<g transform="translate(0 -1.735)">`. Verified by isolated DOM/pixel measurement: mark ink center ≈ 35.5px, wordmark ink center ≈ 36px, locale ≈ 35.5px (all within ~0.5px); DOM box centers all equal.
+- Verify: `npm run check` 494/494 · `test:e2e` **3/3**.
