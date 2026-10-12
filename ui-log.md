@@ -390,3 +390,11 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - Added a `search` message namespace (ar/en): title, placeholder, prompt, forQuery, noResults, noResultsHint.
 - Verified end-to-end (Playwright): header input exists → submitting goes to `/search?q=test`; `/search` renders (h1 "بحث"); with a seeded client, `?q=Test` renders the Clients group with the match (Arabic name under `ar` locale).
 - `npm run check` 494/494 · `test:e2e` **3/3**.
+
+## Header search dropdown + profile icon (follow-up)
+
+- Search moved to the **start** of the dashboard header (removed `justify-content: space-between`; the controls use `margin-inline-start: auto`). Verified: LTR search left ≈ header+54px; RTL right edge inset ≈ 54px.
+- Replaced the `/search` page with a **results dropdown**: new API route `src/app/api/search/route.ts` (GET `?q=`, `getCurrentUser` → 401 JSON, returns `{ ok, data }` from `searchAll`); `HeaderSearch` now debounces (250ms) and fetches it, showing a `Paper` under the input with grouped hits (Clients/Projects/Contracts/Invoices) that navigate on click, plus a no-results state. Removed `src/app/(app)/search/page.tsx` and trimmed the `search` messages to `placeholder`/`noResults`.
+- Profile is now an **icon** `IconButton` (lucide `User`) that opens the same menu (Account / Log out).
+- Verified (Playwright): search is at the start; typing shows the dropdown with the seeded client (Arabic name + email); the profile icon opens a menu with the log-out item.
+- `npm run check` 494/494 · `test:e2e` **3/3**.
