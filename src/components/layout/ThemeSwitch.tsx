@@ -32,6 +32,8 @@ export function ThemeSwitch({ current }: { current: Theme }) {
               aria-label={t(theme)}
               aria-pressed={active}
               sx={{
+                width: 32,
+                height: 32,
                 color: active ? "text.primary" : "text.secondary",
                 "&:hover": { color: "text.primary" },
               }}

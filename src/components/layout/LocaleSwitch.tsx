@@ -20,7 +20,13 @@ export function LocaleSwitch({
     return (
       <form action={setLocale}>
         <input type="hidden" name="locale" value={target} />
-        <MuiButton type="submit" variant="text" color="inherit" size="small">
+        <MuiButton
+          type="submit"
+          variant="text"
+          color="inherit"
+          size="small"
+          sx={{ height: 32, minWidth: 0 }}
+        >
           <Languages size={16} aria-hidden="true" />
           {t(target)}
         </MuiButton>
