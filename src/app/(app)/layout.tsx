@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
+import { Footer } from "@/components/layout/Footer";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { ToastProvider } from "@/components/ui/Toast";
@@ -27,6 +28,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           >
             {children}
           </main>
+          <Footer />
         </div>
       </div>
     </ToastProvider>
