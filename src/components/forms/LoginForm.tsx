@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { LogIn, Lock, Mail } from "lucide-react";
 import InputAdornment from "@mui/material/InputAdornment";
 import { Button } from "@/components/ui/Button";
@@ -13,6 +13,14 @@ import { loginAction } from "@/server/actions/auth";
 export function LoginForm() {
   const t = useTranslations();
   const router = useRouter();
+  const locale = useLocale();
+  const rtl = locale === "ar";
+  const withAdornment = (icon: ReactNode) =>
+    rtl
+      ? { endAdornment: <InputAdornment position="end">{icon}</InputAdornment> }
+      : {
+          startAdornment: <InputAdornment position="start">{icon}</InputAdornment>,
+        };
   const [error, setError] = useState<ErrorCode | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -80,11 +88,7 @@ export function LoginForm() {
           autoComplete="email"
           required
           dir="ltr"
-          startAdornment={
-            <InputAdornment position="start">
-              <Mail size={16} aria-hidden="true" />
-            </InputAdornment>
-          }
+          {...withAdornment(<Mail size={16} aria-hidden="true" />)}
         />
       </div>
 
@@ -99,11 +103,7 @@ export function LoginForm() {
           autoComplete="current-password"
           required
           dir="ltr"
-          startAdornment={
-            <InputAdornment position="start">
-              <Lock size={16} aria-hidden="true" />
-            </InputAdornment>
-          }
+          {...withAdornment(<Lock size={16} aria-hidden="true" />)}
         />
       </div>
 

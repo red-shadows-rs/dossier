@@ -1,9 +1,9 @@
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { LoginForm } from "@/components/forms/LoginForm";
 import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
 import { Logo } from "@/components/layout/Logo";
-import { RedShadowsMark } from "@/components/layout/RedShadowsMark";
 import { getCurrentUser } from "@/server/auth/require-user";
 
 export default async function LoginPage() {
@@ -31,9 +31,15 @@ export default async function LoginPage() {
           href="https://red-shadows-rs.com/"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+          className="inline-flex items-center gap-2 transition-colors hover:text-foreground"
         >
-          <RedShadowsMark />
+          <Image
+            src="/red-shadows-logo.png"
+            alt=""
+            width={512}
+            height={353}
+            className="h-5 w-auto dark:brightness-0 dark:invert"
+          />
           <span dir="ltr">RED SHADOWS | RS</span>
         </a>
       </footer>
