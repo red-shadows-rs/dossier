@@ -1,8 +1,14 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Badge } from "@/components/ui/Badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import MuiAlert from "@mui/material/Alert";
+import MuiCard from "@mui/material/Card";
+import MuiCardContent from "@mui/material/CardContent";
+import MuiChip from "@mui/material/Chip";
+import MuiDivider from "@mui/material/Divider";
+import MuiGrid from "@mui/material/Grid";
+import MuiStack from "@mui/material/Stack";
+import MuiTypography from "@mui/material/Typography";
 import {
   Table,
   TableBody,
@@ -13,6 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/Table";
 import type { CurrencyCode, Locale } from "@/lib/constants";
+import { CONTRACT_STATUSES, INVOICE_STATUSES } from "@/lib/constants";
 import { formatInstant, nowMs } from "@/lib/dates";
 import { isLocale } from "@/lib/i18n";
 import { formatMoney } from "@/lib/money";
@@ -31,27 +38,64 @@ function AmountList({
   locale: Locale;
 }) {
   if (amounts.length === 0) {
-    return <span className="text-muted-foreground">—</span>;
+    return (
+      <MuiTypography component="span" color="text.secondary">
+        —
+      </MuiTypography>
+    );
   }
   return (
-    <span dir="ltr" className="tabular-nums">
-      {amounts
-        .map((entry) =>
-          formatMoney(entry.amountMinor, entry.currency as CurrencyCode, locale),
-        )
-        .join(" · ")}
-    </span>
+    <MuiStack
+      component="span"
+      direction="row"
+      spacing={1}
+      dir="ltr"
+      sx={{
+        flexWrap: "wrap",
+        alignItems: "baseline",
+        fontVariantNumeric: "tabular-nums",
+      }}
+    >
+      {amounts.map((entry) => (
+        <span key={entry.currency}>
+          {formatMoney(entry.amountMinor, entry.currency as CurrencyCode, locale)}
+        </span>
+      ))}
+    </MuiStack>
   );
 }
 
-function Stat({ label, value }: { label: string; value: ReactNode }) {
+function Kpi({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: ReactNode;
+  hint?: ReactNode;
+}) {
   return (
-    <Card>
-      <CardContent className="flex flex-col gap-1">
-        <span className="text-xs text-muted-foreground">{label}</span>
-        <span className="text-lg font-semibold text-foreground">{value}</span>
-      </CardContent>
-    </Card>
+    <MuiCard variant="outlined" sx={{ height: "100%" }}>
+      <MuiCardContent
+        sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
+      >
+        <MuiTypography variant="caption" color="text.secondary">
+          {label}
+        </MuiTypography>
+        <MuiTypography
+          component="div"
+          variant="h6"
+          sx={{ fontWeight: 600, lineHeight: 1.35 }}
+        >
+          {value}
+        </MuiTypography>
+        {hint ? (
+          <MuiTypography variant="caption" color="text.secondary">
+            {hint}
+          </MuiTypography>
+        ) : null}
+      </MuiCardContent>
+    </MuiCard>
   );
 }
 
@@ -63,23 +107,68 @@ function ClientName({
   nameEn: string | null;
 }) {
   return (
-    <span className="flex flex-col">
+    <MuiStack component="span" direction="column">
       <span dir="rtl" lang="ar">
         {nameAr ?? nameEn ?? "—"}
       </span>
       {nameEn && nameAr ? (
-        <span dir="ltr" lang="en" className="text-xs text-muted-foreground">
+        <MuiTypography
+          component="span"
+          variant="caption"
+          color="text.secondary"
+          dir="ltr"
+          lang="en"
+        >
           {nameEn}
-        </span>
+        </MuiTypography>
       ) : null}
-    </span>
+    </MuiStack>
+  );
+}
+
+function StatusBreakdown({
+  title,
+  statuses,
+  counts,
+  labels,
+}: {
+  title: string;
+  statuses: readonly string[];
+  counts: Record<string, number>;
+  labels: (status: string) => string;
+}) {
+  return (
+    <MuiCard variant="outlined" sx={{ height: "100%" }}>
+      <MuiCardContent>
+        <MuiTypography variant="subtitle2" sx={{ mb: 1 }}>
+          {title}
+        </MuiTypography>
+        <MuiStack divider={<MuiDivider flexItem />} spacing={0.5}>
+          {statuses.map((status) => (
+            <MuiStack
+              key={status}
+              direction="row"
+              sx={{ alignItems: "center", justifyContent: "space-between" }}
+            >
+              <MuiTypography variant="body2" color="text.secondary">
+                {labels(status)}
+              </MuiTypography>
+              <MuiTypography variant="body2" sx={{ fontWeight: 600 }}>
+                {counts[status] ?? 0}
+              </MuiTypography>
+            </MuiStack>
+          ))}
+        </MuiStack>
+      </MuiCardContent>
+    </MuiCard>
   );
 }
 
 export default async function DashboardPage() {
   const user = await requireUserPage();
   const t = await getTranslations("dashboard");
-  const tc = await getTranslations("common");
+  const tContracts = await getTranslations("contracts");
+  const tInvoices = await getTranslations("invoices");
   const rawLocale = await getLocale();
   const locale: Locale = isLocale(rawLocale) ? rawLocale : user.locale;
 
@@ -94,92 +183,180 @@ export default async function DashboardPage() {
     user.role === "owner" &&
     (heartbeat === null || nowMs() - heartbeat.ts > HEARTBEAT_STALE_MS);
 
+  const currencyLines = (amounts: CurrencyAmount[]) =>
+    amounts.length === 0
+      ? null
+      : amounts
+          .map((entry) =>
+            formatMoney(
+              entry.amountMinor,
+              entry.currency as CurrencyCode,
+              locale,
+            ),
+          )
+          .join(" · ");
+
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
+    <MuiStack spacing={2}>
+      <MuiStack spacing={0.5}>
+        <MuiTypography component="h1" variant="h5" sx={{ fontWeight: 700 }}>
+          {t("title")}
+        </MuiTypography>
+        <MuiTypography variant="body2" color="text.secondary">
+          {t("subtitle")}
+        </MuiTypography>
+      </MuiStack>
 
       {workerStale ? (
-        <Card className="border-destructive/40">
-          <CardContent className="flex flex-col gap-1">
-            <Badge tone="red">{t("workerStaleTitle")}</Badge>
-            <p className="text-sm text-muted-foreground">
-              {t("workerStaleHint")}
-            </p>
-          </CardContent>
-        </Card>
+        <MuiAlert severity="warning">{t("workerStale")}</MuiAlert>
       ) : null}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Stat
-          label={t("awaitingSignature")}
-          value={
-            <span dir="ltr" className="tabular-nums">
-              {data.awaitingSignature.count}
-            </span>
-          }
-        />
-        <Stat
-          label={t("signedLast30Days")}
-          value={
-            <span dir="ltr" className="tabular-nums">
-              {data.signedLast30Days}
-            </span>
-          }
-        />
-        <Stat
-          label={t("drafts")}
-          value={
-            <span dir="ltr" className="tabular-nums">
-              {data.draftContracts} / {data.draftInvoices}
-            </span>
-          }
-        />
-        <Stat
-          label={t("outstanding")}
-          value={<AmountList amounts={data.outstanding} locale={locale} />}
-        />
-        <Stat
-          label={t("overdue")}
-          value={
-            <span className="flex flex-col gap-0.5">
-              <span className="tabular-nums" dir="ltr">
-                {data.overdue.count}
-              </span>
-              <AmountList amounts={data.overdue.amounts} locale={locale} />
-            </span>
-          }
-        />
-        <Stat
-          label={t("revenue")}
-          value={
-            <span className="flex flex-col gap-0.5">
-              <span className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
-                {t("currentMonth")}
-                <AmountList
-                  amounts={data.revenue.currentMonth}
-                  locale={locale}
-                />
-              </span>
-              <span className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
-                {t("previousMonth")}
-                <AmountList
-                  amounts={data.revenue.previousMonth}
-                  locale={locale}
-                />
-              </span>
-            </span>
-          }
-        />
-      </div>
+      <MuiTypography variant="overline" color="text.secondary">
+        {t("finance")}
+      </MuiTypography>
+      <MuiGrid container spacing={2}>
+        <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Kpi
+            label={t("outstanding")}
+            value={<AmountList amounts={data.outstanding} locale={locale} />}
+            hint={t("outstandingHint")}
+          />
+        </MuiGrid>
+        <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Kpi
+            label={t("overdue")}
+            value={
+              <MuiStack
+                component="span"
+                direction="row"
+                spacing={1}
+                sx={{ alignItems: "baseline" }}
+              >
+                <span dir="ltr" style={{ fontVariantNumeric: "tabular-nums" }}>
+                  {data.overdue.count}
+                </span>
+                <AmountList amounts={data.overdue.amounts} locale={locale} />
+              </MuiStack>
+            }
+            hint={t("overdueHint")}
+          />
+        </MuiGrid>
+        <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Kpi
+            label={t("collectedThisMonth")}
+            value={
+              <AmountList amounts={data.revenue.currentMonth} locale={locale} />
+            }
+            hint={`${t("lastMonth")}: ${
+              currencyLines(data.revenue.previousMonth) ?? "—"
+            }`}
+          />
+        </MuiGrid>
+        <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Kpi
+            label={t("issuedThisMonth")}
+            value={
+              <AmountList
+                amounts={data.issuedThisMonth.amounts}
+                locale={locale}
+              />
+            }
+            hint={t("invoicesCount", { count: data.issuedThisMonth.count })}
+          />
+        </MuiGrid>
+      </MuiGrid>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("awaitingTitle")}</CardTitle>
-          <span className="text-sm text-muted-foreground" dir="ltr">
-            {data.awaitingSignature.count}
-          </span>
-        </CardHeader>
-        <CardContent>
+      <MuiTypography variant="overline" color="text.secondary">
+        {t("operations")}
+      </MuiTypography>
+      <MuiGrid container spacing={2}>
+        <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Kpi
+            label={t("awaitingSignature")}
+            value={
+              <span dir="ltr" style={{ fontVariantNumeric: "tabular-nums" }}>
+                {data.awaitingSignature.count}
+              </span>
+            }
+            hint={t("awaitingHint")}
+          />
+        </MuiGrid>
+        <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Kpi
+            label={t("contractsActive")}
+            value={
+              <span dir="ltr" style={{ fontVariantNumeric: "tabular-nums" }}>
+                {data.contractsActive}
+              </span>
+            }
+            hint={t("signedLast30Days", { count: data.signedLast30Days })}
+          />
+        </MuiGrid>
+        <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Kpi
+            label={t("projectsActive")}
+            value={
+              <span dir="ltr" style={{ fontVariantNumeric: "tabular-nums" }}>
+                {data.projectsActive}
+              </span>
+            }
+            hint={t("drafts", {
+              contracts: data.draftContracts,
+              invoices: data.draftInvoices,
+            })}
+          />
+        </MuiGrid>
+        <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Kpi
+            label={t("clients")}
+            value={
+              <span dir="ltr" style={{ fontVariantNumeric: "tabular-nums" }}>
+                {data.clientsTotal}
+              </span>
+            }
+            hint={t("clientsNew", { count: data.clientsNewThisMonth })}
+          />
+        </MuiGrid>
+      </MuiGrid>
+
+      <MuiGrid container spacing={2}>
+        <MuiGrid size={{ xs: 12, md: 6 }}>
+          <StatusBreakdown
+            title={t("contractsByStatus")}
+            statuses={CONTRACT_STATUSES}
+            counts={data.contractsByStatus}
+            labels={(status) => tContracts(`status.${status}`)}
+          />
+        </MuiGrid>
+        <MuiGrid size={{ xs: 12, md: 6 }}>
+          <StatusBreakdown
+            title={t("invoicesByStatus")}
+            statuses={INVOICE_STATUSES}
+            counts={data.invoicesByStatus}
+            labels={(status) => tInvoices(`status.${status}`)}
+          />
+        </MuiGrid>
+      </MuiGrid>
+
+      <MuiTypography variant="overline" color="text.secondary">
+        {t("attention")}
+      </MuiTypography>
+
+      <MuiCard variant="outlined">
+        <MuiCardContent>
+          <MuiStack
+            direction="row"
+            sx={{ alignItems: "center", justifyContent: "space-between", mb: 1 }}
+          >
+            <MuiTypography variant="subtitle1" sx={{ fontWeight: 600 }}>
+              {t("awaitingTitle")}
+            </MuiTypography>
+            <MuiChip
+              size="small"
+              variant="outlined"
+              label={data.awaitingSignature.count}
+            />
+          </MuiStack>
           <Table>
             <TableHead>
               <TableRow>
@@ -219,23 +396,31 @@ export default async function DashboardPage() {
               )}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </MuiCardContent>
+      </MuiCard>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("dueSoonTitle")}</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <MuiCard variant="outlined">
+        <MuiCardContent>
+          <MuiStack
+            direction="row"
+            sx={{ alignItems: "center", justifyContent: "space-between", mb: 1 }}
+          >
+            <MuiTypography variant="subtitle1" sx={{ fontWeight: 600 }}>
+              {t("dueSoonTitle")}
+            </MuiTypography>
+            <MuiChip
+              size="small"
+              variant="outlined"
+              label={data.dueSoon.length}
+            />
+          </MuiStack>
           <Table>
             <TableHead>
               <TableRow>
                 <TableHeaderCell>{t("number")}</TableHeaderCell>
                 <TableHeaderCell>{t("client")}</TableHeaderCell>
                 <TableHeaderCell>{t("dueDate")}</TableHeaderCell>
-                <TableHeaderCell className="text-end">
-                  {t("outstanding")}
-                </TableHeaderCell>
+                <TableHeaderCell className="text-end">{t("outstanding")}</TableHeaderCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -274,17 +459,24 @@ export default async function DashboardPage() {
               )}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </MuiCardContent>
+      </MuiCard>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("endingSoonTitle")}</CardTitle>
-          <span className="text-sm text-muted-foreground" dir="ltr">
-            {data.endingSoon.count}
-          </span>
-        </CardHeader>
-        <CardContent>
+      <MuiCard variant="outlined">
+        <MuiCardContent>
+          <MuiStack
+            direction="row"
+            sx={{ alignItems: "center", justifyContent: "space-between", mb: 1 }}
+          >
+            <MuiTypography variant="subtitle1" sx={{ fontWeight: 600 }}>
+              {t("endingSoonTitle")}
+            </MuiTypography>
+            <MuiChip
+              size="small"
+              variant="outlined"
+              label={data.endingSoon.count}
+            />
+          </MuiStack>
           <Table>
             <TableHead>
               <TableRow>
@@ -320,14 +512,18 @@ export default async function DashboardPage() {
               )}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </MuiCardContent>
+      </MuiCard>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("activityTitle")}</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <MuiCard variant="outlined">
+        <MuiCardContent>
+          <MuiTypography
+            component="h2"
+            variant="subtitle1"
+            sx={{ fontWeight: 600, mb: 1 }}
+          >
+            {t("activityTitle")}
+          </MuiTypography>
           <Table>
             <TableHead>
               <TableRow>
@@ -373,10 +569,8 @@ export default async function DashboardPage() {
               )}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
-
-      <p className="text-xs text-muted-foreground">{tc("tagline")}</p>
-    </div>
+        </MuiCardContent>
+      </MuiCard>
+    </MuiStack>
   );
 }

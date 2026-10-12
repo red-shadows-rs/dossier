@@ -1,7 +1,14 @@
 import { and, asc, count, desc, eq, gte, inArray, isNull, lte, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { auditLog, clients, contracts, invoices, payments } from "@/db/schema";
-import { addDays, nowMs, todayInTz } from "@/lib/dates";
+import {
+  auditLog,
+  clients,
+  contracts,
+  invoices,
+  payments,
+  projects,
+} from "@/db/schema";
+import { addDays, nowMs, todayInTz, utcStartOfDayMs } from "@/lib/dates";
 import { getSettings } from "@/server/services/settings";
 
 const MS_PER_DAY = 86_400_000;
@@ -61,6 +68,13 @@ export type DashboardData = {
   };
   endingSoon: { count: number; rows: EndingSoonRow[] };
   recentActivity: ActivityRow[];
+  clientsTotal: number;
+  clientsNewThisMonth: number;
+  projectsActive: number;
+  contractsActive: number;
+  contractsByStatus: Record<string, number>;
+  invoicesByStatus: Record<string, number>;
+  issuedThisMonth: { count: number; amounts: CurrencyAmount[] };
 };
 
 function addAmount(
@@ -275,6 +289,98 @@ function recentActivity(): ActivityRow[] {
     .all();
 }
 
+// 7.12.8 — clients: total (non-archived) and created in the current month.
+function clientCounts(currentStart: string): {
+  total: number;
+  newThisMonth: number;
+} {
+  const sinceMs = utcStartOfDayMs(currentStart);
+  const total =
+    db
+      .select({ value: count() })
+      .from(clients)
+      .where(isNull(clients.archivedAt))
+      .get()?.value ?? 0;
+  const newThisMonth =
+    db
+      .select({ value: count() })
+      .from(clients)
+      .where(and(isNull(clients.archivedAt), gte(clients.createdAt, sinceMs)))
+      .get()?.value ?? 0;
+  return { total, newThisMonth };
+}
+
+// 7.12.9 — active projects (non-archived, status = active).
+function activeProjects(): number {
+  return (
+    db
+      .select({ value: count() })
+      .from(projects)
+      .where(and(isNull(projects.archivedAt), eq(projects.status, "active")))
+      .get()?.value ?? 0
+  );
+}
+
+// 7.12.10 — contracts in force (signed or completed).
+function activeContracts(): number {
+  return (
+    db
+      .select({ value: count() })
+      .from(contracts)
+      .where(inArray(contracts.status, ["signed", "completed"]))
+      .get()?.value ?? 0
+  );
+}
+
+function contractStatusCounts(): Record<string, number> {
+  const rows = db
+    .select({ status: contracts.status, value: count() })
+    .from(contracts)
+    .groupBy(contracts.status)
+    .all();
+  const out: Record<string, number> = {};
+  for (const row of rows) out[row.status] = row.value;
+  return out;
+}
+
+function invoiceStatusCounts(): Record<string, number> {
+  const rows = db
+    .select({ status: invoices.status, value: count() })
+    .from(invoices)
+    .groupBy(invoices.status)
+    .all();
+  const out: Record<string, number> = {};
+  for (const row of rows) out[row.status] = row.value;
+  return out;
+}
+
+// 7.12.11 — invoices issued in the current month (count + totals per currency).
+function issuedInRange(start: string, end: string): {
+  count: number;
+  amounts: CurrencyAmount[];
+} {
+  const rows = db
+    .select({
+      currency: invoices.currency,
+      totalMinor: invoices.totalMinor,
+    })
+    .from(invoices)
+    .where(
+      and(
+        inArray(invoices.status, ["issued", "partially_paid", "paid"]),
+        sql`${invoices.issueDate} IS NOT NULL`,
+        gte(invoices.issueDate, start),
+        lte(invoices.issueDate, end),
+      ),
+    )
+    .all();
+  const map = new Map<string, number>();
+  for (const row of rows) {
+    addAmount(map, row.currency, row.totalMinor);
+  }
+  return { count: rows.length, amounts: toAmounts(map) };
+}
+
 // DOSSIER_PLAN.md 7.12 — dashboard metrics.
 export function getDashboard(
   today = todayInTz(getSettings("defaults").timezone),
@@ -282,6 +388,8 @@ export function getDashboard(
   const { currentStart, currentEnd, previousStart, previousEnd } =
     monthBounds(today);
   const totals = invoiceTotals(today);
+  const clientStats = clientCounts(currentStart);
+  const issued = issuedInRange(currentStart, currentEnd);
 
   return {
     awaitingSignature: awaitingSignature(),
@@ -307,5 +415,12 @@ export function getDashboard(
     },
     endingSoon: endingSoon(today),
     recentActivity: recentActivity(),
+    clientsTotal: clientStats.total,
+    clientsNewThisMonth: clientStats.newThisMonth,
+    projectsActive: activeProjects(),
+    contractsActive: activeContracts(),
+    contractsByStatus: contractStatusCounts(),
+    invoicesByStatus: invoiceStatusCounts(),
+    issuedThisMonth: issued,
   };
 }
