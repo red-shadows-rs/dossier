@@ -350,3 +350,11 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - **Theme switch on the login page** (`ThemeSwitch variant="icon"`): the login header now shows a compact theme toggle (icon-only: sun/moon/monitor) beside the language button; it cycles system→light→dark via the existing `setTheme` server action. The login page reads the theme from the `dossier_theme` cookie (same as the app shell). Verified: the button has `aria-label` "المظهر" and each click changes the `html` theme class / cookie. The app shell keeps the `<select>` variant (`ThemeSwitch` default `variant="select"`).
 - **Logout location (answer)**: on the dashboard it lives in the top-bar **user menu** (the button showing the user's name) → menu item "تسجيل الخروج" (`UserMenu.tsx`, `logoutAction`). Verified in a real session: user-menu button = 1, logout menuitem = 1. It is not in the sidebar.
 - Verify: `npm run check` → typecheck 0, lint 0, check:rtl 0, 494/494.
+
+## Login header polish (follow-up)
+
+- **Theme control redesign**: dropped the icon-cycling button (user feedback: bad design); the login header now uses the same `ThemeSwitch` **select** as the app shell (single component, consistent everywhere). Removed the unused `variant` from `ThemeSwitch`.
+- **Dossier logo matches the favicon**: the `Logo` mark now uses the favicon's exact folder path (fills the 32-box) and renders at **32×32** (same as the favicon), filled with `currentColor`/`text-primary` and a `var(--primary-foreground)` inner line. No raw colors in the component.
+- **Red Shadows logo real colors**: removed the `dark:brightness-0 dark:invert` treatment, so the footer logo shows its real red/black artwork in both themes.
+- Verify: `npm run check` → typecheck 0, lint 0, check:rtl 0, 494/494. DOM probe: header has `select[name=theme]`; logo `32×32` with `fill=currentColor`; footer img class `h-5 w-auto`.
+- Note: the Red Shadows PNG is red + near-black, so its dark parts have low contrast on the dark theme; a light variant of the asset would be needed to keep it crisp on dark.
