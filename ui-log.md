@@ -358,3 +358,13 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - **Red Shadows logo real colors**: removed the `dark:brightness-0 dark:invert` treatment, so the footer logo shows its real red/black artwork in both themes.
 - Verify: `npm run check` → typecheck 0, lint 0, check:rtl 0, 494/494. DOM probe: header has `select[name=theme]`; logo `32×32` with `fill=currentColor`; footer img class `h-5 w-auto`.
 - Note: the Red Shadows PNG is red + near-black, so its dark parts have low contrast on the dark theme; a light variant of the asset would be needed to keep it crisp on dark.
+
+## Theme control + logo + system scheme (follow-up)
+
+- **Icon theme control** (`ThemeSwitch`): replaced the `<select>` with three borderless icon buttons (light/system/dark; active = `text.primary`, others `text.secondary`). Single shared component → used on the login header and the app shell.
+- **Balanced logo** (`Logo`): mark reduced to **24×24** (was 32) and the wordmark set to `text-xl`, so the mark is no longer larger than the name; the mark still uses the favicon's folder path.
+- **"system" theme bug fixed**: MUI's palette variables are emitted only under `.dark`/`.light` (`:root` has no palette vars), so "system" (no class) left MUI with **undefined colors** while Tailwind used `:root` dark → black-on-black / colorless components. Fix: always resolve a color-scheme class —
+  - a pre-paint inline script in `src/app/layout.tsx` (first child of `<body>`, `suppressHydrationWarning` on `<html>`) adds `dark`/`light` from `prefers-color-scheme` when no class is present;
+  - `Providers` now takes `colorTheme` and, for `system`, applies/lstens to the media query at runtime (so switching to system re-applies the class).
+  - Verified with Playwright (colorScheme dark/light): after selecting system, `html` gets `dark`/`light` respectively and `--mui-palette-primary-main` = `#e11d48`, `--mui-palette-background-default` = `#0b0b0f`/`#ffffff`.
+- Verify: `npm run check` 494/494 · `test:e2e` **3/3**.
