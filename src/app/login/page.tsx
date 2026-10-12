@@ -26,7 +26,7 @@ export default async function LoginPage() {
         <Logo />
         <div className="flex items-center gap-3">
           <ThemeSwitch current={theme} />
-          <LocaleSwitch variant="toggle" />
+          <LocaleSwitch />
         </div>
       </header>
       <main className="flex flex-1 flex-col items-center justify-center gap-6">
