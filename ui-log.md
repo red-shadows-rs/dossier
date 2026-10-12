@@ -334,3 +334,8 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - **Favicon enlarged** (`e93239c`): `src/app/icon.svg` folder redrawn taller/wider (x1–31, y6.3–29.2) to fill the icon box; still transparent.
 - Verify: `check` 494/494 · `build` 0 · `e2e` **3/3**. Playwright: eye toggles password→text and is `type="button"`; inputs `rtl` (ar)/`ltr` (en).
 - **Favicon fills the square** (`5fe1dab`): redesigned `src/app/icon.svg` — the folder now spans x1–31, y2.5–30 (two overlapping rounded rects: tab + body). Rasterized at 32px it fills 100% wide × 91% tall (previously wide but short). Still transparent. Note: browsers cache favicons aggressively — check in a private window / hard refresh.
+- **Standard favicon set** (`favicon set` commit): generated the standard sizes every site ships and wired them via `metadata.icons` + a web manifest.
+  - `public/`: `favicon.ico` (48/32/16 frames), `favicon-16x16.png`, `favicon-32x32.png`, `favicon-48x48.png`, `apple-touch-icon.png` (180, accent-badge), `android-chrome-192x192.png`, `android-chrome-512x512.png` (accent-badge), `icon.svg` (moved from `src/app/icon.svg`), `site.webmanifest`.
+  - `src/app/layout.tsx`: `metadata.manifest = "/site.webmanifest"` and `metadata.icons` = ico(48) + svg + 16/32 PNG, `apple` 180.
+  - Verified served head: `rel=manifest`, `rel=icon` (ico 48, svg, 16/32 png), `rel=apple-touch-icon` 180; all assets 200 with correct content types; `site.webmanifest` → `application/manifest+json`.
+  - `check` 494/494 · `build` 0 · `e2e` 3/3.
