@@ -31,7 +31,6 @@ export async function TopBar({ user }: { user: SessionUser }) {
         sx={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
           gap: 1.5,
           height: 56,
           px: 2,
@@ -53,17 +52,16 @@ export async function TopBar({ user }: { user: SessionUser }) {
         </MuiBox>
         <MuiBox
           sx={{
-            display: { xs: "none", sm: "flex" },
-            flex: 1,
-            justifyContent: "center",
-            px: 2,
+            display: { xs: "none", sm: "block" },
+            width: "100%",
+            maxWidth: 420,
           }}
         >
           <HeaderSearch />
         </MuiBox>
         <MuiBox
           sx={{
-            marginInlineStart: { xs: "auto", sm: 0 },
+            marginInlineStart: "auto",
             display: "flex",
             alignItems: "center",
             gap: 1.5,

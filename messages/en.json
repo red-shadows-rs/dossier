@@ -1,11 +1,7 @@
 {
   "search": {
-    "title": "Search",
     "placeholder": "Search clients, projects, contracts, invoices…",
-    "prompt": "Type a query to search clients, projects, contracts and invoices.",
-    "forQuery": "Results for \u201c{q}\u201d",
-    "noResults": "No results",
-    "noResultsHint": "Try a different term or check the spelling."
+    "noResults": "No results"
   },
   "common": {
     "tagline": "Contracts & invoices platform",
