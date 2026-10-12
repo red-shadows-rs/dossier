@@ -3,6 +3,7 @@ import MuiAppBar from "@mui/material/AppBar";
 import MuiBox from "@mui/material/Box";
 import MuiToolbar from "@mui/material/Toolbar";
 import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
+import { Logo } from "@/components/layout/Logo";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { ThemeSwitch } from "@/components/layout/ThemeSwitch";
 import { UserMenu } from "@/components/layout/UserMenu";
@@ -40,7 +41,7 @@ export async function TopBar({ user }: { user: SessionUser }) {
             canSignForCompany={user.canSignForCompany}
             theme={theme}
           />
-          <span className="text-lg font-bold text-primary">Dossier</span>
+          <Logo />
         </MuiBox>
         <MuiBox
           sx={{

@@ -10,6 +10,7 @@ import MuiIconButton from "@mui/material/IconButton";
 import MuiList from "@mui/material/List";
 import type { Theme } from "@/lib/i18n";
 import { LocaleSwitch } from "./LocaleSwitch";
+import { Logo } from "./Logo";
 import { NavItem } from "./NavItem";
 import { ThemeSwitch } from "./ThemeSwitch";
 import { isActive, navEntries, type NavSubject } from "./nav";
@@ -58,7 +59,7 @@ export function MobileNav({
               borderColor: "divider",
             }}
           >
-            <span className="text-lg font-bold text-primary">Dossier</span>
+            <Logo />
           </MuiBox>
           <MuiList
             component="nav"

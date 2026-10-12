@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import MuiBox from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiList from "@mui/material/List";
+import { Logo } from "./Logo";
 import { NavItem } from "./NavItem";
 import { isActive, navEntries, type NavSubject } from "./nav";
 
@@ -50,8 +51,8 @@ export function Sidebar({
           borderColor: "divider",
         }}
       >
-        <Link href="/" className="text-lg font-bold text-primary">
-          Dossier
+        <Link href="/" aria-label="Dossier">
+          <Logo />
         </Link>
       </MuiBox>
       <MuiList
