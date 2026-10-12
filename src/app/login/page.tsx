@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { LoginForm } from "@/components/forms/LoginForm";
 import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
 import { Logo } from "@/components/layout/Logo";
+import { RedShadowsMark } from "@/components/layout/RedShadowsMark";
 import { getCurrentUser } from "@/server/auth/require-user";
 
 export default async function LoginPage() {
@@ -12,6 +13,7 @@ export default async function LoginPage() {
   }
   const t = await getTranslations("auth");
   const tc = await getTranslations("common");
+  const year = new Date().getFullYear();
 
   return (
     <div className="flex min-h-dvh flex-col bg-background px-6 py-5 sm:px-8">
@@ -23,8 +25,17 @@ export default async function LoginPage() {
         <h1 className="text-3xl font-bold text-foreground">{t("loginTitle")}</h1>
         <LoginForm />
       </main>
-      <footer className="text-center text-sm text-muted-foreground">
-        {tc("tagline")}
+      <footer className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+        <p>{tc("rights", { year })}</p>
+        <a
+          href="https://red-shadows-rs.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+        >
+          <RedShadowsMark />
+          <span dir="ltr">RED SHADOWS | RS</span>
+        </a>
       </footer>
     </div>
   );

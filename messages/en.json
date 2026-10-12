@@ -1,6 +1,7 @@
 {
   "common": {
     "tagline": "Contracts & invoices platform",
+    "rights": "© {year} Dossier. All rights reserved.",
     "skipToContent": "Skip to content",
     "save": "Save",
     "cancel": "Cancel",

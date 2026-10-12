@@ -1,6 +1,7 @@
 {
   "common": {
     "tagline": "منصة العقود والفواتير",
+    "rights": "© {year} Dossier. جميع الحقوق محفوظة.",
     "skipToContent": "تخطٍّ إلى المحتوى",
     "save": "حفظ",
     "cancel": "إلغاء",
