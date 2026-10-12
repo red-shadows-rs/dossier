@@ -317,3 +317,10 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - **Two-sided footer** (`966d9c3`): login footer now uses `flex justify-between` — copyright (`common.rights` = "© {year} Dossier …", dynamic year) on the start side (right in RTL) and a team credit on the end side: new `RedShadowsMark` (RS monogram SVG) + "RED SHADOWS | RS" (`dir="ltr"` for mixed bidi), linking to https://red-shadows-rs.com/ with `target="_blank" rel="noopener noreferrer"`. Verified via DOM: link href/target/rel correct; in RTL copyright center x≈1145 (right), team x≈97 (left) at 1280px.
 - **Favicon transparent** (`966d9c3`): `src/app/icon.svg` is now a filled accent folder with no background rect (transparent).
 - Verify: `check` 494/494 · `build` 0 · `e2e` 3/3.
+
+## Logo + icon polish (follow-up)
+
+- **Real Red Shadows logo** (`465618b`): fetched the team's real asset `https://red-shadows-rs.com/logo.png` (512×353 RGBA, red + near-black) into `public/red-shadows-logo.png` and used it via `next/image` in the login footer (replacing the hand-made `RedShadowsMark`, now deleted). The logo's dark parts are near-invisible on the dark theme, so it uses `dark:brightness-0 dark:invert` (light theme = original colors; dark theme = white silhouette). `alt=""` (decorative) with the visible text "RED SHADOWS | RS" as the accessible name.
+- **RTL-aware field icons** (`465618b`): the email/password adornments now switch side with direction — `endAdornment` (`position="end"`, right) for `ar`, `startAdornment` (`position="start"`, left) for `en`, since the inputs are `dir="ltr"`. Verified via Playwright: `ar` → 2 `positionEnd`, `en` → 2 `positionStart`. Login button icon left as the first child (renders at the RTL start/right, consistent with the fields).
+- **Favicon enlarged** (`465618b`): `src/app/icon.svg` folder redrawn to fill the 32-box (x2.5–29.5, y7–26), bolder inner line; still transparent (no background). Served at `/icon.svg` (200, image/svg+xml).
+- Verify: `check` 494/494 · `build` 0.
