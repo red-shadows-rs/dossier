@@ -4,6 +4,8 @@ import {
   endDateIso,
   invoiceBalanceMinor,
   login,
+  pickSelect,
+  pickSelectIndex,
   todayIso,
   waitForOutbox,
 } from "./helpers";
@@ -31,7 +33,7 @@ test.describe.serial("contract lifecycle (16.2 #1 + #2)", () => {
 
     // 2. Project
     await page.goto("/projects/new");
-    await page.locator("#project-client").selectOption(clientId);
+    await pickSelect(page, "#project-client", clientId);
     await page.locator("#project-name-ar").fill("مشروع الاختبار");
     await page.locator("#project-name-en").fill("E2E Project");
     await page.getByRole("button", { name: "Save" }).click();
@@ -40,8 +42,8 @@ test.describe.serial("contract lifecycle (16.2 #1 + #2)", () => {
 
     // 3. Contract draft from the first system template
     await page.goto("/contracts/new");
-    await page.locator("#nc-project").selectOption(projectId);
-    await page.locator("#nc-template").selectOption({ index: 1 });
+    await pickSelect(page, "#nc-project", projectId);
+    await pickSelectIndex(page, "#nc-template", 1);
     await page.getByRole("button", { name: "Create draft" }).click();
     await expect(page).toHaveURL(/\/contracts\/[^/]+\/edit$/);
     const contractId = new URL(page.url()).pathname.split("/")[2];

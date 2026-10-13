@@ -109,3 +109,23 @@ export async function login(page: Page): Promise<void> {
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
 }
+
+// The app uses MUI's custom Select (role=combobox). Pick an option by value.
+export async function pickSelect(
+  page: Page,
+  selector: string,
+  value: string,
+): Promise<void> {
+  await page.locator(selector).click();
+  await page.locator(`li[data-value="${value}"]`).click();
+}
+
+// Pick an option by position (0-based).
+export async function pickSelectIndex(
+  page: Page,
+  selector: string,
+  index: number,
+): Promise<void> {
+  await page.locator(selector).click();
+  await page.getByRole("option").nth(index).click();
+}
