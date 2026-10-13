@@ -30,6 +30,7 @@ export function NavItem({
       onClick={onNavigate}
       selected={active}
       sx={{
+        gap: 1.5,
         borderRadius: "4px",
         mb: 0.25,
         px: 1.5,
@@ -48,7 +49,7 @@ export function NavItem({
     >
       <MuiListItemIcon
         sx={{
-          minWidth: collapsed ? 0 : 36,
+          minWidth: 0,
           justifyContent: collapsed ? "center" : undefined,
           color: "inherit",
         }}

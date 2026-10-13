@@ -8,10 +8,9 @@ import MuiAvatar from "@mui/material/Avatar";
 import MuiBox from "@mui/material/Box";
 import MuiDivider from "@mui/material/Divider";
 import MuiIconButton from "@mui/material/IconButton";
-import MuiListItemIcon from "@mui/material/ListItemIcon";
-import MuiListItemText from "@mui/material/ListItemText";
 import MuiMenu from "@mui/material/Menu";
 import MuiMenuItem from "@mui/material/MenuItem";
+import MuiStack from "@mui/material/Stack";
 import MuiTypography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import { logoutAction } from "@/server/actions/auth";
@@ -23,12 +22,6 @@ export function UserMenu({ user }: { user: SessionUser }) {
   const horizontal = theme.direction === "rtl" ? "left" : "right";
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
-
-  const iconSlot = (node: React.ReactNode) => (
-    <MuiListItemIcon sx={{ minWidth: 32, color: "inherit" }}>
-      {node}
-    </MuiListItemIcon>
-  );
 
   return (
     <>
@@ -75,11 +68,10 @@ export function UserMenu({ user }: { user: SessionUser }) {
           href="/account"
           onClick={() => setAnchorEl(null)}
         >
-          {iconSlot(<User size={18} aria-hidden="true" />)}
-          <MuiListItemText
-            primary={t("account")}
-            slotProps={{ primary: { variant: "body2" } }}
-          />
+          <MuiStack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+            <User size={18} aria-hidden="true" />
+            <MuiTypography variant="body2">{t("account")}</MuiTypography>
+          </MuiStack>
         </MuiMenuItem>
         <form action={logoutAction}>
           <MuiMenuItem
@@ -87,11 +79,10 @@ export function UserMenu({ user }: { user: SessionUser }) {
             type="submit"
             sx={{ width: "100%", color: "error.main" }}
           >
-            {iconSlot(<LogOut size={18} aria-hidden="true" />)}
-            <MuiListItemText
-              primary={t("logout")}
-              slotProps={{ primary: { variant: "body2" } }}
-            />
+            <MuiStack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+              <LogOut size={18} aria-hidden="true" />
+              <MuiTypography variant="body2">{t("logout")}</MuiTypography>
+            </MuiStack>
           </MuiMenuItem>
         </form>
       </MuiMenu>
