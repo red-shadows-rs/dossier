@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Fragment, type ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import MuiAlert from "@mui/material/Alert";
+import MuiBox from "@mui/material/Box";
 import MuiCard from "@mui/material/Card";
 import MuiCardContent from "@mui/material/CardContent";
 import MuiChip from "@mui/material/Chip";
@@ -25,7 +26,11 @@ import { isLocale } from "@/lib/i18n";
 import { formatMoney } from "@/lib/money";
 import { workerHeartbeatSchema } from "@/lib/validation/settings";
 import { requireUserPage } from "@/server/auth/require-user";
-import { getDashboard, type CurrencyAmount } from "@/server/services/dashboard";
+import {
+  getDashboard,
+  type CurrencyAmount,
+  type MonthlyPoint,
+} from "@/server/services/dashboard";
 import { getInternalSetting, getSettings } from "@/server/services/settings";
 
 const HEARTBEAT_STALE_MS = 5 * 60 * 1000;
@@ -164,6 +169,104 @@ function StatusBreakdown({
         </MuiStack>
       </MuiCardContent>
     </MuiCard>
+  );
+}
+
+function MonthChart({
+  points,
+  locale,
+  issuedLabel,
+  signedLabel,
+}: {
+  points: MonthlyPoint[];
+  locale: Locale;
+  issuedLabel: string;
+  signedLabel: string;
+}) {
+  const max = Math.max(1, ...points.map((p) => Math.max(p.issued, p.signed)));
+  const fmt = new Intl.DateTimeFormat(locale === "ar" ? "ar" : "en", {
+    month: "short",
+  });
+
+  const legend = (color: string, label: string) => (
+    <MuiStack
+      component="span"
+      direction="row"
+      spacing={0.75}
+      sx={{ alignItems: "center" }}
+    >
+      <MuiBox
+        component="span"
+        sx={{ width: 10, height: 10, bgcolor: color, borderRadius: "2px" }}
+      />
+      <MuiTypography component="span" variant="caption" color="text.secondary">
+        {label}
+      </MuiTypography>
+    </MuiStack>
+  );
+
+  return (
+    <MuiBox>
+      <MuiStack direction="row" spacing={2} sx={{ mb: 1.5 }}>
+        {legend("primary.main", issuedLabel)}
+        {legend("info.main", signedLabel)}
+      </MuiStack>
+      <MuiBox
+        sx={{
+          display: "flex",
+          alignItems: "flex-end",
+          gap: 1,
+          height: 160,
+        }}
+      >
+        {points.map((point) => (
+          <MuiBox
+            key={point.month}
+            sx={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 0.5,
+              minWidth: 0,
+            }}
+          >
+            <MuiStack
+              direction="row"
+              spacing={0.5}
+              sx={{
+                alignItems: "flex-end",
+                justifyContent: "center",
+                height: 120,
+                width: "100%",
+              }}
+            >
+              <MuiBox
+                sx={{
+                  width: 12,
+                  minHeight: 2,
+                  height: `${(point.issued / max) * 100}%`,
+                  bgcolor: "primary.main",
+                  borderRadius: "2px 2px 0 0",
+                }}
+              />
+              <MuiBox
+                sx={{
+                  width: 12,
+                  minHeight: 2,
+                  height: `${(point.signed / max) * 100}%`,
+                  bgcolor: "info.main",
+                  borderRadius: "2px 2px 0 0",
+                }}
+              />
+            </MuiStack>
+            <MuiTypography variant="caption" color="text.secondary">
+              {fmt.format(new Date(`${point.month}-01T00:00:00Z`))}
+            </MuiTypography>
+          </MuiBox>
+        ))}
+      </MuiBox>
+    </MuiBox>
   );
 }
 
@@ -340,6 +443,20 @@ export default async function DashboardPage() {
           />
         </MuiGrid>
       </MuiGrid>
+
+      <MuiCard variant="outlined">
+        <MuiCardContent>
+          <MuiTypography variant="subtitle2" sx={{ mb: 1 }}>
+            {t("monthlyTitle")}
+          </MuiTypography>
+          <MonthChart
+            points={data.monthlyActivity}
+            locale={locale}
+            issuedLabel={t("seriesIssued")}
+            signedLabel={t("seriesSigned")}
+          />
+        </MuiCardContent>
+      </MuiCard>
 
       <MuiTypography variant="overline" color="text.secondary">
         {t("attention")}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
@@ -201,19 +202,17 @@ export default async function ProjectsPage({
                       </TableCell>
                       <TableCell className="text-end">
                         <div className="flex justify-end gap-2">
-                          <Link
+                          <ActionLink
                             href={`/projects/${row.id}`}
-                            className="text-sm text-muted-foreground hover:text-foreground"
-                          >
-                            {tc("preview")}
-                          </Link>
+                            action="preview"
+                            label={tc("preview")}
+                          />
                           {canWrite ? (
-                            <Link
+                            <ActionLink
                               href={`/projects/${row.id}/edit`}
-                              className="text-sm text-muted-foreground hover:text-foreground"
-                            >
-                              {tc("edit")}
-                            </Link>
+                              action="edit"
+                              label={tc("edit")}
+                            />
                           ) : null}
                         </div>
                       </TableCell>

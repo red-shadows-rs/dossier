@@ -239,7 +239,10 @@
     "when": "Time",
     "action": "Action",
     "entity": "Item",
-    "workerStale": "The background worker is offline. Queued emails and scheduled jobs are paused. Start exactly one worker."
+    "workerStale": "The background worker is offline. Queued emails and scheduled jobs are paused. Start exactly one worker.",
+    "monthlyTitle": "Monthly activity",
+    "seriesIssued": "Invoices issued",
+    "seriesSigned": "Contracts signed"
   },
   "audit": {
     "title": "Audit log",

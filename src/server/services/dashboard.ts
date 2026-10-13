@@ -54,6 +54,12 @@ export type EndingSoonRow = {
 
 export type ActivityRow = typeof auditLog.$inferSelect;
 
+export type MonthlyPoint = {
+  month: string;
+  issued: number;
+  signed: number;
+};
+
 export type DashboardData = {
   awaitingSignature: { count: number; rows: AwaitingSignatureRow[] };
   signedLast30Days: number;
@@ -75,6 +81,7 @@ export type DashboardData = {
   contractsByStatus: Record<string, number>;
   invoicesByStatus: Record<string, number>;
   issuedThisMonth: { count: number; amounts: CurrencyAmount[] };
+  monthlyActivity: MonthlyPoint[];
 };
 
 function addAmount(
@@ -381,6 +388,62 @@ function issuedInRange(start: string, end: string): {
   return { count: rows.length, amounts: toAmounts(map) };
 }
 
+// 7.12.12 — monthly activity over the last N months (issued invoices + signed contracts).
+function lastMonths(today: string, count: number): string[] {
+  const months: string[] = [];
+  let year = Number(today.slice(0, 4));
+  let month = Number(today.slice(5, 7));
+  for (let i = 0; i < count; i += 1) {
+    months.unshift(`${year}-${String(month).padStart(2, "0")}`);
+    month -= 1;
+    if (month === 0) {
+      month = 12;
+      year -= 1;
+    }
+  }
+  return months;
+}
+
+function monthlyActivity(today: string, count = 6): MonthlyPoint[] {
+  const months = lastMonths(today, count);
+  const buckets = new Map<string, MonthlyPoint>(
+    months.map((month) => [month, { month, issued: 0, signed: 0 }]),
+  );
+
+  const issuedRows = db
+    .select({ issueDate: invoices.issueDate })
+    .from(invoices)
+    .where(
+      and(
+        inArray(invoices.status, ["issued", "partially_paid", "paid"]),
+        sql`${invoices.issueDate} IS NOT NULL`,
+        gte(invoices.issueDate, `${months[0]}-01`),
+      ),
+    )
+    .all();
+  for (const row of issuedRows) {
+    const bucket = buckets.get((row.issueDate as string).slice(0, 7));
+    if (bucket) bucket.issued += 1;
+  }
+
+  const signedRows = db
+    .select({ signedAt: contracts.signedAt })
+    .from(contracts)
+    .where(sql`${contracts.signedAt} IS NOT NULL`)
+    .all();
+  for (const row of signedRows) {
+    if (row.signedAt === null) continue;
+    const bucket = buckets.get(
+      new Date(row.signedAt).toISOString().slice(0, 7),
+    );
+    if (bucket) bucket.signed += 1;
+  }
+
+  return months.map(
+    (month) => buckets.get(month) ?? { month, issued: 0, signed: 0 },
+  );
+}
+
 // DOSSIER_PLAN.md 7.12 — dashboard metrics.
 export function getDashboard(
   today = todayInTz(getSettings("defaults").timezone),
@@ -422,5 +485,6 @@ export function getDashboard(
     contractsByStatus: contractStatusCounts(),
     invoicesByStatus: invoiceStatusCounts(),
     issuedThisMonth: issued,
+    monthlyActivity: monthlyActivity(today),
   };
 }
