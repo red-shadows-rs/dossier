@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import MuiBox from "@mui/material/Box";
+import MuiDivider from "@mui/material/Divider";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiIconButton from "@mui/material/IconButton";
 import MuiList from "@mui/material/List";
@@ -27,7 +28,19 @@ export function Sidebar({
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const entries = navEntries({ role, canSignForCompany });
+  const mainEntries = entries.filter((entry) => entry.section === "main");
+  const manageEntries = entries.filter((entry) => entry.section === "manage");
   const width = collapsed ? COLLAPSED_WIDTH : WIDTH;
+
+  const renderEntry = (entry: (typeof entries)[number]) => (
+    <NavItem
+      key={entry.key}
+      entry={entry}
+      label={t(entry.key)}
+      active={isActive(pathname, entry.href)}
+      collapsed={collapsed}
+    />
+  );
 
   return (
     <MuiDrawer
@@ -77,16 +90,14 @@ export function Sidebar({
           )}
         </MuiIconButton>
       </MuiBox>
-      <MuiList component="nav" sx={{ py: 1 }}>
-        {entries.map((entry) => (
-          <NavItem
-            key={entry.key}
-            entry={entry}
-            label={t(entry.key)}
-            active={isActive(pathname, entry.href)}
-            collapsed={collapsed}
-          />
-        ))}
+      <MuiList component="nav" sx={{ px: 1, py: 1 }}>
+        {mainEntries.map(renderEntry)}
+      </MuiList>
+      {manageEntries.length > 0 ? (
+        <MuiDivider sx={{ mx: 2, my: 0.5 }} />
+      ) : null}
+      <MuiList component="nav" sx={{ px: 1, py: 1 }}>
+        {manageEntries.map(renderEntry)}
       </MuiList>
     </MuiDrawer>
   );

@@ -22,43 +22,73 @@ export type NavEntry = {
   href: string;
   icon: LucideIcon;
   permission: Permission | null;
+  section: "main" | "manage";
 };
 
 export const NAV: NavEntry[] = [
-  { key: "dashboard", href: "/", icon: LayoutDashboard, permission: null },
-  { key: "clients", href: "/clients", icon: Users, permission: "clients.read" },
+  {
+    key: "dashboard",
+    href: "/",
+    icon: LayoutDashboard,
+    permission: null,
+    section: "main",
+  },
+  {
+    key: "clients",
+    href: "/clients",
+    icon: Users,
+    permission: "clients.read",
+    section: "main",
+  },
   {
     key: "projects",
     href: "/projects",
     icon: FolderKanban,
     permission: "projects.read",
+    section: "main",
   },
   {
     key: "contracts",
     href: "/contracts",
     icon: FileText,
     permission: "contracts.read",
+    section: "main",
   },
   {
     key: "invoices",
     href: "/invoices",
     icon: Receipt,
     permission: "invoices.read",
+    section: "main",
   },
   {
     key: "templates",
     href: "/templates",
     icon: Layers,
     permission: "templates.read",
+    section: "main",
   },
   {
     key: "settings",
     href: "/settings",
     icon: Settings,
     permission: "settings.read",
+    section: "manage",
   },
-  { key: "users", href: "/users", icon: UserCog, permission: "users.manage" },
-  { key: "audit", href: "/audit", icon: ScrollText, permission: "audit.read" },
+  {
+    key: "users",
+    href: "/users",
+    icon: UserCog,
+    permission: "users.manage",
+    section: "manage",
+  },
+  {
+    key: "audit",
+    href: "/audit",
+    icon: ScrollText,
+    permission: "audit.read",
+    section: "manage",
+  },
 ];
 
 export function navEntries(subject: NavSubject): NavEntry[] {

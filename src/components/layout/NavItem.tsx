@@ -28,10 +28,23 @@ export function NavItem({
       aria-current={active ? "page" : undefined}
       onClick={onNavigate}
       selected={active}
-      sx={collapsed ? { justifyContent: "center", px: 1.5 } : undefined}
+      sx={{
+        borderRadius: (theme) => theme.shape.borderRadius,
+        mb: 0.25,
+        ...(collapsed ? { justifyContent: "center", px: 1.5 } : {}),
+        "&.Mui-selected": {
+          bgcolor: "action.selected",
+          color: "primary.main",
+          "&:hover": { bgcolor: "action.selected" },
+        },
+      }}
     >
       <MuiListItemIcon
-        sx={collapsed ? { minWidth: 0, justifyContent: "center" } : undefined}
+        sx={{
+          minWidth: collapsed ? 0 : 40,
+          justifyContent: collapsed ? "center" : undefined,
+          color: "inherit",
+        }}
       >
         <Icon size={20} aria-hidden="true" />
       </MuiListItemIcon>
