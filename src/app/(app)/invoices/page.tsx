@@ -1,26 +1,14 @@
 import Link from "next/link";
 import { Filter, Plus, RotateCcw } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { ActionLink } from "@/components/ui/ActionLink";
-import { RowActionButton } from "@/components/forms/RowActionButton";
-import { deleteDraftInvoiceAction } from "@/server/actions/invoices";
-import { Badge, invoiceStatusTone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
-import { Pagination } from "@/components/ui/Pagination";
 import { Select } from "@/components/ui/Select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from "@/components/ui/Table";
+import { InvoicesTable } from "@/components/tables/InvoicesTable";
+import { deleteDraftInvoiceAction } from "@/server/actions/invoices";
 import { INVOICE_STATUSES } from "@/lib/constants";
 import { formatMoney } from "@/lib/money";
 import { todayInTz } from "@/lib/dates";
@@ -77,7 +65,6 @@ export default async function InvoicesPage({
     page: pageParam ? Number(pageParam) : 1,
   });
   const today = todayInTz(getSettings("defaults").timezone);
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const projects = listProjectOptions();
   const canWrite = can(user, "invoices.write");
   const sort = (INVOICE_SORT_FIELDS as readonly string[]).includes(
@@ -94,6 +81,35 @@ export default async function InvoicesPage({
   if (overdue) query.overdue = "1";
   if (sortParam) query.sort = sort;
   if (dirParam) query.dir = dir;
+
+  const projectNames = Object.fromEntries(
+    projects.map((project) => [
+      project.id,
+      project.nameAr ?? project.nameEn ?? project.code,
+    ]),
+  );
+  const tableRows = rows.map((row) => ({
+    ...row,
+    overdue: isOverdue(row, today),
+  }));
+  const labels = {
+    number: t("number"),
+    project: t("project"),
+    statusLabel: t("statusLabel"),
+    total: t("total"),
+    dueDate: t("dueDate"),
+    actions: tc("actions"),
+    preview: tc("preview"),
+    edit: tc("edit"),
+    deleteTitle: t("deleteTitle"),
+    deleteMessage: t("deleteMessage"),
+    deleted: t("deleted"),
+    overdue: t("overdue"),
+    empty: t("empty"),
+    statusValues: Object.fromEntries(
+      INVOICE_STATUSES.map((value) => [value, t(`status.${value}`)]),
+    ),
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -200,97 +216,16 @@ export default async function InvoicesPage({
 
       <Card>
         <CardContent>
-          {rows.length === 0 ? (
-            <EmptyState title={t("empty")} description={t("emptyHint")} />
-          ) : (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableHeaderCell>{t("number")}</TableHeaderCell>
-                  <TableHeaderCell>{t("project")}</TableHeaderCell>
-                  <TableHeaderCell>{t("statusLabel")}</TableHeaderCell>
-                  <TableHeaderCell>{t("total")}</TableHeaderCell>
-                  <TableHeaderCell>{t("dueDate")}</TableHeaderCell>
-                  <TableHeaderCell className="text-end">
-                    {tc("actions")}
-                  </TableHeaderCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => {
-                  const isPastDue = isOverdue(row, today);
-                  return (
-                    <TableRow key={row.id}>
-                      <TableCell dir="ltr" className="text-start font-mono">
-                        {row.number ?? "-"}
-                      </TableCell>
-                      <TableCell>
-                        {projects.find((p) => p.id === row.projectId)?.nameAr ??
-                          projects.find((p) => p.id === row.projectId)
-                            ?.nameEn ??
-                          "-"}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap items-center gap-1">
-                          <Badge
-                            tone={invoiceStatusTone(row.status, isPastDue)}
-                          >
-                            {isPastDue
-                              ? t("overdue")
-                              : t(`status.${row.status}`)}
-                          </Badge>
-                        </div>
-                      </TableCell>
-                      <TableCell dir="ltr" className="text-start tabular-nums">
-                        {formatMoney(
-                          row.totalMinor,
-                          row.currency as CurrencyCode,
-                          "en",
-                        )}
-                      </TableCell>
-                      <TableCell dir="ltr" className="text-start">
-                        {row.dueDate ?? "-"}
-                      </TableCell>
-                      <TableCell className="text-end">
-                        <div className="flex justify-end gap-2">
-                          <ActionLink
-                            href={`/invoices/${row.id}`}
-                            action="preview"
-                            label={tc("preview")}
-                          />
-                          {canWrite && row.status === "draft" ? (
-                            <ActionLink
-                              href={`/invoices/${row.id}/edit`}
-                              action="edit"
-                              label={tc("edit")}
-                            />
-                          ) : null}
-                          {canWrite && row.status === "draft" ? (
-                            <RowActionButton
-                              id={row.id}
-                              action={deleteDraftInvoiceAction}
-                              kind="delete"
-                              label={t("deleteTitle")}
-                              title={t("deleteTitle")}
-                              message={t("deleteMessage")}
-                              confirmLabel={t("deleteTitle")}
-                              successTitle={t("deleted")}
-                            />
-                          ) : null}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          )}
-
-          <Pagination
+          <InvoicesTable
+            rows={tableRows}
+            total={total}
             page={page}
-            totalPages={totalPages}
-            basePath="/invoices"
+            pageSize={pageSize}
             query={query}
+            canWrite={canWrite}
+            labels={labels}
+            projectNames={projectNames}
+            deleteAction={deleteDraftInvoiceAction}
           />
         </CardContent>
       </Card>
