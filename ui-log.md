@@ -470,3 +470,10 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - **Sidebar**: nav grouped into two sections (main: dashboard→templates; manage: settings/users/audit) with a `Divider` between; items are rounded MUI pill buttons (`borderRadius` from theme, `action.selected` + `primary.main` when selected) with tighter icon spacing (`minWidth: 40`). Lists use `px:1` so the pills inset cleanly. Collapse (240⇄72) preserved. Verified: 9 items, 1 divider; logo mark/wordmark centers equal (inline).
 - **User menu**: trigger is now an `Avatar` with the user's initial; the menu has a header (name + email), a `Divider`, and items with icons (`User` for Account, `LogOut` for Log out, error-colored). Verified: 2 items, 2 icons, header present.
 - `npm run check` 494/494 · `test:e2e` 3/3.
+
+## Sidebar logo / user menu / header gap (follow-up)
+
+- **Sidebar logo now inline with the collapse button**: the logo `<Link>` was an anonymous inline box (line-height made the mark/wordmark sit ~3px above the button). Made it `flex h-8 items-center`; verified mark/wordmark/button centers are all 28.
+- **User menu flattened**: removed the nested inner `<MuiList>` (invalid nested `<ul>` + extra padding) and dropped the paper elevation from MUI's menu default 8 to 1; kept the header (name + email), divider, and the `User`/`LogOut` item icons.
+- **Header→content gap**: the main top padding was 24px at lg; now `lg:pt-4` (16px). Verified gap = 16px.
+- `npm run check` 494/494 · `test:e2e` 3/3.
