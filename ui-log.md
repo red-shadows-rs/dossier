@@ -491,3 +491,9 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - **User menu text balanced**: the header name was `subtitle2` (an `<h6>` heading) + a caption email (mixed levels). Now both are `body2` `component="div"` (name weight 600, email muted) — consistent with the menu items.
 - **Full demo seed**: new `scripts/seed-demo.ts` + `npm run seed:demo` populates the site through the real services (company settings; 6 clients; 5 projects; 5 invoices with lines + tax, 3 issued, 2 with payments). Idempotent (reuses clients/projects, skips invoices once seeded). Run against the dev DB: dashboard now shows populated KPIs and the monthly chart bar, and lists show 7 clients / 5 projects / 6 invoices.
 - `npm run check` 494/494 · `test:e2e` 3/3.
+
+## RTL audit + KPI icon adjacency (follow-up)
+
+- **RTL verified correct** (Playwright, ar locale): `html` dir=rtl, DataGrid direction rtl, sidebar on the right (left=1200 at 1440), main rtl — on `/`, `/clients`, `/invoices`. `check:rtl` passes and there are no physical direction utilities (`ml/mr/pl/pr/left/right`). The remaining `dir="ltr"` in the code are intentional (emails, phones, dates, currencies, numeric fields).
+- **Dashboard KPI icon** moved next to its label (was pushed to the far card edge via `justify-between`).
+- `npm run check` 494/494 · `test:e2e` 3/3.
