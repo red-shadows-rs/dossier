@@ -424,3 +424,9 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - **Sidebar/tables aligned to MUI defaults**: `NavItem` uses default `ListItemButton`/`ListItemIcon`/`ListItemText` (removed the custom primary-filled pill); `Table` header cells use MUI defaults.
 - **Em dashes removed** from all UI copy (`messages/**`, src `—`/`–` → `-`) and prose rewritten; internal code comments left as-is. Updated the e2e assertion for the changed thank-you copy.
 - Verified: `npm run check` 494/494 · `test:e2e` 3/3 · browser probe on `/`, `/clients`, `/projects`, `/invoices`, `/users`, `/settings/company`, `/templates` → all **200**, no console errors, footer present, no horizontal overflow.
+
+## Charts + icon actions (follow-up)
+
+- **Professional overview chart**: added a dependency-free, theme-aware monthly grouped bar chart (`MonthChart` in `src/app/(app)/page.tsx`, MUI `Box`/`Stack`, heights from `primary.main`/`info.main`) showing **invoices issued vs contracts signed** over the last 6 months, in a dedicated `Card` with a legend. New read-only service aggregate `monthlyActivity(today, months=6)` (`MonthlyPoint[]`) in `dashboard.ts`; new `dashboard` keys `monthlyTitle`/`seriesIssued`/`seriesSigned` (ar/en). Verified: 6 months × 2 series render.
+- **Icon actions**: new `src/components/ui/ActionLink.tsx` (`IconButton` + `Tooltip` + lucide `Eye`/`Pencil`/`Trash2`/`Download`, `aria-label` = action label). Replaced the text "preview"/"edit" links in the Clients/Contracts/Projects/Invoices/Templates/Users list action columns with icons. Verified: `/clients` shows 2 `a.MuiIconButton-root` with aria-labels "معاينة"/"تعديل".
+- Verify: `npm run check` 494/494 · `test:e2e` 3/3 · dashboard 200, no console errors, no overflow.
