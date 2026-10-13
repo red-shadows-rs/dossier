@@ -446,3 +446,14 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - **Material cards**: `MuiCard` now defaults to `elevation: 1` (theme) and the `Card` wrapper no longer forces `variant="outlined"`; dashboard cards likewise use the default elevation. Verified: cards carry an MUI elevation shadow.
 - **KPI icons**: dashboard KPI cards now show a leading-accent icon (Wallet, AlertTriangle, TrendingUp, Receipt, FileSignature, FileCheck2, FolderKanban, Users). Verified: 8 KPI icons render.
 - Verify: `npm run check` 494/494 · `test:e2e` 3/3 · no console errors.
+
+## MUI X DataGrid across lists (follow-up)
+
+- Installed `@mui/x-data-grid` 9.15.0 (peers: @mui/material ^9.0.0, React 18/19).
+- New `src/components/tables/ServerDataGrid.tsx` (client): DataGrid with `paginationMode="server"`, `rowCount`, `onPaginationModelChange` → router.push, plus `noRowsLabel`.
+- Per-list client tables with column renderers and server actions passed as props:
+  - `ClientsTable`, `ProjectsTable`, `ContractsTable`, `InvoicesTable` (server pagination via `ServerDataGrid`).
+  - `TemplatesTable`, `UsersTable` (client pagination; these lists have no server paging).
+- Pages updated to render the table component and pass serializable `labels`/maps + `canWrite` + the relevant server action (archive/delete).
+- Verified (Playwright, owner session): `/clients`, `/projects`, `/contracts`, `/invoices`, `/templates`, `/users` all 200 with `.MuiDataGrid-root` present, no console errors, no horizontal overflow.
+- `npm run check` 494/494 · `test:e2e` 3/3.
