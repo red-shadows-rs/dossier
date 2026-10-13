@@ -413,3 +413,14 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - **Translations** rewritten concise and product-ready for a documents/invoices system (`dashboard` namespace, ar/en).
 - Fixed a hydration warning (a `<div>` inside a `<p>`); dashboard now renders with a clean console.
 - Verified in a real session: 14 cards, h1 "لوحة المعلومات", footer present, no horizontal overflow, no console errors. `npm run check` 494/494 · `test:e2e` 3/3.
+
+## Error fixes + MUI alignment pass (follow-up)
+
+- **Dashboard 500 fixed** (`8d29eb3`): passing a client-component element via a prop (`<MuiStack divider={<MuiDivider/>}>`) from a Server Component produced "Element type is invalid: got undefined". Dividers are now rendered directly (Fragment + `<MuiDivider />`).
+- **Inline `<script>` warning removed** (`8d29eb3`): dropped the pre-paint theme `<script>`/`next/script` (React warns for scripts in components); the `Providers` effect already resolves the `system` scheme at runtime.
+- **CSS layer order fixed** (`8d29eb3`): `@layer theme, base, components, mui, utilities;` declared before `@import "tailwindcss"`. Before this, `@layer mui` loaded after `utilities`, so MUI `fullWidth` (in `@layer mui`) beat Tailwind widths — e.g. the filter `Select` stretched to ~958px. Now `w-40` wins (select = 160px) and MUI typography is unaffected.
+- **MUI Checkbox** (`Checkbox.tsx`, client): replaced all raw `<input type="checkbox">` (list filters + settings/user/template/dialog/signing forms). The wrapper is a client component because `FormControlLabel` receives `control={<MuiCheckbox/>}` as a prop (same element-as-prop constraint).
+- **Header order**: theme control now precedes the language switch (`TopBar`).
+- **Sidebar/tables aligned to MUI defaults**: `NavItem` uses default `ListItemButton`/`ListItemIcon`/`ListItemText` (removed the custom primary-filled pill); `Table` header cells use MUI defaults.
+- **Em dashes removed** from all UI copy (`messages/**`, src `—`/`–` → `-`) and prose rewritten; internal code comments left as-is. Updated the e2e assertion for the changed thank-you copy.
+- Verified: `npm run check` 494/494 · `test:e2e` 3/3 · browser probe on `/`, `/clients`, `/projects`, `/invoices`, `/users`, `/settings/company`, `/templates` → all **200**, no console errors, footer present, no horizontal overflow.
