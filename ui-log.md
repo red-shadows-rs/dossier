@@ -484,3 +484,10 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - **Selected state** is now primary-tinted: `alpha(primary, 0.12)` bg + `primary.main` text (hover 0.18), with `fontWeight: 600`; non-selected items are muted with an `action.hover` hover. Rounded pill items with a 36px icon column.
 - Verified: 2 subheaders, 9 items, selected bg `rgba(225,29,72,0.12)`, width 240 (collapse 72 preserved), no console errors.
 - `npm run check` 494/494 · `test:e2e` 3/3.
+
+## Sidebar radius, user menu text, demo seed (follow-up)
+
+- **Sidebar radius matched**: the nav item was rendering **16px** radius while cards/buttons/inputs are 4px (the `sx` function form resolved to a surprising value). Set it to an explicit `"4px"`. Verified: sidebar item radius now 4px = dashboard.
+- **User menu text balanced**: the header name was `subtitle2` (an `<h6>` heading) + a caption email (mixed levels). Now both are `body2` `component="div"` (name weight 600, email muted) — consistent with the menu items.
+- **Full demo seed**: new `scripts/seed-demo.ts` + `npm run seed:demo` populates the site through the real services (company settings; 6 clients; 5 projects; 5 invoices with lines + tax, 3 issued, 2 with payments). Idempotent (reuses clients/projects, skips invoices once seeded). Run against the dev DB: dashboard now shows populated KPIs and the monthly chart bar, and lists show 7 clients / 5 projects / 6 invoices.
+- `npm run check` 494/494 · `test:e2e` 3/3.
