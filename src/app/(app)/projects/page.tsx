@@ -1,26 +1,14 @@
 import Link from "next/link";
 import { Filter, Plus, RotateCcw } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { ActionLink } from "@/components/ui/ActionLink";
-import { RowActionButton } from "@/components/forms/RowActionButton";
-import { archiveProjectAction } from "@/server/actions/projects";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
-import { Pagination } from "@/components/ui/Pagination";
 import { Select } from "@/components/ui/Select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from "@/components/ui/Table";
+import { ProjectsTable } from "@/components/tables/ProjectsTable";
+import { archiveProjectAction } from "@/server/actions/projects";
 import { PROJECT_STATUSES, type ProjectStatus } from "@/lib/constants";
 import { can } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
@@ -64,7 +52,6 @@ export default async function ProjectsPage({
     archived,
     page: pageParam ? Number(pageParam) : 1,
   });
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const clients = listClientOptions();
   const canWrite = can(user, "projects.write");
 
@@ -73,6 +60,30 @@ export default async function ProjectsPage({
   if (status) query.status = status;
   if (clientId) query.clientId = clientId;
   if (archived) query.archived = "1";
+
+  const clientNames = Object.fromEntries(
+    clients.map((client) => [
+      client.id,
+      client.nameAr ?? client.nameEn ?? "",
+    ]),
+  );
+  const labels = {
+    code: t("code"),
+    name: t("name"),
+    client: t("client"),
+    statusLabel: t("statusLabel"),
+    currency: t("currency"),
+    actions: tc("actions"),
+    preview: tc("preview"),
+    edit: tc("edit"),
+    archive: t("archive"),
+    archiveConfirm: t("archiveConfirm"),
+    archivedToast: t("archivedToast"),
+    empty: t("empty"),
+    statusValues: Object.fromEntries(
+      PROJECT_STATUSES.map((value) => [value, t(`status.${value}`)]),
+    ),
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -154,97 +165,16 @@ export default async function ProjectsPage({
 
       <Card>
         <CardContent>
-          {rows.length === 0 ? (
-            <EmptyState title={t("empty")} description={t("emptyHint")} />
-          ) : (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableHeaderCell>{t("code")}</TableHeaderCell>
-                  <TableHeaderCell>{t("name")}</TableHeaderCell>
-                  <TableHeaderCell>{t("client")}</TableHeaderCell>
-                  <TableHeaderCell>{t("statusLabel")}</TableHeaderCell>
-                  <TableHeaderCell>{t("currency")}</TableHeaderCell>
-                  <TableHeaderCell className="text-end">
-                    {tc("actions")}
-                  </TableHeaderCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => {
-                  const client = clients.find((c) => c.id === row.clientId);
-                  return (
-                    <TableRow key={row.id}>
-                      <TableCell dir="ltr" className="text-start font-mono">
-                        {row.code}
-                      </TableCell>
-                      <TableCell>
-                        <Link
-                          href={`/projects/${row.id}`}
-                          className="font-medium text-foreground hover:text-primary"
-                        >
-                          <span dir="rtl" lang="ar">
-                            {row.nameAr ?? "-"}
-                          </span>
-                          {row.nameEn ? (
-                            <>
-                              {" / "}
-                              <span dir="ltr" lang="en">
-                                {row.nameEn}
-                              </span>
-                            </>
-                          ) : null}
-                        </Link>
-                      </TableCell>
-                      <TableCell>
-                        {client?.nameAr ?? client?.nameEn ?? "-"}
-                      </TableCell>
-                      <TableCell>
-                        <Badge tone="blue">{t(`status.${row.status}`)}</Badge>
-                      </TableCell>
-                      <TableCell dir="ltr" className="text-start">
-                        {row.currency}
-                      </TableCell>
-                      <TableCell className="text-end">
-                        <div className="flex justify-end gap-2">
-                          <ActionLink
-                            href={`/projects/${row.id}`}
-                            action="preview"
-                            label={tc("preview")}
-                          />
-                          {canWrite ? (
-                            <ActionLink
-                              href={`/projects/${row.id}/edit`}
-                              action="edit"
-                              label={tc("edit")}
-                            />
-                          ) : null}
-                          {canWrite && !row.archivedAt ? (
-                            <RowActionButton
-                              id={row.id}
-                              action={archiveProjectAction}
-                              kind="archive"
-                              label={t("archive")}
-                              title={t("archive")}
-                              message={t("archiveConfirm")}
-                              confirmLabel={t("archive")}
-                              successTitle={t("archivedToast")}
-                            />
-                          ) : null}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          )}
-
-          <Pagination
+          <ProjectsTable
+            rows={rows}
+            total={total}
             page={page}
-            totalPages={totalPages}
-            basePath="/projects"
+            pageSize={pageSize}
             query={query}
+            canWrite={canWrite}
+            labels={labels}
+            clientNames={clientNames}
+            archiveAction={archiveProjectAction}
           />
         </CardContent>
       </Card>
