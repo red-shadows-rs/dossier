@@ -464,3 +464,9 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - **Trimmed main padding**: `p-4 md:p-6 lg:p-8` → `p-3 md:p-4 lg:p-6`.
 - **Slop re-scan (clean)**: no gradients, no backdrop-blur/glow, no raw palette utilities, no `rounded-2xl/3xl`, no emoji, no hover lift/scale, no buzzwords, no fake/lorem content, no UI em/en dashes. Only raw hex is `SignaturePad #111111` (canvas ink, justified) and the only `box-shadow` is the autofill override in `globals.css`.
 - `npm run check` 494/494 · `test:e2e` 3/3.
+
+## Sidebar + user menu redesign (follow-up)
+
+- **Sidebar**: nav grouped into two sections (main: dashboard→templates; manage: settings/users/audit) with a `Divider` between; items are rounded MUI pill buttons (`borderRadius` from theme, `action.selected` + `primary.main` when selected) with tighter icon spacing (`minWidth: 40`). Lists use `px:1` so the pills inset cleanly. Collapse (240⇄72) preserved. Verified: 9 items, 1 divider; logo mark/wordmark centers equal (inline).
+- **User menu**: trigger is now an `Avatar` with the user's initial; the menu has a header (name + email), a `Divider`, and items with icons (`User` for Account, `LogOut` for Log out, error-colored). Verified: 2 items, 2 icons, header present.
+- `npm run check` 494/494 · `test:e2e` 3/3.
