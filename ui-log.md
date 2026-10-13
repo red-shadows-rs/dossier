@@ -497,3 +497,10 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - **RTL verified correct** (Playwright, ar locale): `html` dir=rtl, DataGrid direction rtl, sidebar on the right (left=1200 at 1440), main rtl — on `/`, `/clients`, `/invoices`. `check:rtl` passes and there are no physical direction utilities (`ml/mr/pl/pr/left/right`). The remaining `dir="ltr"` in the code are intentional (emails, phones, dates, currencies, numeric fields).
 - **Dashboard KPI icon** moved next to its label (was pushed to the far card edge via `justify-between`).
 - `npm run check` 494/494 · `test:e2e` 3/3.
+
+## Menu/nav icon spacing (follow-up)
+
+- Root cause of "text far from the icon": `ListItemIcon` reserves a min-width column (36–56px) while the glyph is only 18–20px, leaving an empty box between icon and label.
+- User menu: replaced `ListItemIcon`/`ListItemText` with a tight `Stack` (icon + `body2` text, `spacing={1}`). Verified gap = **8px** in both RTL and LTR (was ~26px). Menu paper elevation stays 1.
+- Sidebar nav: `ListItemIcon` `minWidth: 0` + `gap: 1.5` on the button → icon hugs the label (gap ~12px).
+- `npm run check` 494/494 · `test:e2e` 3/3.
