@@ -4,6 +4,7 @@ import Link from "next/link";
 import MuiListItemButton from "@mui/material/ListItemButton";
 import MuiListItemIcon from "@mui/material/ListItemIcon";
 import MuiListItemText from "@mui/material/ListItemText";
+import MuiTooltip from "@mui/material/Tooltip";
 import type { NavEntry } from "./nav";
 
 export function NavItem({
@@ -11,28 +12,41 @@ export function NavItem({
   label,
   active,
   onNavigate,
+  collapsed = false,
 }: {
   entry: NavEntry;
   label: string;
   active: boolean;
   onNavigate?: () => void;
+  collapsed?: boolean;
 }) {
   const Icon = entry.icon;
-  return (
+  const button = (
     <MuiListItemButton
       component={Link}
       href={entry.href}
       aria-current={active ? "page" : undefined}
       onClick={onNavigate}
       selected={active}
+      sx={collapsed ? { justifyContent: "center", px: 1.5 } : undefined}
     >
-      <MuiListItemIcon>
+      <MuiListItemIcon
+        sx={collapsed ? { minWidth: 0, justifyContent: "center" } : undefined}
+      >
         <Icon size={20} aria-hidden="true" />
       </MuiListItemIcon>
-      <MuiListItemText
-        primary={label}
-        slotProps={{ primary: { variant: "body2" } }}
-      />
+      {collapsed ? null : (
+        <MuiListItemText
+          primary={label}
+          slotProps={{ primary: { variant: "body2" } }}
+        />
+      )}
     </MuiListItemButton>
+  );
+
+  return collapsed ? (
+    <MuiTooltip title={label}>{button}</MuiTooltip>
+  ) : (
+    button
   );
 }

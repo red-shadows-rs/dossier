@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import MuiAppBar from "@mui/material/AppBar";
 import MuiBox from "@mui/material/Box";
+import { AppBreadcrumbs } from "@/components/layout/AppBreadcrumbs";
 import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
 import { HeaderSearch } from "@/components/layout/HeaderSearch";
 import { Logo } from "@/components/layout/Logo";
@@ -16,7 +17,7 @@ export async function TopBar({ user }: { user: SessionUser }) {
 
   return (
     <MuiAppBar
-      position="static"
+      position="sticky"
       elevation={0}
       color="inherit"
       sx={{
@@ -79,6 +80,17 @@ export async function TopBar({ user }: { user: SessionUser }) {
           </MuiBox>
           <UserMenu user={user} />
         </MuiBox>
+      </MuiBox>
+      <MuiBox
+        sx={{
+          display: { xs: "none", md: "block" },
+          px: 2,
+          py: 0.75,
+          borderTop: "1px solid",
+          borderColor: "divider",
+        }}
+      >
+        <AppBreadcrumbs />
       </MuiBox>
     </MuiAppBar>
   );

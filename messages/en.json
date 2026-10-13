@@ -58,7 +58,9 @@
     "audit": "Audit log",
     "account": "Account",
     "logout": "Log out",
-    "menu": "Open navigation"
+    "menu": "Open navigation",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
   },
   "auth": {
     "loginTitle": "Sign in",
