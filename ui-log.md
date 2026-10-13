@@ -439,3 +439,10 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - **Row delete/archive**: new `src/components/forms/RowActionButton.tsx` (client): a MUI `IconButton` (+`Tooltip`, `aria-label`) that opens `ConfirmDialog`, calls the passed server action, shows a toast and refreshes. Wired into the list action columns:
   - Clients/Projects → **archive** (`archiveClientAction`/`archiveProjectAction`); Templates → **archive** (`archiveTemplateAction`, hidden for system templates); Contracts/Invoices → **delete draft** (`deleteDraftContractAction`/`deleteDraftInvoiceAction`). Server actions are passed as props (allowed).
 - Verify: `npm run check` 494/494 · `test:e2e` 3/3 · probes: `/contracts` and `/clients` 200, filter button has an icon, no console errors.
+
+## Full width + Material surfaces (follow-up)
+
+- **Full-width content**: removed `mx-auto max-w-content` from the app `<main>` (`src/app/(app)/layout.tsx`); now `w-full p-4 md:p-6 lg:p-8`. Verified at 1920px: main = 1680 = viewport − 240 sidebar (no 1280 cap).
+- **Material cards**: `MuiCard` now defaults to `elevation: 1` (theme) and the `Card` wrapper no longer forces `variant="outlined"`; dashboard cards likewise use the default elevation. Verified: cards carry an MUI elevation shadow.
+- **KPI icons**: dashboard KPI cards now show a leading-accent icon (Wallet, AlertTriangle, TrendingUp, Receipt, FileSignature, FileCheck2, FolderKanban, Users). Verified: 8 KPI icons render.
+- Verify: `npm run check` 494/494 · `test:e2e` 3/3 · no console errors.
