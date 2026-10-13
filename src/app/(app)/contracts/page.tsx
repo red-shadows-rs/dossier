@@ -1,25 +1,13 @@
 import Link from "next/link";
 import { Filter, Plus, RotateCcw } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { ActionLink } from "@/components/ui/ActionLink";
-import { RowActionButton } from "@/components/forms/RowActionButton";
-import { deleteDraftContractAction } from "@/server/actions/contracts";
-import { Badge, contractStatusTone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
-import { Pagination } from "@/components/ui/Pagination";
 import { Select } from "@/components/ui/Select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from "@/components/ui/Table";
+import { ContractsTable } from "@/components/tables/ContractsTable";
+import { deleteDraftContractAction } from "@/server/actions/contracts";
 import { CONTRACT_STATUSES } from "@/lib/constants";
 import { can } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
@@ -67,7 +55,6 @@ export default async function ContractsPage({
     dir: dirParam,
     page: pageParam ? Number(pageParam) : 1,
   });
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const projects = listProjectOptions();
   const canWrite = can(user, "contracts.write");
   const sort = (CONTRACT_SORT_FIELDS as readonly string[]).includes(
@@ -83,6 +70,22 @@ export default async function ContractsPage({
   if (projectId) query.projectId = projectId;
   if (sortParam) query.sort = sort;
   if (dirParam) query.dir = dir;
+
+  const labels = {
+    number: t("number"),
+    name: t("name"),
+    statusLabel: t("statusLabel"),
+    actions: tc("actions"),
+    preview: tc("preview"),
+    edit: tc("edit"),
+    deleteTitle: t("deleteConfirmTitle"),
+    deleteMessage: t("deleteConfirm"),
+    deleted: t("deleted"),
+    empty: t("empty"),
+    statusValues: Object.fromEntries(
+      CONTRACT_STATUSES.map((value) => [value, t(`status.${value}`)]),
+    ),
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -181,88 +184,15 @@ export default async function ContractsPage({
 
       <Card>
         <CardContent>
-          {rows.length === 0 ? (
-            <EmptyState title={t("empty")} description={t("emptyHint")} />
-          ) : (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableHeaderCell>{t("number")}</TableHeaderCell>
-                  <TableHeaderCell>{t("name")}</TableHeaderCell>
-                  <TableHeaderCell>{t("statusLabel")}</TableHeaderCell>
-                  <TableHeaderCell className="text-end">
-                    {tc("actions")}
-                  </TableHeaderCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell dir="ltr" className="text-start font-mono">
-                      {row.number ?? "-"}
-                    </TableCell>
-                    <TableCell>
-                      <Link
-                        href={`/contracts/${row.id}`}
-                        className="font-medium text-foreground hover:text-primary"
-                      >
-                        <span dir="rtl" lang="ar">
-                          {row.titleAr ?? "-"}
-                        </span>
-                        {row.titleEn ? (
-                          <>
-                            {" / "}
-                            <span dir="ltr" lang="en">
-                              {row.titleEn}
-                            </span>
-                          </>
-                        ) : null}
-                      </Link>
-                    </TableCell>
-                    <TableCell>
-                      <Badge tone={contractStatusTone(row.status)}>
-                        {t(`status.${row.status}`)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-end">
-                      <div className="flex justify-end gap-2">
-                        <ActionLink
-                          href={`/contracts/${row.id}`}
-                          action="preview"
-                          label={tc("preview")}
-                        />
-                        {canWrite && row.status === "draft" ? (
-                          <ActionLink
-                            href={`/contracts/${row.id}/edit`}
-                            action="edit"
-                            label={tc("edit")}
-                          />
-                        ) : null}
-                        {canWrite && row.status === "draft" ? (
-                          <RowActionButton
-                            id={row.id}
-                            action={deleteDraftContractAction}
-                            kind="delete"
-                            label={t("deleteConfirmTitle")}
-                            title={t("deleteConfirmTitle")}
-                            message={t("deleteConfirm")}
-                            confirmLabel={t("deleteConfirmTitle")}
-                            successTitle={t("deleted")}
-                          />
-                        ) : null}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-
-          <Pagination
+          <ContractsTable
+            rows={rows}
+            total={total}
             page={page}
-            totalPages={totalPages}
-            basePath="/contracts"
+            pageSize={pageSize}
             query={query}
+            canWrite={canWrite}
+            labels={labels}
+            deleteAction={deleteDraftContractAction}
           />
         </CardContent>
       </Card>
