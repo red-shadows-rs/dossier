@@ -12,7 +12,7 @@ export function Card({
   children: ReactNode;
 }) {
   return (
-    <MuiCard component="section" variant="outlined" className={className}>
+    <MuiCard component="section" className={className}>
       {children}
     </MuiCard>
   );

@@ -51,7 +51,7 @@ export function createAppTheme(direction: AppDirection) {
         styleOverrides: { root: { backgroundImage: "none" } },
       },
       MuiCard: {
-        defaultProps: { variant: "outlined" },
+        defaultProps: { elevation: 1 },
       },
       MuiAppBar: {
         defaultProps: { elevation: 0, color: "inherit" },

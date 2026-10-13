@@ -1,5 +1,16 @@
 import Link from "next/link";
 import { Fragment, type ReactNode } from "react";
+import {
+  AlertTriangle,
+  FileCheck2,
+  FileSignature,
+  FolderKanban,
+  Receipt,
+  TrendingUp,
+  Users,
+  Wallet,
+  type LucideIcon,
+} from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import MuiAlert from "@mui/material/Alert";
 import MuiBox from "@mui/material/Box";
@@ -75,19 +86,36 @@ function Kpi({
   label,
   value,
   hint,
+  icon: Icon,
+  accent,
 }: {
   label: string;
   value: ReactNode;
   hint?: ReactNode;
+  icon?: LucideIcon;
+  accent?: string;
 }) {
   return (
-    <MuiCard variant="outlined" sx={{ height: "100%" }}>
+    <MuiCard sx={{ height: "100%" }}>
       <MuiCardContent
         sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
       >
-        <MuiTypography variant="caption" color="text.secondary">
-          {label}
-        </MuiTypography>
+        <MuiStack
+          direction="row"
+          sx={{ alignItems: "center", justifyContent: "space-between" }}
+        >
+          <MuiTypography variant="caption" color="text.secondary">
+            {label}
+          </MuiTypography>
+          {Icon ? (
+            <MuiBox
+              component="span"
+              sx={{ display: "inline-flex", color: accent ?? "text.disabled" }}
+            >
+              <Icon size={20} aria-hidden="true" />
+            </MuiBox>
+          ) : null}
+        </MuiStack>
         <MuiTypography
           component="div"
           variant="h6"
@@ -144,7 +172,7 @@ function StatusBreakdown({
   labels: (status: string) => string;
 }) {
   return (
-    <MuiCard variant="outlined" sx={{ height: "100%" }}>
+    <MuiCard sx={{ height: "100%" }}>
       <MuiCardContent>
         <MuiTypography variant="subtitle2" sx={{ mb: 1 }}>
           {title}
@@ -326,6 +354,8 @@ export default async function DashboardPage() {
             label={t("outstanding")}
             value={<AmountList amounts={data.outstanding} locale={locale} />}
             hint={t("outstandingHint")}
+            icon={Wallet}
+            accent="primary.main"
           />
         </MuiGrid>
         <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -345,6 +375,8 @@ export default async function DashboardPage() {
               </MuiStack>
             }
             hint={t("overdueHint")}
+            icon={AlertTriangle}
+            accent="error.main"
           />
         </MuiGrid>
         <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -356,6 +388,8 @@ export default async function DashboardPage() {
             hint={`${t("lastMonth")}: ${
               currencyLines(data.revenue.previousMonth) ?? "-"
             }`}
+            icon={TrendingUp}
+            accent="success.main"
           />
         </MuiGrid>
         <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -368,6 +402,8 @@ export default async function DashboardPage() {
               />
             }
             hint={t("invoicesCount", { count: data.issuedThisMonth.count })}
+            icon={Receipt}
+            accent="info.main"
           />
         </MuiGrid>
       </MuiGrid>
@@ -385,6 +421,8 @@ export default async function DashboardPage() {
               </span>
             }
             hint={t("awaitingHint")}
+            icon={FileSignature}
+            accent="warning.main"
           />
         </MuiGrid>
         <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -396,6 +434,8 @@ export default async function DashboardPage() {
               </span>
             }
             hint={t("signedLast30Days", { count: data.signedLast30Days })}
+            icon={FileCheck2}
+            accent="success.main"
           />
         </MuiGrid>
         <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -410,6 +450,8 @@ export default async function DashboardPage() {
               contracts: data.draftContracts,
               invoices: data.draftInvoices,
             })}
+            icon={FolderKanban}
+            accent="primary.main"
           />
         </MuiGrid>
         <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -421,6 +463,8 @@ export default async function DashboardPage() {
               </span>
             }
             hint={t("clientsNew", { count: data.clientsNewThisMonth })}
+            icon={Users}
+            accent="info.main"
           />
         </MuiGrid>
       </MuiGrid>
@@ -444,7 +488,7 @@ export default async function DashboardPage() {
         </MuiGrid>
       </MuiGrid>
 
-      <MuiCard variant="outlined">
+      <MuiCard>
         <MuiCardContent>
           <MuiTypography variant="subtitle2" sx={{ mb: 1 }}>
             {t("monthlyTitle")}
@@ -462,7 +506,7 @@ export default async function DashboardPage() {
         {t("attention")}
       </MuiTypography>
 
-      <MuiCard variant="outlined">
+      <MuiCard>
         <MuiCardContent>
           <MuiStack
             direction="row"
@@ -519,7 +563,7 @@ export default async function DashboardPage() {
         </MuiCardContent>
       </MuiCard>
 
-      <MuiCard variant="outlined">
+      <MuiCard>
         <MuiCardContent>
           <MuiStack
             direction="row"
@@ -582,7 +626,7 @@ export default async function DashboardPage() {
         </MuiCardContent>
       </MuiCard>
 
-      <MuiCard variant="outlined">
+      <MuiCard>
         <MuiCardContent>
           <MuiStack
             direction="row"
@@ -635,7 +679,7 @@ export default async function DashboardPage() {
         </MuiCardContent>
       </MuiCard>
 
-      <MuiCard variant="outlined">
+      <MuiCard>
         <MuiCardContent>
           <MuiTypography
             component="h2"
