@@ -102,19 +102,20 @@ function Kpi({
       >
         <MuiStack
           direction="row"
-          sx={{ alignItems: "center", justifyContent: "space-between" }}
+          spacing={0.75}
+          sx={{ alignItems: "center" }}
         >
-          <MuiTypography variant="caption" color="text.secondary">
-            {label}
-          </MuiTypography>
           {Icon ? (
             <MuiBox
               component="span"
               sx={{ display: "inline-flex", color: accent ?? "text.disabled" }}
             >
-              <Icon size={20} aria-hidden="true" />
+              <Icon size={18} aria-hidden="true" />
             </MuiBox>
           ) : null}
+          <MuiTypography variant="caption" color="text.secondary">
+            {label}
+          </MuiTypography>
         </MuiStack>
         <MuiTypography
           component="div"
