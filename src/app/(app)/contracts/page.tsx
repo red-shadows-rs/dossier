@@ -107,7 +107,7 @@ export default async function ContractsPage({
             <Field
               label={tc("search")}
               htmlFor="contracts-q"
-              className="min-w-52"
+              className="w-60"
             >
               <Input id="contracts-q" name="q" defaultValue={q ?? ""} />
             </Field>

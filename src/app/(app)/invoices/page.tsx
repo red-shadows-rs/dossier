@@ -129,7 +129,7 @@ export default async function InvoicesPage({
             <Field
               label={tc("search")}
               htmlFor="invoices-q"
-              className="min-w-52"
+              className="w-60"
             >
               <Input id="invoices-q" name="q" defaultValue={q ?? ""} />
             </Field>

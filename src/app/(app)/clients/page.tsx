@@ -87,7 +87,7 @@ export default async function ClientsPage({
             <Field
               label={tc("search")}
               htmlFor="clients-q"
-              className="min-w-56"
+              className="w-64"
             >
               <Input
                 id="clients-q"

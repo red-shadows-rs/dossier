@@ -105,7 +105,7 @@ export default async function ProjectsPage({
             <Field
               label={tc("search")}
               htmlFor="projects-q"
-              className="min-w-52"
+              className="w-60"
             >
               <Input id="projects-q" name="q" defaultValue={q ?? ""} />
             </Field>
