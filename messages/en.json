@@ -60,7 +60,9 @@
     "logout": "Log out",
     "menu": "Open navigation",
     "collapse": "Collapse sidebar",
-    "expand": "Expand sidebar"
+    "expand": "Expand sidebar",
+    "general": "General",
+    "management": "Management"
   },
   "auth": {
     "loginTitle": "Sign in",

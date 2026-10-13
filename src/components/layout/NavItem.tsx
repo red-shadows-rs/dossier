@@ -5,6 +5,7 @@ import MuiListItemButton from "@mui/material/ListItemButton";
 import MuiListItemIcon from "@mui/material/ListItemIcon";
 import MuiListItemText from "@mui/material/ListItemText";
 import MuiTooltip from "@mui/material/Tooltip";
+import { alpha } from "@mui/material/styles";
 import type { NavEntry } from "./nav";
 
 export function NavItem({
@@ -31,17 +32,23 @@ export function NavItem({
       sx={{
         borderRadius: (theme) => theme.shape.borderRadius,
         mb: 0.25,
-        ...(collapsed ? { justifyContent: "center", px: 1.5 } : {}),
+        px: 1.5,
+        py: 1,
+        color: "text.secondary",
+        "&:hover": { bgcolor: "action.hover", color: "text.primary" },
+        ...(collapsed ? { justifyContent: "center" } : {}),
         "&.Mui-selected": {
-          bgcolor: "action.selected",
+          bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12),
           color: "primary.main",
-          "&:hover": { bgcolor: "action.selected" },
+          "&:hover": {
+            bgcolor: (theme) => alpha(theme.palette.primary.main, 0.18),
+          },
         },
       }}
     >
       <MuiListItemIcon
         sx={{
-          minWidth: collapsed ? 0 : 40,
+          minWidth: collapsed ? 0 : 36,
           justifyContent: collapsed ? "center" : undefined,
           color: "inherit",
         }}
@@ -51,15 +58,16 @@ export function NavItem({
       {collapsed ? null : (
         <MuiListItemText
           primary={label}
-          slotProps={{ primary: { variant: "body2" } }}
+          slotProps={{
+            primary: {
+              variant: "body2",
+              sx: { fontWeight: active ? 600 : 400 },
+            },
+          }}
         />
       )}
     </MuiListItemButton>
   );
 
-  return collapsed ? (
-    <MuiTooltip title={label}>{button}</MuiTooltip>
-  ) : (
-    button
-  );
+  return collapsed ? <MuiTooltip title={label}>{button}</MuiTooltip> : button;
 }

@@ -10,12 +10,24 @@ import MuiDivider from "@mui/material/Divider";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiIconButton from "@mui/material/IconButton";
 import MuiList from "@mui/material/List";
+import MuiListSubheader from "@mui/material/ListSubheader";
 import { Logo } from "./Logo";
 import { NavItem } from "./NavItem";
 import { isActive, navEntries, type NavSubject } from "./nav";
 
 const WIDTH = 240;
 const COLLAPSED_WIDTH = 72;
+
+const sectionLabelSx = {
+  bgcolor: "transparent",
+  lineHeight: "30px",
+  fontSize: 11,
+  fontWeight: 600,
+  letterSpacing: "0.06em",
+  textTransform: "uppercase",
+  color: "text.secondary",
+  px: 2,
+} as const;
 
 export function Sidebar({
   role,
@@ -74,11 +86,7 @@ export function Sidebar({
         }}
       >
         {collapsed ? null : (
-          <Link
-            href="/"
-            aria-label="Dossier"
-            className="flex h-8 items-center"
-          >
+          <Link href="/" aria-label="Dossier" className="flex h-8 items-center">
             <Logo />
           </Link>
         )}
@@ -94,13 +102,29 @@ export function Sidebar({
           )}
         </MuiIconButton>
       </MuiBox>
-      <MuiList component="nav" sx={{ px: 1, py: 1 }}>
+
+      {collapsed ? null : (
+        <MuiListSubheader component="div" sx={{ ...sectionLabelSx, mt: 1 }}>
+          {t("general")}
+        </MuiListSubheader>
+      )}
+      <MuiList component="nav" sx={{ px: 1, pb: 1, pt: collapsed ? 1 : 0 }}>
         {mainEntries.map(renderEntry)}
       </MuiList>
+
       {manageEntries.length > 0 ? (
-        <MuiDivider sx={{ mx: 2, my: 0.5 }} />
+        collapsed ? (
+          <MuiDivider sx={{ mx: 2, my: 0.5 }} />
+        ) : (
+          <MuiListSubheader component="div" sx={sectionLabelSx}>
+            {t("management")}
+          </MuiListSubheader>
+        )
       ) : null}
-      <MuiList component="nav" sx={{ px: 1, py: 1 }}>
+      <MuiList
+        component="nav"
+        sx={{ px: 1, pb: 1, pt: collapsed ? 0 : 0 }}
+      >
         {manageEntries.map(renderEntry)}
       </MuiList>
     </MuiDrawer>
