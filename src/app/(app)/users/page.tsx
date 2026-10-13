@@ -1,21 +1,10 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
-import { ActionLink } from "@/components/ui/ActionLink";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from "@/components/ui/Table";
-import type { Locale } from "@/lib/constants";
-import { formatInstant } from "@/lib/dates";
+import { UsersTable } from "@/components/tables/UsersTable";
+import { ROLES, type Locale } from "@/lib/constants";
 import { isLocale } from "@/lib/i18n";
 import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
@@ -32,6 +21,24 @@ export default async function UsersPage() {
   const timezone = getSettings("defaults").timezone;
   const rows = listUsers();
 
+  const labels = {
+    name: t("name"),
+    email: t("email"),
+    roleLabel: t("roleLabel"),
+    canSign: t("canSignForCompany"),
+    status: tc("status"),
+    lastLogin: t("lastLogin"),
+    actions: tc("actions"),
+    preview: tc("preview"),
+    yes: t("yes"),
+    active: t("active"),
+    disabled: t("disabled"),
+    empty: t("empty"),
+    roleValues: Object.fromEntries(
+      ROLES.map((value) => [value, t(`role.${value}`)]),
+    ),
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
@@ -46,71 +53,12 @@ export default async function UsersPage() {
 
       <Card>
         <CardContent>
-          {rows.length === 0 ? (
-            <EmptyState title={t("empty")} />
-          ) : (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableHeaderCell>{t("name")}</TableHeaderCell>
-                  <TableHeaderCell>{t("email")}</TableHeaderCell>
-                  <TableHeaderCell>{t("roleLabel")}</TableHeaderCell>
-                  <TableHeaderCell>{t("canSignForCompany")}</TableHeaderCell>
-                  <TableHeaderCell>{tc("status")}</TableHeaderCell>
-                  <TableHeaderCell>{t("lastLogin")}</TableHeaderCell>
-                  <TableHeaderCell className="text-end">
-                    {tc("actions")}
-                  </TableHeaderCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell>
-                      <Link
-                        href={`/users/${row.id}`}
-                        className="font-medium text-foreground hover:text-primary"
-                      >
-                        {row.name}
-                      </Link>
-                    </TableCell>
-                    <TableCell dir="ltr" className="text-start">
-                      {row.email}
-                    </TableCell>
-                    <TableCell>{t(`role.${row.role}`)}</TableCell>
-                    <TableCell>
-                      {row.canSignForCompany ? (
-                        <Badge tone="teal">{t("yes")}</Badge>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {row.status === "active" ? (
-                        <Badge tone="green">{t("active")}</Badge>
-                      ) : (
-                        <Badge tone="gray">{t("disabled")}</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {row.lastLoginAt
-                        ? formatInstant(row.lastLoginAt, timezone, locale)
-                        : "-"}
-                    </TableCell>
-                    <TableCell className="text-end">
-                      <div className="flex justify-end gap-2">
-                        <ActionLink
-                          href={`/users/${row.id}`}
-                          action="preview"
-                          label={tc("preview")}
-                        />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+          <UsersTable
+            rows={rows}
+            labels={labels}
+            timezone={timezone}
+            locale={locale}
+          />
         </CardContent>
       </Card>
     </div>

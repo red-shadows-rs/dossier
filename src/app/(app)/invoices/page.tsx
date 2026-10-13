@@ -10,9 +10,7 @@ import { Select } from "@/components/ui/Select";
 import { InvoicesTable } from "@/components/tables/InvoicesTable";
 import { deleteDraftInvoiceAction } from "@/server/actions/invoices";
 import { INVOICE_STATUSES } from "@/lib/constants";
-import { formatMoney } from "@/lib/money";
 import { todayInTz } from "@/lib/dates";
-import type { CurrencyCode } from "@/lib/constants";
 import { can } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
 import {
