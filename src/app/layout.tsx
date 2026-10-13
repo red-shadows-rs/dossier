@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { cookies } from "next/headers";
 import localFont from "next/font/local";
-import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { Providers } from "@/components/Providers";
@@ -14,9 +13,6 @@ const cairo = localFont({
   variable: "--font-cairo",
   display: "swap",
 });
-
-const themeScript =
-  '(function(){try{var e=document.documentElement;if(!e.classList.contains("dark")&&!e.classList.contains("light")){e.classList.add(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");}}catch(_){}})();';
 
 export const metadata: Metadata = {
   title: "Dossier",
@@ -52,11 +48,6 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <Script
-          id="theme-init"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: themeScript }}
-        />
         <Providers dir={dir} colorTheme={theme}>
           <NextIntlClientProvider locale={locale} messages={messages}>
             {children}

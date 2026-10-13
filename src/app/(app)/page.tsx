@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import MuiAlert from "@mui/material/Alert";
 import MuiCard from "@mui/material/Card";
@@ -30,6 +30,7 @@ import { getInternalSetting, getSettings } from "@/server/services/settings";
 
 const HEARTBEAT_STALE_MS = 5 * 60 * 1000;
 
+
 function AmountList({
   amounts,
   locale,
@@ -40,7 +41,7 @@ function AmountList({
   if (amounts.length === 0) {
     return (
       <MuiTypography component="span" color="text.secondary">
-        —
+        -
       </MuiTypography>
     );
   }
@@ -109,7 +110,7 @@ function ClientName({
   return (
     <MuiStack component="span" direction="column">
       <span dir="rtl" lang="ar">
-        {nameAr ?? nameEn ?? "—"}
+        {nameAr ?? nameEn ?? "-"}
       </span>
       {nameEn && nameAr ? (
         <MuiTypography
@@ -143,20 +144,22 @@ function StatusBreakdown({
         <MuiTypography variant="subtitle2" sx={{ mb: 1 }}>
           {title}
         </MuiTypography>
-        <MuiStack divider={<MuiDivider flexItem />} spacing={0.5}>
-          {statuses.map((status) => (
-            <MuiStack
-              key={status}
-              direction="row"
-              sx={{ alignItems: "center", justifyContent: "space-between" }}
-            >
-              <MuiTypography variant="body2" color="text.secondary">
-                {labels(status)}
-              </MuiTypography>
-              <MuiTypography variant="body2" sx={{ fontWeight: 600 }}>
-                {counts[status] ?? 0}
-              </MuiTypography>
-            </MuiStack>
+        <MuiStack spacing={0.5}>
+          {statuses.map((status, index) => (
+            <Fragment key={status}>
+              {index > 0 ? <MuiDivider /> : null}
+              <MuiStack
+                direction="row"
+                sx={{ alignItems: "center", justifyContent: "space-between" }}
+              >
+                <MuiTypography variant="body2" color="text.secondary">
+                  {labels(status)}
+                </MuiTypography>
+                <MuiTypography variant="body2" sx={{ fontWeight: 600 }}>
+                  {counts[status] ?? 0}
+                </MuiTypography>
+              </MuiStack>
+            </Fragment>
           ))}
         </MuiStack>
       </MuiCardContent>
@@ -248,7 +251,7 @@ export default async function DashboardPage() {
               <AmountList amounts={data.revenue.currentMonth} locale={locale} />
             }
             hint={`${t("lastMonth")}: ${
-              currencyLines(data.revenue.previousMonth) ?? "—"
+              currencyLines(data.revenue.previousMonth) ?? "-"
             }`}
           />
         </MuiGrid>
@@ -379,7 +382,7 @@ export default async function DashboardPage() {
                         className="font-medium text-foreground hover:text-primary"
                         dir="ltr"
                       >
-                        {row.number ?? "—"}
+                        {row.number ?? "-"}
                       </Link>
                     </TableCell>
                     <TableCell>
@@ -435,7 +438,7 @@ export default async function DashboardPage() {
                         className="font-medium text-foreground hover:text-primary"
                         dir="ltr"
                       >
-                        {row.number ?? "—"}
+                        {row.number ?? "-"}
                       </Link>
                     </TableCell>
                     <TableCell>
@@ -497,7 +500,7 @@ export default async function DashboardPage() {
                         className="font-medium text-foreground hover:text-primary"
                         dir="ltr"
                       >
-                        {row.number ?? "—"}
+                        {row.number ?? "-"}
                       </Link>
                     </TableCell>
                     <TableCell>
