@@ -8,7 +8,6 @@ import MuiAvatar from "@mui/material/Avatar";
 import MuiBox from "@mui/material/Box";
 import MuiDivider from "@mui/material/Divider";
 import MuiIconButton from "@mui/material/IconButton";
-import MuiList from "@mui/material/List";
 import MuiListItemIcon from "@mui/material/ListItemIcon";
 import MuiListItemText from "@mui/material/ListItemText";
 import MuiMenu from "@mui/material/Menu";
@@ -60,7 +59,7 @@ export function UserMenu({ user }: { user: SessionUser }) {
         onClose={() => setAnchorEl(null)}
         anchorOrigin={{ vertical: "bottom", horizontal }}
         transformOrigin={{ vertical: "top", horizontal }}
-        slotProps={{ paper: { sx: { minWidth: 220, mt: 0.5 } } }}
+        slotProps={{ paper: { elevation: 1, sx: { minWidth: 220, mt: 0.5 } } }}
       >
         <MuiBox sx={{ px: 2, py: 1 }}>
           <MuiTypography variant="subtitle2" noWrap>
@@ -71,32 +70,30 @@ export function UserMenu({ user }: { user: SessionUser }) {
           </MuiTypography>
         </MuiBox>
         <MuiDivider />
-        <MuiList sx={{ py: 0.5 }}>
+        <MuiMenuItem
+          component={Link}
+          href="/account"
+          onClick={() => setAnchorEl(null)}
+        >
+          {iconSlot(<User size={18} aria-hidden="true" />)}
+          <MuiListItemText
+            primary={t("account")}
+            slotProps={{ primary: { variant: "body2" } }}
+          />
+        </MuiMenuItem>
+        <form action={logoutAction}>
           <MuiMenuItem
-            component={Link}
-            href="/account"
-            onClick={() => setAnchorEl(null)}
+            component="button"
+            type="submit"
+            sx={{ width: "100%", color: "error.main" }}
           >
-            {iconSlot(<User size={18} aria-hidden="true" />)}
+            {iconSlot(<LogOut size={18} aria-hidden="true" />)}
             <MuiListItemText
-              primary={t("account")}
+              primary={t("logout")}
               slotProps={{ primary: { variant: "body2" } }}
             />
           </MuiMenuItem>
-          <form action={logoutAction}>
-            <MuiMenuItem
-              component="button"
-              type="submit"
-              sx={{ width: "100%", color: "error.main" }}
-            >
-              {iconSlot(<LogOut size={18} aria-hidden="true" />)}
-              <MuiListItemText
-                primary={t("logout")}
-                slotProps={{ primary: { variant: "body2" } }}
-              />
-            </MuiMenuItem>
-          </form>
-        </MuiList>
+        </form>
       </MuiMenu>
     </>
   );

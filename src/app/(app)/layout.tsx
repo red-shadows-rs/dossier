@@ -24,7 +24,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <TopBar user={user} />
           <main
             id="main"
-            className="w-full flex-1 p-3 md:p-4 lg:p-6"
+            className="w-full flex-1 p-3 pt-3 md:p-4 lg:p-6 lg:pt-4"
           >
             {children}
           </main>

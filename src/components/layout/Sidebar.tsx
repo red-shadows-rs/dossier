@@ -74,7 +74,11 @@ export function Sidebar({
         }}
       >
         {collapsed ? null : (
-          <Link href="/" aria-label="Dossier">
+          <Link
+            href="/"
+            aria-label="Dossier"
+            className="flex h-8 items-center"
+          >
             <Logo />
           </Link>
         )}
