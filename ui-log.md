@@ -477,3 +477,10 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - **User menu flattened**: removed the nested inner `<MuiList>` (invalid nested `<ul>` + extra padding) and dropped the paper elevation from MUI's menu default 8 to 1; kept the header (name + email), divider, and the `User`/`LogOut` item icons.
 - **Header→content gap**: the main top padding was 24px at lg; now `lg:pt-4` (16px). Verified gap = 16px.
 - `npm run check` 494/494 · `test:e2e` 3/3.
+
+## Sidebar polish v2 (follow-up)
+
+- Added **section labels** ("General"/"Management", ar/en) via `ListSubheader` (uppercase, letter-spaced, muted) above each group; a `Divider` replaces the label when collapsed.
+- **Selected state** is now primary-tinted: `alpha(primary, 0.12)` bg + `primary.main` text (hover 0.18), with `fontWeight: 600`; non-selected items are muted with an `action.hover` hover. Rounded pill items with a 36px icon column.
+- Verified: 2 subheaders, 9 items, selected bg `rgba(225,29,72,0.12)`, width 240 (collapse 72 preserved), no console errors.
+- `npm run check` 494/494 · `test:e2e` 3/3.
