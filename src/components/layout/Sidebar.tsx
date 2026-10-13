@@ -55,10 +55,7 @@ export function Sidebar({
           <Logo />
         </Link>
       </MuiBox>
-      <MuiList
-        component="nav"
-        sx={{ p: 1, display: "flex", flexDirection: "column", gap: 0.5 }}
-      >
+      <MuiList component="nav" sx={{ py: 1 }}>
         {entries.map((entry) => (
           <NavItem
             key={entry.key}

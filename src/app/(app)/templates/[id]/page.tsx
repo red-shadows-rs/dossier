@@ -120,7 +120,7 @@ export default async function TemplateDetailPage({
                 {t("paymentTerms")}
               </dt>
               <dd className="text-sm text-foreground" dir="ltr">
-                {defaults.paymentTermsDays ?? "—"}
+                {defaults.paymentTermsDays ?? "-"}
               </dd>
             </div>
             <div className="flex flex-col gap-0.5">

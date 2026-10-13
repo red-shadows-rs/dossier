@@ -4,6 +4,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { Dialog } from "@/components/ui/Dialog";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
@@ -268,19 +269,15 @@ export function SendContractDialog({
               </Field>
             )}
 
-            <label className="flex items-start gap-2 text-sm text-foreground">
-              <input
-                type="checkbox"
-                checked={consent}
-                onChange={(event) => {
-                  setConsent(event.target.checked);
-                  setFieldErrors((e) => ({ ...e, consent: "" }));
-                }}
-                disabled={pending}
-                className="mt-1 size-4 rounded border-border"
-              />
-              <span>{consentText}</span>
-            </label>
+            <Checkbox
+              checked={consent}
+              onChange={(event) => {
+                setConsent(event.target.checked);
+                setFieldErrors((e) => ({ ...e, consent: "" }));
+              }}
+              disabled={pending}
+              label={<span>{consentText}</span>}
+            />
             {err("consent") || err("signature") ? (
               <p role="alert" className="text-xs text-destructive">
                 {err("consent") ?? err("signature")}

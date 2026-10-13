@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -149,16 +150,14 @@ export function UserForm({
               />
             </Field>
           ) : null}
-          <label className="flex items-center gap-2 self-end pb-2 text-sm text-foreground">
-            <input
-              type="checkbox"
+          <div className="self-end pb-1">
+            <Checkbox
               checked={canSign}
               onChange={(event) => setCanSign(event.currentTarget.checked)}
               disabled={pending}
-              className="size-4 rounded border-border"
+              label={t("users.canSignForCompany")}
             />
-            {t("users.canSignForCompany")}
-          </label>
+          </div>
         </CardContent>
       </Card>
 

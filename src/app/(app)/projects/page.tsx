@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
@@ -124,16 +125,14 @@ export default async function ProjectsPage({
                 ))}
               </Select>
             </Field>
-            <label className="flex items-center gap-2 pb-2 text-sm text-foreground">
-              <input
-                type="checkbox"
+            <div className="pb-1">
+              <Checkbox
                 name="archived"
                 value="1"
                 defaultChecked={archived}
-                className="size-4 rounded border-border"
+                label={t("includeArchived")}
               />
-              {t("includeArchived")}
-            </label>
+            </div>
             <div className="flex gap-2 pb-0.5">
               <Button type="submit">{tc("filter")}</Button>
               <Link
@@ -179,7 +178,7 @@ export default async function ProjectsPage({
                           className="font-medium text-foreground hover:text-primary"
                         >
                           <span dir="rtl" lang="ar">
-                            {row.nameAr ?? "—"}
+                            {row.nameAr ?? "-"}
                           </span>
                           {row.nameEn ? (
                             <>
@@ -192,7 +191,7 @@ export default async function ProjectsPage({
                         </Link>
                       </TableCell>
                       <TableCell>
-                        {client?.nameAr ?? client?.nameEn ?? "—"}
+                        {client?.nameAr ?? client?.nameEn ?? "-"}
                       </TableCell>
                       <TableCell>
                         <Badge tone="blue">{t(`status.${row.status}`)}</Badge>

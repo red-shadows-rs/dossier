@@ -199,7 +199,7 @@ export default async function AuditPage({
                     </TableCell>
                     <TableCell>
                       <span dir="ltr" className="text-start">
-                        {row.ip ?? "—"}
+                        {row.ip ?? "-"}
                       </span>
                     </TableCell>
                   </TableRow>

@@ -12,7 +12,7 @@ export default async function NewContractPage() {
 
   const projects = listProjectOptions().map((project) => ({
     id: project.id,
-    label: `${project.code} — ${project.nameAr ?? project.nameEn ?? ""}`,
+    label: `${project.code} - ${project.nameAr ?? project.nameEn ?? ""}`,
   }));
   const templates = listTemplates().rows.map((template) => ({
     id: template.id,

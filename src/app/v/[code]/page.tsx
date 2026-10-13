@@ -139,15 +139,15 @@ function ContractCard({
         />
       </div>
       <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Row label={t.fields.number} value={result.number ?? "—"} />
-        <Row label={t.fields.title} value={title ?? "—"} />
-        <Row label={t.fields.provider} value={result.providerName ?? "—"} />
-        <Row label={t.fields.client} value={result.clientName ?? "—"} />
+        <Row label={t.fields.number} value={result.number ?? "-"} />
+        <Row label={t.fields.title} value={title ?? "-"} />
+        <Row label={t.fields.provider} value={result.providerName ?? "-"} />
+        <Row label={t.fields.client} value={result.clientName ?? "-"} />
         <Row
           label={t.fields.signedAt}
-          value={result.signedAt ? formatInstant(result.signedAt, "UTC", locale) : "—"}
+          value={result.signedAt ? formatInstant(result.signedAt, "UTC", locale) : "-"}
         />
-        <Row label={t.fields.contentHash} value={result.contentHash ?? "—"} />
+        <Row label={t.fields.contentHash} value={result.contentHash ?? "-"} />
       </dl>
     </div>
   );
@@ -172,9 +172,9 @@ function InvoiceCard({
         />
       </div>
       <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Row label={t.fields.number} value={result.number ?? "—"} />
-        <Row label={t.fields.issuer} value={result.issuerName ?? "—"} />
-        <Row label={t.fields.issueDate} value={result.issueDate ?? "—"} />
+        <Row label={t.fields.number} value={result.number ?? "-"} />
+        <Row label={t.fields.issuer} value={result.issuerName ?? "-"} />
+        <Row label={t.fields.issueDate} value={result.issueDate ?? "-"} />
         <Row label={t.fields.total} value={result.totalFormatted} />
       </dl>
     </div>

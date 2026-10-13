@@ -59,7 +59,7 @@ export default async function EditProjectPage({
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-bold text-foreground">
-        {t("edit")} — {project.code}
+        {t("edit")} - {project.code}
       </h1>
       <ProjectForm
         mode="edit"

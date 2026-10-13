@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -164,19 +165,13 @@ export function SettingsForm({
           const error = fieldError(field.name);
           if (field.kind === "checkbox") {
             return (
-              <label
+              <Checkbox
                 key={field.name}
-                className="flex items-center gap-2 text-sm text-foreground"
-              >
-                <input
-                  type="checkbox"
-                  name={field.name}
-                  defaultChecked={initialValue(field, values) === true}
-                  disabled={disabled}
-                  className="size-4 rounded border-border"
-                />
-                {field.label}
-              </label>
+                name={field.name}
+                defaultChecked={initialValue(field, values) === true}
+                disabled={disabled}
+                label={field.label}
+              />
             );
           }
           return (

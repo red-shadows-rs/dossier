@@ -93,14 +93,14 @@ export default async function InvoiceDetailPage({
           <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Row
               label={t("project")}
-              value={project?.nameAr ?? project?.nameEn ?? "—"}
+              value={project?.nameAr ?? project?.nameEn ?? "-"}
             />
             <Row
               label={t("client")}
-              value={client?.nameAr ?? client?.nameEn ?? "—"}
+              value={client?.nameAr ?? client?.nameEn ?? "-"}
             />
-            <Row label={t("issueDate")} value={invoice.issueDate ?? "—"} ltr />
-            <Row label={t("dueDate")} value={invoice.dueDate ?? "—"} ltr />
+            <Row label={t("issueDate")} value={invoice.issueDate ?? "-"} ltr />
+            <Row label={t("dueDate")} value={invoice.dueDate ?? "-"} ltr />
             <Row label={t("currency")} value={invoice.currency} ltr />
           </dl>
           <dl className="mt-4 flex flex-col gap-1" dir="ltr">
@@ -163,7 +163,7 @@ export default async function InvoiceDetailPage({
                 {lines.map((line) => (
                   <TableRow key={line.id}>
                     <TableCell>
-                      {line.descriptionEn ?? line.descriptionAr ?? "—"}
+                      {line.descriptionEn ?? line.descriptionAr ?? "-"}
                     </TableCell>
                     <TableCell dir="ltr" className="text-start tabular-nums">
                       {line.qtyMilli / 1000}
@@ -211,7 +211,7 @@ export default async function InvoiceDetailPage({
                     </TableCell>
                     <TableCell>{t(`methods.${payment.method}`)}</TableCell>
                     <TableCell dir="ltr" className="text-start">
-                      {payment.reference ?? "—"}
+                      {payment.reference ?? "-"}
                     </TableCell>
                     <TableCell className="text-end">
                       {payment.voidedAt === null &&

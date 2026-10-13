@@ -130,7 +130,7 @@ export default async function ContractsPage({
                 <option value="">{t("allProjects")}</option>
                 {projects.map((project) => (
                   <option key={project.id} value={project.id}>
-                    {project.code} — {project.nameAr ?? project.nameEn ?? ""}
+                    {project.code} - {project.nameAr ?? project.nameEn ?? ""}
                   </option>
                 ))}
               </Select>
@@ -193,7 +193,7 @@ export default async function ContractsPage({
                 {rows.map((row) => (
                   <TableRow key={row.id}>
                     <TableCell dir="ltr" className="text-start font-mono">
-                      {row.number ?? "—"}
+                      {row.number ?? "-"}
                     </TableCell>
                     <TableCell>
                       <Link
@@ -201,7 +201,7 @@ export default async function ContractsPage({
                         className="font-medium text-foreground hover:text-primary"
                       >
                         <span dir="rtl" lang="ar">
-                          {row.titleAr ?? "—"}
+                          {row.titleAr ?? "-"}
                         </span>
                         {row.titleEn ? (
                           <>

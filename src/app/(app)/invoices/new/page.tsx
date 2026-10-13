@@ -12,7 +12,7 @@ export default async function NewInvoicePage() {
 
   const projects = listProjectOptions().map((project) => ({
     id: project.id,
-    label: `${project.code} — ${project.nameAr ?? project.nameEn ?? ""}`,
+    label: `${project.code} - ${project.nameAr ?? project.nameEn ?? ""}`,
   }));
   const milestones = listInvoiceableMilestones();
 

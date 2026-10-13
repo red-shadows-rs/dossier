@@ -45,7 +45,7 @@ export function HeaderSearch() {
         setResults(json.data);
         setOpen(true);
       } catch {
-        // aborted or network error — ignore
+        // aborted or network error - ignore
       }
     }, 250);
     return () => {

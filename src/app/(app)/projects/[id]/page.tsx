@@ -101,7 +101,7 @@ export default async function ProjectDetailPage({
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold text-foreground">
             <span dir="rtl" lang="ar">
-              {project.nameAr ?? project.nameEn ?? "—"}
+              {project.nameAr ?? project.nameEn ?? "-"}
             </span>
           </h1>
           <Badge tone="gray" className="font-mono">
@@ -170,10 +170,10 @@ export default async function ProjectDetailPage({
                   {t(`status.${project.status}`)}
                 </Field>
                 <Field label={t("startDate")} ltr>
-                  {project.startDate ?? "—"}
+                  {project.startDate ?? "-"}
                 </Field>
                 <Field label={t("endDate")} ltr>
-                  {project.endDate ?? "—"}
+                  {project.endDate ?? "-"}
                 </Field>
                 {project.taskboardRef ? (
                   <Field label={t("taskboardRef")} ltr>
@@ -323,12 +323,12 @@ export default async function ProjectDetailPage({
                           className="font-medium text-foreground hover:text-primary"
                         >
                           <span dir="rtl" lang="ar">
-                            {contract.titleAr ?? contract.titleEn ?? "—"}
+                            {contract.titleAr ?? contract.titleEn ?? "-"}
                           </span>
                         </Link>
                       </TableCell>
                       <TableCell dir="ltr" className="text-start font-mono">
-                        {contract.number ?? "—"}
+                        {contract.number ?? "-"}
                       </TableCell>
                       <TableCell className="text-end">
                         <Link
@@ -372,7 +372,7 @@ export default async function ProjectDetailPage({
                   {projectInvoices.map((invoice) => (
                     <TableRow key={invoice.id}>
                       <TableCell dir="ltr" className="text-start font-mono">
-                        {invoice.number ?? "—"}
+                        {invoice.number ?? "-"}
                       </TableCell>
                       <TableCell>
                         <Badge tone={invoiceStatusTone(invoice.status)}>
@@ -387,7 +387,7 @@ export default async function ProjectDetailPage({
                         )}
                       </TableCell>
                       <TableCell dir="ltr" className="text-start">
-                        {invoice.dueDate ?? "—"}
+                        {invoice.dueDate ?? "-"}
                       </TableCell>
                       <TableCell className="text-end">
                         <Link

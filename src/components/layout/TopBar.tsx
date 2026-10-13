@@ -74,8 +74,8 @@ export async function TopBar({ user }: { user: SessionUser }) {
               gap: 1.5,
             }}
           >
-            <LocaleSwitch />
             <ThemeSwitch current={theme} />
+            <LocaleSwitch />
           </MuiBox>
           <UserMenu user={user} />
         </MuiBox>

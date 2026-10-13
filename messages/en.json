@@ -104,7 +104,7 @@
     "decline": "Decline",
     "declineReason": "Reason (optional)",
     "declineConfirm": "Confirm decline",
-    "signedTitle": "Thank you — your signature was recorded",
+    "signedTitle": "Thank you, your signature was recorded",
     "signedBody": "The sender will be notified. A copy of the signed contract will be emailed to you when it is ready.",
     "declinedTitle": "You declined this contract",
     "declinedBody": "The sender has been notified. You can close this page."
@@ -239,7 +239,7 @@
     "when": "Time",
     "action": "Action",
     "entity": "Item",
-    "workerStale": "The background worker is offline — queued emails and scheduled jobs are paused. Start exactly one worker."
+    "workerStale": "The background worker is offline. Queued emails and scheduled jobs are paused. Start exactly one worker."
   },
   "audit": {
     "title": "Audit log",
@@ -556,7 +556,7 @@
     "terminateHint": "Terminating is permanent. Issued invoices are unaffected, but un-invoiced milestones can no longer be invoiced.",
     "terminateReason": "Reason",
     "linkTitle": "New signing link",
-    "linkOnce": "Copy this link now — it is shown only once and invalidates the previous link.",
+    "linkOnce": "Copy this link now. It is shown only once and invalidates the previous link.",
     "linkLabel": "Signing link",
     "signatures": {
       "empty": "No signatories yet. They are created when the contract is sent.",
@@ -582,7 +582,7 @@
         "drawn": "Drawn",
         "typed": "Typed"
       },
-      "dash": "—"
+      "dash": "-"
     },
     "finalize": {
       "pending": "The signed copy is not ready yet. The worker will retry automatically.",

@@ -81,7 +81,7 @@ export default async function UsersPage() {
                       {row.canSignForCompany ? (
                         <Badge tone="teal">{t("yes")}</Badge>
                       ) : (
-                        <span className="text-muted-foreground">—</span>
+                        <span className="text-muted-foreground">-</span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -94,7 +94,7 @@ export default async function UsersPage() {
                     <TableCell>
                       {row.lastLoginAt
                         ? formatInstant(row.lastLoginAt, timezone, locale)
-                        : "—"}
+                        : "-"}
                     </TableCell>
                     <TableCell className="text-end">
                       <div className="flex justify-end gap-2">

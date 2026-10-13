@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -389,16 +390,14 @@ export function TemplateForm({
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <label className="flex items-center gap-2 self-end pb-2 text-sm text-foreground">
-              <input
-                type="checkbox"
+            <div className="self-end pb-1">
+              <Checkbox
                 checked={form.hasFees}
                 onChange={(event) => patch({ hasFees: event.currentTarget.checked })}
                 disabled={pending}
-                className="size-4 rounded border-border"
+                label={t("templates.hasFees")}
               />
-              {t("templates.hasFees")}
-            </label>
+            </div>
             <Field
               label={t("templates.paymentTerms")}
               htmlFor="tpl-payment-terms"
@@ -443,18 +442,14 @@ export function TemplateForm({
           </div>
 
           <div className="flex flex-col gap-3 rounded-md border border-border p-3">
-            <label className="flex items-center gap-2 text-sm text-foreground">
-              <input
-                type="checkbox"
-                checked={form.presetEnabled}
-                onChange={(event) =>
-                  patch({ presetEnabled: event.currentTarget.checked })
-                }
-                disabled={pending}
-                className="size-4 rounded border-border"
-              />
-              {t("templates.milestonePresetEnabled")}
-            </label>
+            <Checkbox
+              checked={form.presetEnabled}
+              onChange={(event) =>
+                patch({ presetEnabled: event.currentTarget.checked })
+              }
+              disabled={pending}
+              label={t("templates.milestonePresetEnabled")}
+            />
 
             {form.presetEnabled ? (
               <div className="flex flex-col gap-3">

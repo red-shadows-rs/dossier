@@ -93,7 +93,7 @@ export default async function ContractDetailPage({
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-bold text-foreground">
             <span dir="rtl" lang="ar">
-              {contract.titleAr ?? contract.titleEn ?? "—"}
+              {contract.titleAr ?? contract.titleEn ?? "-"}
             </span>
           </h1>
           <Badge tone={contractStatusTone(contract.status)}>
@@ -162,11 +162,11 @@ export default async function ContractDetailPage({
               <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <Row
                   label={t("project")}
-                  value={project?.nameAr ?? project?.nameEn ?? "—"}
+                  value={project?.nameAr ?? project?.nameEn ?? "-"}
                 />
                 <Row
                   label={t("client")}
-                  value={client?.nameAr ?? client?.nameEn ?? "—"}
+                  value={client?.nameAr ?? client?.nameEn ?? "-"}
                 />
                 <Row
                   label={t("languageMode")}
@@ -186,10 +186,10 @@ export default async function ContractDetailPage({
                 <Row label={t("clauses")} value={String(clauses.length)} ltr />
                 <Row
                   label={t("startDate")}
-                  value={contract.startDate ?? "—"}
+                  value={contract.startDate ?? "-"}
                   ltr
                 />
-                <Row label={t("endDate")} value={contract.endDate ?? "—"} ltr />
+                <Row label={t("endDate")} value={contract.endDate ?? "-"} ltr />
               </dl>
             </CardContent>
           </Card>

@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent } from "@/components/ui/Card";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
@@ -83,16 +84,14 @@ export default async function ClientsPage({
                 placeholder={t("searchPlaceholder")}
               />
             </Field>
-            <label className="flex items-center gap-2 pb-2 text-sm text-foreground">
-              <input
-                type="checkbox"
+            <div className="pb-1">
+              <Checkbox
                 name="archived"
                 value="1"
                 defaultChecked={archived}
-                className="size-4 rounded border-border"
+                label={t("includeArchived")}
               />
-              {t("includeArchived")}
-            </label>
+            </div>
             <div className="flex gap-2 pb-0.5">
               <Button type="submit">{tc("filter")}</Button>
               <Link
@@ -134,7 +133,7 @@ export default async function ClientsPage({
                         className="font-medium text-foreground hover:text-primary"
                       >
                         <span dir="rtl" lang="ar">
-                          {row.nameAr ?? "—"}
+                          {row.nameAr ?? "-"}
                         </span>
                         {row.nameEn ? (
                           <>
@@ -148,12 +147,12 @@ export default async function ClientsPage({
                     </TableCell>
                     <TableCell>{t(`type.${row.type}`)}</TableCell>
                     <TableCell dir="ltr" className="text-start">
-                      {row.email ?? "—"}
+                      {row.email ?? "-"}
                     </TableCell>
                     <TableCell dir="ltr" className="text-start">
-                      {row.phone ?? "—"}
+                      {row.phone ?? "-"}
                     </TableCell>
-                    <TableCell>{row.city ?? "—"}</TableCell>
+                    <TableCell>{row.city ?? "-"}</TableCell>
                     <TableCell>
                       {row.archivedAt ? (
                         <Badge tone="gray">{t("archived")}</Badge>

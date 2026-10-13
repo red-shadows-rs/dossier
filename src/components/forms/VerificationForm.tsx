@@ -110,8 +110,8 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
             <p className="font-medium">{t("found")}</p>
             <p className="mt-1 text-muted-foreground">
               {result.kind === "contract"
-                ? `${t("contract.heading")}: ${result.number ?? "—"}`
-                : `${t("invoice.heading")}: ${result.number ?? "—"} · ${result.totalFormatted}`}
+                ? `${t("contract.heading")}: ${result.number ?? "-"}`
+                : `${t("invoice.heading")}: ${result.number ?? "-"} · ${result.totalFormatted}`}
             </p>
             <a
               href={`/v/${code}?lang=${locale}`}

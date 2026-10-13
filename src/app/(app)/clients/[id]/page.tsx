@@ -58,7 +58,7 @@ export default async function ClientDetailPage({
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold text-foreground">
             <span dir="rtl" lang="ar">
-              {client.nameAr ?? client.nameEn ?? "—"}
+              {client.nameAr ?? client.nameEn ?? "-"}
             </span>
           </h1>
           {client.archivedAt ? (

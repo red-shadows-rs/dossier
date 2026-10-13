@@ -72,7 +72,7 @@ export function TableHeaderCell({
       component="th"
       scope="col"
       className={className}
-      sx={{ fontWeight: 500, color: "text.secondary" }}
+      sx={{ fontWeight: 600 }}
       {...(props as unknown as TableCellProps)}
     >
       {children}

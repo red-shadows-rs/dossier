@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { Badge, invoiceStatusTone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
@@ -140,21 +141,19 @@ export default async function InvoicesPage({
                 <option value="">{t("allProjects")}</option>
                 {projects.map((project) => (
                   <option key={project.id} value={project.id}>
-                    {project.code} — {project.nameAr ?? project.nameEn ?? ""}
+                    {project.code} - {project.nameAr ?? project.nameEn ?? ""}
                   </option>
                 ))}
               </Select>
             </Field>
-            <label className="flex items-center gap-2 pb-2 text-sm text-foreground">
-              <input
-                type="checkbox"
+            <div className="pb-1">
+              <Checkbox
                 name="overdue"
                 value="1"
                 defaultChecked={overdue}
-                className="size-4 rounded border-border"
+                label={t("overdueOnly")}
               />
-              {t("overdueOnly")}
-            </label>
+            </div>
             <Field label={tc("sort")} htmlFor="invoices-sort">
               <Select
                 id="invoices-sort"
@@ -217,13 +216,13 @@ export default async function InvoicesPage({
                   return (
                     <TableRow key={row.id}>
                       <TableCell dir="ltr" className="text-start font-mono">
-                        {row.number ?? "—"}
+                        {row.number ?? "-"}
                       </TableCell>
                       <TableCell>
                         {projects.find((p) => p.id === row.projectId)?.nameAr ??
                           projects.find((p) => p.id === row.projectId)
                             ?.nameEn ??
-                          "—"}
+                          "-"}
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap items-center gap-1">
@@ -244,7 +243,7 @@ export default async function InvoicesPage({
                         )}
                       </TableCell>
                       <TableCell dir="ltr" className="text-start">
-                        {row.dueDate ?? "—"}
+                        {row.dueDate ?? "-"}
                       </TableCell>
                       <TableCell className="text-end">
                         <div className="flex justify-end gap-2">

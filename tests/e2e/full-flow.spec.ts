@@ -104,7 +104,7 @@ test.describe.serial("contract lifecycle (16.2 #1 + #2)", () => {
     await page.locator('input[type="checkbox"]').check();
     await page.getByRole("button", { name: "Sign contract" }).click();
     await expect(
-      page.getByText("Thank you — your signature was recorded"),
+      page.getByText("Thank you, your signature was recorded"),
     ).toBeVisible();
 
     // 10. Contract is signed and the sealed PDF downloads

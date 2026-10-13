@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -119,16 +120,14 @@ export function ContractBasicsStep({
               className="text-start"
             />
           </Field>
-          <label className="flex items-center gap-2 self-end pb-2 text-sm text-foreground">
-            <input
-              type="checkbox"
+          <div className="self-end pb-1">
+            <Checkbox
               checked={hasFees}
               onChange={(event) => setHasFees(event.currentTarget.checked)}
               disabled={pending}
-              className="size-4 rounded border-border"
+              label={t("contracts.hasFees")}
             />
-            {t("contracts.hasFees")}
-          </label>
+          </div>
           <Field label={t("contracts.milestoneMode")} htmlFor="cb-mode">
             <Select
               id="cb-mode"

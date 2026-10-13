@@ -3,6 +3,7 @@
 import Link from "next/link";
 import MuiListItemButton from "@mui/material/ListItemButton";
 import MuiListItemIcon from "@mui/material/ListItemIcon";
+import MuiListItemText from "@mui/material/ListItemText";
 import type { NavEntry } from "./nav";
 
 export function NavItem({
@@ -24,22 +25,14 @@ export function NavItem({
       aria-current={active ? "page" : undefined}
       onClick={onNavigate}
       selected={active}
-      sx={{
-        gap: 1,
-        py: 1,
-        borderRadius: (theme) => theme.shape.borderRadius,
-        color: "text.secondary",
-        "&.Mui-selected": {
-          bgcolor: "primary.main",
-          color: "primary.contrastText",
-          "&:hover": { bgcolor: "primary.main" },
-        },
-      }}
     >
-      <MuiListItemIcon sx={{ minWidth: 0, color: "inherit", fontSize: 0 }}>
-        <Icon size={16} aria-hidden="true" />
+      <MuiListItemIcon>
+        <Icon size={20} aria-hidden="true" />
       </MuiListItemIcon>
-      <span>{label}</span>
+      <MuiListItemText
+        primary={label}
+        slotProps={{ primary: { variant: "body2" } }}
+      />
     </MuiListItemButton>
   );
 }

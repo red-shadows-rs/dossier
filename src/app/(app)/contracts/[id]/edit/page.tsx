@@ -65,9 +65,9 @@ export default async function ContractEditPage({
     currency: detail.contract.currency,
     hasFees: detail.contract.hasFees,
     projectLabel: project
-      ? `${project.code} — ${project.nameAr ?? project.nameEn ?? ""}${client ? ` (${client.nameAr ?? client.nameEn ?? ""})` : ""}`
-      : "—",
-    templateLabel: template ? `${template.nameAr} / ${template.nameEn}` : "—",
+      ? `${project.code} - ${project.nameAr ?? project.nameEn ?? ""}${client ? ` (${client.nameAr ?? client.nameEn ?? ""})` : ""}`
+      : "-",
+    templateLabel: template ? `${template.nameAr} / ${template.nameEn}` : "-",
     basics: {
       languageMode: detail.contract.languageMode,
       titleAr: detail.contract.titleAr ?? "",
