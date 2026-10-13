@@ -23,7 +23,8 @@
     "db:migrate": "tsx src/db/migrate.ts",
     "seed": "tsx scripts/seed.ts",
     "user:create": "tsx scripts/create-user.ts",
-    "worker": "tsx scripts/worker.ts"
+    "worker": "tsx scripts/worker.ts",
+    "seed:demo": "tsx scripts/seed-demo.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",

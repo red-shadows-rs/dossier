@@ -30,7 +30,7 @@ export function NavItem({
       onClick={onNavigate}
       selected={active}
       sx={{
-        borderRadius: (theme) => theme.shape.borderRadius,
+        borderRadius: "4px",
         mb: 0.25,
         px: 1.5,
         py: 1,

@@ -62,10 +62,10 @@ export function UserMenu({ user }: { user: SessionUser }) {
         slotProps={{ paper: { elevation: 1, sx: { minWidth: 220, mt: 0.5 } } }}
       >
         <MuiBox sx={{ px: 2, py: 1 }}>
-          <MuiTypography variant="subtitle2" noWrap>
+          <MuiTypography component="div" variant="body2" sx={{ fontWeight: 600 }} noWrap>
             {user.name}
           </MuiTypography>
-          <MuiTypography variant="caption" color="text.secondary" noWrap>
+          <MuiTypography component="div" variant="body2" color="text.secondary" noWrap>
             {user.email}
           </MuiTypography>
         </MuiBox>
