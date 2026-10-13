@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Filter, Plus, RotateCcw } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { ActionLink } from "@/components/ui/ActionLink";
+import { RowActionButton } from "@/components/forms/RowActionButton";
+import { deleteDraftContractAction } from "@/server/actions/contracts";
 import { Badge, contractStatusTone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
@@ -162,12 +164,15 @@ export default async function ContractsPage({
               </Select>
             </Field>
             <div className="flex gap-2 pb-0.5">
-              <Button type="submit">{tc("filter")}</Button>
-              <Link
-                href="/contracts"
-                className="rounded-md border border-border px-3 py-2 text-sm text-foreground hover:bg-surface"
-              >
-                {tc("reset")}
+              <Button type="submit">
+                <Filter size={16} aria-hidden="true" />
+                {tc("filter")}
+              </Button>
+              <Link href="/contracts">
+                <Button type="button" variant="secondary">
+                  <RotateCcw size={16} aria-hidden="true" />
+                  {tc("reset")}
+                </Button>
               </Link>
             </div>
           </form>
@@ -231,6 +236,18 @@ export default async function ContractsPage({
                             href={`/contracts/${row.id}/edit`}
                             action="edit"
                             label={tc("edit")}
+                          />
+                        ) : null}
+                        {canWrite && row.status === "draft" ? (
+                          <RowActionButton
+                            id={row.id}
+                            action={deleteDraftContractAction}
+                            kind="delete"
+                            label={t("deleteConfirmTitle")}
+                            title={t("deleteConfirmTitle")}
+                            message={t("deleteConfirm")}
+                            confirmLabel={t("deleteConfirmTitle")}
+                            successTitle={t("deleted")}
                           />
                         ) : null}
                       </div>

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { ActionLink } from "@/components/ui/ActionLink";
+import { RowActionButton } from "@/components/forms/RowActionButton";
+import { archiveTemplateAction } from "@/server/actions/templates";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
@@ -88,11 +90,25 @@ export default async function TemplatesPage() {
                       )}
                     </TableCell>
                     <TableCell className="text-end">
-                      <ActionLink
-                        href={`/templates/${row.id}`}
-                        action="preview"
-                        label={tc("preview")}
-                      />
+                      <div className="flex items-center gap-1">
+                        <ActionLink
+                          href={`/templates/${row.id}`}
+                          action="preview"
+                          label={tc("preview")}
+                        />
+                        {!row.isSystem ? (
+                          <RowActionButton
+                            id={row.id}
+                            action={archiveTemplateAction}
+                            kind="archive"
+                            label={t("archive")}
+                            title={t("archive")}
+                            message={t("archiveConfirm")}
+                            confirmLabel={t("archive")}
+                            successTitle={t("archivedToast")}
+                          />
+                        ) : null}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Filter, RotateCcw } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -126,12 +127,15 @@ export default async function AuditPage({
               />
             </Field>
             <div className="flex items-end gap-2">
-              <Button type="submit">{tc("filter")}</Button>
-              <Link
-                href="/audit"
-                className="rounded-md border border-border px-3 py-2 text-sm text-foreground hover:bg-surface"
-              >
-                {tc("reset")}
+              <Button type="submit">
+                <Filter size={16} aria-hidden="true" />
+                {tc("filter")}
+              </Button>
+              <Link href="/audit">
+                <Button type="button" variant="secondary">
+                  <RotateCcw size={16} aria-hidden="true" />
+                  {tc("reset")}
+                </Button>
               </Link>
             </div>
           </form>

@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Filter, Plus, RotateCcw } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { ActionLink } from "@/components/ui/ActionLink";
+import { RowActionButton } from "@/components/forms/RowActionButton";
+import { archiveClientAction } from "@/server/actions/clients";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent } from "@/components/ui/Card";
@@ -94,12 +96,15 @@ export default async function ClientsPage({
               />
             </div>
             <div className="flex gap-2 pb-0.5">
-              <Button type="submit">{tc("filter")}</Button>
-              <Link
-                href="/clients"
-                className="rounded-md border border-border px-3 py-2 text-sm text-foreground hover:bg-surface"
-              >
-                {tc("reset")}
+              <Button type="submit">
+                <Filter size={16} aria-hidden="true" />
+                {tc("filter")}
+              </Button>
+              <Link href="/clients">
+                <Button type="button" variant="secondary">
+                  <RotateCcw size={16} aria-hidden="true" />
+                  {tc("reset")}
+                </Button>
               </Link>
             </div>
           </form>
@@ -173,6 +178,18 @@ export default async function ClientsPage({
                             href={`/clients/${row.id}/edit`}
                             action="edit"
                             label={tc("edit")}
+                          />
+                        ) : null}
+                        {canWrite && !row.archivedAt ? (
+                          <RowActionButton
+                            id={row.id}
+                            action={archiveClientAction}
+                            kind="archive"
+                            label={t("archive")}
+                            title={t("archive")}
+                            message={t("archiveConfirm")}
+                            confirmLabel={t("archive")}
+                            successTitle={t("archivedToast")}
                           />
                         ) : null}
                       </div>
