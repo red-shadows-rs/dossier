@@ -457,3 +457,10 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - Pages updated to render the table component and pass serializable `labels`/maps + `canWrite` + the relevant server action (archive/delete).
 - Verified (Playwright, owner session): `/clients`, `/projects`, `/contracts`, `/invoices`, `/templates`, `/users` all 200 with `.MuiDataGrid-root` present, no console errors, no horizontal overflow.
 - `npm run check` 494/494 · `test:e2e` 3/3.
+
+## Padding + inline alignment (follow-up)
+
+- **Filter rows were wrapping** (the search Field was `fullWidth`, so it took the whole row and pushed the checkbox/buttons to a second line → "some things higher than others"). Fixed by giving the search Field a fixed width (`w-64` clients, `w-60` contracts/projects/invoices) after the CSS-layer fix that lets Tailwind widths override MUI `fullWidth`. Verified: input/checkbox/filter-button centers now within ~3px on one row.
+- **Trimmed main padding**: `p-4 md:p-6 lg:p-8` → `p-3 md:p-4 lg:p-6`.
+- **Slop re-scan (clean)**: no gradients, no backdrop-blur/glow, no raw palette utilities, no `rounded-2xl/3xl`, no emoji, no hover lift/scale, no buzzwords, no fake/lorem content, no UI em/en dashes. Only raw hex is `SignaturePad #111111` (canvas ink, justified) and the only `box-shadow` is the autofill override in `globals.css`.
+- `npm run check` 494/494 · `test:e2e` 3/3.
