@@ -1,7 +1,11 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/Button";
+import { AlertTriangle, RotateCcw } from "lucide-react";
+import MuiBox from "@mui/material/Box";
+import MuiButton from "@mui/material/Button";
+import MuiStack from "@mui/material/Stack";
+import MuiTypography from "@mui/material/Typography";
 
 export default function AppError({
   reset,
@@ -13,11 +17,38 @@ export default function AppError({
   const tc = useTranslations("common");
 
   return (
-    <main className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
-      <h1 className="text-2xl font-bold text-foreground">{t("INTERNAL")}</h1>
-      <Button type="button" onClick={reset}>
+    <MuiStack
+      component="main"
+      sx={{
+        minHeight: "70vh",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 2,
+        p: 3,
+        textAlign: "center",
+      }}
+    >
+      <MuiBox
+        sx={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 56,
+          height: 56,
+          borderRadius: "50%",
+          bgcolor: "action.selected",
+          color: "error.main",
+        }}
+      >
+        <AlertTriangle size={28} aria-hidden="true" />
+      </MuiBox>
+      <MuiTypography component="h1" variant="h5" sx={{ fontWeight: 700 }}>
+        {t("INTERNAL")}
+      </MuiTypography>
+      <MuiButton type="button" variant="contained" onClick={reset}>
+        <RotateCcw size={18} aria-hidden="true" />
         {tc("retry")}
-      </Button>
-    </main>
+      </MuiButton>
+    </MuiStack>
   );
 }

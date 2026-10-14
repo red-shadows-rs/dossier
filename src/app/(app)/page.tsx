@@ -1,10 +1,17 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
+  Activity,
   AlertTriangle,
+  BarChart3,
+  BellRing,
+  CalendarClock,
+  Clock,
   FileCheck2,
   FileSignature,
+  FileText,
   FolderKanban,
+  History,
   Receipt,
   TrendingUp,
   Users,
@@ -53,6 +60,47 @@ const CHART_COLORS = [
   "var(--mui-palette-error-main)",
   "var(--mui-palette-text-disabled)",
 ];
+
+function SectionHeading({
+  icon: Icon,
+  children,
+}: {
+  icon: LucideIcon;
+  children: ReactNode;
+}) {
+  return (
+    <MuiStack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
+      <Icon size={16} aria-hidden="true" />
+      <MuiTypography variant="overline" color="text.secondary">
+        {children}
+      </MuiTypography>
+    </MuiStack>
+  );
+}
+
+function CardHeading({
+  icon: Icon,
+  children,
+}: {
+  icon: LucideIcon;
+  children: ReactNode;
+}) {
+  return (
+    <MuiStack
+      direction="row"
+      spacing={0.75}
+      sx={{ alignItems: "center", mb: 1 }}
+    >
+      <MuiBox
+        component="span"
+        sx={{ display: "inline-flex", color: "text.secondary" }}
+      >
+        <Icon size={18} aria-hidden="true" />
+      </MuiBox>
+      <MuiTypography variant="subtitle2">{children}</MuiTypography>
+    </MuiStack>
+  );
+}
 
 function AmountList({
   amounts,
@@ -282,11 +330,13 @@ function MonthlyChart({
 
 function StatusDonut({
   title,
+  icon,
   statuses,
   counts,
   labels,
 }: {
   title: string;
+  icon: LucideIcon;
   statuses: readonly string[];
   counts: Record<string, number>;
   labels: (status: string) => string;
@@ -309,9 +359,7 @@ function StatusDonut({
   return (
     <MuiCard sx={{ height: "100%" }}>
       <MuiCardContent>
-        <MuiTypography variant="subtitle2" sx={{ mb: 1 }}>
-          {title}
-        </MuiTypography>
+        <CardHeading icon={icon}>{title}</CardHeading>
         {total === 0 ? (
           <MuiTypography variant="body2" color="text.secondary">
             -
@@ -533,9 +581,7 @@ export default async function DashboardPage() {
         <MuiAlert severity="warning">{t("workerStale")}</MuiAlert>
       ) : null}
 
-      <MuiTypography variant="overline" color="text.secondary">
-        {t("finance")}
-      </MuiTypography>
+      <SectionHeading icon={Wallet}>{t("finance")}</SectionHeading>
       <MuiGrid container spacing={2}>
         {financial.map((item) => (
           <MuiGrid key={item.label} size={{ xs: 12, sm: 6, md: 3 }}>
@@ -550,9 +596,7 @@ export default async function DashboardPage() {
         ))}
       </MuiGrid>
 
-      <MuiTypography variant="overline" color="text.secondary">
-        {t("operations")}
-      </MuiTypography>
+      <SectionHeading icon={Activity}>{t("operations")}</SectionHeading>
       <MuiGrid container spacing={2}>
         {operations.map((item) => (
           <MuiGrid key={item.label} size={{ xs: 12, sm: 6, md: 3 }}>
@@ -573,9 +617,7 @@ export default async function DashboardPage() {
 
       <MuiCard>
         <MuiCardContent>
-          <MuiTypography variant="subtitle2" sx={{ mb: 1 }}>
-            {t("monthlyTitle")}
-          </MuiTypography>
+          <CardHeading icon={BarChart3}>{t("monthlyTitle")}</CardHeading>
           <MonthlyChart
             points={data.monthlyActivity}
             locale={locale}
@@ -589,6 +631,7 @@ export default async function DashboardPage() {
         <MuiGrid size={{ xs: 12, md: 6 }}>
           <StatusDonut
             title={t("contractsByStatus")}
+            icon={FileText}
             statuses={CONTRACT_STATUSES}
             counts={data.contractsByStatus}
             labels={(status) => tContracts(`status.${status}`)}
@@ -597,6 +640,7 @@ export default async function DashboardPage() {
         <MuiGrid size={{ xs: 12, md: 6 }}>
           <StatusDonut
             title={t("invoicesByStatus")}
+            icon={Receipt}
             statuses={INVOICE_STATUSES}
             counts={data.invoicesByStatus}
             labels={(status) => tInvoices(`status.${status}`)}
@@ -604,9 +648,7 @@ export default async function DashboardPage() {
         </MuiGrid>
       </MuiGrid>
 
-      <MuiTypography variant="overline" color="text.secondary">
-        {t("attention")}
-      </MuiTypography>
+      <SectionHeading icon={BellRing}>{t("attention")}</SectionHeading>
 
       <MuiCard>
         <MuiCardContent>
@@ -614,9 +656,21 @@ export default async function DashboardPage() {
             direction="row"
             sx={{ alignItems: "center", justifyContent: "space-between", mb: 1 }}
           >
-            <MuiTypography variant="subtitle1" sx={{ fontWeight: 600 }}>
-              {t("awaitingTitle")}
-            </MuiTypography>
+            <MuiStack
+              direction="row"
+              spacing={0.75}
+              sx={{ alignItems: "center" }}
+            >
+              <MuiBox
+                component="span"
+                sx={{ display: "inline-flex", color: "text.secondary" }}
+              >
+                <FileSignature size={18} aria-hidden="true" />
+              </MuiBox>
+              <MuiTypography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                {t("awaitingTitle")}
+              </MuiTypography>
+            </MuiStack>
             <MuiChip
               size="small"
               variant="outlined"
@@ -671,9 +725,21 @@ export default async function DashboardPage() {
             direction="row"
             sx={{ alignItems: "center", justifyContent: "space-between", mb: 1 }}
           >
-            <MuiTypography variant="subtitle1" sx={{ fontWeight: 600 }}>
-              {t("dueSoonTitle")}
-            </MuiTypography>
+            <MuiStack
+              direction="row"
+              spacing={0.75}
+              sx={{ alignItems: "center" }}
+            >
+              <MuiBox
+                component="span"
+                sx={{ display: "inline-flex", color: "text.secondary" }}
+              >
+                <Clock size={18} aria-hidden="true" />
+              </MuiBox>
+              <MuiTypography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                {t("dueSoonTitle")}
+              </MuiTypography>
+            </MuiStack>
             <MuiChip
               size="small"
               variant="outlined"
@@ -736,9 +802,21 @@ export default async function DashboardPage() {
             direction="row"
             sx={{ alignItems: "center", justifyContent: "space-between", mb: 1 }}
           >
-            <MuiTypography variant="subtitle1" sx={{ fontWeight: 600 }}>
-              {t("endingSoonTitle")}
-            </MuiTypography>
+            <MuiStack
+              direction="row"
+              spacing={0.75}
+              sx={{ alignItems: "center" }}
+            >
+              <MuiBox
+                component="span"
+                sx={{ display: "inline-flex", color: "text.secondary" }}
+              >
+                <CalendarClock size={18} aria-hidden="true" />
+              </MuiBox>
+              <MuiTypography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                {t("endingSoonTitle")}
+              </MuiTypography>
+            </MuiStack>
             <MuiChip
               size="small"
               variant="outlined"
@@ -785,13 +863,21 @@ export default async function DashboardPage() {
 
       <MuiCard>
         <MuiCardContent>
-          <MuiTypography
-            component="h2"
-            variant="subtitle1"
-            sx={{ fontWeight: 600, mb: 1 }}
+          <MuiStack
+            direction="row"
+            spacing={0.75}
+            sx={{ alignItems: "center", mb: 1 }}
           >
-            {t("activityTitle")}
-          </MuiTypography>
+            <MuiBox
+              component="span"
+              sx={{ display: "inline-flex", color: "text.secondary" }}
+            >
+              <History size={18} aria-hidden="true" />
+            </MuiBox>
+            <MuiTypography component="h2" variant="subtitle1" sx={{ fontWeight: 600 }}>
+              {t("activityTitle")}
+            </MuiTypography>
+          </MuiStack>
           <Table>
             <TableHead>
               <TableRow>
