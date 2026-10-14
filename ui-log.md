@@ -513,3 +513,11 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - Charts need a definite width: wrapped each in `Box sx={{ width: "100%" }}` (fixes the MUI X "container has no width" warning).
 - **Cleanup**: KPI grids are now data-driven (removed repetitive markup); activity-table entity names are translated (contract→Contracts, invoice→Invoices). Refined AR copy (`المُصدَر هذا الشهر`, `المحصَّل هذا الشهر`).
 - Verified: `/` 200, 2 chart surfaces render (bar chart + 3-arc do-nut), no console errors, no overflow. `npm run check` 494/494 · `test:e2e` 3/3.
+
+## RTL-correct dashboard charts (follow-up)
+
+- Root cause of the Arabic chart problem: MUI X Charts (`@mui/x-charts`) rendered the band axis **tick labels empty** and did **not mirror** in RTL (bars stayed LTR). Removed the dependency.
+- Replaced both charts with **custom, RTL-aware** components in `src/app/(app)/page.tsx`:
+  - `MonthlyChart`: flex bars laid out with the flow direction (so they mirror in RTL), dashed horizontal grid, per-bar `title` tooltip, month labels via `Intl.DateTimeFormat`.
+  - `StatusDonut`: an SVG do-nut built from `circle` + `stroke-dasharray`/`stroke-dashoffset` (symmetric, RTL-agnostic) with a center total and a dot legend.
+- Verified (ar + en): months render correctly (مايو…أكتوبر / May…Oct), 3 do-nut arcs, no console errors, no overflow. `npm run check` 494/494 · `test:e2e` 3/3.
