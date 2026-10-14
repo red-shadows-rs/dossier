@@ -521,3 +521,11 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
   - `MonthlyChart`: flex bars laid out with the flow direction (so they mirror in RTL), dashed horizontal grid, per-bar `title` tooltip, month labels via `Intl.DateTimeFormat`.
   - `StatusDonut`: an SVG do-nut built from `circle` + `stroke-dasharray`/`stroke-dashoffset` (symmetric, RTL-agnostic) with a center total and a dot legend.
 - Verified (ar + en): months render correctly (مايو…أكتوبر / May…Oct), 3 do-nut arcs, no console errors, no overflow. `npm run check` 494/494 · `test:e2e` 3/3.
+
+## Error/404 pages, dashboard icons, diacritics (follow-up)
+
+- **Error page** (`src/app/(app)/error.tsx`): redesigned as a centered MUI block (min-height 70vh) with an icon badge, title, and a Retry `Button`.
+- **404 page** (new `src/app/not-found.tsx`): centered MUI layout with the logo, a "404" pill, `errors.NOT_FOUND`, and a button back to the dashboard.
+- **Dashboard icons**: every section heading now has an icon (`المالية`→Wallet, `العمليات`→Activity, `تحتاج متابعة`→BellRing) and every card title too (monthly→BarChart3, contracts→FileText, invoices→Receipt, awaiting→FileSignature, due soon→Clock, ending soon→CalendarClock, activity→History). Previously only the KPI cards had icons.
+- **Arabic diacritics removed**: stripped 131 harakat/shadda marks from `messages/ar.json` (`المُصدَر`→`المصدر`, `المحصَّل`→`المحصل`, `موقّعة`→`موقعة`, …).
+- `npm run check` 494/494 · `test:e2e` 3/3.
