@@ -504,3 +504,12 @@ Baseline to keep or beat: `typecheck` 0 · `lint` 0 · `check:rtl` 0 · `test` 4
 - User menu: replaced `ListItemIcon`/`ListItemText` with a tight `Stack` (icon + `body2` text, `spacing={1}`). Verified gap = **8px** in both RTL and LTR (was ~26px). Menu paper elevation stays 1.
 - Sidebar nav: `ListItemIcon` `minWidth: 0` + `gap: 1.5` on the button → icon hugs the label (gap ~12px).
 - `npm run check` 494/494 · `test:e2e` 3/3.
+
+## Dashboard Material charts (follow-up)
+
+- Installed `@mui/x-charts` 9.15.0.
+- **Bar chart**: replaced the hand-rolled monthly chart with MUI X `BarChart` (barRadius, horizontal grid, theme colors via CSS vars `--mui-palette-primary-main`/`info-main`, animated) for invoices issued vs contracts signed (last 6 months).
+- **Do-nut charts**: replaced the plain status lists with two MUI X `PieChart` do-nuts (`innerRadius: 58`, `paddingAngle`, `cornerRadius`) for contracts-by-status and invoices-by-status, each with a dot legend and per-status counts. Zero-data cards show a dash instead of an empty chart.
+- Charts need a definite width: wrapped each in `Box sx={{ width: "100%" }}` (fixes the MUI X "container has no width" warning).
+- **Cleanup**: KPI grids are now data-driven (removed repetitive markup); activity-table entity names are translated (contract→Contracts, invoice→Invoices). Refined AR copy (`المُصدَر هذا الشهر`, `المحصَّل هذا الشهر`).
+- Verified: `/` 200, 2 chart surfaces render (bar chart + 3-arc do-nut), no console errors, no overflow. `npm run check` 494/494 · `test:e2e` 3/3.
