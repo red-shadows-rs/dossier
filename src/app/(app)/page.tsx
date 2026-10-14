@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Fragment, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import {
   AlertTriangle,
   FileCheck2,
@@ -17,10 +17,11 @@ import MuiBox from "@mui/material/Box";
 import MuiCard from "@mui/material/Card";
 import MuiCardContent from "@mui/material/CardContent";
 import MuiChip from "@mui/material/Chip";
-import MuiDivider from "@mui/material/Divider";
 import MuiGrid from "@mui/material/Grid";
 import MuiStack from "@mui/material/Stack";
 import MuiTypography from "@mui/material/Typography";
+import { BarChart } from "@mui/x-charts/BarChart";
+import { PieChart } from "@mui/x-charts/PieChart";
 import {
   Table,
   TableBody,
@@ -46,6 +47,14 @@ import { getInternalSetting, getSettings } from "@/server/services/settings";
 
 const HEARTBEAT_STALE_MS = 5 * 60 * 1000;
 
+const CHART_COLORS = [
+  "var(--mui-palette-primary-main)",
+  "var(--mui-palette-info-main)",
+  "var(--mui-palette-warning-main)",
+  "var(--mui-palette-success-main)",
+  "var(--mui-palette-error-main)",
+  "var(--mui-palette-text-disabled)",
+];
 
 function AmountList({
   amounts,
@@ -100,11 +109,7 @@ function Kpi({
       <MuiCardContent
         sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
       >
-        <MuiStack
-          direction="row"
-          spacing={0.75}
-          sx={{ alignItems: "center" }}
-        >
+        <MuiStack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
           {Icon ? (
             <MuiBox
               component="span"
@@ -161,47 +166,7 @@ function ClientName({
   );
 }
 
-function StatusBreakdown({
-  title,
-  statuses,
-  counts,
-  labels,
-}: {
-  title: string;
-  statuses: readonly string[];
-  counts: Record<string, number>;
-  labels: (status: string) => string;
-}) {
-  return (
-    <MuiCard sx={{ height: "100%" }}>
-      <MuiCardContent>
-        <MuiTypography variant="subtitle2" sx={{ mb: 1 }}>
-          {title}
-        </MuiTypography>
-        <MuiStack spacing={0.5}>
-          {statuses.map((status, index) => (
-            <Fragment key={status}>
-              {index > 0 ? <MuiDivider /> : null}
-              <MuiStack
-                direction="row"
-                sx={{ alignItems: "center", justifyContent: "space-between" }}
-              >
-                <MuiTypography variant="body2" color="text.secondary">
-                  {labels(status)}
-                </MuiTypography>
-                <MuiTypography variant="body2" sx={{ fontWeight: 600 }}>
-                  {counts[status] ?? 0}
-                </MuiTypography>
-              </MuiStack>
-            </Fragment>
-          ))}
-        </MuiStack>
-      </MuiCardContent>
-    </MuiCard>
-  );
-}
-
-function MonthChart({
+function MonthlyChart({
   points,
   locale,
   issuedLabel,
@@ -212,90 +177,125 @@ function MonthChart({
   issuedLabel: string;
   signedLabel: string;
 }) {
-  const max = Math.max(1, ...points.map((p) => Math.max(p.issued, p.signed)));
   const fmt = new Intl.DateTimeFormat(locale === "ar" ? "ar" : "en", {
     month: "short",
   });
-
-  const legend = (color: string, label: string) => (
-    <MuiStack
-      component="span"
-      direction="row"
-      spacing={0.75}
-      sx={{ alignItems: "center" }}
-    >
-      <MuiBox
-        component="span"
-        sx={{ width: 10, height: 10, bgcolor: color, borderRadius: "2px" }}
-      />
-      <MuiTypography component="span" variant="caption" color="text.secondary">
-        {label}
-      </MuiTypography>
-    </MuiStack>
+  const months = points.map((point) =>
+    fmt.format(new Date(`${point.month}-01T00:00:00Z`)),
   );
 
   return (
-    <MuiBox>
-      <MuiStack direction="row" spacing={2} sx={{ mb: 1.5 }}>
-        {legend("primary.main", issuedLabel)}
-        {legend("info.main", signedLabel)}
-      </MuiStack>
-      <MuiBox
-        sx={{
-          display: "flex",
-          alignItems: "flex-end",
-          gap: 1,
-          height: 160,
-        }}
-      >
-        {points.map((point) => (
-          <MuiBox
-            key={point.month}
-            sx={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 0.5,
-              minWidth: 0,
-            }}
-          >
-            <MuiStack
-              direction="row"
-              spacing={0.5}
-              sx={{
-                alignItems: "flex-end",
-                justifyContent: "center",
-                height: 120,
-                width: "100%",
-              }}
-            >
-              <MuiBox
-                sx={{
-                  width: 12,
-                  minHeight: 2,
-                  height: `${(point.issued / max) * 100}%`,
-                  bgcolor: "primary.main",
-                  borderRadius: "2px 2px 0 0",
-                }}
-              />
-              <MuiBox
-                sx={{
-                  width: 12,
-                  minHeight: 2,
-                  height: `${(point.signed / max) * 100}%`,
-                  bgcolor: "info.main",
-                  borderRadius: "2px 2px 0 0",
-                }}
-              />
-            </MuiStack>
-            <MuiTypography variant="caption" color="text.secondary">
-              {fmt.format(new Date(`${point.month}-01T00:00:00Z`))}
-            </MuiTypography>
-          </MuiBox>
-        ))}
-      </MuiBox>
+    <MuiBox sx={{ width: "100%" }}>
+      <BarChart
+        height={300}
+        xAxis={[{ scaleType: "band", data: months }]}
+        series={[
+          {
+            data: points.map((point) => point.issued),
+            label: issuedLabel,
+            color: "var(--mui-palette-primary-main)",
+          },
+          {
+            data: points.map((point) => point.signed),
+            label: signedLabel,
+            color: "var(--mui-palette-info-main)",
+          },
+        ]}
+        borderRadius={6}
+        grid={{ horizontal: true }}
+        margin={{ top: 10, bottom: 10, left: 30, right: 10 }}
+      />
     </MuiBox>
+  );
+}
+
+function StatusDonut({
+  title,
+  statuses,
+  counts,
+  labels,
+}: {
+  title: string;
+  statuses: readonly string[];
+  counts: Record<string, number>;
+  labels: (status: string) => string;
+}) {
+  const data = statuses
+    .map((status, index) => ({
+      id: index,
+      value: counts[status] ?? 0,
+      label: labels(status),
+      color: CHART_COLORS[index % CHART_COLORS.length],
+    }))
+    .filter((entry) => entry.value > 0);
+  const total = data.reduce((sum, entry) => sum + entry.value, 0);
+
+  return (
+    <MuiCard sx={{ height: "100%" }}>
+      <MuiCardContent>
+        <MuiTypography variant="subtitle2" sx={{ mb: 1 }}>
+          {title}
+        </MuiTypography>
+        {total === 0 ? (
+          <MuiTypography variant="body2" color="text.secondary">
+            -
+          </MuiTypography>
+        ) : (
+          <MuiStack spacing={1} sx={{ alignItems: "center" }}>
+            <MuiBox sx={{ width: "100%" }}>
+              <PieChart
+                height={200}
+                series={[
+                  {
+                    data: data.map((entry) => ({
+                      id: entry.id,
+                      value: entry.value,
+                      label: entry.label,
+                    })),
+                    innerRadius: 58,
+                    paddingAngle: 2,
+                    cornerRadius: 3,
+                  },
+                ]}
+                colors={data.map((entry) => entry.color)}
+                margin={{ left: 0, right: 0, top: 0, bottom: 0 }}
+              />
+            </MuiBox>
+            <MuiStack spacing={0.5} sx={{ width: "100%" }}>
+              {data.map((entry) => (
+                <MuiStack
+                  key={entry.id}
+                  direction="row"
+                  sx={{ alignItems: "center", justifyContent: "space-between" }}
+                >
+                  <MuiStack
+                    direction="row"
+                    spacing={0.75}
+                    sx={{ alignItems: "center" }}
+                  >
+                    <MuiBox
+                      component="span"
+                      sx={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: "50%",
+                        bgcolor: entry.color,
+                      }}
+                    />
+                    <MuiTypography variant="body2" color="text.secondary">
+                      {entry.label}
+                    </MuiTypography>
+                  </MuiStack>
+                  <MuiTypography variant="body2" sx={{ fontWeight: 600 }}>
+                    {entry.value}
+                  </MuiTypography>
+                </MuiStack>
+              ))}
+            </MuiStack>
+          </MuiStack>
+        )}
+      </MuiCardContent>
+    </MuiCard>
   );
 }
 
@@ -304,6 +304,7 @@ export default async function DashboardPage() {
   const t = await getTranslations("dashboard");
   const tContracts = await getTranslations("contracts");
   const tInvoices = await getTranslations("invoices");
+  const tn = await getTranslations("nav");
   const rawLocale = await getLocale();
   const locale: Locale = isLocale(rawLocale) ? rawLocale : user.locale;
 
@@ -331,6 +332,85 @@ export default async function DashboardPage() {
           )
           .join(" · ");
 
+  const financial = [
+    {
+      label: t("outstanding"),
+      value: <AmountList amounts={data.outstanding} locale={locale} />,
+      hint: t("outstandingHint"),
+      icon: Wallet,
+      accent: "primary.main",
+    },
+    {
+      label: t("overdue"),
+      value: (
+        <MuiStack
+          component="span"
+          direction="row"
+          spacing={1}
+          sx={{ alignItems: "baseline" }}
+        >
+          <span dir="ltr" style={{ fontVariantNumeric: "tabular-nums" }}>
+            {data.overdue.count}
+          </span>
+          <AmountList amounts={data.overdue.amounts} locale={locale} />
+        </MuiStack>
+      ),
+      hint: t("overdueHint"),
+      icon: AlertTriangle,
+      accent: "error.main",
+    },
+    {
+      label: t("collectedThisMonth"),
+      value: <AmountList amounts={data.revenue.currentMonth} locale={locale} />,
+      hint: `${t("lastMonth")}: ${currencyLines(data.revenue.previousMonth) ?? "-"}`,
+      icon: TrendingUp,
+      accent: "success.main",
+    },
+    {
+      label: t("issuedThisMonth"),
+      value: (
+        <AmountList amounts={data.issuedThisMonth.amounts} locale={locale} />
+      ),
+      hint: t("invoicesCount", { count: data.issuedThisMonth.count }),
+      icon: Receipt,
+      accent: "info.main",
+    },
+  ];
+
+  const operations = [
+    {
+      label: t("awaitingSignature"),
+      value: data.awaitingSignature.count,
+      hint: t("awaitingHint"),
+      icon: FileSignature,
+      accent: "warning.main",
+    },
+    {
+      label: t("contractsActive"),
+      value: data.contractsActive,
+      hint: t("signedLast30Days", { count: data.signedLast30Days }),
+      icon: FileCheck2,
+      accent: "success.main",
+    },
+    {
+      label: t("projectsActive"),
+      value: data.projectsActive,
+      hint: t("drafts", {
+        contracts: data.draftContracts,
+        invoices: data.draftInvoices,
+      }),
+      icon: FolderKanban,
+      accent: "primary.main",
+    },
+    {
+      label: t("clients"),
+      value: data.clientsTotal,
+      hint: t("clientsNew", { count: data.clientsNewThisMonth }),
+      icon: Users,
+      accent: "info.main",
+    },
+  ];
+
   return (
     <MuiStack spacing={2}>
       <MuiStack spacing={0.5}>
@@ -350,143 +430,38 @@ export default async function DashboardPage() {
         {t("finance")}
       </MuiTypography>
       <MuiGrid container spacing={2}>
-        <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Kpi
-            label={t("outstanding")}
-            value={<AmountList amounts={data.outstanding} locale={locale} />}
-            hint={t("outstandingHint")}
-            icon={Wallet}
-            accent="primary.main"
-          />
-        </MuiGrid>
-        <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Kpi
-            label={t("overdue")}
-            value={
-              <MuiStack
-                component="span"
-                direction="row"
-                spacing={1}
-                sx={{ alignItems: "baseline" }}
-              >
-                <span dir="ltr" style={{ fontVariantNumeric: "tabular-nums" }}>
-                  {data.overdue.count}
-                </span>
-                <AmountList amounts={data.overdue.amounts} locale={locale} />
-              </MuiStack>
-            }
-            hint={t("overdueHint")}
-            icon={AlertTriangle}
-            accent="error.main"
-          />
-        </MuiGrid>
-        <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Kpi
-            label={t("collectedThisMonth")}
-            value={
-              <AmountList amounts={data.revenue.currentMonth} locale={locale} />
-            }
-            hint={`${t("lastMonth")}: ${
-              currencyLines(data.revenue.previousMonth) ?? "-"
-            }`}
-            icon={TrendingUp}
-            accent="success.main"
-          />
-        </MuiGrid>
-        <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Kpi
-            label={t("issuedThisMonth")}
-            value={
-              <AmountList
-                amounts={data.issuedThisMonth.amounts}
-                locale={locale}
-              />
-            }
-            hint={t("invoicesCount", { count: data.issuedThisMonth.count })}
-            icon={Receipt}
-            accent="info.main"
-          />
-        </MuiGrid>
+        {financial.map((item) => (
+          <MuiGrid key={item.label} size={{ xs: 12, sm: 6, md: 3 }}>
+            <Kpi
+              label={item.label}
+              value={item.value}
+              hint={item.hint}
+              icon={item.icon}
+              accent={item.accent}
+            />
+          </MuiGrid>
+        ))}
       </MuiGrid>
 
       <MuiTypography variant="overline" color="text.secondary">
         {t("operations")}
       </MuiTypography>
       <MuiGrid container spacing={2}>
-        <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Kpi
-            label={t("awaitingSignature")}
-            value={
-              <span dir="ltr" style={{ fontVariantNumeric: "tabular-nums" }}>
-                {data.awaitingSignature.count}
-              </span>
-            }
-            hint={t("awaitingHint")}
-            icon={FileSignature}
-            accent="warning.main"
-          />
-        </MuiGrid>
-        <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Kpi
-            label={t("contractsActive")}
-            value={
-              <span dir="ltr" style={{ fontVariantNumeric: "tabular-nums" }}>
-                {data.contractsActive}
-              </span>
-            }
-            hint={t("signedLast30Days", { count: data.signedLast30Days })}
-            icon={FileCheck2}
-            accent="success.main"
-          />
-        </MuiGrid>
-        <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Kpi
-            label={t("projectsActive")}
-            value={
-              <span dir="ltr" style={{ fontVariantNumeric: "tabular-nums" }}>
-                {data.projectsActive}
-              </span>
-            }
-            hint={t("drafts", {
-              contracts: data.draftContracts,
-              invoices: data.draftInvoices,
-            })}
-            icon={FolderKanban}
-            accent="primary.main"
-          />
-        </MuiGrid>
-        <MuiGrid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Kpi
-            label={t("clients")}
-            value={
-              <span dir="ltr" style={{ fontVariantNumeric: "tabular-nums" }}>
-                {data.clientsTotal}
-              </span>
-            }
-            hint={t("clientsNew", { count: data.clientsNewThisMonth })}
-            icon={Users}
-            accent="info.main"
-          />
-        </MuiGrid>
-      </MuiGrid>
-
-      <MuiGrid container spacing={2}>
-        <MuiGrid size={{ xs: 12, md: 6 }}>
-          <StatusBreakdown
-            title={t("contractsByStatus")}
-            statuses={CONTRACT_STATUSES}
-            counts={data.contractsByStatus}
-            labels={(status) => tContracts(`status.${status}`)}
-          />
-        </MuiGrid>
-        <MuiGrid size={{ xs: 12, md: 6 }}>
-          <StatusBreakdown
-            title={t("invoicesByStatus")}
-            statuses={INVOICE_STATUSES}
-            counts={data.invoicesByStatus}
-            labels={(status) => tInvoices(`status.${status}`)}
-          />
-        </MuiGrid>
+        {operations.map((item) => (
+          <MuiGrid key={item.label} size={{ xs: 12, sm: 6, md: 3 }}>
+            <Kpi
+              label={item.label}
+              value={
+                <span dir="ltr" style={{ fontVariantNumeric: "tabular-nums" }}>
+                  {item.value}
+                </span>
+              }
+              hint={item.hint}
+              icon={item.icon}
+              accent={item.accent}
+            />
+          </MuiGrid>
+        ))}
       </MuiGrid>
 
       <MuiCard>
@@ -494,7 +469,7 @@ export default async function DashboardPage() {
           <MuiTypography variant="subtitle2" sx={{ mb: 1 }}>
             {t("monthlyTitle")}
           </MuiTypography>
-          <MonthChart
+          <MonthlyChart
             points={data.monthlyActivity}
             locale={locale}
             issuedLabel={t("seriesIssued")}
@@ -502,6 +477,25 @@ export default async function DashboardPage() {
           />
         </MuiCardContent>
       </MuiCard>
+
+      <MuiGrid container spacing={2}>
+        <MuiGrid size={{ xs: 12, md: 6 }}>
+          <StatusDonut
+            title={t("contractsByStatus")}
+            statuses={CONTRACT_STATUSES}
+            counts={data.contractsByStatus}
+            labels={(status) => tContracts(`status.${status}`)}
+          />
+        </MuiGrid>
+        <MuiGrid size={{ xs: 12, md: 6 }}>
+          <StatusDonut
+            title={t("invoicesByStatus")}
+            statuses={INVOICE_STATUSES}
+            counts={data.invoicesByStatus}
+            labels={(status) => tInvoices(`status.${status}`)}
+          />
+        </MuiGrid>
+      </MuiGrid>
 
       <MuiTypography variant="overline" color="text.secondary">
         {t("attention")}
@@ -585,7 +579,9 @@ export default async function DashboardPage() {
                 <TableHeaderCell>{t("number")}</TableHeaderCell>
                 <TableHeaderCell>{t("client")}</TableHeaderCell>
                 <TableHeaderCell>{t("dueDate")}</TableHeaderCell>
-                <TableHeaderCell className="text-end">{t("outstanding")}</TableHeaderCell>
+                <TableHeaderCell className="text-end">
+                  {t("outstanding")}
+                </TableHeaderCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -708,6 +704,12 @@ export default async function DashboardPage() {
                       : row.entityType === "invoice"
                         ? `/invoices/${row.entityId}`
                         : null;
+                  const entityLabel =
+                    row.entityType === "contract"
+                      ? tn("contracts")
+                      : row.entityType === "invoice"
+                        ? tn("invoices")
+                        : row.entityType;
                   return (
                     <TableRow key={row.id}>
                       <TableCell className="whitespace-nowrap">
@@ -722,10 +724,10 @@ export default async function DashboardPage() {
                             href={href}
                             className="text-foreground hover:text-primary"
                           >
-                            <span dir="ltr">{row.entityType}</span>
+                            {entityLabel}
                           </Link>
                         ) : (
-                          <span dir="ltr">{row.entityType}</span>
+                          <span>{entityLabel}</span>
                         )}
                       </TableCell>
                     </TableRow>
