@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import MuiBox from "@mui/material/Box";
 import MuiButton from "@mui/material/Button";
@@ -43,7 +42,7 @@ export default async function NotFound() {
       <MuiTypography variant="h6" sx={{ fontWeight: 600 }}>
         {t("NOT_FOUND")}
       </MuiTypography>
-      <MuiButton component={Link} href="/" variant="contained">
+      <MuiButton href="/" variant="contained">
         {tn("dashboard")}
       </MuiButton>
     </MuiStack>
