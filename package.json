@@ -34,7 +34,6 @@
     "@mui/material": "^9.5.0",
     "@mui/material-nextjs": "^9.5.0",
     "@mui/stylis-plugin-rtl": "^9.5.0",
-    "@mui/x-charts": "^9.15.0",
     "@mui/x-data-grid": "^9.15.0",
     "@node-rs/argon2": "^2.0.2",
     "better-sqlite3": "11.10.0",

@@ -20,8 +20,6 @@ import MuiChip from "@mui/material/Chip";
 import MuiGrid from "@mui/material/Grid";
 import MuiStack from "@mui/material/Stack";
 import MuiTypography from "@mui/material/Typography";
-import { BarChart } from "@mui/x-charts/BarChart";
-import { PieChart } from "@mui/x-charts/PieChart";
 import {
   Table,
   TableBody,
@@ -177,34 +175,107 @@ function MonthlyChart({
   issuedLabel: string;
   signedLabel: string;
 }) {
+  const max = Math.max(1, ...points.flatMap((p) => [p.issued, p.signed]));
   const fmt = new Intl.DateTimeFormat(locale === "ar" ? "ar" : "en", {
     month: "short",
   });
-  const months = points.map((point) =>
-    fmt.format(new Date(`${point.month}-01T00:00:00Z`)),
+
+  const legend = (color: string, label: string) => (
+    <MuiStack
+      component="span"
+      direction="row"
+      spacing={0.75}
+      sx={{ alignItems: "center" }}
+    >
+      <MuiBox
+        component="span"
+        sx={{ width: 10, height: 10, borderRadius: "3px", bgcolor: color }}
+      />
+      <MuiTypography component="span" variant="caption" color="text.secondary">
+        {label}
+      </MuiTypography>
+    </MuiStack>
   );
 
   return (
-    <MuiBox sx={{ width: "100%" }}>
-      <BarChart
-        height={300}
-        xAxis={[{ scaleType: "band", data: months }]}
-        series={[
-          {
-            data: points.map((point) => point.issued),
-            label: issuedLabel,
-            color: "var(--mui-palette-primary-main)",
-          },
-          {
-            data: points.map((point) => point.signed),
-            label: signedLabel,
-            color: "var(--mui-palette-info-main)",
-          },
-        ]}
-        borderRadius={6}
-        grid={{ horizontal: true }}
-        margin={{ top: 10, bottom: 10, left: 30, right: 10 }}
-      />
+    <MuiBox>
+      <MuiStack direction="row" spacing={2} sx={{ mb: 1.5 }}>
+        {legend("primary.main", issuedLabel)}
+        {legend("info.main", signedLabel)}
+      </MuiStack>
+      <MuiBox
+        sx={{
+          position: "relative",
+          display: "flex",
+          alignItems: "flex-end",
+          gap: 1,
+          height: 190,
+        }}
+      >
+        {[0, 1, 2, 3].map((line) => (
+          <MuiBox
+            key={line}
+            aria-hidden="true"
+            sx={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: `${(line / 4) * 100}%`,
+              borderTop: "1px dashed",
+              borderColor: "divider",
+            }}
+          />
+        ))}
+        {points.map((point) => (
+          <MuiBox
+            key={point.month}
+            sx={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 0.5,
+              minWidth: 0,
+              zIndex: 1,
+            }}
+          >
+            <MuiStack
+              direction="row"
+              spacing={0.5}
+              sx={{
+                alignItems: "flex-end",
+                justifyContent: "center",
+                height: 150,
+                width: "100%",
+              }}
+            >
+              <MuiBox
+                title={`${issuedLabel}: ${point.issued}`}
+                sx={{
+                  width: 14,
+                  minHeight: 2,
+                  height: `${(point.issued / max) * 100}%`,
+                  bgcolor: "primary.main",
+                  borderRadius: "3px 3px 0 0",
+                }}
+              />
+              <MuiBox
+                title={`${signedLabel}: ${point.signed}`}
+                sx={{
+                  width: 14,
+                  minHeight: 2,
+                  height: `${(point.signed / max) * 100}%`,
+                  bgcolor: "info.main",
+                  borderRadius: "3px 3px 0 0",
+                }}
+              />
+            </MuiStack>
+            <MuiTypography variant="caption" color="text.secondary">
+              {fmt.format(new Date(`${point.month}-01T00:00:00Z`))}
+            </MuiTypography>
+          </MuiBox>
+        ))}
+      </MuiBox>
     </MuiBox>
   );
 }
@@ -229,6 +300,11 @@ function StatusDonut({
     }))
     .filter((entry) => entry.value > 0);
   const total = data.reduce((sum, entry) => sum + entry.value, 0);
+  const size = 168;
+  const stroke = 24;
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  let acc = 0;
 
   return (
     <MuiCard sx={{ height: "100%" }}>
@@ -241,27 +317,58 @@ function StatusDonut({
             -
           </MuiTypography>
         ) : (
-          <MuiStack spacing={1} sx={{ alignItems: "center" }}>
-            <MuiBox sx={{ width: "100%" }}>
-              <PieChart
-                height={200}
-                series={[
-                  {
-                    data: data.map((entry) => ({
-                      id: entry.id,
-                      value: entry.value,
-                      label: entry.label,
-                    })),
-                    innerRadius: 58,
-                    paddingAngle: 2,
-                    cornerRadius: 3,
-                  },
-                ]}
-                colors={data.map((entry) => entry.color)}
-                margin={{ left: 0, right: 0, top: 0, bottom: 0 }}
-              />
+          <MuiStack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            sx={{ alignItems: "center" }}
+          >
+            <MuiBox
+              sx={{ position: "relative", width: size, height: size, flexShrink: 0 }}
+            >
+              <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+                <circle
+                  cx={size / 2}
+                  cy={size / 2}
+                  r={radius}
+                  fill="none"
+                  stroke="var(--mui-palette-divider)"
+                  strokeWidth={stroke}
+                />
+                {data.map((entry) => {
+                  const fraction = entry.value / total;
+                  const dash = fraction * circumference;
+                  const offset = -acc * circumference;
+                  acc += fraction;
+                  return (
+                    <circle
+                      key={entry.id}
+                      cx={size / 2}
+                      cy={size / 2}
+                      r={radius}
+                      fill="none"
+                      stroke={entry.color}
+                      strokeWidth={stroke}
+                      strokeDasharray={`${dash} ${circumference - dash}`}
+                      strokeDashoffset={offset}
+                      transform={`rotate(-90 ${size / 2} ${size / 2})`}
+                    />
+                  );
+                })}
+              </svg>
+              <MuiStack
+                sx={{
+                  position: "absolute",
+                  inset: 0,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <MuiTypography variant="h6" sx={{ fontWeight: 700, lineHeight: 1 }}>
+                  {total}
+                </MuiTypography>
+              </MuiStack>
             </MuiBox>
-            <MuiStack spacing={0.5} sx={{ width: "100%" }}>
+            <MuiStack spacing={0.75} sx={{ width: "100%" }}>
               {data.map((entry) => (
                 <MuiStack
                   key={entry.id}
