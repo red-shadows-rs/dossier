@@ -2,8 +2,6 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-// Each test file gets its own isolated temp database with migrations applied,
-// so the app singleton (`@/db`) is usable in tests without touching repo data/.
 const dataDir = mkdtempSync(join(tmpdir(), "dossier-test-"));
 
 process.env = {

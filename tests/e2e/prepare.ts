@@ -3,8 +3,6 @@ import { rmSync } from "node:fs";
 import { join } from "node:path";
 import { E2E_DATA_DIR, E2E_ENV, COMPANY_NAME_AR, COMPANY_NAME_EN } from "./config";
 
-// 16.2 setup — fresh temp DATA_DIR, migrations, seed (owner + settings +
-// templates), then fill the company name so a contract passes send validation.
 async function main(): Promise<void> {
   Object.assign(process.env, E2E_ENV);
   rmSync(E2E_DATA_DIR, { recursive: true, force: true });
@@ -16,8 +14,6 @@ async function main(): Promise<void> {
   run("src/db/migrate.ts");
   run("scripts/seed.ts");
 
-  // Fill company + defaults that send validation requires (the template
-  // clauses reference provider.email / contract.governing_law / jurisdiction).
   const { db } = await import("@/db");
   const { users } = await import("@/db/schema");
   const { updateSettings } = await import("@/server/services/settings");

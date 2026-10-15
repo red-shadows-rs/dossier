@@ -2,9 +2,6 @@ import Database from "better-sqlite3";
 import { expect, type Page } from "@playwright/test";
 import { E2E_DB_PATH, OWNER_EMAIL, OWNER_PASSWORD } from "./config";
 
-// The e2e stack runs with a temp DATA_DIR and no worker, so emails accumulate
-// in the outbox. Tests read that table directly to get the signing link and
-// the OTP code (16.2).
 export type OutboxRow = {
   rowid: number;
   templateKey: string;
@@ -110,7 +107,6 @@ export async function login(page: Page): Promise<void> {
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
 }
 
-// Pick a select option by value (supports both native <select> and custom dropdowns).
 export async function pickSelect(
   page: Page,
   selector: string,
@@ -133,7 +129,6 @@ export async function pickSelect(
   await page.locator(`li[data-value="${value}"]`).click();
 }
 
-// Pick an option by position (0-based).
 export async function pickSelectIndex(
   page: Page,
   selector: string,

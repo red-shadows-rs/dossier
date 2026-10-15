@@ -1,8 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { login } from "./helpers";
 
-// 16.2 #4 — switching the UI to Arabic flips the document to RTL and moves the
-// sidebar to the right.
 test("Arabic locale sets dir=rtl and the sidebar moves right", async ({
   page,
 }) => {
@@ -18,7 +16,6 @@ test("Arabic locale sets dir=rtl and the sidebar moves right", async ({
   const viewport = page.viewportSize();
   expect(box).not.toBeNull();
   expect(viewport).not.toBeNull();
-  // In RTL the sidebar sits on the right half of the viewport.
   expect((box?.x ?? 0) + (box?.width ?? 0)).toBeGreaterThan(
     (viewport?.width ?? 0) * 0.6,
   );
