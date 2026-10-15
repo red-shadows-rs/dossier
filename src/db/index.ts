@@ -29,10 +29,6 @@ export function openDb(path: string): DbInstance {
 
 let instance: DbInstance | null = null;
 
-// The connection is opened lazily on first use. This keeps `next build`'s
-// page-data workers from opening SQLite just by importing a page module
-// (better-sqlite3's native teardown asserts under Node 24 when a worker exits
-// with an open connection).
 function getInstance(): DbInstance {
   if (instance === null) {
     mkdirSync(env.DATA_DIR, { recursive: true, mode: 0o700 });
@@ -41,8 +37,6 @@ function getInstance(): DbInstance {
   return instance;
 }
 
-// Proxy so every existing `db` / `sqlite` usage keeps working unchanged while
-// the underlying connection is created on first access.
 export const sqlite = new Proxy({} as Database.Database, {
   get(_target, property) {
     const target = getInstance().sqlite;

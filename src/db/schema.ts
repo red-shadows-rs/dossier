@@ -16,12 +16,11 @@ const bool = (name: string) =>
   integer(name, { mode: "boolean" }).notNull().default(false);
 const money = (name: string) => integer(name).notNull().default(0);
 
-// ───────── identity ─────────
 export const users = sqliteTable(
   "users",
   {
     id: pk(),
-    email: text("email").notNull(), // stored lowercase, trimmed
+    email: text("email").notNull(),
     name: text("name").notNull(),
     passwordHash: text("password_hash").notNull(),
     role: text("role", { enum: C.ROLES }).notNull().default("member"),
@@ -29,7 +28,7 @@ export const users = sqliteTable(
       .notNull()
       .default("active"),
     locale: text("locale", { enum: C.LOCALES }).notNull().default("ar"),
-    canSignForCompany: bool("can_sign_for_company"), // may sign as provider
+    canSignForCompany: bool("can_sign_for_company"),
     signerTitleAr: text("signer_title_ar"),
     signerTitleEn: text("signer_title_en"),
     lastLoginAt: integer("last_login_at"),
@@ -42,7 +41,7 @@ export const users = sqliteTable(
 export const sessions = sqliteTable(
   "sessions",
   {
-    id: text("id").primaryKey(), // = hmacToken(rawToken)
+    id: text("id").primaryKey(),
     userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
@@ -58,9 +57,8 @@ export const sessions = sqliteTable(
   ],
 );
 
-// key/value JSON settings, validated by Zod schemas in src/lib/validation/settings.ts (21.1)
 export const settings = sqliteTable("settings", {
-  key: text("key").primaryKey(), // 'company' | 'defaults' | 'numbering' | 'signing' | 'email'
+  key: text("key").primaryKey(),
   valueJson: text("value_json").notNull(),
   updatedAt: updatedAt(),
   updatedBy: text("updated_by").references(() => users.id, {
@@ -76,9 +74,9 @@ export const files = sqliteTable(
     mime: text("mime").notNull(),
     sizeBytes: integer("size_bytes").notNull(),
     sha256: text("sha256").notNull(),
-    storagePath: text("storage_path").notNull(), // relative to DATA_DIR/files, e.g. '2026/10/<id>'
-    originalName: text("original_name"), // display only, sanitized, never used as a path
-    ownerType: text("owner_type"), // 'project' | 'contract' | 'setting' | ...
+    storagePath: text("storage_path").notNull(),
+    originalName: text("original_name"),
+    ownerType: text("owner_type"),
     ownerId: text("owner_id"),
     createdBy: text("created_by").references(() => users.id, {
       onDelete: "set null",
@@ -97,12 +95,12 @@ export const auditLog = sqliteTable(
       enum: ["user", "signer", "system"],
     }).notNull(),
     actorId: text("actor_id"),
-    action: text("action").notNull(), // see 21.5
+    action: text("action").notNull(),
     entityType: text("entity_type").notNull(),
     entityId: text("entity_id").notNull(),
     ip: text("ip"),
     userAgent: text("user_agent"),
-    metaJson: text("meta_json"), // small JSON, NO secrets
+    metaJson: text("meta_json"),
   },
   (t) => [
     index("audit_entity_idx").on(t.entityType, t.entityId),
@@ -114,31 +112,30 @@ export const numberSequences = sqliteTable(
   "number_sequences",
   {
     seqKey: text("seq_key", { enum: C.SEQ_KEYS }).notNull(),
-    year: integer("year").notNull(), // 0 for non-yearly sequences (project)
+    year: integer("year").notNull(),
     lastValue: integer("last_value").notNull().default(0),
   },
   (t) => [uniqueIndex("number_sequences_uq").on(t.seqKey, t.year)],
 );
 
-// ───────── parties & projects ─────────
 export const clients = sqliteTable(
   "clients",
   {
     id: pk(),
     type: text("type", { enum: C.CLIENT_TYPES }).notNull().default("company"),
-    nameAr: text("name_ar"), // at least one required (service + CHECK)
+    nameAr: text("name_ar"),
     nameEn: text("name_en"),
     legalNameAr: text("legal_name_ar"),
     legalNameEn: text("legal_name_en"),
     email: text("email"),
     phone: text("phone"),
-    country: text("country"), // ISO 3166-1 alpha-2
+    country: text("country"),
     city: text("city"),
     addressAr: text("address_ar"),
     addressEn: text("address_en"),
-    taxNumber: text("tax_number"), // VAT no.
-    crNumber: text("cr_number"), // commercial registration
-    repNameAr: text("rep_name_ar"), // legal representative
+    taxNumber: text("tax_number"),
+    crNumber: text("cr_number"),
+    repNameAr: text("rep_name_ar"),
     repNameEn: text("rep_name_en"),
     repTitleAr: text("rep_title_ar"),
     repTitleEn: text("rep_title_en"),
@@ -166,21 +163,21 @@ export const projects = sqliteTable(
   "projects",
   {
     id: pk(),
-    code: text("code").notNull(), // 'P-0001', from sequence 'project'
+    code: text("code").notNull(),
     clientId: text("client_id")
       .notNull()
       .references(() => clients.id, { onDelete: "restrict" }),
-    nameAr: text("name_ar"), // at least one required (service + CHECK)
+    nameAr: text("name_ar"),
     nameEn: text("name_en"),
     description: text("description"),
     status: text("status", { enum: C.PROJECT_STATUSES })
       .notNull()
       .default("lead"),
-    startDate: text("start_date"), // 'YYYY-MM-DD'
+    startDate: text("start_date"),
     endDate: text("end_date"),
-    budgetMinor: integer("budget_minor"), // optional
+    budgetMinor: integer("budget_minor"),
     currency: text("currency").notNull(),
-    taskboardRef: text("taskboard_ref"), // Phase 4 optional link to task-board
+    taskboardRef: text("taskboard_ref"),
     notes: text("notes"),
     archivedAt: integer("archived_at"),
     createdBy: text("created_by").references(() => users.id, {
@@ -205,7 +202,6 @@ export const projects = sqliteTable(
   ],
 );
 
-// ───────── templates ─────────
 export const templates = sqliteTable(
   "templates",
   {
@@ -213,7 +209,7 @@ export const templates = sqliteTable(
     type: text("type", { enum: C.TEMPLATE_TYPES })
       .notNull()
       .default("contract"),
-    key: text("key"), // stable key for system templates, e.g. 'web-development'
+    key: text("key"),
     nameAr: text("name_ar").notNull(),
     nameEn: text("name_en").notNull(),
     descriptionAr: text("description_ar"),
@@ -221,7 +217,7 @@ export const templates = sqliteTable(
     defaultLanguageMode: text("default_language_mode", { enum: C.LANG_MODES })
       .notNull()
       .default("bilingual"),
-    defaultsJson: text("defaults_json").notNull().default("{}"), // templateDefaultsSchema (11.6)
+    defaultsJson: text("defaults_json").notNull().default("{}"),
     isSystem: bool("is_system"),
     archivedAt: integer("archived_at"),
     createdBy: text("created_by").references(() => users.id, {
@@ -240,8 +236,8 @@ export const templateClauses = sqliteTable(
     templateId: text("template_id")
       .notNull()
       .references(() => templates.id, { onDelete: "cascade" }),
-    position: integer("position").notNull(), // 1-based, contiguous
-    key: text("key"), // e.g. 'scope', 'confidentiality'
+    position: integer("position").notNull(),
+    key: text("key"),
     titleAr: text("title_ar").notNull(),
     titleEn: text("title_en").notNull(),
     bodyAr: text("body_ar").notNull(),
@@ -253,16 +249,15 @@ export const templateClauses = sqliteTable(
   ],
 );
 
-// ───────── contracts ─────────
 export const contracts = sqliteTable(
   "contracts",
   {
     id: pk(),
-    number: text("number"), // assigned at first send; NULL while never sent
+    number: text("number"),
     kind: text("kind", { enum: ["contract", "amendment"] })
       .notNull()
-      .default("contract"), // only 'contract' used now
-    parentContractId: text("parent_contract_id"), // reserved for amendments (Phase 5)
+      .default("contract"),
+    parentContractId: text("parent_contract_id"),
     clientId: text("client_id")
       .notNull()
       .references(() => clients.id, { onDelete: "restrict" }),
@@ -278,7 +273,7 @@ export const contracts = sqliteTable(
     languageMode: text("language_mode", { enum: C.LANG_MODES })
       .notNull()
       .default("bilingual"),
-    hasFees: integer("has_fees", { mode: "boolean" }).notNull().default(true), // false for NDAs
+    hasFees: integer("has_fees", { mode: "boolean" }).notNull().default(true),
     titleAr: text("title_ar"),
     titleEn: text("title_en"),
     scopeAr: text("scope_ar"),
@@ -287,7 +282,7 @@ export const contracts = sqliteTable(
     discountType: text("discount_type", { enum: C.DISCOUNT_TYPES })
       .notNull()
       .default("none"),
-    discountValue: integer("discount_value").notNull().default(0), // bp if percent, minor if fixed
+    discountValue: integer("discount_value").notNull().default(0),
     subtotalMinor: money("subtotal_minor"),
     discountMinor: money("discount_minor"),
     netMinor: money("net_minor"),
@@ -304,12 +299,12 @@ export const contracts = sqliteTable(
     governingLawEn: text("governing_law_en"),
     jurisdictionAr: text("jurisdiction_ar"),
     jurisdictionEn: text("jurisdiction_en"),
-    signingDeadline: text("signing_deadline"), // 'YYYY-MM-DD' or NULL
+    signingDeadline: text("signing_deadline"),
     internalNotes: text("internal_notes"),
     versionNo: integer("version_no").notNull().default(1),
-    currentVersionId: text("current_version_id"), // no FK (avoids circular FK)
+    currentVersionId: text("current_version_id"),
     verificationCode: text("verification_code"),
-    contentHash: text("content_hash"), // sha256 of canonical snapshot (7.6)
+    contentHash: text("content_hash"),
     finalPdfFileId: text("final_pdf_file_id").references(() => files.id, {
       onDelete: "set null",
     }),
@@ -353,9 +348,9 @@ export const contractItems = sqliteTable(
     position: integer("position").notNull(),
     descriptionAr: text("description_ar"),
     descriptionEn: text("description_en"),
-    qtyMilli: integer("qty_milli").notNull().default(1000), // quantity ×1000
+    qtyMilli: integer("qty_milli").notNull().default(1000),
     unitPriceMinor: integer("unit_price_minor").notNull(),
-    lineTotalMinor: integer("line_total_minor").notNull(), // mulDivRound(unit, qtyMilli, 1000)
+    lineTotalMinor: integer("line_total_minor").notNull(),
   },
   (t) => [
     uniqueIndex("contract_items_pos_uq").on(t.contractId, t.position),
@@ -398,11 +393,11 @@ export const paymentMilestones = sqliteTable(
     position: integer("position").notNull(),
     titleAr: text("title_ar").notNull(),
     titleEn: text("title_en").notNull(),
-    percentBp: integer("percent_bp"), // set when milestoneMode = 'percent'
-    amountMinor: integer("amount_minor").notNull(), // net (pre-tax) amount
+    percentBp: integer("percent_bp"),
+    amountMinor: integer("amount_minor").notNull(),
     taxMinor: integer("tax_minor").notNull().default(0),
-    totalMinor: integer("total_minor").notNull(), // amount + tax
-    dueDate: text("due_date"), // optional fixed date
+    totalMinor: integer("total_minor").notNull(),
+    dueDate: text("due_date"),
     triggerNoteAr: text("trigger_note_ar"),
     triggerNoteEn: text("trigger_note_en"),
   },
@@ -428,7 +423,7 @@ export const contractVersions = sqliteTable(
       .notNull()
       .references(() => contracts.id, { onDelete: "cascade" }),
     versionNo: integer("version_no").notNull(),
-    snapshotJson: text("snapshot_json").notNull(), // canonical JSON (7.6)
+    snapshotJson: text("snapshot_json").notNull(),
     contentHash: text("content_hash").notNull(),
     createdBy: text("created_by").references(() => users.id, {
       onDelete: "set null",
@@ -457,12 +452,12 @@ export const contractSignatories = sqliteTable(
     email: text("email"),
     signerUserId: text("signer_user_id").references(() => users.id, {
       onDelete: "set null",
-    }), // provider side
+    }),
     sortOrder: integer("sort_order").notNull().default(0),
     status: text("status", { enum: C.SIGNATORY_STATUSES })
       .notNull()
       .default("pending"),
-    tokenHash: text("token_hash"), // client link
+    tokenHash: text("token_hash"),
     tokenExpiresAt: integer("token_expires_at"),
     otpHash: text("otp_hash"),
     otpExpiresAt: integer("otp_expires_at"),
@@ -487,13 +482,12 @@ export const contractSignatories = sqliteTable(
     uniqueIndex("signatories_token_uq").on(t.tokenHash),
   ],
 );
-// ───────── invoices & payments ─────────
 export const invoices = sqliteTable(
   "invoices",
   {
     id: pk(),
-    number: text("number"), // assigned at ISSUE; NULL for drafts
-    verificationCode: text("verification_code"), // assigned at ISSUE
+    number: text("number"),
+    verificationCode: text("verification_code"),
     clientId: text("client_id")
       .notNull()
       .references(() => clients.id, { onDelete: "restrict" }),
@@ -502,7 +496,7 @@ export const invoices = sqliteTable(
       .references(() => projects.id, { onDelete: "restrict" }),
     contractId: text("contract_id").references(() => contracts.id, {
       onDelete: "restrict",
-    }), // optional
+    }),
     milestoneId: text("milestone_id").references(() => paymentMilestones.id, {
       onDelete: "restrict",
     }),
@@ -525,13 +519,13 @@ export const invoices = sqliteTable(
     taxRateBp: integer("tax_rate_bp").notNull().default(0),
     taxMinor: money("tax_minor"),
     totalMinor: money("total_minor"),
-    paidMinor: money("paid_minor"), // cached sum of non-voided payments
+    paidMinor: money("paid_minor"),
     notesAr: text("notes_ar"),
     notesEn: text("notes_en"),
     paymentInstructionsAr: text("payment_instructions_ar"),
     paymentInstructionsEn: text("payment_instructions_en"),
-    sellerSnapshotJson: text("seller_snapshot_json"), // frozen at issue
-    buyerSnapshotJson: text("buyer_snapshot_json"), // frozen at issue
+    sellerSnapshotJson: text("seller_snapshot_json"),
+    buyerSnapshotJson: text("buyer_snapshot_json"),
     issuedAt: integer("issued_at"),
     paidAt: integer("paid_at"),
     voidedAt: integer("voided_at"),
@@ -546,7 +540,6 @@ export const invoices = sqliteTable(
   (t) => [
     uniqueIndex("invoices_number_uq").on(t.number),
     uniqueIndex("invoices_vcode_uq").on(t.verificationCode),
-    // one ACTIVE invoice per milestone (voiding frees the milestone):
     uniqueIndex("invoices_milestone_active_uq")
       .on(t.milestoneId)
       .where(sql`milestone_id IS NOT NULL AND status <> 'void'`),
@@ -596,8 +589,8 @@ export const payments = sqliteTable(
     invoiceId: text("invoice_id")
       .notNull()
       .references(() => invoices.id, { onDelete: "restrict" }),
-    amountMinor: integer("amount_minor").notNull(), // > 0
-    paidOn: text("paid_on").notNull(), // 'YYYY-MM-DD'
+    amountMinor: integer("amount_minor").notNull(),
+    paidOn: text("paid_on").notNull(),
     method: text("method", { enum: C.PAYMENT_METHODS })
       .notNull()
       .default("bank_transfer"),
@@ -616,7 +609,6 @@ export const payments = sqliteTable(
   ],
 );
 
-// ───────── outbound email queue ─────────
 export const emailOutbox = sqliteTable(
   "email_outbox",
   {
@@ -625,7 +617,7 @@ export const emailOutbox = sqliteTable(
     toName: text("to_name"),
     locale: text("locale", { enum: C.LOCALES }).notNull().default("en"),
     templateKey: text("template_key").notNull(),
-    payloadJson: text("payload_json").notNull(), // variables + attachment file ids; NO raw tokens
+    payloadJson: text("payload_json").notNull(),
     status: text("status", { enum: C.EMAIL_STATUSES })
       .notNull()
       .default("pending"),
