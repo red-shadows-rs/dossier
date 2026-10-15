@@ -47,4 +47,4 @@ COPY --from=build /app/tsconfig.json ./tsconfig.json
 RUN mkdir -p /app/data && chown -R pwuser:pwuser /app
 USER pwuser
 EXPOSE 3000
-CMD ["sh", "-c", "npm run db:migrate && node server.js"]
+CMD ["sh", "-c", "npm run db:migrate && npm run seed && node server.js"]
