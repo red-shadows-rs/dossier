@@ -10,6 +10,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { can } from "@/lib/permissions";
 import {
+  deleteLogoAction,
+  deleteStampAction,
   updateCompanyAction,
   uploadLogoAction,
   uploadStampAction,
@@ -131,12 +133,14 @@ export default async function CompanySettingsPage() {
               label={t("logo")}
               currentFileId={company.logoFileId}
               action={uploadLogoAction}
+              deleteAction={deleteLogoAction}
               disabled={!canWrite}
             />
             <ImageUploadField
               label={t("stamp")}
               currentFileId={company.stampFileId}
               action={uploadStampAction}
+              deleteAction={deleteStampAction}
               disabled={!canWrite}
             />
           </div>

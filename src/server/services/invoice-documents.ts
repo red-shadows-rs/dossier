@@ -55,10 +55,15 @@ export function resolveInvoiceDocLang(
 }
 
 function sellerSnapshotFor(invoice: InvoiceRow): SellerSnapshot {
-  if (invoice.sellerSnapshotJson) {
-    return JSON.parse(invoice.sellerSnapshotJson) as SellerSnapshot;
-  }
   const company = getSettings("company");
+  if (invoice.sellerSnapshotJson) {
+    const parsed = JSON.parse(invoice.sellerSnapshotJson) as SellerSnapshot;
+    return {
+      ...parsed,
+      logoFileId: parsed.logoFileId ?? company.logoFileId,
+      stampFileId: parsed.stampFileId ?? company.stampFileId,
+    };
+  }
   return {
     nameAr: company.nameAr,
     nameEn: company.nameEn,
@@ -71,6 +76,8 @@ function sellerSnapshotFor(invoice: InvoiceRow): SellerSnapshot {
     email: company.email,
     phone: company.phone,
     website: company.website,
+    logoFileId: company.logoFileId,
+    stampFileId: company.stampFileId,
   };
 }
 

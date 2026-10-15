@@ -13,11 +13,13 @@ export function ImageUploadField({
   label,
   currentFileId,
   action,
+  deleteAction,
   disabled,
 }: {
   label: string;
   currentFileId: string | null;
   action: (formData: FormData) => Promise<ActionResult<{ fileId: string }>>;
+  deleteAction?: () => Promise<ActionResult<null>>;
   disabled?: boolean;
 }) {
   const t = useTranslations();
@@ -26,13 +28,9 @@ export function ImageUploadField({
   const [file, setFile] = useState<File | null>(null);
   const [pending, setPending] = useState(false);
 
-  async function handleUpload() {
-    if (!file) {
-      toast({ title: t("errors.FILE_REJECTED"), tone: "error" });
-      return;
-    }
+  async function uploadFile(targetFile: File) {
     const formData = new FormData();
-    formData.set("file", file);
+    formData.set("file", targetFile);
     setPending(true);
     const result = await action(formData);
     setPending(false);
@@ -45,6 +43,29 @@ export function ImageUploadField({
     toast({ title: t(`errors.${result.error.code}`), tone: "error" });
   }
 
+  async function handleFileSelect(selected: File) {
+    setFile(selected);
+    await uploadFile(selected);
+  }
+
+  async function handleDelete() {
+    if (file) {
+      setFile(null);
+      return;
+    }
+    if (currentFileId && deleteAction) {
+      setPending(true);
+      const result = await deleteAction();
+      setPending(false);
+      if (result.ok) {
+        toast({ title: t("settings.saved"), tone: "success" });
+        router.refresh();
+        return;
+      }
+      toast({ title: t(`errors.${result.error.code}`), tone: "error" });
+    }
+  }
+
   return (
     <div className="flex flex-col gap-3">
       <FileUpload
@@ -52,20 +73,20 @@ export function ImageUploadField({
         accept="image/png,image/jpeg,image/webp"
         currentFileId={currentFileId}
         isImage
-        disabled={disabled}
+        disabled={disabled || pending}
         pending={pending}
-        onFileSelect={(selected) => setFile(selected)}
-        onClear={() => setFile(null)}
+        onFileSelect={handleFileSelect}
+        onClear={handleDelete}
       />
 
-      {file ? (
+      {file && !pending ? (
         <div className="flex items-center justify-end">
           <Button
             type="button"
             size="sm"
             loading={pending}
             disabled={disabled}
-            onClick={handleUpload}
+            onClick={() => uploadFile(file)}
             className="gap-1.5"
           >
             <Upload size={15} aria-hidden="true" />

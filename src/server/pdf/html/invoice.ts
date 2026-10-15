@@ -267,10 +267,9 @@ body {
   text-align: end;
 }
 .brand-logo-img {
-  max-height: 11mm;
-  max-width: 32mm;
+  max-height: 14mm;
+  max-width: 40mm;
   object-fit: contain;
-  filter: brightness(0) invert(1);
 }
 .brand-name {
   font-size: 10pt;
@@ -622,13 +621,30 @@ table.inv-items-table tbody tr:last-child td {
   break-inside: avoid;
   flex-shrink: 0;
 }
+tr.split-page {
+  break-after: page !important;
+  page-break-after: always !important;
+}
 @media print {
   html, body {
     height: auto !important;
     min-height: auto !important;
   }
   .invoice-page {
-    min-height: 284mm !important;
+    display: block !important;
+    min-height: auto !important;
+  }
+  .invoice-body {
+    display: block !important;
+  }
+  tr.split-page {
+    break-after: page !important;
+    page-break-after: always !important;
+  }
+  .inv-footer-wrap {
+    margin-top: 4mm !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
   .bottom-red-bar {
     display: none !important;
@@ -819,7 +835,7 @@ function linesTable(input: InvoiceHtmlInput): string {
   const lang = uiLang(input.lang);
   const isBilingual = input.lang === "bilingual";
   const rows = input.lines
-    .map((line) => {
+    .map((line, index) => {
       let descHtml = "";
       if (isBilingual) {
         const en = line.descriptionEn ? `<div class="item-title">${esc(line.descriptionEn)}</div>` : "";
@@ -829,7 +845,10 @@ function linesTable(input: InvoiceHtmlInput): string {
         const primary = pick(line.descriptionAr, line.descriptionEn, input.lang);
         descHtml = `<div class="item-title">${primary}</div>`;
       }
-      return `<tr>
+      const shouldBreakAfter =
+        input.lines.length > 10 &&
+        (index === 9 || (index > 9 && (index - 9) % 14 === 0 && index < input.lines.length - 1));
+      return `<tr class="${shouldBreakAfter ? "split-page" : ""}">
         <td class="col-num">${num(String(line.position))}</td>
         <td class="col-desc">${descHtml}</td>
         <td class="col-price">${num(formatMoney(line.unitPriceMinor, currency, lang))}</td>

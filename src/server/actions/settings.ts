@@ -186,3 +186,25 @@ export async function uploadStampAction(
 ): Promise<ActionResult<{ fileId: string }>> {
   return uploadCompanyImage(formData, "stamp", "stampFileId");
 }
+
+async function deleteCompanyImage(
+  field: "logoFileId" | "stampFileId",
+): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "settings.write");
+    const meta = await getRequestMeta();
+    const current = getSettings("company");
+    updateSettings("company", { ...current, [field]: null }, user, meta);
+    revalidateSettings();
+    return null;
+  });
+}
+
+export async function deleteLogoAction(): Promise<ActionResult<null>> {
+  return deleteCompanyImage("logoFileId");
+}
+
+export async function deleteStampAction(): Promise<ActionResult<null>> {
+  return deleteCompanyImage("stampFileId");
+}
