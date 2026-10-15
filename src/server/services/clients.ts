@@ -3,13 +3,14 @@ import {
   count,
   desc,
   eq,
+  inArray,
   isNotNull,
   isNull,
   sql,
   type SQL,
 } from "drizzle-orm";
 import { db, withTx } from "@/db";
-import { clients } from "@/db/schema";
+import { clients, contracts, invoices, projects } from "@/db/schema";
 import { nowMs } from "@/lib/dates";
 import { AppError } from "@/lib/errors";
 import { newId } from "@/lib/ids";
@@ -19,7 +20,9 @@ import { audit } from "@/server/services/audit";
 
 export const CLIENTS_PAGE_SIZE = 20;
 
-export type ClientRow = typeof clients.$inferSelect;
+export type ClientRow = typeof clients.$inferSelect & {
+  canDelete?: boolean;
+};
 
 export type ClientFilters = {
   q?: string;
@@ -74,7 +77,47 @@ export function listClients(filters: ClientFilters = {}): ClientPage {
     .offset((page - 1) * CLIENTS_PAGE_SIZE)
     .all();
 
-  return { rows, total, page, pageSize: CLIENTS_PAGE_SIZE };
+  const clientIds = rows.map((r) => r.id);
+  const clientIdsWithProjects = new Set(
+    clientIds.length > 0
+      ? db
+          .select({ clientId: projects.clientId })
+          .from(projects)
+          .where(inArray(projects.clientId, clientIds))
+          .all()
+          .map((r) => r.clientId)
+      : [],
+  );
+  const clientIdsWithContracts = new Set(
+    clientIds.length > 0
+      ? db
+          .select({ clientId: contracts.clientId })
+          .from(contracts)
+          .where(inArray(contracts.clientId, clientIds))
+          .all()
+          .map((r) => r.clientId)
+      : [],
+  );
+  const clientIdsWithInvoices = new Set(
+    clientIds.length > 0
+      ? db
+          .select({ clientId: invoices.clientId })
+          .from(invoices)
+          .where(inArray(invoices.clientId, clientIds))
+          .all()
+          .map((r) => r.clientId)
+      : [],
+  );
+
+  const augmentedRows: ClientRow[] = rows.map((r) => ({
+    ...r,
+    canDelete:
+      !clientIdsWithProjects.has(r.id) &&
+      !clientIdsWithContracts.has(r.id) &&
+      !clientIdsWithInvoices.has(r.id),
+  }));
+
+  return { rows: augmentedRows, total, page, pageSize: CLIENTS_PAGE_SIZE };
 }
 
 export function getClient(id: string): ClientRow {
@@ -212,5 +255,95 @@ export function unarchiveClient(
       ip: meta.ip,
       userAgent: meta.userAgent,
     });
+  });
+}
+
+export function canDeleteClient(id: string): boolean {
+  const hasProjects = db
+    .select({ id: projects.id })
+    .from(projects)
+    .where(eq(projects.clientId, id))
+    .get();
+  if (hasProjects) return false;
+
+  const hasContracts = db
+    .select({ id: contracts.id })
+    .from(contracts)
+    .where(eq(contracts.clientId, id))
+    .get();
+  if (hasContracts) return false;
+
+  const hasInvoices = db
+    .select({ id: invoices.id })
+    .from(invoices)
+    .where(eq(invoices.clientId, id))
+    .get();
+  if (hasInvoices) return false;
+
+  return true;
+}
+
+export function deleteClient(
+  user: SessionUser,
+  id: string,
+  meta: RequestMeta,
+): void {
+  withTx((tx) => {
+    const existing = tx.select().from(clients).where(eq(clients.id, id)).get();
+    if (!existing) {
+      throw new AppError("NOT_FOUND", "Client not found");
+    }
+
+    const hasProjects = tx
+      .select({ id: projects.id })
+      .from(projects)
+      .where(eq(projects.clientId, id))
+      .get();
+    if (hasProjects) {
+      throw new AppError(
+        "INVALID_STATE",
+        "Cannot delete client with existing projects",
+      );
+    }
+
+    const hasContracts = tx
+      .select({ id: contracts.id })
+      .from(contracts)
+      .where(eq(contracts.clientId, id))
+      .get();
+    if (hasContracts) {
+      throw new AppError(
+        "INVALID_STATE",
+        "Cannot delete client with existing contracts",
+      );
+    }
+
+    const hasInvoices = tx
+      .select({ id: invoices.id })
+      .from(invoices)
+      .where(eq(invoices.clientId, id))
+      .get();
+    if (hasInvoices) {
+      throw new AppError(
+        "INVALID_STATE",
+        "Cannot delete client with existing invoices",
+      );
+    }
+
+    audit(tx, {
+      actorType: "user",
+      actorId: user.id,
+      action: "client.deleted",
+      entityType: "client",
+      entityId: id,
+      meta: {
+        nameAr: existing.nameAr,
+        nameEn: existing.nameEn,
+      },
+      ip: meta.ip,
+      userAgent: meta.userAgent,
+    });
+
+    tx.delete(clients).where(eq(clients.id, id)).run();
   });
 }

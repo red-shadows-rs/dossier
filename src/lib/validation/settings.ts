@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { CURRENCIES, LANG_MODES, type CurrencyCode } from "@/lib/constants";
+import {
+  CURRENCIES,
+  GENERAL_LANG_MODES,
+  type CurrencyCode,
+} from "@/lib/constants";
 
 const text = (max = 200) =>
   z
@@ -59,7 +63,12 @@ export const defaultsSchema = z.object({
   currency: currencyEnum.default("SAR"),
   taxRateBp: z.number().int().min(0).max(10000).default(1500),
   paymentTermsDays: z.number().int().min(0).max(365).default(14),
-  languageMode: z.enum(LANG_MODES).default("bilingual"),
+  languageMode: z
+    .preprocess(
+      (val) => (val === "bilingual" ? "ar" : val),
+      z.enum(GENERAL_LANG_MODES),
+    )
+    .default("ar"),
   governingLawAr: text(200),
   governingLawEn: text(200),
   jurisdictionAr: text(200),
@@ -87,7 +96,7 @@ export const signingSchema = z.object({
     .string()
     .max(600, "errors.tooLong")
     .default(
-      "أقرّ بأنني قرأت هذا العقد وأوافق على الالتزام بجميع بنوده، وأوافق على التوقيع عليه إلكترونياً.",
+      "أقر بأنني قرأت هذا العقد وأوافق على الالتزام بجميع بنوده، وأوافق على التوقيع عليه إلكترونيا.",
     ),
 });
 

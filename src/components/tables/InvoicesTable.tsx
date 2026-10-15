@@ -1,13 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import type { GridColDef } from "@mui/x-data-grid";
-import MuiLink from "@mui/material/Link";
-import MuiStack from "@mui/material/Stack";
+import { Receipt } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge, invoiceStatusTone } from "@/components/ui/Badge";
 import { RowActionButton } from "@/components/forms/RowActionButton";
-import { ServerDataGrid } from "@/components/tables/ServerDataGrid";
+import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
 import { formatMoney } from "@/lib/money";
 import type { CurrencyCode } from "@/lib/constants";
 import type { ActionResult } from "@/lib/result";
@@ -63,90 +61,86 @@ export function InvoicesTable({
 }) {
   const canDelete = (status: string) => canWrite && status === "draft";
 
-  const columns: GridColDef<InvoiceTableRow>[] = [
+  const columns: ColumnDef<InvoiceTableRow>[] = [
     {
-      field: "number",
-      headerName: labels.number,
-      width: 170,
-      sortable: false,
-      renderCell: (params) => (
-        <MuiLink
-          component={Link}
-          href={`/invoices/${params.row.id}`}
-          underline="hover"
-          color="inherit"
-          sx={{ fontFamily: "monospace", fontWeight: 600 }}
+      id: "number",
+      header: labels.number,
+      className: "whitespace-nowrap font-mono font-medium text-xs",
+      render: (row) => (
+        <Link
+          href={`/invoices/${row.id}`}
           dir="ltr"
+          className="text-foreground hover:text-primary transition-colors font-semibold"
         >
-          {params.row.number ?? "-"}
-        </MuiLink>
+          {row.number ?? "-"}
+        </Link>
       ),
     },
     {
-      field: "project",
-      headerName: labels.project,
-      flex: 1,
-      minWidth: 200,
-      sortable: false,
-      valueGetter: (_value, row) => projectNames[row.projectId ?? ""] ?? "-",
+      id: "project",
+      header: labels.project,
+      className: "text-muted-foreground",
+      render: (row) => projectNames[row.projectId ?? ""] ?? "-",
     },
     {
-      field: "status",
-      headerName: labels.statusLabel,
-      width: 150,
-      sortable: false,
-      renderCell: (params) => (
-        <Badge tone={invoiceStatusTone(params.row.status, params.row.overdue)}>
-          {params.row.overdue
+      id: "status",
+      header: labels.statusLabel,
+      className: "whitespace-nowrap",
+      render: (row) => (
+        <Badge tone={invoiceStatusTone(row.status, row.overdue)}>
+          {row.overdue
             ? labels.overdue
-            : (labels.statusValues[params.row.status] ?? params.row.status)}
+            : (labels.statusValues[row.status] ?? row.status)}
         </Badge>
       ),
     },
     {
-      field: "total",
-      headerName: labels.total,
-      width: 160,
-      sortable: false,
-      renderCell: (params) => (
-        <span dir="ltr" style={{ fontVariantNumeric: "tabular-nums" }}>
+      id: "total",
+      header: labels.total,
+      align: "end",
+      className: "whitespace-nowrap font-medium",
+      render: (row) => (
+        <span dir="ltr" className="tabular-nums">
           {formatMoney(
-            params.row.totalMinor,
-            params.row.currency as CurrencyCode,
+            row.totalMinor,
+            row.currency as CurrencyCode,
             "en",
           )}
         </span>
       ),
     },
     {
-      field: "dueDate",
-      headerName: labels.dueDate,
-      width: 130,
-      sortable: false,
-      renderCell: (params) => <span dir="ltr">{params.row.dueDate ?? "-"}</span>,
+      id: "dueDate",
+      header: labels.dueDate,
+      className: "whitespace-nowrap text-muted-foreground text-xs",
+      render: (row) => (
+        <span dir="ltr" className="tabular-nums">
+          {row.dueDate ?? "-"}
+        </span>
+      ),
     },
     {
-      field: "actions",
-      headerName: labels.actions,
-      width: 170,
-      sortable: false,
-      renderCell: (params) => (
-        <MuiStack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+      id: "actions",
+      header: labels.actions,
+      align: "end",
+      className: "whitespace-nowrap",
+      render: (row) => (
+        <div className="inline-flex items-center justify-end gap-1">
           <ActionLink
-            href={`/invoices/${params.row.id}`}
+            href={`/invoices/${row.id}`}
             action="preview"
             label={labels.preview}
           />
-          {canDelete(params.row.status) ? (
+          {canDelete(row.status) ? (
             <ActionLink
-              href={`/invoices/${params.row.id}/edit`}
+              href={`/invoices/${row.id}/edit`}
               action="edit"
               label={labels.edit}
             />
           ) : null}
-          {canDelete(params.row.status) ? (
+          {canDelete(row.status) ? (
             <RowActionButton
-              id={params.row.id}
+              id={row.id}
               action={deleteAction}
               kind="delete"
               label={labels.deleteTitle}
@@ -156,13 +150,13 @@ export function InvoicesTable({
               successTitle={labels.deleted}
             />
           ) : null}
-        </MuiStack>
+        </div>
       ),
     },
   ];
 
   return (
-    <ServerDataGrid
+    <ServerDataTable
       rows={rows}
       columns={columns}
       total={total}
@@ -171,6 +165,7 @@ export function InvoicesTable({
       basePath="/invoices"
       query={query}
       noRowsLabel={labels.empty}
+      emptyIcon={<Receipt size={36} className="text-muted-foreground" aria-hidden="true" />}
     />
   );
 }

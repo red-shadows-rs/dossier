@@ -3,6 +3,15 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import {
+  ArrowDown,
+  ArrowUp,
+  Copy,
+  Plus,
+  Save,
+  Trash2,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
@@ -96,6 +105,7 @@ export function TemplateForm({
   const [previewLang, setPreviewLang] = useState<"ar" | "en">("ar");
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   const previewClauses = useMemo(
     () => toPreviewClauses(form.clauses),
@@ -244,6 +254,7 @@ export function TemplateForm({
     event.preventDefault();
     setPending(true);
     setFieldErrors({});
+    setStatusError(null);
     const payload = buildPayload();
     const result =
       mode === "create"
@@ -258,7 +269,12 @@ export function TemplateForm({
       return;
     }
     if (result.error.fieldErrors) setFieldErrors(result.error.fieldErrors);
-    toast({ title: t(`errors.${result.error.code}`), tone: "error" });
+    const msg =
+      result.error.code === "VALIDATION_FAILED"
+        ? t("auth.requiredFields")
+        : t(`errors.${result.error.code}`);
+    setStatusError(msg);
+    toast({ title: msg, tone: "error" });
   }
 
   // Server field errors carry message keys only (no interpolation params), so
@@ -276,12 +292,20 @@ export function TemplateForm({
   const hasErrors = Object.keys(fieldErrors).length > 0;
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+      {statusError ? (
+        <p
+          role="alert"
+          className="rounded border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm font-medium text-destructive"
+        >
+          {statusError}
+        </p>
+      ) : null}
       <Card>
         <CardHeader>
           <CardTitle>{t("templates.basicInfo")}</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
           <Field label={t("templates.typeLabel")} htmlFor="tpl-type">
             <Select
               id="tpl-type"
@@ -352,7 +376,7 @@ export function TemplateForm({
           <Field
             label={t("templates.descriptionAr")}
             htmlFor="tpl-desc-ar"
-            className="md:col-span-2"
+            className="md:col-span-2 2xl:col-span-3"
           >
             <Textarea
               id="tpl-desc-ar"
@@ -368,7 +392,7 @@ export function TemplateForm({
           <Field
             label={t("templates.descriptionEn")}
             htmlFor="tpl-desc-en"
-            className="md:col-span-2"
+            className="md:col-span-2 2xl:col-span-3"
           >
             <Textarea
               id="tpl-desc-en"
@@ -582,8 +606,10 @@ export function TemplateForm({
                         size="sm"
                         onClick={() => removePresetRow(index)}
                         disabled={form.presetRows.length <= 1 || pending}
+                        className="gap-1.5 text-destructive hover:bg-destructive/10"
                       >
-                        {t("common.delete")}
+                        <Trash2 size={14} aria-hidden="true" />
+                        <span>{t("common.delete")}</span>
                       </Button>
                     </div>
                   </div>
@@ -596,8 +622,10 @@ export function TemplateForm({
                     size="sm"
                     onClick={addPresetRow}
                     disabled={pending}
+                    className="gap-1.5"
                   >
-                    {t("templates.presetAddRow")}
+                    <Plus size={14} aria-hidden="true" />
+                    <span>{t("templates.presetAddRow")}</span>
                   </Button>
                   {form.presetMode === "percent" ? (
                     <span className="text-sm text-muted-foreground" dir="ltr">
@@ -632,7 +660,9 @@ export function TemplateForm({
                     size="sm"
                     onClick={() => moveClause(index, -1)}
                     disabled={index === 0 || pending}
+                    className="gap-1"
                   >
+                    <ArrowUp className="h-3.5 w-3.5" />
                     {t("templates.clauseUp")}
                   </Button>
                   <Button
@@ -641,7 +671,9 @@ export function TemplateForm({
                     size="sm"
                     onClick={() => moveClause(index, 1)}
                     disabled={index === form.clauses.length - 1 || pending}
+                    className="gap-1"
                   >
+                    <ArrowDown className="h-3.5 w-3.5" />
                     {t("templates.clauseDown")}
                   </Button>
                   <Button
@@ -650,7 +682,9 @@ export function TemplateForm({
                     size="sm"
                     onClick={() => duplicateClause(index)}
                     disabled={pending}
+                    className="gap-1"
                   >
+                    <Copy className="h-3.5 w-3.5" />
                     {t("templates.clauseDuplicate")}
                   </Button>
                   <Button
@@ -659,7 +693,9 @@ export function TemplateForm({
                     size="sm"
                     onClick={() => removeClause(index)}
                     disabled={form.clauses.length <= 1 || pending}
+                    className="gap-1 text-destructive hover:text-destructive"
                   >
+                    <Trash2 className="h-3.5 w-3.5" />
                     {t("common.delete")}
                   </Button>
                 </div>
@@ -740,10 +776,11 @@ export function TemplateForm({
             type="button"
             variant="secondary"
             size="sm"
-            className="self-start"
+            className="self-start gap-1.5"
             onClick={addClause}
             disabled={pending}
           >
+            <Plus className="h-4 w-4" />
             {t("templates.clauseAdd")}
           </Button>
 
@@ -820,10 +857,13 @@ export function TemplateForm({
           variant="secondary"
           onClick={() => router.back()}
           disabled={pending}
+          className="gap-2"
         >
+          <X className="h-4 w-4" />
           {t("common.cancel")}
         </Button>
-        <Button type="submit" loading={pending}>
+        <Button type="submit" loading={pending} className="gap-2">
+          <Save className="h-4 w-4" />
           {mode === "create" ? t("templates.create") : t("common.save")}
         </Button>
       </div>

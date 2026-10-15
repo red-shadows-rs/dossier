@@ -9,6 +9,7 @@ import { getRequestMeta } from "@/server/services/audit";
 import {
   archiveClient,
   createClient,
+  deleteClient,
   unarchiveClient,
   updateClient,
 } from "@/server/services/clients";
@@ -71,6 +72,20 @@ export async function unarchiveClientAction(
     unarchiveClient(user, id, meta);
     revalidatePath("/clients");
     revalidatePath(`/clients/${id}`);
+    return null;
+  });
+}
+
+export async function deleteClientAction(
+  raw: unknown,
+): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "clients.write");
+    const id = String((raw as { id?: unknown })?.id ?? "");
+    const meta = await getRequestMeta();
+    deleteClient(user, id, meta);
+    revalidatePath("/clients");
     return null;
   });
 }

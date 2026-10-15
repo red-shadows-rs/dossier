@@ -12,7 +12,11 @@ export function Card({
   children: ReactNode;
 }) {
   return (
-    <MuiCard component="section" className={className}>
+    <MuiCard
+      component="section"
+      className={className}
+      sx={{ overflow: "visible" }}
+    >
       {children}
     </MuiCard>
   );
@@ -58,6 +62,24 @@ export function CardTitle({
       variant="subtitle1"
       className={className}
       sx={{ fontWeight: 600 }}
+    >
+      {children}
+    </MuiTypography>
+  );
+}
+
+export function CardDescription({
+  className,
+  children,
+}: {
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <MuiTypography
+      variant="body2"
+      className={className}
+      sx={{ color: "text.secondary" }}
     >
       {children}
     </MuiTypography>

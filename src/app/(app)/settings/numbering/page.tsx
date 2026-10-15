@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { Hash } from "lucide-react";
 import {
   SettingsForm,
   type SettingsFieldDef,
@@ -32,7 +33,10 @@ export default async function NumberingSettingsPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("numbering")}</CardTitle>
+        <CardTitle className="inline-flex items-center gap-2">
+          <Hash size={18} className="text-primary" aria-hidden="true" />
+          <span>{t("numbering")}</span>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <SettingsForm

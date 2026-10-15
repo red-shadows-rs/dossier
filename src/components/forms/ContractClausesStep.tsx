@@ -2,12 +2,14 @@
 
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
+import { ArrowDown, ArrowUp, Copy, Plus, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { useToast } from "@/components/ui/Toast";
+import { Tooltip } from "@/components/ui/Tooltip";
 import { saveClausesAction } from "@/server/actions/contracts";
 import type { BuilderClause } from "./ContractBuilder";
 
@@ -99,48 +101,56 @@ export function ContractClausesStep({
                 <span className="text-sm text-muted-foreground" dir="ltr">
                   {index + 1}
                 </span>
-                <div className="flex gap-1">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => move(index, -1)}
-                    disabled={index === 0}
-                  >
-                    {t("contracts.clause.up")}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => move(index, 1)}
-                    disabled={index === clauses.length - 1}
-                  >
-                    {t("contracts.clause.down")}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => duplicate(index)}
-                  >
-                    {t("contracts.clause.duplicate")}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      setClauses((current) =>
-                        current.length > 1
-                          ? current.filter((_, i) => i !== index)
-                          : current,
-                      )
-                    }
-                    disabled={clauses.length <= 1}
-                  >
-                    {t("common.delete")}
-                  </Button>
+                <div className="flex items-center gap-1">
+                  <Tooltip content={t("contracts.clause.up")}>
+                    <button
+                      type="button"
+                      aria-label={t("contracts.clause.up")}
+                      onClick={() => move(index, -1)}
+                      disabled={index === 0}
+                      className="flex h-7 w-7 items-center justify-center rounded border border-border/70 bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+                    >
+                      <ArrowUp size={14} aria-hidden="true" />
+                    </button>
+                  </Tooltip>
+                  <Tooltip content={t("contracts.clause.down")}>
+                    <button
+                      type="button"
+                      aria-label={t("contracts.clause.down")}
+                      onClick={() => move(index, 1)}
+                      disabled={index === clauses.length - 1}
+                      className="flex h-7 w-7 items-center justify-center rounded border border-border/70 bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+                    >
+                      <ArrowDown size={14} aria-hidden="true" />
+                    </button>
+                  </Tooltip>
+                  <Tooltip content={t("contracts.clause.duplicate")}>
+                    <button
+                      type="button"
+                      aria-label={t("contracts.clause.duplicate")}
+                      onClick={() => duplicate(index)}
+                      className="flex h-7 w-7 items-center justify-center rounded border border-border/70 bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
+                    >
+                      <Copy size={14} aria-hidden="true" />
+                    </button>
+                  </Tooltip>
+                  <Tooltip content={t("common.delete")}>
+                    <button
+                      type="button"
+                      aria-label={t("common.delete")}
+                      onClick={() =>
+                        setClauses((current) =>
+                          current.length > 1
+                            ? current.filter((_, i) => i !== index)
+                            : current,
+                        )
+                      }
+                      disabled={clauses.length <= 1}
+                      className="flex h-7 w-7 items-center justify-center rounded border border-border/70 bg-card text-muted-foreground transition-colors hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+                    >
+                      <Trash2 size={14} aria-hidden="true" />
+                    </button>
+                  </Tooltip>
                 </div>
               </div>
 
@@ -215,7 +225,7 @@ export function ContractClausesStep({
             type="button"
             variant="secondary"
             size="sm"
-            className="self-start"
+            className="self-start gap-1.5"
             onClick={() =>
               setClauses((current) => [
                 ...current,
@@ -223,7 +233,8 @@ export function ContractClausesStep({
               ])
             }
           >
-            {t("contracts.clause.add")}
+            <Plus size={15} aria-hidden="true" />
+            <span>{t("contracts.clause.add")}</span>
           </Button>
 
           {generalError ? (
@@ -235,8 +246,9 @@ export function ContractClausesStep({
       </Card>
 
       <div className="flex justify-end">
-        <Button type="submit" loading={pending}>
-          {t("common.save")}
+        <Button type="submit" loading={pending} className="gap-2">
+          <Save size={16} aria-hidden="true" />
+          <span>{t("common.save")}</span>
         </Button>
       </div>
     </form>

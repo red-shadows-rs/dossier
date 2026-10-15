@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
+import { Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
@@ -26,12 +27,14 @@ export function AccountForm({
   const toast = useToast();
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     setPending(true);
     setFieldErrors({});
+    setStatusError(null);
     const result = await updateAccountAction({
       name: String(data.get("name") ?? ""),
       locale: String(data.get("locale") ?? "ar"),
@@ -46,7 +49,12 @@ export function AccountForm({
     if (result.error.fieldErrors) {
       setFieldErrors(result.error.fieldErrors);
     }
-    toast({ title: t(`errors.${result.error.code}`), tone: "error" });
+    const msg =
+      result.error.code === "VALIDATION_FAILED"
+        ? t("auth.requiredFields")
+        : t(`errors.${result.error.code}`);
+    setStatusError(msg);
+    toast({ title: msg, tone: "error" });
   }
 
   const fieldError = (key: string): string | null => {
@@ -55,7 +63,15 @@ export function AccountForm({
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+      {statusError ? (
+        <p
+          role="alert"
+          className="rounded border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm font-medium text-destructive"
+        >
+          {statusError}
+        </p>
+      ) : null}
       <Field
         label={t("account.name")}
         htmlFor="account-name"
@@ -66,7 +82,6 @@ export function AccountForm({
           id="account-name"
           name="name"
           defaultValue={name}
-          required
           maxLength={200}
         />
       </Field>
@@ -112,7 +127,8 @@ export function AccountForm({
       ) : null}
 
       <div className="flex justify-end">
-        <Button type="submit" loading={pending}>
+        <Button type="submit" loading={pending} className="gap-2">
+          <Save className="h-4 w-4" />
           {t("common.save")}
         </Button>
       </div>

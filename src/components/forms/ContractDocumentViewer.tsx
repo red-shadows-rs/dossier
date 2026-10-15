@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Download, Eye } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/components/ui/cn";
 import {
@@ -73,13 +74,15 @@ export function ContractDocumentViewer({
               target="_blank"
               rel="noreferrer"
             >
-              <Button type="button" variant="secondary" size="sm">
-                {t("previewPdf")}
+              <Button type="button" variant="secondary" size="sm" className="gap-1.5">
+                <Eye size={15} aria-hidden="true" />
+                <span>{t("previewPdf")}</span>
               </Button>
             </a>
             <a href={`/api/contracts/${id}/pdf?lang=${lang}`}>
-              <Button type="button" variant="secondary" size="sm">
-                {t("downloadPdf")}
+              <Button type="button" variant="secondary" size="sm" className="gap-1.5">
+                <Download size={15} aria-hidden="true" />
+                <span>{t("downloadPdf")}</span>
               </Button>
             </a>
           </div>

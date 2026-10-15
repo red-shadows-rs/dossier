@@ -208,6 +208,8 @@ describe("renderPdf smoke", () => {
       const pdf = await renderPdf(html, {
         docNumber: "DOS-I-2026-0001",
         code: null,
+        kind: "invoice",
+        lang,
       });
       expect(pdf.subarray(0, 5).toString("ascii")).toBe("%PDF-");
       mkdirSync(QA_DIR, { recursive: true });

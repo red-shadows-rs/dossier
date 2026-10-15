@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { sendTestEmailAction } from "@/server/actions/settings";
@@ -29,8 +30,10 @@ export function TestEmailButton({ disabled }: { disabled?: boolean }) {
       onClick={onClick}
       loading={pending}
       disabled={disabled}
+      className="gap-2"
     >
-      {t("settings.worker.testEmail")}
+      <Mail size={16} aria-hidden="true" />
+      <span>{t("settings.worker.testEmail")}</span>
     </Button>
   );
 }

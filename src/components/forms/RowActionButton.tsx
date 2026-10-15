@@ -4,10 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Archive, Trash2 } from "lucide-react";
-import MuiIconButton from "@mui/material/IconButton";
-import MuiTooltip from "@mui/material/Tooltip";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { Tooltip } from "@/components/ui/Tooltip";
 import { useToast } from "@/components/ui/Toast";
+import { cn } from "@/components/ui/cn";
 import type { ActionResult } from "@/lib/result";
 
 export function RowActionButton({
@@ -51,16 +51,21 @@ export function RowActionButton({
 
   return (
     <>
-      <MuiTooltip title={label}>
-        <MuiIconButton
-          size="small"
+      <Tooltip content={label}>
+        <button
+          type="button"
           aria-label={label}
           onClick={() => setOpen(true)}
-          sx={{ color: kind === "delete" ? "error.main" : "text.secondary" }}
+          className={cn(
+            "flex h-8 w-8 items-center justify-center rounded border border-border/70 bg-card transition-all shadow-2xs cursor-pointer",
+            kind === "delete"
+              ? "text-muted-foreground hover:border-destructive/50 hover:text-destructive hover:bg-destructive/10"
+              : "text-muted-foreground hover:border-amber-500/50 hover:text-amber-500 hover:bg-amber-500/10",
+          )}
         >
-          <Icon size={18} aria-hidden="true" />
-        </MuiIconButton>
-      </MuiTooltip>
+          <Icon size={15} aria-hidden="true" />
+        </button>
+      </Tooltip>
       <ConfirmDialog
         open={open}
         onClose={() => setOpen(false)}

@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Plus, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Tooltip } from "@/components/ui/Tooltip";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -238,22 +240,24 @@ export function InvoiceLinesEditor({
                   className="text-start"
                 />
               </Field>
-              <div className="flex items-end md:col-span-1">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() =>
-                    setRows((current) =>
-                      current.length > 1
-                        ? current.filter((_, i) => i !== index)
-                        : current,
-                    )
-                  }
-                  disabled={rows.length <= 1}
-                >
-                  {t("common.delete")}
-                </Button>
+              <div className="flex items-end justify-center pb-0.5 md:col-span-1">
+                <Tooltip content={t("common.delete")}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setRows((current) =>
+                        current.length > 1
+                          ? current.filter((_, i) => i !== index)
+                          : current,
+                      )
+                    }
+                    disabled={rows.length <= 1}
+                    aria-label={t("common.delete")}
+                    className="flex h-9 w-9 items-center justify-center rounded border border-border/70 bg-card text-muted-foreground hover:bg-destructive/10 hover:border-destructive/40 hover:text-destructive transition-all shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </Tooltip>
               </div>
             </div>
           ))}
@@ -262,7 +266,7 @@ export function InvoiceLinesEditor({
             type="button"
             variant="secondary"
             size="sm"
-            className="self-start"
+            className="self-start gap-1.5"
             onClick={() =>
               setRows((current) => [
                 ...current,
@@ -270,7 +274,8 @@ export function InvoiceLinesEditor({
               ])
             }
           >
-            {t("invoices.addLine")}
+            <Plus className="h-4 w-4" />
+            <span>{t("invoices.addLine")}</span>
           </Button>
         </CardContent>
       </Card>
@@ -321,7 +326,7 @@ export function InvoiceLinesEditor({
             />
           </Field>
 
-          <dl className="flex flex-col gap-1 md:col-span-3" dir="ltr">
+          <dl className="flex flex-col gap-1 md:col-span-3">
             {totals ? (
               <>
                 <Line
@@ -350,8 +355,9 @@ export function InvoiceLinesEditor({
       </Card>
 
       <div className="flex justify-end">
-        <Button type="submit" loading={pending}>
-          {t("common.save")}
+        <Button type="submit" loading={pending} className="gap-2">
+          <Save className="h-4 w-4" />
+          <span>{t("common.save")}</span>
         </Button>
       </div>
     </form>

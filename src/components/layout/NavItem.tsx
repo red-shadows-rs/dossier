@@ -26,6 +26,7 @@ export function NavItem({
     <MuiListItemButton
       component={Link}
       href={entry.href}
+      prefetch={false}
       aria-current={active ? "page" : undefined}
       onClick={onNavigate}
       selected={active}

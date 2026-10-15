@@ -3,6 +3,7 @@
 import { useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { PenTool, Send, Type, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Dialog } from "@/components/ui/Dialog";
@@ -55,23 +56,28 @@ export function SendContractDialog({
   );
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   const signer = signers.find((s) => s.id === signerId);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    setStatusError(null);
     if (requireProviderSignature) {
       if (!consent) {
         setFieldErrors({ consent: "errors.required" });
+        setStatusError(t("auth.requiredFields"));
         return;
       }
       if (method === "drawn" && points < 20) {
         setFieldErrors({ signature: "errors.tooShort" });
+        setStatusError(t("errors.tooShort"));
         return;
       }
       if (method === "typed" && typedName.trim() === "") {
         setFieldErrors({ signature: "errors.required" });
+        setStatusError(t("auth.requiredFields"));
         return;
       }
     }
@@ -106,7 +112,12 @@ export function SendContractDialog({
       return;
     }
     if (result.error.fieldErrors) setFieldErrors(result.error.fieldErrors);
-    toast({ title: t(`errors.${result.error.code}`), tone: "error" });
+    const msg =
+      result.error.code === "VALIDATION_FAILED"
+        ? t("auth.requiredFields")
+        : t(`errors.${result.error.code}`);
+    setStatusError(msg);
+    toast({ title: msg, tone: "error" });
   }
 
   const err = (key: string) => {
@@ -121,7 +132,15 @@ export function SendContractDialog({
       title={tContracts("send.title")}
       className="w-[min(44rem,calc(100vw-2rem))]"
     >
-      <form onSubmit={onSubmit} className="flex flex-col gap-4">
+      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+        {statusError ? (
+          <p
+            role="alert"
+            className="rounded border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm font-medium text-destructive"
+          >
+            {statusError}
+          </p>
+        ) : null}
         <Field
           label={tContracts("send.providerSigner")}
           htmlFor="send-signer"
@@ -183,7 +202,6 @@ export function SendContractDialog({
               name="clientName"
               defaultValue={clientDefaults.name}
               disabled={pending}
-              required
             />
           </Field>
           <Field
@@ -209,7 +227,6 @@ export function SendContractDialog({
               dir="ltr"
               defaultValue={clientDefaults.email}
               disabled={pending}
-              required
               className="text-start"
             />
           </Field>
@@ -223,26 +240,28 @@ export function SendContractDialog({
                 aria-current={method === "drawn" ? "true" : undefined}
                 onClick={() => setMethod("drawn")}
                 className={cn(
-                  "rounded-md border px-3 py-1.5 text-sm",
+                  "flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm",
                   method === "drawn"
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-border text-muted-foreground",
                 )}
               >
-                {tContracts("send.drawn")}
+                <PenTool className="h-4 w-4" />
+                <span>{tContracts("send.drawn")}</span>
               </button>
               <button
                 type="button"
                 aria-current={method === "typed" ? "true" : undefined}
                 onClick={() => setMethod("typed")}
                 className={cn(
-                  "rounded-md border px-3 py-1.5 text-sm",
+                  "flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm",
                   method === "typed"
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-border text-muted-foreground",
                 )}
               >
-                {tContracts("send.typed")}
+                <Type className="h-4 w-4" />
+                <span>{tContracts("send.typed")}</span>
               </button>
             </div>
 
@@ -292,10 +311,13 @@ export function SendContractDialog({
             variant="secondary"
             onClick={onClose}
             disabled={pending}
+            className="gap-2"
           >
+            <X className="h-4 w-4" />
             {t("common.cancel")}
           </Button>
-          <Button type="submit" loading={pending}>
+          <Button type="submit" loading={pending} className="gap-2">
+            <Send className="h-4 w-4" />
             {tContracts("send.submit")}
           </Button>
         </div>

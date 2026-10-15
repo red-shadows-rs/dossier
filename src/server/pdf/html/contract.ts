@@ -13,6 +13,7 @@ import {
 } from "@/server/templating/variables";
 import { renderCertificateSection, type CertificateData } from "./certificate";
 import {
+  docDir,
   documentShell,
   esc,
   num,
@@ -72,7 +73,7 @@ function renderBlockHtml(
       if (!block.numbered) return `<p class="note">${inner}</p>`;
       const label = labels[labelIndex.value] ?? "";
       labelIndex.value += 1;
-      return `<p><span class="num">${esc(label)}</span> ${inner}</p>`;
+      return `<p><span class="clause-num">${esc(label)}</span> ${inner}</p>`;
     }
     case "bullets": {
       const items = block.items
@@ -102,10 +103,10 @@ function renderClauseSingle(
   const vars = buildVariableMap(snapshot, lang);
   const title = lang === "ar" ? clause.titleAr : clause.titleEn;
   const body = lang === "ar" ? clause.bodyAr : clause.bodyEn;
-  const heading =
+  const badgeLabel =
     lang === "ar"
-      ? `المادة (${clause.position}): ${esc(title)}`
-      : `Article ${clause.position} — ${esc(title)}`;
+      ? `المادة (${clause.position})`
+      : `Article ${clause.position} —`;
   const blocks = parseBody(body);
   const labels = numberedParagraphLabels(clause.position, blocks);
   const labelIndex = { value: 0 };
@@ -124,7 +125,7 @@ function renderClauseSingle(
       ),
     )
     .join("");
-  return `<section><h2 class="clause">${heading}</h2>${inner}</section>`;
+  return `<section class="contract-single-clause" dir="${docDir(lang)}"><div class="article-header"><span class="article-badge">${esc(badgeLabel)}</span> <span class="article-title">${esc(title)}</span></div><div class="clause-body-single">${inner}</div></section>`;
 }
 
 type Segment =
@@ -167,7 +168,7 @@ function renderTextBlocks(
         if (!block.numbered) return `<p class="note">${inner}</p>`;
         const label = labels[labelIndex.value] ?? "";
         labelIndex.value += 1;
-        return `<p><span class="num">${esc(label)}</span> ${inner}</p>`;
+        return `<p><span class="clause-num">${esc(label)}</span> ${inner}</p>`;
       }
       const items = block.items
         .map((item) => `<li>${renderInline(item, vars, () => {})}</li>`)
@@ -192,11 +193,7 @@ function renderClauseBilingual(
 
   const rows: string[] = [];
   rows.push(
-    `<tr class="clause-row"><th class="en" dir="ltr">${esc(
-      `Article ${clause.position} — ${clause.titleEn}`,
-    )}</th><th class="ar" dir="rtl">${esc(
-      `المادة (${clause.position}): ${clause.titleAr}`,
-    )}</th></tr>`,
+    `<tr class="clause-heading-row"><th class="col-en divider" dir="ltr" style="width: 50%;"><div class="article-header"><span class="article-badge">Article ${clause.position} —</span> <span class="article-title">${esc(clause.titleEn)}</span></div></th><th class="col-ar" dir="rtl" style="width: 50%;"><div class="article-header"><span class="article-badge">المادة (${clause.position}):</span> <span class="article-title">${esc(clause.titleAr)}</span></div></th></tr>`,
   );
 
   const count = Math.max(enSegments.length, arSegments.length);
@@ -211,7 +208,7 @@ function renderClauseBilingual(
             ? arSeg.name
             : "parties";
       rows.push(
-        `<tr class="block-row"><td colspan="2">${renderSpecial(
+        `<tr class="block-row"><td colspan="2" style="padding: 2mm 0; border: none;">${renderSpecial(
           name,
           snapshot,
           "bilingual",
@@ -228,11 +225,12 @@ function renderClauseBilingual(
       ? renderTextBlocks(arSeg.blocks, arVars, clause.position)
       : "";
     rows.push(
-      `<tr class="clause-row"><td class="en divider" dir="ltr">${enHtml}</td><td class="ar" dir="rtl">${arHtml}</td></tr>`,
+      `<tr class="clause-body-row"><td class="col-en divider" dir="ltr" style="width: 50%; vertical-align: top;">${enHtml}</td><td class="col-ar" dir="rtl" style="width: 50%; vertical-align: top;">${arHtml}</td></tr>`,
     );
   }
 
-  return `<table class="bilingual-clause"><tbody>${rows.join("")}</tbody></table>`;
+  const clauseClass = clause.key ? ` clause-${clause.key}` : "";
+  return `<table class="bilingual-clause${clauseClass}"><tbody>${rows.join("")}</tbody></table>`;
 }
 
 function renderHeader(
@@ -242,41 +240,92 @@ function renderHeader(
 ): string {
   const c = snapshot.contract;
   const p = snapshot.provider;
-  const companyName =
-    lang === "ar"
-      ? esc(p.nameAr ?? p.nameEn ?? "")
-      : lang === "en"
-        ? esc(p.nameEn ?? p.nameAr ?? "")
-        : `${esc(p.nameEn ?? "")}<br><span class="ar" dir="rtl">${esc(p.nameAr ?? "")}</span>`;
-  const title =
-    lang === "ar"
-      ? esc(c.titleAr ?? c.titleEn ?? "")
-      : lang === "en"
-        ? esc(c.titleEn ?? c.titleAr ?? "")
-        : `${esc(c.titleEn ?? "")}<br><span class="ar" dir="rtl">${esc(c.titleAr ?? "")}</span>`;
-  const logo = logoDataUri
-    ? `<img class="logo" src="${esc(logoDataUri)}" alt="" />`
-    : "";
-  const metaRows = [
-    ["Number", "رقم", c.number ? num(c.number) : "—"],
-    ["Date", "التاريخ", esc(formatDateLong(c.issueDate, "en"))],
-    ...(c.versionNo > 1
-      ? ([["Version", "الإصدار", num(String(c.versionNo))]] as Array<
-          [string, string, string]
-        >)
-      : []),
-    [
-      "Project",
-      "المشروع",
-      `${esc(snapshot.project.code)} — ${esc(snapshot.project.nameEn ?? snapshot.project.nameAr ?? "")}`,
-    ],
-  ]
-    .map(
-      ([en, ar, value]) =>
-        `<tr><td>${esc(en)} / <span class="ar" dir="rtl">${esc(ar)}</span></td><td>${value}</td></tr>`,
-    )
-    .join("");
-  return `<header class="header"><div>${logo}<div>${companyName}</div></div><div><h1>${title}</h1><table class="meta"><tbody>${metaRows}</tbody></table></div></header>`;
+  const isBilingual = lang === "bilingual";
+  const isArabic = lang === "ar";
+  const docNumber = c.number ?? "DRAFT";
+  const issueDateFormatted = formatDateLong(c.issueDate, "en");
+
+  const logoMarkup = logoDataUri
+    ? `<img class="header-logo" src="${esc(logoDataUri)}" alt="Logo" />`
+    : `
+      <div class="brand-logo-fallback">
+        <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+          <polygon points="16,2 30,10 16,18 2,10" fill="#e11d48" />
+          <polygon points="2,10 16,18 16,30 2,22" fill="#9f1239" />
+          <polygon points="30,10 16,18 16,30 30,22" fill="#fb7185" />
+        </svg>
+        <span class="brand-title">${esc(p.nameEn || p.nameAr || "DOSSIER")}</span>
+      </div>
+    `;
+
+  if (isBilingual) {
+    return `
+      <header class="contract-hero-header">
+        <div class="header-top-bar">
+          <div class="header-logo-container">${logoMarkup}</div>
+          <div class="header-pills-container">
+            <span class="header-pill doc-number-pill"><span class="pill-lbl">NO:</span> ${esc(docNumber)}</span>
+            <span class="header-pill"><span class="pill-lbl">DATE:</span> ${esc(issueDateFormatted)}</span>
+            ${c.versionNo > 1 ? `<span class="header-pill"><span class="pill-lbl">VER:</span> v${c.versionNo}</span>` : ""}
+          </div>
+        </div>
+
+        <table class="bilingual-clause" style="margin: 0; border: none;">
+          <tbody>
+            <tr>
+              <td class="col-en divider" dir="ltr" style="width: 50%; vertical-align: top; border-bottom: none;">
+                <div class="doc-badge">LEGAL AGREEMENT</div>
+                <h1 class="contract-main-title">${esc(c.titleEn || c.titleAr || "Contract Agreement")}</h1>
+                <div class="contract-meta-sub">
+                  <span>Project: <strong>${esc(snapshot.project.code)}</strong> — ${esc(snapshot.project.nameEn || snapshot.project.nameAr || "")}</span>
+                </div>
+              </td>
+              <td class="col-ar" dir="rtl" style="width: 50%; vertical-align: top; border-bottom: none;">
+                <div class="doc-badge">عقد اتفاق قانوني</div>
+                <h1 class="contract-main-title">${esc(c.titleAr || c.titleEn || "عقد اتفاق")}</h1>
+                <div class="contract-meta-sub">
+                  <span>المشروع: <strong>${esc(snapshot.project.code)}</strong> — ${esc(snapshot.project.nameAr || snapshot.project.nameEn || "")}</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </header>
+    `;
+  }
+
+  // Single language (ar or en)
+  const docBadgeText = isArabic ? "عقد اتفاق قانوني" : "LEGAL AGREEMENT";
+  const mainTitle = isArabic
+    ? esc(c.titleAr || c.titleEn || "عقد اتفاق")
+    : esc(c.titleEn || c.titleAr || "Contract Agreement");
+  const projectLabel = isArabic ? "المشروع" : "Project";
+  const projectName = isArabic
+    ? esc(snapshot.project.nameAr || snapshot.project.nameEn || "")
+    : esc(snapshot.project.nameEn || snapshot.project.nameAr || "");
+  const numLabel = isArabic ? "رقم العقد" : "NO";
+  const dateLabel = isArabic ? "التاريخ" : "DATE";
+
+  return `
+    <header class="contract-hero-header" dir="${docDir(lang)}">
+      <div class="header-top-bar">
+        <div class="header-logo-container">${logoMarkup}</div>
+        <div class="header-pills-container">
+          <span class="header-pill doc-number-pill"><span class="pill-lbl">${numLabel}:</span> ${esc(docNumber)}</span>
+          <span class="header-pill"><span class="pill-lbl">${dateLabel}:</span> ${esc(issueDateFormatted)}</span>
+          ${c.versionNo > 1 ? `<span class="header-pill"><span class="pill-lbl">v:</span> ${c.versionNo}</span>` : ""}
+        </div>
+      </div>
+
+      <div class="contract-title-wrap">
+        <div class="doc-badge">${docBadgeText}</div>
+        <h1 class="contract-main-title">${mainTitle}</h1>
+        <div class="contract-meta-sub">
+          <span>${projectLabel}: <strong>${esc(snapshot.project.code)}</strong> — ${projectName}</span>
+        </div>
+      </div>
+    </header>
+  `;
 }
 
 // 12.5
@@ -310,20 +359,34 @@ export function renderContractHtml(input: ContractHtmlInput): string {
 
   const unsignedNote =
     mode === "unsigned"
-      ? `<p class="unsigned-note">UNSIGNED / <span class="ar" dir="rtl">غير موقّع</span></p>`
+      ? `<div class="unsigned-card"><span class="unsigned-badge">UNSIGNED</span> <span class="unsigned-badge ar" dir="rtl">غير موقع</span><p class="unsigned-desc">This contract document is currently unsigned and has no legal validity until fully executed by all parties.</p></div>`
       : "";
 
   const verificationBlock =
     mode === "sealed" && input.verification
-      ? `<div class="verify"><table><tbody><tr><td class="divider"><img class="qr" src="${esc(
-          input.verification.qrDataUri,
-        )}" alt="QR" /></td><td><p><strong>Verification / التحقق:</strong> ${num(
-          input.verification.code,
-        )}</p><p class="muted" dir="ltr">${esc(
-          input.verification.url,
-        )}</p><p class="hash">SHA-256: ${esc(
-          input.certificate?.contentHash ?? "",
-        )}</p></td></tr></tbody></table></div>`
+      ? `<div class="verify">
+          <table style="width: 100%; border: none;">
+            <tbody>
+              <tr>
+                <td style="width: 30mm; vertical-align: middle; border: none; padding-inline-end: 4mm;">
+                  <img class="qr" src="${esc(input.verification.qrDataUri)}" alt="QR" />
+                </td>
+                <td style="vertical-align: middle; border: none;">
+                  <div class="verify-badge">CRYPTOGRAPHIC VERIFICATION</div>
+                  <p style="margin: 0 0 1.5mm;"><strong>Verification code / رمز التحقق:</strong> ${num(
+                    input.verification.code,
+                  )}</p>
+                  <p class="muted" dir="ltr" style="margin: 0 0 1.5mm;">${esc(
+                    input.verification.url,
+                  )}</p>
+                  <p class="hash" style="margin: 0;">SHA-256 (content): ${esc(
+                    input.certificate?.contentHash ?? "",
+                  )}</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>`
       : "";
 
   const certificateHtml =

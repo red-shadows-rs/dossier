@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { cookies } from "next/headers";
 import localFont from "next/font/local";
+import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { Providers } from "@/components/Providers";
+import { NavigationProgressBar } from "@/components/ui/NavigationProgressBar";
 import { resolveTheme, THEME_COOKIE, themeClass } from "@/lib/i18n";
 import "./globals.css";
 
@@ -47,9 +49,18 @@ export default async function RootLayout({
       className={`${cairo.variable} ${themeClass(theme)}`}
       suppressHydrationWarning
     >
+      <head>
+        <InitColorSchemeScript
+          attribute="class"
+          defaultMode={theme === "light" ? "light" : "dark"}
+        />
+      </head>
       <body>
         <Providers dir={dir} colorTheme={theme}>
           <NextIntlClientProvider locale={locale} messages={messages}>
+            <Suspense fallback={null}>
+              <NavigationProgressBar />
+            </Suspense>
             {children}
           </NextIntlClientProvider>
         </Providers>

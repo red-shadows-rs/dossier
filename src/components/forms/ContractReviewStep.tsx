@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Send } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { DocumentSkeleton } from "@/components/ui/Skeleton";
 import { cn } from "@/components/ui/cn";
 import {
   allowedDocLangs,
@@ -166,7 +168,9 @@ export function ContractReviewStep({
             </div>
           ) : null}
 
-          {html ? (
+          {loading ? (
+            <DocumentSkeleton className="h-[40rem]" />
+          ) : html ? (
             <iframe
               title={t("review.previewTitle")}
               sandbox=""
@@ -175,7 +179,7 @@ export function ContractReviewStep({
             />
           ) : (
             <div className="flex h-[40rem] items-center justify-center rounded-md border border-dashed border-border text-sm text-muted-foreground">
-              {loading ? t("review.loading") : t("review.previewUnavailable")}
+              {t("review.previewUnavailable")}
             </div>
           )}
         </CardContent>
@@ -191,8 +195,10 @@ export function ContractReviewStep({
           type="button"
           disabled={errors.length > 0}
           onClick={() => setSendOpen(true)}
+          className="gap-1.5"
         >
-          {t("review.send")}
+          <Send size={15} aria-hidden="true" />
+          <span>{t("review.send")}</span>
         </Button>
       </div>
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { retryFinalizeAction } from "@/server/actions/contracts";
@@ -48,8 +49,15 @@ export function FinalizeRetryBanner({
         </span>
       </div>
       {canRetry ? (
-        <Button type="button" variant="secondary" onClick={onRetry} loading={pending}>
-          {t("finalize.retry")}
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onRetry}
+          loading={pending}
+          className="gap-1.5"
+        >
+          <RotateCcw size={15} aria-hidden="true" />
+          <span>{t("finalize.retry")}</span>
         </Button>
       ) : null}
     </div>

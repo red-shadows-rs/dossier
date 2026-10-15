@@ -3,6 +3,15 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import {
+  Building2,
+  Mail,
+  MapPin,
+  Save,
+  ShieldCheck,
+  UserCheck,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Field } from "@/components/ui/Field";
@@ -90,6 +99,14 @@ const SECTIONS: { title: string; fields: FieldDef[] }[] = [
   },
 ];
 
+const SECTION_ICONS = {
+  identity: Building2,
+  contact: Mail,
+  legal: ShieldCheck,
+  representative: UserCheck,
+  address: MapPin,
+} as const;
+
 export function ClientForm({
   mode,
   clientId,
@@ -104,6 +121,7 @@ export function ClientForm({
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -114,6 +132,7 @@ export function ClientForm({
     }
     setPending(true);
     setFieldErrors({});
+    setStatusError(null);
     const result =
       mode === "create"
         ? await createClientAction(payload)
@@ -127,7 +146,12 @@ export function ClientForm({
       return;
     }
     if (result.error.fieldErrors) setFieldErrors(result.error.fieldErrors);
-    toast({ title: t(`errors.${result.error.code}`), tone: "error" });
+    const msg =
+      result.error.code === "VALIDATION_FAILED"
+        ? t("auth.requiredFields")
+        : t(`errors.${result.error.code}`);
+    setStatusError(msg);
+    toast({ title: msg, tone: "error" });
   }
 
   const fieldError = (name: string): string | null => {
@@ -136,12 +160,23 @@ export function ClientForm({
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+      {statusError ? (
+        <p
+          role="alert"
+          className="rounded border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm font-medium text-destructive"
+        >
+          {statusError}
+        </p>
+      ) : null}
       <Card>
         <CardHeader>
-          <CardTitle>{t("clients.identity")}</CardTitle>
+          <CardTitle className="inline-flex items-center gap-2">
+            <Building2 size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("clients.identity")}</span>
+          </CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
           <Field label={t("clients.typeLabel")} htmlFor="client-type">
             <Select
               id="client-type"
@@ -192,12 +227,20 @@ export function ClientForm({
         </CardContent>
       </Card>
 
-      {SECTIONS.slice(1).map((section) => (
-        <Card key={section.title}>
-          <CardHeader>
-            <CardTitle>{t(`clients.${section.title}`)}</CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      {SECTIONS.slice(1).map((section) => {
+        const Icon =
+          SECTION_ICONS[section.title as keyof typeof SECTION_ICONS];
+        return (
+          <Card key={section.title}>
+            <CardHeader>
+              <CardTitle className="inline-flex items-center gap-2">
+                {Icon ? (
+                  <Icon size={18} className="text-primary" aria-hidden="true" />
+                ) : null}
+                <span>{t(`clients.${section.title}`)}</span>
+              </CardTitle>
+            </CardHeader>
+          <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
             {section.fields.map((field) => (
               <Field
                 key={field.name}
@@ -205,7 +248,7 @@ export function ClientForm({
                 htmlFor={`client-${field.name}`}
                 error={fieldError(field.name)}
                 className={
-                  field.kind === "textarea" ? "md:col-span-2" : undefined
+                  field.kind === "textarea" ? "md:col-span-2 2xl:col-span-3" : undefined
                 }
               >
                 {field.kind === "textarea" ? (
@@ -232,7 +275,8 @@ export function ClientForm({
             ))}
           </CardContent>
         </Card>
-      ))}
+      );
+    })}
 
       <div className="flex justify-end gap-2">
         <Button
@@ -240,10 +284,13 @@ export function ClientForm({
           variant="secondary"
           onClick={() => router.back()}
           disabled={pending}
+          className="gap-2"
         >
+          <X className="h-4 w-4" />
           {t("common.cancel")}
         </Button>
-        <Button type="submit" loading={pending}>
+        <Button type="submit" loading={pending} className="gap-2">
+          <Save className="h-4 w-4" />
           {t("common.save")}
         </Button>
       </div>

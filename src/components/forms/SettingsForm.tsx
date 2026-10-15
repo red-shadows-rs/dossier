@@ -2,7 +2,9 @@
 
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
+import { Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
@@ -44,6 +46,12 @@ export type SettingsFieldDef =
     }
   | { kind: "checkbox"; name: string; label: string }
   | { kind: "numberList"; name: string; label: string; placeholder?: string };
+
+export type SettingsSectionDef = {
+  title?: string;
+  description?: string;
+  fields: SettingsFieldDef[];
+};
 
 export type SettingsValues = Record<
   string,
@@ -122,13 +130,120 @@ function initialValue(
   return value as string | number;
 }
 
+function renderField(
+  field: SettingsFieldDef,
+  values: SettingsValues,
+  fieldErrors: Record<string, string>,
+  t: (key: string) => string,
+  disabled?: boolean,
+) {
+  const errorKey = fieldErrors[field.name];
+  const error = errorKey ? t(errorKey) : null;
+  if (field.kind === "checkbox") {
+    return (
+      <div key={field.name} className="flex flex-col justify-end">
+        <label className="flex h-10 cursor-pointer items-center justify-between rounded border border-border/80 bg-muted/20 px-3 text-sm text-foreground transition-colors hover:bg-muted/30 select-none">
+          <span className="font-medium text-foreground">{field.label}</span>
+          <Checkbox
+            name={field.name}
+            defaultChecked={initialValue(field, values) === true}
+            disabled={disabled}
+            sx={{ p: 0.5 }}
+          />
+        </label>
+      </div>
+    );
+  }
+  return (
+    <Field
+      key={field.name}
+      label={field.label}
+      htmlFor={`field-${field.name}`}
+      error={error}
+      className={field.kind === "textarea" ? "md:col-span-2 2xl:col-span-3" : undefined}
+    >
+      {field.kind === "text" ? (
+        <Input
+          id={`field-${field.name}`}
+          name={field.name}
+          dir={field.dir}
+          maxLength={field.maxLength}
+          placeholder={field.placeholder}
+          defaultValue={initialValue(field, values) as string}
+          disabled={disabled}
+          className={field.dir ? "text-start" : undefined}
+        />
+      ) : null}
+      {field.kind === "textarea" ? (
+        <Textarea
+          id={`field-${field.name}`}
+          name={field.name}
+          dir={field.dir}
+          rows={field.rows}
+          defaultValue={initialValue(field, values) as string}
+          disabled={disabled}
+          className={field.dir ? "text-start" : undefined}
+        />
+      ) : null}
+      {field.kind === "number" ? (
+        <Input
+          id={`field-${field.name}`}
+          name={field.name}
+          type="number"
+          min={field.min}
+          max={field.max}
+          step={field.step}
+          defaultValue={initialValue(field, values) as number}
+          disabled={disabled}
+          dir="ltr"
+          className="text-start"
+          endAdornment={
+            field.suffix ? (
+              <span className="text-xs font-semibold text-muted-foreground select-none">
+                {field.suffix}
+              </span>
+            ) : undefined
+          }
+        />
+      ) : null}
+      {field.kind === "select" ? (
+        <Select
+          id={`field-${field.name}`}
+          name={field.name}
+          defaultValue={String(initialValue(field, values))}
+          disabled={disabled}
+        >
+          {field.options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </Select>
+      ) : null}
+      {field.kind === "numberList" ? (
+        <Input
+          id={`field-${field.name}`}
+          name={field.name}
+          dir="ltr"
+          placeholder={field.placeholder}
+          defaultValue={initialValue(field, values) as string}
+          disabled={disabled}
+          className="text-start"
+        />
+      ) : null}
+    </Field>
+  );
+}
+
 export function SettingsForm({
   fields,
+  sections,
   values,
   action,
   disabled,
 }: {
-  fields: SettingsFieldDef[];
+  fields?: SettingsFieldDef[];
+  sections?: SettingsSectionDef[];
   values: SettingsValues;
   action: (input: unknown) => Promise<ActionResult<null>>;
   disabled?: boolean;
@@ -138,9 +253,13 @@ export function SettingsForm({
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
+  const allFields = sections
+    ? sections.flatMap((s) => s.fields)
+    : (fields ?? []);
+
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const payload = buildPayload(fields, new FormData(event.currentTarget));
+    const payload = buildPayload(allFields, new FormData(event.currentTarget));
     setPending(true);
     setFieldErrors({});
     const result = await action(payload);
@@ -153,113 +272,44 @@ export function SettingsForm({
     toast({ title: t(`errors.${result.error.code}`), tone: "error" });
   }
 
-  const fieldError = (name: string): string | null => {
-    const key = fieldErrors[name];
-    return key ? t(key) : null;
-  };
-
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-5">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {fields.map((field) => {
-          const error = fieldError(field.name);
-          if (field.kind === "checkbox") {
-            return (
-              <Checkbox
-                key={field.name}
-                name={field.name}
-                defaultChecked={initialValue(field, values) === true}
-                disabled={disabled}
-                label={field.label}
-              />
-            );
-          }
-          return (
-            <Field
-              key={field.name}
-              label={field.label}
-              htmlFor={`field-${field.name}`}
-              error={error}
-              className={
-                field.kind === "textarea" ? "md:col-span-2" : undefined
-              }
-            >
-              {field.kind === "text" ? (
-                <Input
-                  id={`field-${field.name}`}
-                  name={field.name}
-                  dir={field.dir}
-                  maxLength={field.maxLength}
-                  placeholder={field.placeholder}
-                  defaultValue={initialValue(field, values) as string}
-                  disabled={disabled}
-                  className={field.dir ? "text-start" : undefined}
-                />
-              ) : null}
-              {field.kind === "textarea" ? (
-                <Textarea
-                  id={`field-${field.name}`}
-                  name={field.name}
-                  dir={field.dir}
-                  rows={field.rows}
-                  defaultValue={initialValue(field, values) as string}
-                  disabled={disabled}
-                  className={field.dir ? "text-start" : undefined}
-                />
-              ) : null}
-              {field.kind === "number" ? (
-                <div className="flex items-center gap-2">
-                  <Input
-                    id={`field-${field.name}`}
-                    name={field.name}
-                    type="number"
-                    min={field.min}
-                    max={field.max}
-                    step={field.step}
-                    defaultValue={initialValue(field, values) as number}
-                    disabled={disabled}
-                    dir="ltr"
-                    className="text-start"
-                  />
-                  {field.suffix ? (
-                    <span className="text-sm text-muted-foreground">
-                      {field.suffix}
-                    </span>
-                  ) : null}
-                </div>
-              ) : null}
-              {field.kind === "select" ? (
-                <Select
-                  id={`field-${field.name}`}
-                  name={field.name}
-                  defaultValue={String(initialValue(field, values))}
-                  disabled={disabled}
-                >
-                  {field.options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </Select>
-              ) : null}
-              {field.kind === "numberList" ? (
-                <Input
-                  id={`field-${field.name}`}
-                  name={field.name}
-                  dir="ltr"
-                  placeholder={field.placeholder}
-                  defaultValue={initialValue(field, values) as string}
-                  disabled={disabled}
-                  className="text-start"
-                />
-              ) : null}
-            </Field>
-          );
-        })}
-      </div>
+    <form onSubmit={onSubmit} className="flex flex-col gap-6">
+      {sections ? (
+        sections.map((section, idx) => (
+          <Card key={section.title ?? idx}>
+            {section.title ? (
+              <CardHeader>
+                <CardTitle>{section.title}</CardTitle>
+                {section.description ? (
+                  <CardDescription>{section.description}</CardDescription>
+                ) : null}
+              </CardHeader>
+            ) : null}
+            <CardContent>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
+                {section.fields.map((field) =>
+                  renderField(field, values, fieldErrors, t, disabled),
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        ))
+      ) : (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
+          {allFields.map((field) =>
+            renderField(field, values, fieldErrors, t, disabled),
+          )}
+        </div>
+      )}
 
       <div className="flex justify-end">
-        <Button type="submit" loading={pending} disabled={disabled}>
+        <Button
+          type="submit"
+          loading={pending}
+          disabled={disabled}
+          className="gap-2"
+        >
+          <Save className="h-4 w-4" />
           {t("common.save")}
         </Button>
       </div>

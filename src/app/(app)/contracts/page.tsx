@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { Filter, Plus, RotateCcw } from "lucide-react";
+import { FileText, Plus, RotateCcw, Search } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import { Field } from "@/components/ui/Field";
-import { Input } from "@/components/ui/Input";
+import { Input, InputAdornment } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { ContractsTable } from "@/components/tables/ContractsTable";
+import { FilterDropdown } from "@/components/tables/FilterDropdown";
 import { deleteDraftContractAction } from "@/server/actions/contracts";
 import { CONTRACT_STATUSES } from "@/lib/constants";
 import { can } from "@/lib/permissions";
@@ -16,6 +16,7 @@ import {
   listContracts,
 } from "@/server/services/contracts";
 import { listProjectOptions } from "@/server/services/projects";
+import { smoothLoading } from "@/lib/smooth-loader";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -30,6 +31,7 @@ export default async function ContractsPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
+  await smoothLoading();
   const user = await requireUserPage();
   const t = await getTranslations("contracts");
   const tc = await getTranslations("common");
@@ -71,6 +73,8 @@ export default async function ContractsPage({
   if (sortParam) query.sort = sort;
   if (dirParam) query.dir = dir;
 
+  const projectMap = Object.fromEntries(projects.map((p) => [p.id, p]));
+
   const labels = {
     number: t("number"),
     name: t("name"),
@@ -87,115 +91,236 @@ export default async function ContractsPage({
     ),
   };
 
+  const hasActiveFilters = Boolean(
+    q ||
+      status ||
+      projectId ||
+      (sort && sort !== "createdAt") ||
+      (dir && dir !== "desc"),
+  );
+  const activeFilterCount =
+    (status ? 1 : 0) +
+    (projectId ? 1 : 0) +
+    (sort && sort !== "createdAt" ? 1 : 0) +
+    (dir && dir !== "desc" ? 1 : 0);
+
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
+    <div className="flex flex-col gap-5 sm:gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+            <FileText size={20} aria-hidden="true" />
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">{t("title")}</h1>
+              <span className="inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground translate-y-0.5">
+                {total}
+              </span>
+            </div>
+          </div>
+        </div>
         {canWrite ? (
-          <Link href="/contracts/new">
-            <Button type="button">
-              <Plus size={16} aria-hidden="true" />
-              {t("new")}
-            </Button>
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href="/contracts/new">
+              <Button type="button" className="gap-1.5 font-medium shadow-xs">
+                <Plus size={16} aria-hidden="true" />
+                <span>{t("new")}</span>
+              </Button>
+            </Link>
+          </div>
         ) : null}
       </div>
 
-      <Card>
-        <CardContent>
-          <form method="get" className="flex flex-wrap items-end gap-3">
-            <Field
-              label={tc("search")}
-              htmlFor="contracts-q"
-              className="w-60"
-            >
-              <Input id="contracts-q" name="q" defaultValue={q ?? ""} />
-            </Field>
-            <Field label={t("statusLabel")} htmlFor="contracts-status">
-              <Select
-                id="contracts-status"
-                name="status"
-                defaultValue={status ?? ""}
-                className="w-40"
-              >
-                <option value="">{t("allStatuses")}</option>
-                {CONTRACT_STATUSES.map((value) => (
-                  <option key={value} value={value}>
-                    {t(`status.${value}`)}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Field label={t("project")} htmlFor="contracts-project">
-              <Select
-                id="contracts-project"
-                name="projectId"
-                defaultValue={projectId ?? ""}
-                className="w-52"
-              >
-                <option value="">{t("allProjects")}</option>
-                {projects.map((project) => (
-                  <option key={project.id} value={project.id}>
-                    {project.code} - {project.nameAr ?? project.nameEn ?? ""}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Field label={tc("sort")} htmlFor="contracts-sort">
-              <Select
-                id="contracts-sort"
-                name="sort"
-                defaultValue={sort}
-                className="w-40"
-              >
-                {CONTRACT_SORT_FIELDS.map((value) => (
-                  <option key={value} value={value}>
-                    {t(`sort.${value}`)}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Field label={tc("direction")} htmlFor="contracts-dir">
-              <Select
-                id="contracts-dir"
-                name="dir"
-                defaultValue={dir}
-                className="w-32"
-              >
-                <option value="desc">{tc("desc")}</option>
-                <option value="asc">{tc("asc")}</option>
-              </Select>
-            </Field>
-            <div className="flex gap-2 pb-0.5">
-              <Button type="submit">
-                <Filter size={16} aria-hidden="true" />
-                {tc("filter")}
-              </Button>
-              <Link href="/contracts">
-                <Button type="button" variant="secondary">
-                  <RotateCcw size={16} aria-hidden="true" />
-                  {tc("reset")}
+      <Card className="overflow-visible">
+        <CardContent className="p-3 sm:p-4 overflow-visible">
+          <form method="get" className="flex flex-col gap-2.5">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+              <div className="flex flex-1 items-center gap-2 min-w-[240px]">
+                <div className="relative flex-1">
+                  <Input
+                    id="contracts-q"
+                    name="q"
+                    defaultValue={q ?? ""}
+                    placeholder={t("searchPlaceholder")}
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <Search
+                          size={16}
+                          className="text-muted-foreground"
+                          aria-hidden="true"
+                        />
+                      </InputAdornment>
+                    }
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  variant="secondary"
+                  className="shrink-0 gap-1.5 h-10 px-4 border-border/80 font-medium"
+                >
+                  <Search size={15} aria-hidden="true" />
+                  <span>{tc("search")}</span>
                 </Button>
-              </Link>
+              </div>
+
+              <FilterDropdown
+                label={tc("filter")}
+                activeCount={activeFilterCount}
+                title={tc("filterOptions")}
+                applyLabel={tc("applyFilters")}
+                resetLabel={tc("reset")}
+                resetHref="/contracts"
+              >
+                <div>
+                  <label
+                    htmlFor="contracts-status"
+                    className="mb-1 block text-xs font-semibold text-muted-foreground cursor-pointer select-none"
+                  >
+                    {t("allStatuses")}
+                  </label>
+                  <Select
+                    id="contracts-status"
+                    name="status"
+                    defaultValue={status ?? ""}
+                  >
+                    <option value="">{t("allStatuses")}</option>
+                    {CONTRACT_STATUSES.map((value) => (
+                      <option key={value} value={value}>
+                        {t(`status.${value}`)}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="contracts-project"
+                    className="mb-1 block text-xs font-semibold text-muted-foreground cursor-pointer select-none"
+                  >
+                    {t("allProjects")}
+                  </label>
+                  <Select
+                    id="contracts-project"
+                    name="projectId"
+                    defaultValue={projectId ?? ""}
+                  >
+                    <option value="">{t("allProjects")}</option>
+                    {projects.map((project) => (
+                      <option key={project.id} value={project.id}>
+                        {project.code} - {project.nameAr ?? project.nameEn ?? ""}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label
+                    htmlFor="contracts-sort"
+                    className="mb-1 block text-xs font-semibold text-muted-foreground cursor-pointer select-none"
+                  >
+                      {tc("sort")}
+                    </label>
+                    <Select
+                      id="contracts-sort"
+                      name="sort"
+                      defaultValue={sort}
+                    >
+                      {CONTRACT_SORT_FIELDS.map((value) => (
+                        <option key={value} value={value}>
+                          {t(`sort.${value}`)}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+                  <div>
+                    <label
+                    htmlFor="contracts-dir"
+                    className="mb-1 block text-xs font-semibold text-muted-foreground cursor-pointer select-none"
+                  >
+                      {tc("direction")}
+                    </label>
+                    <Select
+                      id="contracts-dir"
+                      name="dir"
+                      defaultValue={dir}
+                    >
+                      <option value="desc">{tc("desc")}</option>
+                      <option value="asc">{tc("asc")}</option>
+                    </Select>
+                  </div>
+                </div>
+              </FilterDropdown>
+
+              {hasActiveFilters ? (
+                <Link href="/contracts" className="shrink-0 no-underline">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="gap-1.5 h-10 px-3"
+                  >
+                    <RotateCcw size={15} aria-hidden="true" />
+                    <span>{tc("reset")}</span>
+                  </Button>
+                </Link>
+              ) : null}
             </div>
+
+            {hasActiveFilters ? (
+              <div className="flex flex-wrap items-center gap-1.5 border-t border-border/40 pt-2.5 text-xs text-muted-foreground">
+                <span className="font-medium text-foreground ms-0.5">
+                  {tc("activeFilters")}:
+                </span>
+                {q ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{tc("search")}: {q}</span>
+                  </span>
+                ) : null}
+                {status ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{labels.statusLabel}: {t(`status.${status}`)}</span>
+                  </span>
+                ) : null}
+                {projectId ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{t("project")}: {projectMap[projectId]?.code ?? projectId}</span>
+                  </span>
+                ) : null}
+                {sort && sort !== "createdAt" ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{tc("sort")}: {t(`sort.${sort}`)}</span>
+                  </span>
+                ) : null}
+                {dir && dir !== "desc" ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{tc("direction")}: {tc("asc")}</span>
+                  </span>
+                ) : null}
+                <Link
+                  href="/contracts"
+                  className="ms-auto text-xs text-muted-foreground hover:text-foreground no-underline"
+                >
+                  {tc("clearFilters")}
+                </Link>
+              </div>
+            ) : null}
           </form>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent>
-          <ContractsTable
-            rows={rows}
-            total={total}
-            page={page}
-            pageSize={pageSize}
-            query={query}
-            canWrite={canWrite}
-            labels={labels}
-            deleteAction={deleteDraftContractAction}
-          />
-        </CardContent>
-      </Card>
+      <div className="rounded border border-border bg-card overflow-hidden">
+        <ContractsTable
+          rows={rows}
+          total={total}
+          page={page}
+          pageSize={pageSize}
+          query={query}
+          canWrite={canWrite}
+          labels={labels}
+          deleteAction={deleteDraftContractAction}
+        />
+      </div>
     </div>
   );
 }

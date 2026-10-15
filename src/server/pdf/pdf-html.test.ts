@@ -162,7 +162,7 @@ describe("renderContractHtml — modes", () => {
     const html = renderContractHtml(input({ mode: "unsigned" }));
     expect(html).not.toContain('class="watermark"');
     expect(html).toContain("UNSIGNED");
-    expect(html).toContain("غير موقّع");
+    expect(html).toContain("غير موقع");
   });
 
   it("sealed includes the verification block, hash and certificate", () => {
@@ -230,7 +230,7 @@ describe("renderContractHtml — language modes", () => {
     expect(html).toContain('class="bilingual-clause"');
     expect(html).toContain("Article 2 —");
     expect(html).toContain("المادة (2):");
-    expect(html).toContain("Description /");
+    expect(html).toContain("Description");
     expect(html).toContain("الوصف");
   });
 });

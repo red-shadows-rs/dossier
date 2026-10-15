@@ -1,20 +1,27 @@
 import { forwardRef, type TextareaHTMLAttributes } from "react";
-import MuiOutlinedInput from "@mui/material/OutlinedInput";
-import type { OutlinedInputProps } from "@mui/material/OutlinedInput";
+import { cn } from "@/components/ui/cn";
 
-export const Textarea = forwardRef<
-  HTMLTextAreaElement,
-  TextareaHTMLAttributes<HTMLTextAreaElement>
->(function Textarea({ className, rows = 4, ...props }, ref) {
-  return (
-    <MuiOutlinedInput
-      inputRef={ref}
-      multiline
-      rows={rows}
-      size="small"
-      fullWidth
-      className={className}
-      {...(props as unknown as OutlinedInputProps)}
-    />
-  );
-});
+export type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
+  fullWidth?: boolean;
+  size?: unknown;
+};
+
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
+  function Textarea(
+    { className, rows = 4, disabled, fullWidth: _fw, size: _sz, ...props },
+    ref,
+  ) {
+    return (
+      <textarea
+        ref={ref}
+        rows={rows}
+        disabled={disabled}
+        className={cn(
+          "flex min-h-[80px] w-full rounded border border-border/80 bg-background/50 px-3 py-2 text-sm text-foreground shadow-xs transition-colors placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50",
+          className,
+        )}
+        {...props}
+      />
+    );
+  },
+);

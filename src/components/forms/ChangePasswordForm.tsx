@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
+import { KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
@@ -13,6 +14,7 @@ export function ChangePasswordForm() {
   const toast = useToast();
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -20,6 +22,7 @@ export function ChangePasswordForm() {
     const data = new FormData(form);
     setPending(true);
     setFieldErrors({});
+    setStatusError(null);
     const result = await changePasswordAction({
       currentPassword: String(data.get("currentPassword") ?? ""),
       newPassword: String(data.get("newPassword") ?? ""),
@@ -33,7 +36,12 @@ export function ChangePasswordForm() {
     if (result.error.fieldErrors) {
       setFieldErrors(result.error.fieldErrors);
     }
-    toast({ title: t(`errors.${result.error.code}`), tone: "error" });
+    const msg =
+      result.error.code === "VALIDATION_FAILED"
+        ? t("auth.requiredFields")
+        : t(`errors.${result.error.code}`);
+    setStatusError(msg);
+    toast({ title: msg, tone: "error" });
   }
 
   const fieldError = (key: string): string | null => {
@@ -42,7 +50,15 @@ export function ChangePasswordForm() {
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+      {statusError ? (
+        <p
+          role="alert"
+          className="rounded border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm font-medium text-destructive"
+        >
+          {statusError}
+        </p>
+      ) : null}
       <Field
         label={t("auth.currentPassword")}
         htmlFor="current-password"
@@ -55,7 +71,6 @@ export function ChangePasswordForm() {
           type="password"
           autoComplete="current-password"
           dir="ltr"
-          required
           className="text-start"
         />
       </Field>
@@ -73,14 +88,14 @@ export function ChangePasswordForm() {
           type="password"
           autoComplete="new-password"
           dir="ltr"
-          required
           minLength={12}
           className="text-start"
         />
       </Field>
 
       <div className="flex justify-end">
-        <Button type="submit" loading={pending}>
+        <Button type="submit" loading={pending} className="gap-2">
+          <KeyRound className="h-4 w-4" />
           {t("auth.changePassword")}
         </Button>
       </div>

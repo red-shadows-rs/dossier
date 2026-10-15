@@ -93,7 +93,7 @@ function seedInvoice(
       status: "issued",
       number: `DOS-I-2026-${String(invoiceSeq).padStart(4, "0")}`,
       currency: "SAR",
-      languageMode: "bilingual",
+      languageMode: "ar",
       discountType: "none",
       discountValue: 0,
       taxRateBp: 0,
@@ -149,7 +149,7 @@ describe("sendInvoiceEmail", () => {
     const user = await ownerUser();
     const clientId = seedClient({ preferredLanguage: "en" });
     const projectId = seedProject(clientId);
-    const id = seedInvoice(clientId, projectId, { languageMode: "bilingual" });
+    const id = seedInvoice(clientId, projectId, { languageMode: "en" });
 
     sendInvoiceEmail(user, id, {}, META);
 
@@ -164,7 +164,7 @@ describe("sendInvoiceEmail", () => {
 
     const payload = JSON.parse(row.payloadJson);
     expect(payload.invoiceId).toBe(id);
-    expect(payload.docLang).toBe("bilingual");
+    expect(payload.docLang).toBe("en");
     expect(payload.number).toBe("DOS-I-2026-0001");
     expect(row.toName).toBe("شركة النور");
     expect(payload.amountFormatted).toBe("1,000.00 SAR");
@@ -351,7 +351,7 @@ describe("processOutbox — invoice attachments", () => {
       renderInvoiceAttachment: async (invoiceId, docLang) => {
         calls.push({ invoiceId, docLang });
         return {
-          filename: "DOS-I-2026-0001-bilingual.pdf",
+          filename: "DOS-I-2026-0001-ar.pdf",
           content: Buffer.from("%PDF-1.4\n%%EOF"),
           contentType: "application/pdf",
         };
@@ -359,11 +359,11 @@ describe("processOutbox — invoice attachments", () => {
     });
 
     expect(sent).toHaveLength(1);
-    expect(calls).toEqual([{ invoiceId: id, docLang: "bilingual" }]);
+    expect(calls).toEqual([{ invoiceId: id, docLang: "ar" }]);
     expect(sent[0].attachments).toHaveLength(1);
     expect(sent[0].attachments?.[0].contentType).toBe("application/pdf");
     expect(sent[0].attachments?.[0].filename).toBe(
-      "DOS-I-2026-0001-bilingual.pdf",
+      "DOS-I-2026-0001-ar.pdf",
     );
   });
 });

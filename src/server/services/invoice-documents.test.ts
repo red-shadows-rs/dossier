@@ -143,7 +143,7 @@ describe("resolveInvoiceDocLang", () => {
 
   it("defaults to the invoice mode", () => {
     const invoice = getInvoice(invoiceId);
-    expect(resolveInvoiceDocLang(invoice, undefined)).toBe("bilingual");
+    expect(resolveInvoiceDocLang(invoice, undefined)).toBe("ar");
   });
 });
 
@@ -161,19 +161,19 @@ describe("invoiceSafePdfFilename", () => {
 
 describe("buildInvoiceHtml", () => {
   it("renders a draft invoice with the watermark and live buyer", async () => {
-    const html = await buildInvoiceHtml(invoiceId, "bilingual");
-    expect(html).toContain("DRAFT / مسودة");
-    expect(html).toContain("Client Co");
-    expect(html).toContain("Milestone");
+    const html = await buildInvoiceHtml(invoiceId, "ar");
+    expect(html).toContain("مسودة");
+    expect(html).toContain("شركة");
+    expect(html).toContain("دفعة");
     expect(html).toContain("4,600.01 SAR");
   });
 
   it("renders an issued invoice from the frozen snapshot", async () => {
     issueInvoice(user, invoiceId, META);
-    const html = await buildInvoiceHtml(invoiceId, "en");
+    const html = await buildInvoiceHtml(invoiceId, "ar");
     expect(html).not.toContain('class="watermark"');
     expect(html).toMatch(/DOS-I-\d{4}-\d{4,}/);
-    expect(html).toContain("IBAN: SA00");
+    expect(html).toContain("SA00");
   });
 });
 
@@ -181,9 +181,9 @@ describe("resolveInvoicePdf", () => {
   it("returns html, filename and doc number", async () => {
     issueInvoice(user, invoiceId, META);
     const number = getInvoice(invoiceId).number ?? "";
-    const source = await resolveInvoicePdf(invoiceId, "en");
-    expect(source.filename).toBe(`${number}-en.pdf`);
+    const source = await resolveInvoicePdf(invoiceId, "ar");
+    expect(source.filename).toBe(`${number}-ar.pdf`);
     expect(source.docNumber).toBe(number);
-    expect(source.html).toContain("Invoice");
+    expect(source.html).toContain("فاتورة");
   });
 });

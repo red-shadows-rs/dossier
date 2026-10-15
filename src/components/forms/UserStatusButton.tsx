@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { UserCheck, UserX } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
@@ -47,7 +48,13 @@ export function UserStatusButton({
         type="button"
         variant={disabled ? "secondary" : "danger"}
         onClick={() => setOpen(true)}
+        className="gap-2"
       >
+        {disabled ? (
+          <UserCheck className="h-4 w-4" />
+        ) : (
+          <UserX className="h-4 w-4" />
+        )}
         {t(disabled ? "users.enable" : "users.disable")}
       </Button>
       <ConfirmDialog

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Receipt } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { createInvoiceFromMilestoneAction } from "@/server/actions/invoices";
@@ -30,8 +31,15 @@ export function CreateInvoiceFromMilestoneButton({
   }
 
   return (
-    <Button type="button" size="sm" onClick={onClick} loading={pending}>
-      {t("createInvoice")}
+    <Button
+      type="button"
+      size="sm"
+      onClick={onClick}
+      loading={pending}
+      className="gap-1.5"
+    >
+      <Receipt size={14} aria-hidden="true" />
+      <span>{t("createInvoice")}</span>
     </Button>
   );
 }

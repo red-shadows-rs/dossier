@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { auditLog, clients } from "@/db/schema";
+import { auditLog, clients, projects } from "@/db/schema";
 import { AppError } from "@/lib/errors";
 import { assertCan } from "@/lib/permissions";
 import { clientInputSchema } from "@/lib/validation/clients";
@@ -9,7 +9,9 @@ import { createTestUser } from "@/server/auth/test-utils";
 import type { SessionUser } from "@/server/auth/session";
 import {
   archiveClient,
+  canDeleteClient,
   createClient,
+  deleteClient,
   getClient,
   listClients,
   unarchiveClient,
@@ -186,12 +188,49 @@ describe("client authorization", () => {
     ).not.toThrow();
   });
 
-  it("deleting a client row is not exposed (archive only)", async () => {
+  it("archives client without deleting row", async () => {
     const user = await sessionUser();
     const id = createClient(user, input(), META);
-    // The service has no hard-delete; the row must still exist after archive.
     archiveClient(user, id, META);
     const row = db.select().from(clients).where(eq(clients.id, id)).get();
     expect(row).toBeDefined();
+    expect(row?.archivedAt).not.toBeNull();
+  });
+
+  it("deletes a client with no associations", async () => {
+    const user = await sessionUser();
+    const id = createClient(user, input(), META);
+    expect(canDeleteClient(id)).toBe(true);
+    expect(listClients().rows.find((r) => r.id === id)?.canDelete).toBe(true);
+
+    deleteClient(user, id, META);
+    expect(() => getClient(id)).toThrow(AppError);
+
+    const logs = db.select().from(auditLog).all();
+    expect(logs.some((entry) => entry.action === "client.deleted" && entry.entityId === id)).toBe(true);
+  });
+
+  it("prevents deleting a client with projects", async () => {
+    const user = await sessionUser();
+    const id = createClient(user, input(), META);
+
+    db.insert(projects)
+      .values({
+        id: "proj_test_client",
+        code: "P-9999",
+        clientId: id,
+        nameAr: "مشروع تجريبي",
+        status: "active",
+        currency: "SAR",
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      })
+      .run();
+
+    expect(canDeleteClient(id)).toBe(false);
+    expect(listClients().rows.find((r) => r.id === id)?.canDelete).toBe(false);
+    expect(() => deleteClient(user, id, META)).toThrow(AppError);
+
+    db.delete(projects).where(eq(projects.id, "proj_test_client")).run();
   });
 });

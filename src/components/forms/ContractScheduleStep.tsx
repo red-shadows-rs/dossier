@@ -2,12 +2,14 @@
 
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
+import { Plus, RotateCcw, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { useToast } from "@/components/ui/Toast";
+import { Tooltip } from "@/components/ui/Tooltip";
 import type { CurrencyCode } from "@/lib/constants";
 import { formatMoney, parseMajorToMinor } from "@/lib/money";
 import { saveMilestonesAction } from "@/server/actions/contracts";
@@ -171,8 +173,10 @@ export function ContractScheduleStep({
                 variant="secondary"
                 size="sm"
                 onClick={resetToPreset}
+                className="gap-1.5"
               >
-                {t("contracts.resetToPreset")}
+                <RotateCcw size={14} aria-hidden="true" />
+                <span>{t("contracts.resetToPreset")}</span>
               </Button>
             ) : null}
           </div>
@@ -295,22 +299,24 @@ export function ContractScheduleStep({
                     className="text-start"
                   />
                 </Field>
-                <div className="flex items-end md:col-span-12">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      setRows((current) =>
-                        current.length > 1
-                          ? current.filter((_, i) => i !== index)
-                          : current,
-                      )
-                    }
-                    disabled={rows.length <= 1}
-                  >
-                    {t("common.delete")}
-                  </Button>
+                <div className="flex items-center justify-end md:col-span-12 pt-1">
+                  <Tooltip content={t("common.delete")}>
+                    <button
+                      type="button"
+                      aria-label={t("common.delete")}
+                      onClick={() =>
+                        setRows((current) =>
+                          current.length > 1
+                            ? current.filter((_, i) => i !== index)
+                            : current,
+                        )
+                      }
+                      disabled={rows.length <= 1}
+                      className="flex h-8 w-8 items-center justify-center rounded border border-border/70 bg-card text-muted-foreground transition-colors hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+                    >
+                      <Trash2 size={15} aria-hidden="true" />
+                    </button>
+                  </Tooltip>
                 </div>
               </div>
             ))}
@@ -320,7 +326,7 @@ export function ContractScheduleStep({
             type="button"
             variant="secondary"
             size="sm"
-            className="self-start"
+            className="self-start gap-1.5"
             onClick={() =>
               setRows((current) => [
                 ...current,
@@ -336,7 +342,8 @@ export function ContractScheduleStep({
               ])
             }
           >
-            {t("contracts.milestone.add")}
+            <Plus size={15} aria-hidden="true" />
+            <span>{t("contracts.milestone.add")}</span>
           </Button>
 
           <p className="text-sm text-muted-foreground" dir="ltr">
@@ -354,8 +361,9 @@ export function ContractScheduleStep({
       </Card>
 
       <div className="flex justify-end">
-        <Button type="submit" loading={pending}>
-          {t("common.save")}
+        <Button type="submit" loading={pending} className="gap-2">
+          <Save size={16} aria-hidden="true" />
+          <span>{t("common.save")}</span>
         </Button>
       </div>
     </form>

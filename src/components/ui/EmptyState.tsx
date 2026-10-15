@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Inbox } from "lucide-react";
 import MuiBox from "@mui/material/Box";
 import MuiStack from "@mui/material/Stack";
 import MuiTypography from "@mui/material/Typography";
@@ -9,13 +10,16 @@ export function EmptyState({
   description,
   action,
   className,
+  bordered = true,
 }: {
   icon?: ReactNode;
   title: ReactNode;
   description?: ReactNode;
   action?: ReactNode;
   className?: string;
+  bordered?: boolean;
 }) {
+  const isBorderless = !bordered || className?.includes("border-0");
   return (
     <MuiStack
       spacing={1.5}
@@ -23,19 +27,17 @@ export function EmptyState({
       sx={{
         alignItems: "center",
         justifyContent: "center",
-        border: "1px dashed",
-        borderColor: "divider",
+        border: isBorderless ? "none" : "1px dashed",
+        borderColor: isBorderless ? "transparent" : "divider",
         borderRadius: "var(--mui-shape-borderRadius)",
         px: 3,
         py: 6,
         textAlign: "center",
       }}
     >
-      {icon ? (
-        <MuiBox sx={{ color: "text.secondary" }} aria-hidden="true">
-          {icon}
-        </MuiBox>
-      ) : null}
+      <MuiBox sx={{ color: "text.secondary" }} aria-hidden="true">
+        {icon ?? <Inbox size={36} strokeWidth={1.5} />}
+      </MuiBox>
       <MuiTypography variant="body1" sx={{ fontWeight: 500 }}>
         {title}
       </MuiTypography>

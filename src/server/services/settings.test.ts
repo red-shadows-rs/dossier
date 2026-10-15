@@ -43,7 +43,7 @@ describe("getSettings", () => {
     expect(defaults.currency).toBe("SAR");
     expect(defaults.taxRateBp).toBe(1500);
     expect(defaults.paymentTermsDays).toBe(14);
-    expect(defaults.languageMode).toBe("bilingual");
+    expect(defaults.languageMode).toBe("ar");
 
     expect(getSettings("numbering").prefix).toBe("DOS");
     expect(getSettings("signing").linkTtlDays).toBe(14);

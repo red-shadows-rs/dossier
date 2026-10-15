@@ -18,6 +18,7 @@ import {
   type InvoiceHtmlInput,
   type SellerSnapshot,
 } from "@/server/pdf/html/invoice";
+import { renderReceiptHtml } from "@/server/pdf/html/receipt";
 import { getFileRow, readFile } from "@/server/services/files";
 import { getSettings } from "@/server/services/settings";
 import {
@@ -125,10 +126,12 @@ export async function buildInvoiceHtml(
   const overdue = isOverdue(invoice, today);
 
   let verification: InvoiceHtmlInput["verification"] = null;
-  if (invoice.verificationCode && invoice.status !== "draft") {
-    const url = verificationUrl(env.APP_URL, invoice.verificationCode);
+  const verificationCode =
+    invoice.verificationCode ?? invoice.number ?? (invoice.status === "draft" ? "DRAFT-PREVIEW" : null);
+  if (verificationCode) {
+    const url = verificationUrl(env.APP_URL, verificationCode);
     verification = {
-      code: invoice.verificationCode,
+      code: verificationCode,
       url,
       qrDataUri: await makeQrDataUri(url),
     };
@@ -145,7 +148,15 @@ export async function buildInvoiceHtml(
       issueDate: invoice.issueDate,
       dueDate: invoice.dueDate,
       projectLabel: project
-        ? `${project.code} — ${project.nameAr ?? project.nameEn ?? ""}`
+        ? `${project.code} — ${
+            invoice.languageMode === "ar"
+              ? (project.nameAr ?? project.nameEn ?? "")
+              : invoice.languageMode === "en"
+                ? (project.nameEn ?? project.nameAr ?? "")
+                : (project.nameEn && project.nameAr && project.nameEn !== project.nameAr
+                    ? `${project.nameEn} / ${project.nameAr}`
+                    : (project.nameEn ?? project.nameAr ?? ""))
+          }`
         : "—",
       contractNumber: contract?.number ?? null,
       subtotalMinor: invoice.subtotalMinor,
@@ -181,6 +192,7 @@ export async function buildInvoiceHtml(
     isOverdue: overdue,
     fonts: getFontCss(),
     logoDataUri: imageByFileId(seller.logoFileId ?? null),
+    stampDataUri: imageByFileId(seller.stampFileId ?? null),
     verification,
   };
   return renderInvoiceHtml(input);
@@ -190,6 +202,7 @@ export type InvoicePdfSource = {
   html: string;
   filename: string;
   docNumber: string;
+  lang: DocLang;
 };
 
 export async function resolveInvoicePdf(
@@ -203,5 +216,124 @@ export async function resolveInvoicePdf(
     html,
     filename: invoiceSafePdfFilename(invoice, lang),
     docNumber: invoice.number ?? "DRAFT",
+    lang,
+  };
+}
+
+export function receiptSafePdfFilename(
+  invoice: Pick<InvoiceRow, "number">,
+  lang: DocLang,
+): string {
+  const base = invoice.number ? `receipt-${invoice.number}` : "draft-receipt";
+  return `${base}-${lang}.pdf`.replace(/[^A-Za-z0-9._-]/g, "");
+}
+
+export async function buildReceiptHtml(
+  invoiceId: string,
+  lang: DocLang,
+): Promise<string> {
+  const { invoice, lines } = getInvoiceDetail(invoiceId);
+  const project = db
+    .select()
+    .from(projects)
+    .where(eq(projects.id, invoice.projectId))
+    .get();
+  const contract = invoice.contractId
+    ? db
+        .select()
+        .from(contracts)
+        .where(eq(contracts.id, invoice.contractId))
+        .get()
+    : undefined;
+
+  const payments = listPayments(invoiceId);
+  const today = todayInTz(getSettings("defaults").timezone);
+  const overdue = isOverdue(invoice, today);
+
+  let verification: InvoiceHtmlInput["verification"] = null;
+  const verificationCode =
+    invoice.verificationCode ?? invoice.number ?? (invoice.status === "draft" ? "DRAFT-PREVIEW" : null);
+  if (verificationCode) {
+    const url = verificationUrl(env.APP_URL, verificationCode);
+    verification = {
+      code: verificationCode,
+      url,
+      qrDataUri: await makeQrDataUri(url),
+    };
+  }
+
+  const seller = sellerSnapshotFor(invoice);
+  const input: InvoiceHtmlInput = {
+    invoice: {
+      id: invoice.id,
+      number: invoice.number,
+      currency: invoice.currency,
+      languageMode: invoice.languageMode,
+      status: invoice.status,
+      issueDate: invoice.issueDate,
+      dueDate: invoice.dueDate,
+      projectLabel: project
+        ? `${project.code} — ${
+            invoice.languageMode === "ar"
+              ? (project.nameAr ?? project.nameEn ?? "")
+              : invoice.languageMode === "en"
+                ? (project.nameEn ?? project.nameAr ?? "")
+                : (project.nameEn && project.nameAr && project.nameEn !== project.nameAr
+                    ? `${project.nameEn} / ${project.nameAr}`
+                    : (project.nameEn ?? project.nameAr ?? ""))
+          }`
+        : "—",
+      contractNumber: contract?.number ?? null,
+      subtotalMinor: invoice.subtotalMinor,
+      discountMinor: invoice.discountMinor,
+      netMinor: invoice.netMinor,
+      taxRateBp: invoice.taxRateBp,
+      taxMinor: invoice.taxMinor,
+      totalMinor: invoice.totalMinor,
+      paidMinor: invoice.paidMinor,
+      notesAr: invoice.notesAr,
+      notesEn: invoice.notesEn,
+      paymentInstructionsAr: invoice.paymentInstructionsAr,
+      paymentInstructionsEn: invoice.paymentInstructionsEn,
+    },
+    lines: lines.map((line) => ({
+      position: line.position,
+      descriptionAr: line.descriptionAr,
+      descriptionEn: line.descriptionEn,
+      qtyMilli: line.qtyMilli,
+      unitPriceMinor: line.unitPriceMinor,
+      lineTotalMinor: line.lineTotalMinor,
+    })),
+    seller,
+    buyer: buyerSnapshotFor(invoice),
+    payments: payments.map((payment) => ({
+      paidOn: payment.paidOn,
+      amountMinor: payment.amountMinor,
+      method: payment.method,
+      reference: payment.reference,
+      voided: payment.voidedAt !== null,
+    })),
+    lang,
+    isOverdue: overdue,
+    fonts: getFontCss(),
+    logoDataUri: imageByFileId(seller.logoFileId ?? null),
+    stampDataUri: imageByFileId(seller.stampFileId ?? null),
+    verification,
+  };
+  return renderReceiptHtml(input);
+}
+
+export async function resolveReceiptPdf(
+  invoiceId: string,
+  requestedLang: string | undefined,
+): Promise<InvoicePdfSource> {
+  const invoice = getInvoiceDetail(invoiceId).invoice;
+  const lang = resolveInvoiceDocLang(invoice, requestedLang);
+  const html = await buildReceiptHtml(invoiceId, lang);
+  return {
+    html,
+    filename: receiptSafePdfFilename(invoice, lang),
+    docNumber: `REC-${invoice.number ?? "DRAFT"}`,
+    lang,
   };
 }

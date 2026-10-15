@@ -6,9 +6,14 @@ import {
   logPdfError,
   renderSemaphore,
 } from "./browser";
-import { buildFooterTemplate } from "./html/shared";
+import { buildFooterTemplate, type DocLang } from "./html/shared";
 
-export type FooterMeta = { docNumber: string; code: string | null };
+export type FooterMeta = {
+  docNumber: string;
+  code: string | null;
+  kind?: "contract" | "invoice";
+  lang?: DocLang;
+};
 
 async function renderOnce(html: string, footer: FooterMeta): Promise<Buffer> {
   const browser = await getBrowser();
@@ -21,13 +26,16 @@ async function renderOnce(html: string, footer: FooterMeta): Promise<Buffer> {
       waitUntil: "load",
       timeout: env.PDF_TIMEOUT_MS,
     });
+    const isInvoice = footer.kind === "invoice";
     const pdf = await page.pdf({
       format: "A4",
       printBackground: true,
       displayHeaderFooter: true,
-      headerTemplate: "<span></span>",
+      headerTemplate: "<div style=\"font-size:0;height:0;margin:0;padding:0;display:none;\"></div>",
       footerTemplate: buildFooterTemplate(footer),
-      margin: { top: "18mm", bottom: "20mm", left: "16mm", right: "16mm" },
+      margin: isInvoice
+        ? { top: "0mm", bottom: "13mm", left: "0mm", right: "0mm" }
+        : { top: "18mm", bottom: "20mm", left: "16mm", right: "16mm" },
     });
     return Buffer.from(pdf);
   } finally {

@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import type { GridColDef } from "@mui/x-data-grid";
-import MuiLink from "@mui/material/Link";
-import MuiStack from "@mui/material/Stack";
+import { useLocale } from "next-intl";
+import { Users } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge } from "@/components/ui/Badge";
 import { RowActionButton } from "@/components/forms/RowActionButton";
-import { ServerDataGrid } from "@/components/tables/ServerDataGrid";
+import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
 import type { ActionResult } from "@/lib/result";
 
 export type ClientTableRow = {
@@ -19,6 +18,7 @@ export type ClientTableRow = {
   phone: string | null;
   city: string | null;
   archivedAt: number | null;
+  canDelete?: boolean;
 };
 
 export type ClientTableLabels = {
@@ -36,6 +36,9 @@ export type ClientTableLabels = {
   archive: string;
   archiveConfirm: string;
   archivedToast: string;
+  delete?: string;
+  deleteConfirm?: string;
+  deletedToast?: string;
   empty: string;
   typeValues: Record<string, string>;
 };
@@ -49,6 +52,7 @@ export function ClientsTable({
   canWrite,
   labels,
   archiveAction,
+  deleteAction,
 }: {
   rows: ClientTableRow[];
   total: number;
@@ -58,92 +62,98 @@ export function ClientsTable({
   canWrite: boolean;
   labels: ClientTableLabels;
   archiveAction: (raw: unknown) => Promise<ActionResult<null>>;
+  deleteAction?: (raw: unknown) => Promise<ActionResult<null>>;
 }) {
-  const columns: GridColDef<ClientTableRow>[] = [
+  const locale = useLocale();
+
+  const columns: ColumnDef<ClientTableRow>[] = [
     {
-      field: "name",
-      headerName: labels.name,
-      flex: 1,
-      minWidth: 220,
-      sortable: false,
-      renderCell: (params) => (
-        <MuiLink
-          component={Link}
-          href={`/clients/${params.row.id}`}
-          underline="hover"
-          color="inherit"
-          sx={{ fontWeight: 600 }}
-        >
-          <span dir="rtl" lang="ar">
-            {params.row.nameAr ?? "-"}
-          </span>
-          {params.row.nameEn ? (
-            <>
-              {" / "}
-              <span dir="ltr" lang="en">
-                {params.row.nameEn}
-              </span>
-            </>
-          ) : null}
-        </MuiLink>
+      id: "name",
+      header: labels.name,
+      render: (row) => {
+        const name =
+          locale === "ar"
+            ? (row.nameAr || row.nameEn || "-")
+            : (row.nameEn || row.nameAr || "-");
+        const dir =
+          locale === "ar"
+            ? (row.nameAr ? "rtl" : "ltr")
+            : (row.nameEn ? "ltr" : "rtl");
+        return (
+          <Link
+            href={`/clients/${row.id}`}
+            className="font-semibold text-foreground hover:text-primary transition-colors"
+          >
+            <span dir={dir}>{name}</span>
+          </Link>
+        );
+      },
+    },
+    {
+      id: "type",
+      header: labels.typeLabel,
+      className: "whitespace-nowrap text-muted-foreground",
+      render: (row) => labels.typeValues[row.type] ?? row.type,
+    },
+    {
+      id: "email",
+      header: labels.email,
+      className: "whitespace-nowrap font-mono text-xs",
+      render: (row) => (
+        <span dir="ltr" className="text-muted-foreground">
+          {row.email ?? "-"}
+        </span>
       ),
     },
     {
-      field: "type",
-      headerName: labels.typeLabel,
-      width: 130,
-      sortable: false,
-      valueGetter: (_value, row) => labels.typeValues[row.type] ?? row.type,
+      id: "phone",
+      header: labels.phone,
+      className: "whitespace-nowrap font-mono text-xs",
+      render: (row) => (
+        <span dir="ltr" className="text-muted-foreground">
+          {row.phone ?? "-"}
+        </span>
+      ),
     },
     {
-      field: "email",
-      headerName: labels.email,
-      width: 220,
-      sortable: false,
-      renderCell: (params) => <span dir="ltr">{params.row.email ?? "-"}</span>,
+      id: "city",
+      header: labels.city,
+      className: "whitespace-nowrap text-muted-foreground",
+      render: (row) => row.city ?? "-",
     },
     {
-      field: "phone",
-      headerName: labels.phone,
-      width: 150,
-      sortable: false,
-      renderCell: (params) => <span dir="ltr">{params.row.phone ?? "-"}</span>,
-    },
-    { field: "city", headerName: labels.city, width: 150, sortable: false },
-    {
-      field: "status",
-      headerName: labels.status,
-      width: 120,
-      sortable: false,
-      renderCell: (params) =>
-        params.row.archivedAt ? (
+      id: "status",
+      header: labels.status,
+      className: "whitespace-nowrap",
+      render: (row) =>
+        row.archivedAt ? (
           <Badge tone="gray">{labels.archived}</Badge>
         ) : (
           <Badge tone="green">{labels.active}</Badge>
         ),
     },
     {
-      field: "actions",
-      headerName: labels.actions,
-      width: 170,
-      sortable: false,
-      renderCell: (params) => (
-        <MuiStack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+      id: "actions",
+      header: labels.actions,
+      align: "end",
+      className: "whitespace-nowrap",
+      render: (row) => (
+        <div className="inline-flex items-center justify-end gap-1">
           <ActionLink
-            href={`/clients/${params.row.id}`}
+            href={`/clients/${row.id}`}
             action="preview"
             label={labels.preview}
           />
           {canWrite ? (
             <ActionLink
-              href={`/clients/${params.row.id}/edit`}
+              href={`/clients/${row.id}/edit`}
               action="edit"
               label={labels.edit}
             />
           ) : null}
-          {canWrite && !params.row.archivedAt ? (
+          {canWrite && !row.archivedAt ? (
             <RowActionButton
-              id={params.row.id}
+              id={row.id}
               action={archiveAction}
               kind="archive"
               label={labels.archive}
@@ -153,13 +163,25 @@ export function ClientsTable({
               successTitle={labels.archivedToast}
             />
           ) : null}
-        </MuiStack>
+          {canWrite && row.canDelete && deleteAction ? (
+            <RowActionButton
+              id={row.id}
+              action={deleteAction}
+              kind="delete"
+              label={labels.delete ?? "حذف"}
+              title={labels.delete ?? "حذف"}
+              message={labels.deleteConfirm ?? ""}
+              confirmLabel={labels.delete ?? "حذف"}
+              successTitle={labels.deletedToast ?? ""}
+            />
+          ) : null}
+        </div>
       ),
     },
   ];
 
   return (
-    <ServerDataGrid
+    <ServerDataTable
       rows={rows}
       columns={columns}
       total={total}
@@ -168,6 +190,7 @@ export function ClientsTable({
       basePath="/clients"
       query={query}
       noRowsLabel={labels.empty}
+      emptyIcon={<Users size={36} className="text-muted-foreground" aria-hidden="true" />}
     />
   );
 }

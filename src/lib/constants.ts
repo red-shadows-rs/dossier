@@ -3,6 +3,10 @@ export type Role = (typeof ROLES)[number];
 export const LOCALES = ["ar", "en"] as const;
 export type Locale = (typeof LOCALES)[number];
 export const LANG_MODES = ["ar", "en", "bilingual"] as const;
+export const GENERAL_LANG_MODES = ["ar", "en"] as const;
+export type GeneralLangMode = (typeof GENERAL_LANG_MODES)[number];
+export const INVOICE_LANG_MODES = ["ar", "en"] as const;
+export type InvoiceLangMode = (typeof INVOICE_LANG_MODES)[number];
 export const CLIENT_TYPES = ["company", "individual"] as const;
 export const PROJECT_STATUSES = [
   "lead",

@@ -2,6 +2,7 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
+import { Ban, Check, CheckCheck, PenTool, Send, Type, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Field } from "@/components/ui/Field";
@@ -157,7 +158,8 @@ export function SigningExperience({
         </h2>
         <p className="text-sm text-muted-foreground">{t("otpHint")}</p>
         <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="secondary" onClick={requestOtp} loading={pending}>
+          <Button type="button" variant="secondary" onClick={requestOtp} loading={pending} className="gap-2">
+            <Send className="h-4 w-4" />
             {otpSent ? t("resendCode") : t("sendCode")}
           </Button>
           {otpSent ? (
@@ -166,7 +168,7 @@ export function SigningExperience({
             </span>
           ) : null}
         </div>
-        <form onSubmit={verifyOtp} className="flex items-end gap-2">
+        <form onSubmit={verifyOtp} noValidate className="flex items-end gap-2">
           <Field label={t("code")} htmlFor="otp-code" className="flex-1">
             <Input
               id="otp-code"
@@ -179,7 +181,8 @@ export function SigningExperience({
               disabled={pending}
             />
           </Field>
-          <Button type="submit" loading={pending}>
+          <Button type="submit" loading={pending} className="gap-2">
+            <Check className="h-4 w-4" />
             {t("verify")}
           </Button>
         </form>
@@ -195,6 +198,7 @@ export function SigningExperience({
   return (
     <form
       onSubmit={submit}
+      noValidate
       className="flex flex-col gap-4 rounded-md border border-border p-4"
     >
       <h2 className="text-base font-semibold text-foreground">
@@ -207,7 +211,6 @@ export function SigningExperience({
           name="fullName"
           defaultValue={signatoryName}
           disabled={pending}
-          required
         />
       </Field>
 
@@ -217,26 +220,28 @@ export function SigningExperience({
           aria-current={method === "drawn" ? "true" : undefined}
           onClick={() => setMethod("drawn")}
           className={cn(
-            "rounded-md border px-3 py-1.5 text-sm",
+            "flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm",
             method === "drawn"
               ? "border-primary bg-primary text-primary-foreground"
               : "border-border text-muted-foreground",
           )}
         >
-          {t("drawn")}
+          <PenTool className="h-4 w-4" />
+          <span>{t("drawn")}</span>
         </button>
         <button
           type="button"
           aria-current={method === "typed" ? "true" : undefined}
           onClick={() => setMethod("typed")}
           className={cn(
-            "rounded-md border px-3 py-1.5 text-sm",
+            "flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm",
             method === "typed"
               ? "border-primary bg-primary text-primary-foreground"
               : "border-border text-muted-foreground",
           )}
         >
-          {t("typed")}
+          <Type className="h-4 w-4" />
+          <span>{t("typed")}</span>
         </button>
       </div>
 
@@ -276,7 +281,8 @@ export function SigningExperience({
       ) : null}
 
       <div className="flex flex-wrap justify-between gap-2">
-        <Button type="submit" loading={pending}>
+        <Button type="submit" loading={pending} className="gap-2">
+          <CheckCheck className="h-4 w-4" />
           {t("sign")}
         </Button>
         <Button
@@ -284,7 +290,9 @@ export function SigningExperience({
           variant="ghost"
           onClick={() => setDeclining((value) => !value)}
           disabled={pending}
+          className="gap-2"
         >
+          <XCircle className="h-4 w-4" />
           {t("decline")}
         </Button>
       </div>
@@ -306,7 +314,9 @@ export function SigningExperience({
               variant="danger"
               onClick={decline}
               loading={pending}
+              className="gap-2"
             >
+              <Ban className="h-4 w-4" />
               {t("declineConfirm")}
             </Button>
           </div>

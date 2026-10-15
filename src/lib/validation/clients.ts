@@ -50,4 +50,8 @@ export const clientInputSchema = z
     path: ["nameAr"],
   });
 
+export const deleteClientSchema = z.object({
+  id: z.string().min(1),
+});
+
 export type ClientInput = z.infer<typeof clientInputSchema>;

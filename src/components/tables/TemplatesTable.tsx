@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { DataGrid, type GridColDef } from "@mui/x-data-grid";
-import MuiLink from "@mui/material/Link";
-import MuiStack from "@mui/material/Stack";
+import { useLocale } from "next-intl";
+import { FileCode2 } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge } from "@/components/ui/Badge";
 import { RowActionButton } from "@/components/forms/RowActionButton";
+import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
 import type { ActionResult } from "@/lib/result";
 
 export type TemplateTableRow = {
@@ -46,85 +46,81 @@ export function TemplatesTable({
   labels: TemplateTableLabels;
   archiveAction: (raw: unknown) => Promise<ActionResult<null>>;
 }) {
-  const columns: GridColDef<TemplateTableRow>[] = [
+  const locale = useLocale();
+
+  const columns: ColumnDef<TemplateTableRow>[] = [
     {
-      field: "name",
-      headerName: labels.name,
-      flex: 1,
-      minWidth: 240,
-      sortable: false,
-      renderCell: (params) => (
-        <MuiLink
-          component={Link}
-          href={`/templates/${params.row.id}`}
-          underline="hover"
-          color="inherit"
-          sx={{ fontWeight: 600 }}
-        >
-          <span dir="rtl" lang="ar">
-            {params.row.nameAr}
-          </span>
-          {" / "}
-          <span dir="ltr" lang="en">
-            {params.row.nameEn}
-          </span>
-        </MuiLink>
-      ),
+      id: "name",
+      header: labels.name,
+      render: (row) => {
+        const name =
+          locale === "ar"
+            ? (row.nameAr || row.nameEn || "-")
+            : (row.nameEn || row.nameAr || "-");
+        const dir =
+          locale === "ar"
+            ? (row.nameAr ? "rtl" : "ltr")
+            : (row.nameEn ? "ltr" : "rtl");
+        return (
+          <Link
+            href={`/templates/${row.id}`}
+            className="font-semibold text-foreground hover:text-primary transition-colors"
+          >
+            <span dir={dir}>{name}</span>
+          </Link>
+        );
+      },
     },
     {
-      field: "type",
-      headerName: labels.typeLabel,
-      width: 140,
-      sortable: false,
-      valueGetter: (_value, row) => labels.typeValues[row.type] ?? row.type,
+      id: "type",
+      header: labels.typeLabel,
+      className: "whitespace-nowrap text-muted-foreground",
+      render: (row) => labels.typeValues[row.type] ?? row.type,
     },
     {
-      field: "defaultLanguageMode",
-      headerName: labels.language,
-      width: 150,
-      sortable: false,
-      valueGetter: (_value, row) =>
+      id: "defaultLanguageMode",
+      header: labels.language,
+      className: "whitespace-nowrap text-muted-foreground",
+      render: (row) =>
         labels.languageValues[row.defaultLanguageMode] ??
         row.defaultLanguageMode,
     },
     {
-      field: "clauseCount",
-      headerName: labels.clauses,
-      width: 120,
-      sortable: false,
-      renderCell: (params) => (
-        <span dir="ltr" style={{ fontVariantNumeric: "tabular-nums" }}>
-          {params.row.clauseCount}
+      id: "clauseCount",
+      header: labels.clauses,
+      className: "whitespace-nowrap font-mono text-xs text-muted-foreground",
+      render: (row) => (
+        <span dir="ltr" className="tabular-nums">
+          {row.clauseCount}
         </span>
       ),
     },
     {
-      field: "source",
-      headerName: labels.source,
-      width: 130,
-      sortable: false,
-      renderCell: (params) =>
-        params.row.isSystem ? (
+      id: "source",
+      header: labels.source,
+      className: "whitespace-nowrap",
+      render: (row) =>
+        row.isSystem ? (
           <Badge tone="blue">{labels.system}</Badge>
         ) : (
           <Badge tone="gray">{labels.custom}</Badge>
         ),
     },
     {
-      field: "actions",
-      headerName: labels.actions,
-      width: 130,
-      sortable: false,
-      renderCell: (params) => (
-        <MuiStack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+      id: "actions",
+      header: labels.actions,
+      align: "end",
+      className: "whitespace-nowrap",
+      render: (row) => (
+        <div className="inline-flex items-center justify-end gap-1">
           <ActionLink
-            href={`/templates/${params.row.id}`}
+            href={`/templates/${row.id}`}
             action="preview"
             label={labels.preview}
           />
-          {!params.row.isSystem ? (
+          {!row.isSystem ? (
             <RowActionButton
-              id={params.row.id}
+              id={row.id}
               action={archiveAction}
               kind="archive"
               label={labels.archive}
@@ -134,25 +130,17 @@ export function TemplatesTable({
               successTitle={labels.archivedToast}
             />
           ) : null}
-        </MuiStack>
+        </div>
       ),
     },
   ];
 
   return (
-    <DataGrid<TemplateTableRow>
+    <ServerDataTable
       rows={rows}
       columns={columns}
-      getRowId={(row) => row.id}
-      disableColumnMenu
-      disableColumnFilter
-      disableColumnSelector
-      disableRowSelectionOnClick
-      autoHeight
-      initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
-      pageSizeOptions={[10, 25, 50]}
-      localeText={{ noRowsLabel: labels.empty }}
-      sx={{ border: 0 }}
+      noRowsLabel={labels.empty}
+      emptyIcon={<FileCode2 size={36} className="text-muted-foreground" aria-hidden="true" />}
     />
   );
 }

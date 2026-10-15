@@ -2,10 +2,10 @@ import { getTranslations } from "next-intl/server";
 import {
   SettingsForm,
   type SettingsFieldDef,
+  type SettingsSectionDef,
   type SettingsValues,
 } from "@/components/forms/SettingsForm";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { CURRENCIES, LANG_MODES } from "@/lib/constants";
+import { CURRENCIES, GENERAL_LANG_MODES } from "@/lib/constants";
 import { can } from "@/lib/permissions";
 import { updateDefaultsAction } from "@/server/actions/settings";
 import { requireUserPage } from "@/server/auth/require-user";
@@ -17,7 +17,7 @@ export default async function DefaultsSettingsPage() {
   const t = await getTranslations("settings");
   const defaults = getSettings("defaults");
 
-  const fields: SettingsFieldDef[] = [
+  const regionalFields: SettingsFieldDef[] = [
     {
       kind: "text",
       name: "country",
@@ -36,6 +36,18 @@ export default async function DefaultsSettingsPage() {
       })),
     },
     {
+      kind: "select",
+      name: "languageMode",
+      label: t("fields.languageMode"),
+      options: GENERAL_LANG_MODES.map((mode) => ({
+        value: mode,
+        label: t(`languageModes.${mode}`),
+      })),
+    },
+  ];
+
+  const financialFields: SettingsFieldDef[] = [
+    {
       kind: "number",
       name: "taxRatePercent",
       label: t("fields.taxRate"),
@@ -51,15 +63,9 @@ export default async function DefaultsSettingsPage() {
       min: 0,
       max: 365,
     },
-    {
-      kind: "select",
-      name: "languageMode",
-      label: t("fields.languageMode"),
-      options: LANG_MODES.map((mode) => ({
-        value: mode,
-        label: t(`languageModes.${mode}`),
-      })),
-    },
+  ];
+
+  const legalFields: SettingsFieldDef[] = [
     {
       kind: "text",
       name: "governingLawAr",
@@ -86,6 +92,21 @@ export default async function DefaultsSettingsPage() {
     },
   ];
 
+  const sections: SettingsSectionDef[] = [
+    {
+      title: t("regionalInfo"),
+      fields: regionalFields,
+    },
+    {
+      title: t("financialTerms"),
+      fields: financialFields,
+    },
+    {
+      title: t("legalInfo"),
+      fields: legalFields,
+    },
+  ];
+
   const values: SettingsValues = {
     country: defaults.country,
     timezone: defaults.timezone,
@@ -100,18 +121,11 @@ export default async function DefaultsSettingsPage() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("defaults")}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <SettingsForm
-          fields={fields}
-          values={values}
-          action={updateDefaultsAction}
-          disabled={!canWrite}
-        />
-      </CardContent>
-    </Card>
+    <SettingsForm
+      sections={sections}
+      values={values}
+      action={updateDefaultsAction}
+      disabled={!canWrite}
+    />
   );
 }

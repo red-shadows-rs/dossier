@@ -35,6 +35,7 @@ import {
 import {
   archiveClientAction,
   createClientAction,
+  deleteClientAction,
   unarchiveClientAction,
   updateClientAction,
 } from "./clients";
@@ -111,6 +112,7 @@ const TABLE: Entry[] = [
   { name: "updateClientAction", action: updateClientAction, viewerForbidden: true },
   { name: "archiveClientAction", action: archiveClientAction, viewerForbidden: true },
   { name: "unarchiveClientAction", action: unarchiveClientAction, viewerForbidden: true },
+  { name: "deleteClientAction", action: deleteClientAction, viewerForbidden: true },
 
   { name: "createProjectAction", action: createProjectAction, viewerForbidden: true },
   { name: "updateProjectAction", action: updateProjectAction, viewerForbidden: true },

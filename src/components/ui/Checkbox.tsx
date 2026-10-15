@@ -2,7 +2,7 @@
 
 import type { ChangeEventHandler, ReactNode } from "react";
 import MuiCheckbox from "@mui/material/Checkbox";
-import MuiFormControlLabel from "@mui/material/FormControlLabel";
+import type { SxProps, Theme } from "@mui/material/styles";
 
 export function Checkbox({
   id,
@@ -13,32 +13,52 @@ export function Checkbox({
   checked,
   onChange,
   disabled,
+  className,
+  sx,
 }: {
   id?: string;
   name?: string;
   value?: string;
-  label: ReactNode;
+  label?: ReactNode;
   defaultChecked?: boolean;
   checked?: boolean;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   disabled?: boolean;
+  className?: string;
+  sx?: SxProps<Theme>;
 }) {
-  return (
-    <MuiFormControlLabel
-      control={
-        <MuiCheckbox
-          id={id}
-          name={name}
-          value={value}
-          size="small"
-          defaultChecked={defaultChecked}
-          checked={checked}
-          onChange={onChange}
-          disabled={disabled}
-        />
-      }
-      label={label}
-      sx={{ mr: 0 }}
+  const checkbox = (
+    <MuiCheckbox
+      id={id}
+      name={name}
+      value={value}
+      size="small"
+      defaultChecked={defaultChecked}
+      checked={checked}
+      onChange={onChange}
+      disabled={disabled}
+      className={`cursor-pointer ${className ?? ""}`}
+      sx={{
+        cursor: disabled ? "not-allowed" : "pointer",
+        "& input": { cursor: disabled ? "not-allowed" : "pointer" },
+        "& .MuiSvgIcon-root": { cursor: disabled ? "not-allowed" : "pointer" },
+        ...sx,
+      }}
     />
+  );
+
+  if (!label) {
+    return checkbox;
+  }
+
+  return (
+    <label
+      className={`inline-flex items-center gap-2 select-none ${
+        disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+      } ${className ?? ""}`}
+    >
+      {checkbox}
+      <span className="text-sm font-medium text-foreground">{label}</span>
+    </label>
   );
 }

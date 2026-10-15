@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { FolderKanban, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Field } from "@/components/ui/Field";
@@ -46,6 +47,7 @@ export function ProjectForm({
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -54,6 +56,7 @@ export function ProjectForm({
     for (const [key, value] of data.entries()) payload[key] = String(value);
     setPending(true);
     setFieldErrors({});
+    setStatusError(null);
     const result =
       mode === "create"
         ? await createProjectAction(payload)
@@ -70,7 +73,12 @@ export function ProjectForm({
       return;
     }
     if (result.error.fieldErrors) setFieldErrors(result.error.fieldErrors);
-    toast({ title: t(`errors.${result.error.code}`), tone: "error" });
+    const msg =
+      result.error.code === "VALIDATION_FAILED"
+        ? t("auth.requiredFields")
+        : t(`errors.${result.error.code}`);
+    setStatusError(msg);
+    toast({ title: msg, tone: "error" });
   }
 
   const fieldError = (name: string): string | null => {
@@ -79,12 +87,23 @@ export function ProjectForm({
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+      {statusError ? (
+        <p
+          role="alert"
+          className="rounded border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm font-medium text-destructive"
+        >
+          {statusError}
+        </p>
+      ) : null}
       <Card>
         <CardHeader>
-          <CardTitle>{t("projects.details")}</CardTitle>
+          <CardTitle className="inline-flex items-center gap-2">
+            <FolderKanban size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("projects.details")}</span>
+          </CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
           <Field
             label={t("projects.client")}
             htmlFor="project-client"
@@ -96,7 +115,6 @@ export function ProjectForm({
               name="clientId"
               defaultValue={initial.clientId}
               disabled={pending}
-              required
             >
               <option value="">{t("projects.selectClient")}</option>
               {clients.map((client) => (
@@ -230,7 +248,7 @@ export function ProjectForm({
             label={t("projects.description")}
             htmlFor="project-description"
             error={fieldError("description")}
-            className="md:col-span-2"
+            className="md:col-span-2 2xl:col-span-3"
           >
             <Textarea
               id="project-description"
@@ -243,7 +261,7 @@ export function ProjectForm({
             label={t("projects.notes")}
             htmlFor="project-notes"
             error={fieldError("notes")}
-            className="md:col-span-2"
+            className="md:col-span-2 2xl:col-span-3"
           >
             <Textarea
               id="project-notes"
@@ -261,10 +279,13 @@ export function ProjectForm({
           variant="secondary"
           onClick={() => router.back()}
           disabled={pending}
+          className="gap-2"
         >
+          <X className="h-4 w-4" />
           {t("common.cancel")}
         </Button>
-        <Button type="submit" loading={pending}>
+        <Button type="submit" loading={pending} className="gap-2">
+          <Save className="h-4 w-4" />
           {t("common.save")}
         </Button>
       </div>

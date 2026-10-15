@@ -1,27 +1,19 @@
 import Link from "next/link";
-import { Filter, RotateCcw } from "lucide-react";
+import { RotateCcw, Search, ShieldCheck } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Field } from "@/components/ui/Field";
-import { Input } from "@/components/ui/Input";
-import { Pagination } from "@/components/ui/Pagination";
+import { Card, CardContent } from "@/components/ui/Card";
+import { DatePicker } from "@/components/ui/DatePicker";
+import { Input, InputAdornment } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableEmpty,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from "@/components/ui/Table";
+import { AuditTable } from "@/components/tables/AuditTable";
+import { FilterDropdown } from "@/components/tables/FilterDropdown";
 import { AUDIT_ACTIONS } from "@/lib/constants";
-import { formatInstant } from "@/lib/dates";
 import { isLocale } from "@/lib/i18n";
 import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
 import { listAuditEntries } from "@/server/services/audit";
+import { smoothLoading } from "@/lib/smooth-loader";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -36,6 +28,7 @@ export default async function AuditPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
+  await smoothLoading();
   const user = await requireUserPage();
   assertCan(user, "audit.read");
 
@@ -61,7 +54,6 @@ export default async function AuditPage({
     to,
     page: requestedPage,
   });
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   const query: Record<string, string> = {};
   if (entityType) query.entityType = entityType;
@@ -70,156 +62,210 @@ export default async function AuditPage({
   if (from) query.from = from;
   if (to) query.to = to;
 
-  return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
+  const hasActiveFilters = Boolean(
+    entityType || entityId || action || from || to,
+  );
+  const activeFilterCount =
+    (action ? 1 : 0) + (from ? 1 : 0) + (to ? 1 : 0);
 
-      <Card>
-        <CardContent>
-          <form
-            method="get"
-            className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-6"
-          >
-            <Field label={t("entityType")} htmlFor="entityType">
-              <Input
-                id="entityType"
-                name="entityType"
-                dir="ltr"
-                defaultValue={entityType ?? ""}
-                className="text-start"
-              />
-            </Field>
-            <Field label={t("entityId")} htmlFor="entityId">
-              <Input
-                id="entityId"
-                name="entityId"
-                dir="ltr"
-                defaultValue={entityId ?? ""}
-                className="text-start"
-              />
-            </Field>
-            <Field label={t("action")} htmlFor="action">
-              <Select id="action" name="action" defaultValue={action ?? ""}>
-                <option value="">{t("allActions")}</option>
-                {AUDIT_ACTIONS.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Field label={t("from")} htmlFor="from">
-              <Input
-                id="from"
-                name="from"
-                type="date"
-                defaultValue={from ?? ""}
-                className="text-start"
-              />
-            </Field>
-            <Field label={t("to")} htmlFor="to">
-              <Input
-                id="to"
-                name="to"
-                type="date"
-                defaultValue={to ?? ""}
-                className="text-start"
-              />
-            </Field>
-            <div className="flex items-end gap-2">
-              <Button type="submit">
-                <Filter size={16} aria-hidden="true" />
-                {tc("filter")}
-              </Button>
-              <Link href="/audit">
-                <Button type="button" variant="secondary">
-                  <RotateCcw size={16} aria-hidden="true" />
-                  {tc("reset")}
-                </Button>
-              </Link>
+  return (
+    <div className="flex flex-col gap-5 sm:gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+            <ShieldCheck size={20} aria-hidden="true" />
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">{t("title")}</h1>
+              <span className="inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground translate-y-0.5">
+                {total}
+              </span>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <Card className="overflow-visible">
+        <CardContent className="p-3 sm:p-4 overflow-visible">
+          <form method="get" className="flex flex-col gap-2.5">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+              <div className="flex flex-1 items-center gap-2 min-w-[280px]">
+                <div className="relative flex-1">
+                  <Input
+                    id="entityType"
+                    name="entityType"
+                    dir="ltr"
+                    defaultValue={entityType ?? ""}
+                    placeholder={t("entityTypePlaceholder")}
+                    className="text-start"
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <Search
+                          size={16}
+                          className="text-muted-foreground"
+                          aria-hidden="true"
+                        />
+                      </InputAdornment>
+                    }
+                  />
+                </div>
+                <div className="w-48 shrink-0">
+                  <Input
+                    id="entityId"
+                    name="entityId"
+                    dir="ltr"
+                    defaultValue={entityId ?? ""}
+                    placeholder={t("entityIdPlaceholder")}
+                    className="text-start"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  variant="secondary"
+                  className="shrink-0 gap-1.5 h-10 px-4 border-border/80 font-medium"
+                >
+                  <Search size={15} aria-hidden="true" />
+                  <span>{tc("search")}</span>
+                </Button>
+              </div>
+
+              <FilterDropdown
+                label={tc("filter")}
+                activeCount={activeFilterCount}
+                title={tc("filterOptions")}
+                applyLabel={tc("applyFilters")}
+                resetLabel={tc("reset")}
+                resetHref="/audit"
+              >
+                <div>
+                  <label
+                    htmlFor="action"
+                    className="mb-1 block text-xs font-semibold text-muted-foreground cursor-pointer select-none"
+                  >
+                    {t("allActions")}
+                  </label>
+                  <Select id="action" name="action" defaultValue={action ?? ""}>
+                    <option value="">{t("allActions")}</option>
+                    {AUDIT_ACTIONS.map((value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label
+                      htmlFor="from"
+                      className="mb-1 block text-xs font-semibold text-muted-foreground cursor-pointer select-none"
+                    >
+                      {t("from")}
+                    </label>
+                    <DatePicker
+                      id="from"
+                      name="from"
+                      defaultValue={from ?? ""}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="to"
+                      className="mb-1 block text-xs font-semibold text-muted-foreground cursor-pointer select-none"
+                    >
+                      {t("to")}
+                    </label>
+                    <DatePicker
+                      id="to"
+                      name="to"
+                      defaultValue={to ?? ""}
+                    />
+                  </div>
+                </div>
+              </FilterDropdown>
+
+              {hasActiveFilters ? (
+                <Link href="/audit" className="shrink-0 no-underline">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="gap-1.5 h-10 px-3"
+                  >
+                    <RotateCcw size={15} aria-hidden="true" />
+                    <span>{tc("reset")}</span>
+                  </Button>
+                </Link>
+              ) : null}
+            </div>
+
+            {hasActiveFilters ? (
+              <div className="flex flex-wrap items-center gap-1.5 border-t border-border/40 pt-2.5 text-xs text-muted-foreground">
+                <span className="font-medium text-foreground ms-0.5">
+                  {tc("activeFilters")}:
+                </span>
+                {entityType ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{t("entityType")}: {entityType}</span>
+                  </span>
+                ) : null}
+                {entityId ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{t("entityId")}: {entityId}</span>
+                  </span>
+                ) : null}
+                {action ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{t("action")}: {action}</span>
+                  </span>
+                ) : null}
+                {from ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{t("from")}: {from}</span>
+                  </span>
+                ) : null}
+                {to ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{t("to")}: {to}</span>
+                  </span>
+                ) : null}
+                <Link
+                  href="/audit"
+                  className="ms-auto text-xs text-muted-foreground hover:text-foreground no-underline"
+                >
+                  {tc("clearFilters")}
+                </Link>
+              </div>
+            ) : null}
           </form>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("title")}</CardTitle>
-          <span
-            className="text-sm text-muted-foreground tabular-nums"
-            dir="ltr"
-          >
-            {total}
-          </span>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeaderCell>{t("when")}</TableHeaderCell>
-                <TableHeaderCell>{t("actor")}</TableHeaderCell>
-                <TableHeaderCell>{t("action")}</TableHeaderCell>
-                <TableHeaderCell>{t("entity")}</TableHeaderCell>
-                <TableHeaderCell>{t("ip")}</TableHeaderCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.length === 0 ? (
-                <TableEmpty colSpan={5}>{tc("noResults")}</TableEmpty>
-              ) : (
-                rows.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell className="whitespace-nowrap">
-                      {formatInstant(row.ts, "UTC", locale)}
-                    </TableCell>
-                    <TableCell>
-                      <span className="flex flex-col">
-                        <span>{t(`actorType.${row.actorType}`)}</span>
-                        {row.actorId ? (
-                          <span
-                            className="text-xs text-muted-foreground"
-                            dir="ltr"
-                          >
-                            {row.actorId}
-                          </span>
-                        ) : null}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span dir="ltr" className="text-start">
-                        {row.action}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="flex flex-col">
-                        <span>{row.entityType}</span>
-                        <span
-                          className="text-xs text-muted-foreground"
-                          dir="ltr"
-                        >
-                          {row.entityId}
-                        </span>
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span dir="ltr" className="text-start">
-                        {row.ip ?? "-"}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            basePath="/audit"
-            query={query}
-          />
-        </CardContent>
-      </Card>
+      <div className="rounded border border-border bg-card overflow-hidden">
+        <AuditTable
+          rows={rows}
+          total={total}
+          page={page}
+          pageSize={pageSize}
+          basePath="/audit"
+          query={query}
+          locale={locale}
+          labels={{
+            when: t("when"),
+            actor: t("actor"),
+            action: t("action"),
+            entity: t("entity"),
+            ip: t("ip"),
+            empty: tc("noResults"),
+            actorTypes: Object.fromEntries(
+              ["system", "user", "signer"].map((type) => [
+                type,
+                t(`actorType.${type}`),
+              ]),
+            ),
+          }}
+        />
+      </div>
     </div>
   );
 }

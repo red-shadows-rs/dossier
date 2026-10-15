@@ -100,7 +100,7 @@ describe("renderEmail — test_email", () => {
     const ar = renderEmail("test_email", "ar", {}, COMPANY);
     expect(ar.subject).toBe("رسالة اختبار من Dossier");
     expect(ar.html).toContain('dir="rtl"');
-    expect(ar.html).toContain("أُرسلت من RED SHADOWS");
+    expect(ar.html).toContain("أرسلت من RED SHADOWS");
   });
 });
 
@@ -135,7 +135,7 @@ describe("renderEmail — contract_signed_copy", () => {
       },
       COMPANY,
     );
-    expect(ar.subject).toBe("العقد الموقّع DOS-C-2026-0001");
+    expect(ar.subject).toBe("العقد الموقع DOS-C-2026-0001");
     expect(ar.html).toContain('dir="rtl"');
     expect(ar.text).toContain("ABCDEFGH1234");
   });

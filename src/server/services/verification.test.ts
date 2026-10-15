@@ -227,7 +227,7 @@ function issuedInvoice(): { id: string; code: string } {
     user,
     {
       projectId,
-      languageMode: "bilingual",
+      languageMode: "ar",
       notesAr: null,
       notesEn: null,
     },

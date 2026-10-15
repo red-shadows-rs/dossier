@@ -31,7 +31,12 @@ export function Providers({
     [rtl],
   );
 
-  const theme = useMemo(() => createAppTheme(dir), [dir]);
+  const defaultMode = colorTheme === "light" ? "light" : "dark";
+
+  const theme = useMemo(
+    () => createAppTheme(dir, defaultMode),
+    [dir, defaultMode],
+  );
 
   useEffect(() => {
     if (colorTheme !== "system") {
@@ -50,7 +55,9 @@ export function Providers({
 
   return (
     <AppRouterCacheProvider key={dir} options={options}>
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      <ThemeProvider theme={theme} defaultMode={defaultMode}>
+        {children}
+      </ThemeProvider>
     </AppRouterCacheProvider>
   );
 }

@@ -35,7 +35,7 @@ function pickTitle(
 }
 
 function greeting(locale: Locale, name: string): string {
-  if (locale === "ar") return name ? `مرحباً ${name}،` : "مرحباً،";
+  if (locale === "ar") return name ? `مرحبا ${name}،` : "مرحبا،";
   return name ? `Hello ${name},` : "Hello,";
 }
 
@@ -48,7 +48,7 @@ function shell(
   const align = locale === "ar" ? "right" : "left";
   const footer =
     locale === "ar"
-      ? `أُرسلت من ${escapeHtml(companyName)}`
+      ? `أرسلت من ${escapeHtml(companyName)}`
       : `Sent by ${escapeHtml(companyName)}`;
   return `<!doctype html>
 <html dir="${dir}" lang="${locale}">
@@ -106,7 +106,7 @@ function renderSigningLink(
 
   const greetingRaw = greeting(locale, name);
   const leadRaw = ar
-    ? `${companyName} أرسل إليك عقداً للمراجعة والتوقيع.`
+    ? `${companyName} أرسل إليك عقدا للمراجعة والتوقيع.`
     : `${companyName} has sent you a contract to review and sign.`;
   const validRaw = expiry
     ? ar
@@ -201,12 +201,12 @@ function renderSignedCopy(
   const name = readText(payload, "recipientName");
 
   const subject = ar
-    ? `العقد الموقّع ${number}`
+    ? `العقد الموقع ${number}`
     : `Signed contract ${number}`;
 
   const greetingRaw = greeting(locale, name);
   const leadRaw = ar
-    ? "وقّع جميع الأطراف على العقد. تجد النسخة الموقّعة مرفقة بهذا البريد."
+    ? "وقع جميع الأطراف على العقد. تجد النسخة الموقعة مرفقة بهذا البريد."
     : "All parties have signed the contract. The signed copy is attached to this email.";
   const verifyRaw = code
     ? ar
@@ -309,7 +309,7 @@ function renderInvoiceIssued(
 
   const greetingRaw = greeting(locale, name);
   const leadRaw = ar
-    ? "تجد مرفقاً فاتورة جديدة."
+    ? "تجد مرفقا فاتورة جديدة."
     : "Please find your invoice attached.";
   const amountRaw = amount
     ? ar
@@ -375,7 +375,7 @@ function renderInvoiceOverdueReminder(
 
   const greetingRaw = greeting(locale, name);
   const leadRaw = ar
-    ? "نودّ تذكيركم بأن الفاتورة التالية متأخرة السداد."
+    ? "نود تذكيركم بأن الفاتورة التالية متأخرة السداد."
     : "This is a reminder that the following invoice is overdue.";
   const balanceRaw = balance
     ? ar

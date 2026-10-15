@@ -509,9 +509,9 @@ export const invoices = sqliteTable(
     status: text("status", { enum: C.INVOICE_STATUSES })
       .notNull()
       .default("draft"),
-    languageMode: text("language_mode", { enum: C.LANG_MODES })
+    languageMode: text("language_mode", { enum: C.INVOICE_LANG_MODES })
       .notNull()
-      .default("bilingual"),
+      .default("ar"),
     currency: text("currency").notNull(),
     issueDate: text("issue_date"),
     dueDate: text("due_date"),

@@ -1,7 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import {
+  Building2,
+  FileText,
+  FolderKanban,
+  Pencil,
+  Receipt,
+  Users,
+} from "lucide-react";
 import { ClientArchiveButton } from "@/components/forms/ClientArchiveButton";
+import { ClientDeleteButton } from "@/components/forms/ClientDeleteButton";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -9,7 +18,8 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { AppError } from "@/lib/errors";
 import { can } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
-import { getClient } from "@/server/services/clients";
+import { canDeleteClient, getClient } from "@/server/services/clients";
+import { smoothLoading } from "@/lib/smooth-loader";
 
 function Row({
   label,
@@ -22,9 +32,9 @@ function Row({
 }) {
   if (!value) return null;
   return (
-    <div className="flex flex-col gap-0.5">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd dir={dir} className="text-sm text-foreground">
+    <div className="flex flex-col gap-1 rounded border border-border/60 bg-muted/20 p-2.5 transition-colors hover:bg-muted/30">
+      <dt className="text-xs font-medium text-muted-foreground">{label}</dt>
+      <dd dir={dir} className="text-sm font-semibold tracking-tight text-foreground break-words">
         {value}
       </dd>
     </div>
@@ -36,8 +46,11 @@ export default async function ClientDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await smoothLoading();
   const user = await requireUserPage();
   const t = await getTranslations("clients");
+  const rawLocale = await getLocale();
+  const locale = rawLocale === "en" ? "en" : "ar";
   const { id } = await params;
 
   let client;
@@ -51,40 +64,63 @@ export default async function ClientDetailPage({
   }
 
   const canWrite = can(user, "clients.write");
+  const canDelete = canDeleteClient(id);
+  const clientDisplayName =
+    (locale === "ar"
+      ? client.nameAr || client.nameEn
+      : client.nameEn || client.nameAr) ?? "-";
+  const clientDir =
+    locale === "ar"
+      ? (client.nameAr ? "rtl" : "ltr")
+      : (client.nameEn ? "ltr" : "rtl");
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-foreground">
-            <span dir="rtl" lang="ar">
-              {client.nameAr ?? client.nameEn ?? "-"}
-            </span>
-          </h1>
-          {client.archivedAt ? (
-            <Badge tone="gray">{t("archived")}</Badge>
-          ) : (
-            <Badge tone="green">{t("active")}</Badge>
-          )}
+    <div className="flex flex-col gap-5 sm:gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+            <Users size={20} aria-hidden="true" />
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                <span dir={clientDir}>
+                  {clientDisplayName}
+                </span>
+              </h1>
+              {client.archivedAt ? (
+                <Badge tone="gray" className="translate-y-0.5">{t("archived")}</Badge>
+              ) : (
+                <Badge tone="green" className="translate-y-0.5">{t("active")}</Badge>
+              )}
+            </div>
+          </div>
         </div>
         {canWrite ? (
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Link href={`/clients/${client.id}/edit`}>
-              <Button type="button" variant="secondary">
-                {t("edit")}
+              <Button type="button" variant="secondary" className="gap-1.5 font-medium shadow-xs">
+                <Pencil size={15} aria-hidden="true" />
+                <span>{t("edit")}</span>
               </Button>
             </Link>
             <ClientArchiveButton
               clientId={client.id}
               archived={client.archivedAt !== null}
             />
+            {canDelete ? (
+              <ClientDeleteButton clientId={client.id} />
+            ) : null}
           </div>
         ) : null}
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("identity")}</CardTitle>
+          <CardTitle className="inline-flex items-center gap-2">
+            <Building2 size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("identity")}</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -124,7 +160,10 @@ export default async function ClientDetailPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("projects")}</CardTitle>
+          <CardTitle className="inline-flex items-center gap-2">
+            <FolderKanban size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("projects")}</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <EmptyState title={t("noProjects")} />
@@ -133,7 +172,10 @@ export default async function ClientDetailPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("contracts")}</CardTitle>
+          <CardTitle className="inline-flex items-center gap-2">
+            <FileText size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("contracts")}</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <EmptyState title={t("noContracts")} />
@@ -142,7 +184,10 @@ export default async function ClientDetailPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("invoices")}</CardTitle>
+          <CardTitle className="inline-flex items-center gap-2">
+            <Receipt size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("invoices")}</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <EmptyState title={t("noInvoices")} />

@@ -4,9 +4,8 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Eye, EyeOff, LogIn, Lock, Mail } from "lucide-react";
-import InputAdornment from "@mui/material/InputAdornment";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { Input, InputAdornment } from "@/components/ui/Input";
 import type { ErrorCode } from "@/lib/errors";
 import { loginAction } from "@/server/actions/auth";
 
@@ -79,7 +78,6 @@ export function LoginForm() {
           name="email"
           type="email"
           autoComplete="email"
-          required
           startAdornment={
             <InputAdornment position="start">
               <Mail size={16} aria-hidden="true" />
@@ -97,7 +95,6 @@ export function LoginForm() {
           name="password"
           type={showPassword ? "text" : "password"}
           autoComplete="current-password"
-          required
           startAdornment={
             <InputAdornment position="start">
               <Lock size={16} aria-hidden="true" />

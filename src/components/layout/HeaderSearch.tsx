@@ -6,9 +6,8 @@ import { useTranslations } from "next-intl";
 import { Search } from "lucide-react";
 import MuiBox from "@mui/material/Box";
 import MuiClickAwayListener from "@mui/material/ClickAwayListener";
-import MuiInputAdornment from "@mui/material/InputAdornment";
 import MuiPaper from "@mui/material/Paper";
-import { Input } from "@/components/ui/Input";
+import { Input, InputAdornment } from "@/components/ui/Input";
 
 type Hit = { id: string; href: string; primary: string; secondary?: string };
 
@@ -83,9 +82,9 @@ export function HeaderSearch() {
             aria-label={t("placeholder")}
             placeholder={t("placeholder")}
             startAdornment={
-              <MuiInputAdornment position="start">
+              <InputAdornment position="start">
                 <Search size={16} aria-hidden="true" />
-              </MuiInputAdornment>
+              </InputAdornment>
             }
           />
         </form>

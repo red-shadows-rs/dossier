@@ -26,6 +26,7 @@ import { previewTotals } from "@/server/services/contracts";
 import type { CalcInput, CalcOutput } from "@/server/services/contract-calc";
 import {
   buildInvoiceHtml,
+  buildReceiptHtml,
   resolveInvoiceDocLang,
 } from "@/server/services/invoice-documents";
 import { getInvoice } from "@/server/services/invoices";
@@ -187,6 +188,24 @@ export async function getInvoicePreviewHtmlAction(
       data.lang ? String(data.lang) : undefined,
     );
     const html = await buildInvoiceHtml(id, lang);
+    return { html };
+  });
+}
+
+export async function getReceiptPreviewHtmlAction(
+  raw: unknown,
+): Promise<ActionResult<{ html: string }>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "invoices.read");
+    const data = raw as { id?: unknown; lang?: unknown };
+    const id = String(data.id ?? "");
+    const invoice = getInvoice(id);
+    const lang = resolveInvoiceDocLang(
+      invoice,
+      data.lang ? String(data.lang) : undefined,
+    );
+    const html = await buildReceiptHtml(id, lang);
     return { html };
   });
 }

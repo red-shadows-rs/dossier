@@ -1,17 +1,18 @@
 import Link from "next/link";
-import { Filter, Plus, RotateCcw } from "lucide-react";
+import { Plus, RotateCcw, Search, Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
-import { Field } from "@/components/ui/Field";
-import { Input } from "@/components/ui/Input";
+import { Input, InputAdornment } from "@/components/ui/Input";
 import { ClientsTable } from "@/components/tables/ClientsTable";
-import { archiveClientAction } from "@/server/actions/clients";
+import { FilterDropdown } from "@/components/tables/FilterDropdown";
+import { archiveClientAction, deleteClientAction } from "@/server/actions/clients";
 import { CLIENT_TYPES } from "@/lib/constants";
 import { can } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
 import { listClients } from "@/server/services/clients";
+import { smoothLoading } from "@/lib/smooth-loader";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -26,6 +27,7 @@ export default async function ClientsPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
+  await smoothLoading();
   const user = await requireUserPage();
   const t = await getTranslations("clients");
   const tc = await getTranslations("common");
@@ -61,79 +63,153 @@ export default async function ClientsPage({
     archive: t("archive"),
     archiveConfirm: t("archiveConfirm"),
     archivedToast: t("archivedToast"),
+    delete: t("delete"),
+    deleteConfirm: t("deleteConfirm"),
+    deletedToast: t("deletedToast"),
     empty: t("empty"),
     typeValues: Object.fromEntries(
       CLIENT_TYPES.map((type) => [type, t(`type.${type}`)]),
     ),
   };
 
+  const hasActiveFilters = Boolean(q || archived);
+  const activeFilterCount = archived ? 1 : 0;
+
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
+    <div className="flex flex-col gap-5 sm:gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+            <Users size={20} aria-hidden="true" />
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">{t("title")}</h1>
+              <span className="inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground translate-y-0.5">
+                {total}
+              </span>
+            </div>
+          </div>
+        </div>
         {canWrite ? (
-          <Link href="/clients/new">
-            <Button type="button">
-              <Plus size={16} aria-hidden="true" />
-              {t("new")}
-            </Button>
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href="/clients/new">
+              <Button type="button" className="gap-1.5 font-medium shadow-xs">
+                <Plus size={16} aria-hidden="true" />
+                <span>{t("new")}</span>
+              </Button>
+            </Link>
+          </div>
         ) : null}
       </div>
 
-      <Card>
-        <CardContent>
-          <form method="get" className="flex flex-wrap items-end gap-3">
-            <Field
-              label={tc("search")}
-              htmlFor="clients-q"
-              className="w-64"
-            >
-              <Input
-                id="clients-q"
-                name="q"
-                defaultValue={q ?? ""}
-                placeholder={t("searchPlaceholder")}
-              />
-            </Field>
-            <div className="pb-1">
-              <Checkbox
-                name="archived"
-                value="1"
-                defaultChecked={archived}
-                label={t("includeArchived")}
-              />
-            </div>
-            <div className="flex gap-2 pb-0.5">
-              <Button type="submit">
-                <Filter size={16} aria-hidden="true" />
-                {tc("filter")}
-              </Button>
-              <Link href="/clients">
-                <Button type="button" variant="secondary">
-                  <RotateCcw size={16} aria-hidden="true" />
-                  {tc("reset")}
+      <Card className="overflow-visible">
+        <CardContent className="p-3 sm:p-4 overflow-visible">
+          <form method="get" className="flex flex-col gap-2.5">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+              <div className="flex flex-1 items-center gap-2 min-w-[240px]">
+                <div className="relative flex-1">
+                  <Input
+                    id="clients-q"
+                    name="q"
+                    defaultValue={q ?? ""}
+                    placeholder={t("searchPlaceholder")}
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <Search
+                          size={16}
+                          className="text-muted-foreground"
+                          aria-hidden="true"
+                        />
+                      </InputAdornment>
+                    }
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  variant="secondary"
+                  className="shrink-0 gap-1.5 h-10 px-4 border-border/80 font-medium"
+                >
+                  <Search size={15} aria-hidden="true" />
+                  <span>{tc("search")}</span>
                 </Button>
-              </Link>
+              </div>
+
+              <FilterDropdown
+                label={tc("filter")}
+                activeCount={activeFilterCount}
+                title={tc("filterOptions")}
+                applyLabel={tc("applyFilters")}
+                resetLabel={tc("reset")}
+                resetHref="/clients"
+              >
+                <label className="flex h-10 cursor-pointer items-center justify-between rounded border border-border/70 bg-muted/20 ps-3 pe-1 text-sm text-foreground hover:bg-muted/40 transition-colors select-none">
+                  <span className="font-medium text-foreground">
+                    {t("includeArchived")}
+                  </span>
+                  <Checkbox
+                    name="archived"
+                    value="1"
+                    defaultChecked={archived}
+                    sx={{ p: 0.5 }}
+                  />
+                </label>
+              </FilterDropdown>
+
+              {hasActiveFilters ? (
+                <Link href="/clients" className="shrink-0 no-underline">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="gap-1.5 h-10 px-3"
+                  >
+                    <RotateCcw size={15} aria-hidden="true" />
+                    <span>{tc("reset")}</span>
+                  </Button>
+                </Link>
+              ) : null}
             </div>
+
+            {hasActiveFilters ? (
+              <div className="flex flex-wrap items-center gap-1.5 border-t border-border/40 pt-2.5 text-xs text-muted-foreground">
+                <span className="font-medium text-foreground ms-0.5">
+                  {tc("activeFilters")}:
+                </span>
+                {q ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{tc("search")}: {q}</span>
+                  </span>
+                ) : null}
+                {archived ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{t("includeArchived")}</span>
+                  </span>
+                ) : null}
+                <Link
+                  href="/clients"
+                  className="ms-auto text-xs text-muted-foreground hover:text-foreground no-underline"
+                >
+                  {tc("clearFilters")}
+                </Link>
+              </div>
+            ) : null}
           </form>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent>
-          <ClientsTable
-            rows={rows}
-            total={total}
-            page={page}
-            pageSize={pageSize}
-            query={query}
-            canWrite={canWrite}
-            labels={labels}
-            archiveAction={archiveClientAction}
-          />
-        </CardContent>
-      </Card>
+      <div className="rounded border border-border bg-card overflow-hidden">
+        <ClientsTable
+          rows={rows}
+          total={total}
+          page={page}
+          pageSize={pageSize}
+          query={query}
+          canWrite={canWrite}
+          labels={labels}
+          archiveAction={archiveClientAction}
+          deleteAction={deleteClientAction}
+        />
+      </div>
     </div>
   );
 }

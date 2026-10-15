@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { DataGrid, type GridColDef } from "@mui/x-data-grid";
-import MuiLink from "@mui/material/Link";
+import { UserCog } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge } from "@/components/ui/Badge";
+import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
 import { formatInstant } from "@/lib/dates";
 import type { Locale } from "@/lib/constants";
 
@@ -45,104 +45,97 @@ export function UsersTable({
   timezone: string;
   locale: Locale;
 }) {
-  const columns: GridColDef<UserTableRow>[] = [
+  const columns: ColumnDef<UserTableRow>[] = [
     {
-      field: "name",
-      headerName: labels.name,
-      flex: 1,
-      minWidth: 180,
-      sortable: false,
-      renderCell: (params) => (
-        <MuiLink
-          component={Link}
-          href={`/users/${params.row.id}`}
-          underline="hover"
-          color="inherit"
-          sx={{ fontWeight: 600 }}
+      id: "name",
+      header: labels.name,
+      render: (row) => (
+        <Link
+          href={`/users/${row.id}`}
+          className="font-semibold text-foreground hover:text-primary transition-colors"
         >
-          {params.row.name}
-        </MuiLink>
+          {row.name}
+        </Link>
       ),
     },
     {
-      field: "email",
-      headerName: labels.email,
-      width: 240,
-      sortable: false,
-      renderCell: (params) => <span dir="ltr">{params.row.email}</span>,
+      id: "email",
+      header: labels.email,
+      className: "whitespace-nowrap font-mono text-xs",
+      render: (row) => (
+        <span dir="ltr" className="text-muted-foreground">
+          {row.email}
+        </span>
+      ),
     },
     {
-      field: "role",
-      headerName: labels.roleLabel,
-      width: 140,
-      sortable: false,
-      valueGetter: (_value, row) => labels.roleValues[row.role] ?? row.role,
+      id: "role",
+      header: labels.roleLabel,
+      className: "whitespace-nowrap",
+      render: (row) => (
+        <Badge tone="blue">
+          {labels.roleValues[row.role] ?? row.role}
+        </Badge>
+      ),
     },
     {
-      field: "canSignForCompany",
-      headerName: labels.canSign,
-      width: 150,
-      sortable: false,
-      renderCell: (params) =>
-        params.row.canSignForCompany ? (
+      id: "canSignForCompany",
+      header: labels.canSign,
+      className: "whitespace-nowrap",
+      render: (row) =>
+        row.canSignForCompany ? (
           <Badge tone="teal">{labels.yes}</Badge>
         ) : (
-          <span style={{ opacity: 0.5 }}>-</span>
+          <span className="text-muted-foreground">-</span>
         ),
     },
     {
-      field: "status",
-      headerName: labels.status,
-      width: 130,
-      sortable: false,
-      renderCell: (params) =>
-        params.row.status === "active" ? (
+      id: "status",
+      header: labels.status,
+      className: "whitespace-nowrap",
+      render: (row) =>
+        row.status === "active" ? (
           <Badge tone="green">{labels.active}</Badge>
         ) : (
           <Badge tone="gray">{labels.disabled}</Badge>
         ),
     },
     {
-      field: "lastLoginAt",
-      headerName: labels.lastLogin,
-      width: 180,
-      sortable: false,
-      renderCell: (params) =>
-        params.row.lastLoginAt ? (
-          formatInstant(params.row.lastLoginAt, timezone, locale)
+      id: "lastLoginAt",
+      header: labels.lastLogin,
+      className: "whitespace-nowrap text-xs text-muted-foreground",
+      render: (row) =>
+        row.lastLoginAt ? (
+          <span dir="ltr" className="tabular-nums">
+            {formatInstant(row.lastLoginAt, timezone, locale)}
+          </span>
         ) : (
           <span>-</span>
         ),
     },
     {
-      field: "actions",
-      headerName: labels.actions,
-      width: 90,
-      sortable: false,
-      renderCell: (params) => (
-        <ActionLink
-          href={`/users/${params.row.id}`}
-          action="preview"
-          label={labels.preview}
-        />
+      id: "actions",
+      header: labels.actions,
+      align: "end",
+      className: "whitespace-nowrap",
+      render: (row) => (
+        <div className="inline-flex items-center justify-end">
+          <ActionLink
+            href={`/users/${row.id}`}
+            action="preview"
+            label={labels.preview}
+          />
+        </div>
       ),
     },
   ];
 
   return (
-    <DataGrid<UserTableRow>
+    <ServerDataTable
       rows={rows}
       columns={columns}
-      getRowId={(row) => row.id}
-      disableColumnMenu
-      disableColumnFilter
-      disableColumnSelector
-      disableRowSelectionOnClick
-      autoHeight
-      initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
-      pageSizeOptions={[10, 25, 50]}
-      localeText={{ noRowsLabel: labels.empty }}
-      sx={{ border: 0 }}
+      noRowsLabel={labels.empty}
+      emptyIcon={<UserCog size={36} className="text-muted-foreground" aria-hidden="true" />}
     />
   );
 }

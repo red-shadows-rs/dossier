@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
+import { KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
@@ -33,7 +34,7 @@ export function UserPasswordForm({ userId }: { userId: string }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
       <Field
         label={t("users.newPassword")}
         htmlFor="user-new-password"
@@ -54,7 +55,8 @@ export function UserPasswordForm({ userId }: { userId: string }) {
         {t("users.passwordResetHint")}
       </p>
       <div className="flex justify-end">
-        <Button type="submit" variant="secondary" loading={pending}>
+        <Button type="submit" variant="secondary" loading={pending} className="gap-2">
+          <KeyRound className="h-4 w-4" />
           {t("users.setPassword")}
         </Button>
       </div>

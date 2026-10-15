@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Archive, ArchiveRestore } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Select } from "@/components/ui/Select";
@@ -81,8 +82,14 @@ export function ProjectActions({
         type="button"
         variant={archived ? "secondary" : "danger"}
         onClick={() => setOpen(true)}
+        className="gap-1.5"
       >
-        {t(archived ? "projects.unarchive" : "projects.archive")}
+        {archived ? (
+          <ArchiveRestore size={15} aria-hidden="true" />
+        ) : (
+          <Archive size={15} aria-hidden="true" />
+        )}
+        <span>{t(archived ? "projects.unarchive" : "projects.archive")}</span>
       </Button>
       <ConfirmDialog
         open={open}

@@ -1,19 +1,20 @@
 import Link from "next/link";
-import { Filter, Plus, RotateCcw } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { FolderKanban, Plus, RotateCcw, Search } from "lucide-react";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
-import { Field } from "@/components/ui/Field";
-import { Input } from "@/components/ui/Input";
+import { Input, InputAdornment } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { ProjectsTable } from "@/components/tables/ProjectsTable";
+import { FilterDropdown } from "@/components/tables/FilterDropdown";
 import { archiveProjectAction } from "@/server/actions/projects";
 import { PROJECT_STATUSES, type ProjectStatus } from "@/lib/constants";
 import { can } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
 import { listClientOptions } from "@/server/services/clients";
 import { listProjects } from "@/server/services/projects";
+import { smoothLoading } from "@/lib/smooth-loader";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -28,9 +29,12 @@ export default async function ProjectsPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
+  await smoothLoading();
   const user = await requireUserPage();
   const t = await getTranslations("projects");
   const tc = await getTranslations("common");
+  const rawLocale = await getLocale();
+  const locale = rawLocale === "en" ? "en" : "ar";
   const params = await searchParams;
 
   const q = readParam(params.q);
@@ -64,7 +68,9 @@ export default async function ProjectsPage({
   const clientNames = Object.fromEntries(
     clients.map((client) => [
       client.id,
-      client.nameAr ?? client.nameEn ?? "",
+      (locale === "ar"
+        ? client.nameAr || client.nameEn
+        : client.nameEn || client.nameAr) ?? "",
     ]),
   );
   const labels = {
@@ -85,99 +91,199 @@ export default async function ProjectsPage({
     ),
   };
 
+  const hasActiveFilters = Boolean(q || status || clientId || archived);
+  const activeFilterCount =
+    (status ? 1 : 0) + (clientId ? 1 : 0) + (archived ? 1 : 0);
+
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
+    <div className="flex flex-col gap-5 sm:gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+            <FolderKanban size={20} aria-hidden="true" />
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">{t("title")}</h1>
+              <span className="inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground translate-y-0.5">
+                {total}
+              </span>
+            </div>
+          </div>
+        </div>
         {canWrite ? (
-          <Link href="/projects/new">
-            <Button type="button">
-              <Plus size={16} aria-hidden="true" />
-              {t("new")}
-            </Button>
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href="/projects/new">
+              <Button type="button" className="gap-1.5 font-medium shadow-xs">
+                <Plus size={16} aria-hidden="true" />
+                <span>{t("new")}</span>
+              </Button>
+            </Link>
+          </div>
         ) : null}
       </div>
 
-      <Card>
-        <CardContent>
-          <form method="get" className="flex flex-wrap items-end gap-3">
-            <Field
-              label={tc("search")}
-              htmlFor="projects-q"
-              className="w-60"
-            >
-              <Input id="projects-q" name="q" defaultValue={q ?? ""} />
-            </Field>
-            <Field label={t("statusLabel")} htmlFor="projects-status">
-              <Select
-                id="projects-status"
-                name="status"
-                defaultValue={status ?? ""}
-                className="w-40"
-              >
-                <option value="">{t("allStatuses")}</option>
-                {PROJECT_STATUSES.map((value) => (
-                  <option key={value} value={value}>
-                    {t(`status.${value}`)}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Field label={t("client")} htmlFor="projects-client">
-              <Select
-                id="projects-client"
-                name="clientId"
-                defaultValue={clientId ?? ""}
-                className="w-52"
-              >
-                <option value="">{t("allClients")}</option>
-                {clients.map((client) => (
-                  <option key={client.id} value={client.id}>
-                    {client.nameAr ?? client.nameEn ?? client.id}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <div className="pb-1">
-              <Checkbox
-                name="archived"
-                value="1"
-                defaultChecked={archived}
-                label={t("includeArchived")}
-              />
-            </div>
-            <div className="flex gap-2 pb-0.5">
-              <Button type="submit">
-                <Filter size={16} aria-hidden="true" />
-                {tc("filter")}
-              </Button>
-              <Link href="/projects">
-                <Button type="button" variant="secondary">
-                  <RotateCcw size={16} aria-hidden="true" />
-                  {tc("reset")}
+      <Card className="overflow-visible">
+        <CardContent className="p-3 sm:p-4 overflow-visible">
+          <form method="get" className="flex flex-col gap-2.5">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+              <div className="flex flex-1 items-center gap-2 min-w-[240px]">
+                <div className="relative flex-1">
+                  <Input
+                    id="projects-q"
+                    name="q"
+                    defaultValue={q ?? ""}
+                    placeholder={t("searchPlaceholder")}
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <Search
+                          size={16}
+                          className="text-muted-foreground"
+                          aria-hidden="true"
+                        />
+                      </InputAdornment>
+                    }
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  variant="secondary"
+                  className="shrink-0 gap-1.5 h-10 px-4 border-border/80 font-medium"
+                >
+                  <Search size={15} aria-hidden="true" />
+                  <span>{tc("search")}</span>
                 </Button>
-              </Link>
+              </div>
+
+              <FilterDropdown
+                label={tc("filter")}
+                activeCount={activeFilterCount}
+                title={tc("filterOptions")}
+                applyLabel={tc("applyFilters")}
+                resetLabel={tc("reset")}
+                resetHref="/projects"
+              >
+                <div>
+                  <label
+                    htmlFor="projects-status"
+                    className="mb-1 block text-xs font-semibold text-muted-foreground cursor-pointer select-none"
+                  >
+                    {labels.statusLabel}
+                  </label>
+                  <Select
+                    id="projects-status"
+                    name="status"
+                    defaultValue={status ?? ""}
+                  >
+                    <option value="">{t("allStatuses")}</option>
+                    {PROJECT_STATUSES.map((value) => (
+                      <option key={value} value={value}>
+                        {t(`status.${value}`)}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="projects-client"
+                    className="mb-1 block text-xs font-semibold text-muted-foreground cursor-pointer select-none"
+                  >
+                    {labels.client}
+                  </label>
+                  <Select
+                    id="projects-client"
+                    name="clientId"
+                    defaultValue={clientId ?? ""}
+                  >
+                    <option value="">{t("allClients")}</option>
+                    {clients.map((client) => (
+                      <option key={client.id} value={client.id}>
+                        {(locale === "ar"
+                          ? client.nameAr || client.nameEn
+                          : client.nameEn || client.nameAr) ?? client.id}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+
+                <label className="flex h-10 cursor-pointer items-center justify-between rounded border border-border/70 bg-muted/20 ps-3 pe-1 text-sm text-foreground hover:bg-muted/40 transition-colors select-none">
+                  <span className="font-medium text-foreground">
+                    {t("includeArchived")}
+                  </span>
+                  <Checkbox
+                    name="archived"
+                    value="1"
+                    defaultChecked={archived}
+                    sx={{ p: 0.5 }}
+                  />
+                </label>
+              </FilterDropdown>
+
+              {hasActiveFilters ? (
+                <Link href="/projects" className="shrink-0 no-underline">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="gap-1.5 h-10 px-3"
+                  >
+                    <RotateCcw size={15} aria-hidden="true" />
+                    <span>{tc("reset")}</span>
+                  </Button>
+                </Link>
+              ) : null}
             </div>
+
+            {hasActiveFilters ? (
+              <div className="flex flex-wrap items-center gap-1.5 border-t border-border/40 pt-2.5 text-xs text-muted-foreground">
+                <span className="font-medium text-foreground ms-0.5">
+                  {tc("activeFilters")}:
+                </span>
+                {q ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{tc("search")}: {q}</span>
+                  </span>
+                ) : null}
+                {status ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{labels.statusLabel}: {labels.statusValues[status] ?? status}</span>
+                  </span>
+                ) : null}
+                {clientId ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{labels.client}: {clientNames[clientId] ?? clientId}</span>
+                  </span>
+                ) : null}
+                {archived ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{t("includeArchived")}</span>
+                  </span>
+                ) : null}
+                <Link
+                  href="/projects"
+                  className="ms-auto text-xs text-muted-foreground hover:text-foreground no-underline"
+                >
+                  {tc("clearFilters")}
+                </Link>
+              </div>
+            ) : null}
           </form>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent>
-          <ProjectsTable
-            rows={rows}
-            total={total}
-            page={page}
-            pageSize={pageSize}
-            query={query}
-            canWrite={canWrite}
-            labels={labels}
-            clientNames={clientNames}
-            archiveAction={archiveProjectAction}
-          />
-        </CardContent>
-      </Card>
+      <div className="rounded border border-border bg-card overflow-hidden">
+        <ProjectsTable
+          rows={rows}
+          total={total}
+          page={page}
+          pageSize={pageSize}
+          query={query}
+          canWrite={canWrite}
+          labels={labels}
+          clientNames={clientNames}
+          archiveAction={archiveProjectAction}
+        />
+      </div>
     </div>
   );
 }

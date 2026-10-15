@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Save, UserCheck, UserPlus, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
@@ -39,6 +40,7 @@ export function UserForm({
   const [canSign, setCanSign] = useState(initial.canSignForCompany);
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -50,6 +52,7 @@ export function UserForm({
     };
     setPending(true);
     setFieldErrors({});
+    setStatusError(null);
     const result =
       mode === "create"
         ? await createUserAction({
@@ -70,7 +73,12 @@ export function UserForm({
       return;
     }
     if (result.error.fieldErrors) setFieldErrors(result.error.fieldErrors);
-    toast({ title: t(`errors.${result.error.code}`), tone: "error" });
+    const msg =
+      result.error.code === "VALIDATION_FAILED"
+        ? t("auth.requiredFields")
+        : t(`errors.${result.error.code}`);
+    setStatusError(msg);
+    toast({ title: msg, tone: "error" });
   }
 
   function fieldError(name: string): string | null {
@@ -79,10 +87,21 @@ export function UserForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+      {statusError ? (
+        <p
+          role="alert"
+          className="rounded border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm font-medium text-destructive"
+        >
+          {statusError}
+        </p>
+      ) : null}
       <Card>
         <CardHeader>
-          <CardTitle>{t("users.profile")}</CardTitle>
+          <CardTitle className="inline-flex items-center gap-2">
+            <UserCheck size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("users.profile")}</span>
+          </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {mode === "create" ? (
@@ -167,11 +186,23 @@ export function UserForm({
           variant="secondary"
           onClick={() => router.back()}
           disabled={pending}
+          className="gap-2"
         >
+          <X className="h-4 w-4" />
           {t("common.cancel")}
         </Button>
-        <Button type="submit" loading={pending}>
-          {mode === "create" ? t("users.create") : t("common.save")}
+        <Button type="submit" loading={pending} className="gap-2">
+          {mode === "create" ? (
+            <>
+              <UserPlus className="h-4 w-4" />
+              {t("users.create")}
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4" />
+              {t("common.save")}
+            </>
+          )}
         </Button>
       </div>
     </form>

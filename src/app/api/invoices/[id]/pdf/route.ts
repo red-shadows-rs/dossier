@@ -34,6 +34,8 @@ export async function GET(
     const pdf = await renderPdf(source.html, {
       docNumber: source.docNumber,
       code: null,
+      kind: "invoice",
+      lang: source.lang,
     });
 
     const headers = new Headers({

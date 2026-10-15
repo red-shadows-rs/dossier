@@ -175,7 +175,10 @@ export function isOverdue(invoice: InvoiceRow, today: string): boolean {
   );
 }
 
-export function listInvoiceableMilestones(projectId?: string): {
+export function listInvoiceableMilestones(
+  projectId?: string,
+  locale: "ar" | "en" = "ar",
+): {
   milestoneId: string;
   contractId: string;
   projectId: string;
@@ -207,12 +210,18 @@ export function listInvoiceableMilestones(projectId?: string): {
     .where(and(...conditions))
     .orderBy(asc(contracts.createdAt), asc(paymentMilestones.position))
     .all();
-  return rows.map((row) => ({
-    milestoneId: row.milestoneId,
-    contractId: row.contractId,
-    projectId: row.projectId,
-    label: `${row.projectCode} · ${row.contractNumber ?? ""} · #${row.position} ${row.titleEn} — ${formatMinorForLabel(row.amountMinor, row.currency)}`,
-  }));
+  return rows.map((row) => {
+    const title =
+      locale === "en"
+        ? (row.titleEn || row.titleAr || "")
+        : (row.titleAr || row.titleEn || "");
+    return {
+      milestoneId: row.milestoneId,
+      contractId: row.contractId,
+      projectId: row.projectId,
+      label: `${row.projectCode} · ${row.contractNumber ?? ""} · #${row.position} ${title} — ${formatMinorForLabel(row.amountMinor, row.currency)}`,
+    };
+  });
 }
 
 function formatMinorForLabel(amountMinor: number, currency: string): string {
@@ -317,7 +326,7 @@ export function createInvoice(
         contractId: contract?.id ?? null,
         status: "draft",
         languageMode:
-          input.languageMode ?? contract?.languageMode ?? "bilingual",
+          input.languageMode ?? (contract?.languageMode === "en" ? "en" : "ar"),
         currency: project.currency,
         taxRateBp: contract?.taxRateBp ?? defaults.taxRateBp,
         discountType: "none",
@@ -398,7 +407,7 @@ export function createInvoiceFromMilestone(
         contractId: contract.id,
         milestoneId: milestone.id,
         status: "draft",
-        languageMode: contract.languageMode,
+        languageMode: contract.languageMode === "en" ? "en" : "ar",
         currency: contract.currency,
         discountType: "none",
         subtotalMinor: result.subtotal,

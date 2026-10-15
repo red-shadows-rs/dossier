@@ -1,6 +1,23 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
+import {
+  Building2,
+  Calendar,
+  Clock,
+  Coins,
+  Compass,
+  ExternalLink,
+  FileSpreadsheet,
+  FileText,
+  FolderKanban,
+  History,
+  Layers,
+  Paperclip,
+  Pencil,
+  Receipt,
+  type LucideIcon,
+} from "lucide-react";
 import { CreateInvoiceFromMilestoneButton } from "@/components/forms/CreateInvoiceFromMilestoneButton";
 import { ProjectActions } from "@/components/forms/ProjectActions";
 import { ProjectFiles } from "@/components/forms/ProjectFiles";
@@ -12,6 +29,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { smoothLoading } from "@/lib/smooth-loader";
 import {
   Table,
   TableBody,
@@ -53,6 +71,14 @@ const TABS = [
 ] as const;
 type Tab = (typeof TABS)[number];
 
+const TAB_ICONS = {
+  overview: Compass,
+  contracts: FileText,
+  invoices: Receipt,
+  files: Paperclip,
+  activity: History,
+} as const;
+
 export default async function ProjectDetailPage({
   params,
   searchParams,
@@ -60,6 +86,7 @@ export default async function ProjectDetailPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<SearchParams>;
 }) {
+  await smoothLoading();
   const user = await requireUserPage();
   const t = await getTranslations("projects");
   const tc = await getTranslations("common");
@@ -82,42 +109,67 @@ export default async function ProjectDetailPage({
 
   const { project, client } = data;
   const canWrite = can(user, "projects.write");
+  const rawLocale = await getLocale();
+  const locale = isLocale(rawLocale) ? rawLocale : "ar";
   const contracts = listProjectContracts(id);
   const summary = getProjectSummary(id);
-  const milestones = listInvoiceableMilestones(id);
+  const milestones = listInvoiceableMilestones(id, locale);
   const projectInvoices = listInvoices({ projectId: id, page: 1 }).rows;
   const attachments = listProjectAttachments(id);
   const activity = listProjectActivity(id);
-  const rawLocale = await getLocale();
-  const locale = isLocale(rawLocale) ? rawLocale : "ar";
   const taskboardHref = resolveTaskboardUrl(
     project.taskboardRef,
     env.TASKBOARD_API_URL,
   );
 
+  const projectName =
+    (locale === "ar"
+      ? project.nameAr || project.nameEn
+      : project.nameEn || project.nameAr) ?? "-";
+  const projectDir =
+    locale === "ar"
+      ? (project.nameAr ? "rtl" : "ltr")
+      : (project.nameEn ? "ltr" : "rtl");
+
+  const tabCounts: Record<Tab, number | null> = {
+    overview: null,
+    contracts: contracts.length,
+    invoices: projectInvoices.length,
+    files: attachments.length,
+    activity: activity.length,
+  };
+
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-foreground">
-            <span dir="rtl" lang="ar">
-              {project.nameAr ?? project.nameEn ?? "-"}
-            </span>
-          </h1>
-          <Badge tone="gray" className="font-mono">
-            {project.code}
-          </Badge>
-          {project.archivedAt ? (
-            <Badge tone="gray">{t("archived")}</Badge>
-          ) : (
-            <Badge tone="blue">{t(`status.${project.status}`)}</Badge>
-          )}
+    <div className="flex flex-col gap-5 sm:gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+            <FolderKanban size={20} aria-hidden="true" />
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                <span dir={projectDir}>
+                  {projectName}
+                </span>
+              </h1>
+              <Badge tone="gray" className="font-mono translate-y-0.5">
+                {project.code}
+              </Badge>
+              {project.archivedAt ? (
+                <Badge tone="gray" className="translate-y-0.5">{t("archived")}</Badge>
+              ) : (
+                <Badge tone="blue" className="translate-y-0.5">{t(`status.${project.status}`)}</Badge>
+              )}
+            </div>
+          </div>
         </div>
         {canWrite ? (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Link href={`/projects/${project.id}/edit`}>
-              <Button type="button" variant="secondary">
-                {t("edit")}
+              <Button type="button" variant="secondary" className="gap-1.5 font-medium shadow-xs">
+                <Pencil size={15} aria-hidden="true" />
+                <span>{t("edit")}</span>
               </Button>
             </Link>
             <ProjectActions
@@ -129,63 +181,90 @@ export default async function ProjectDetailPage({
         ) : null}
       </div>
 
-      <nav className="flex gap-1 overflow-x-auto border-b border-border">
-        {TABS.map((value) => (
-          <Link
-            key={value}
-            href={`/projects/${project.id}?tab=${value}`}
-            aria-current={tab === value ? "page" : undefined}
-            className={cn(
-              "whitespace-nowrap border-b-2 px-3 py-2 text-sm transition-colors",
-              tab === value
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {t(`tabs.${value}`)}
-          </Link>
-        ))}
+      <nav className="flex gap-1 overflow-x-auto border-b border-border/60">
+        {TABS.map((value) => {
+          const Icon = TAB_ICONS[value];
+          const count = tabCounts[value];
+          return (
+            <Link
+              key={value}
+              href={`/projects/${project.id}?tab=${value}`}
+              aria-current={tab === value ? "page" : undefined}
+              className={cn(
+                "inline-flex items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium transition-colors",
+                tab === value
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <Icon size={16} aria-hidden="true" />
+              <span>{t(`tabs.${value}`)}</span>
+              {count !== null ? (
+                <span
+                  className={cn(
+                    "rounded px-1.5 py-0.5 text-[11px] font-mono font-medium",
+                    tab === value
+                      ? "bg-primary/15 text-primary"
+                      : "bg-muted/60 text-muted-foreground",
+                  )}
+                >
+                  {count}
+                </span>
+              ) : null}
+            </Link>
+          );
+        })}
       </nav>
 
       {tab === "overview" ? (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-5">
           <Card>
-            <CardHeader>
-              <CardTitle>{t("tabs.overview")}</CardTitle>
+            <CardHeader className="border-b border-border/40 pb-3">
+              <CardTitle className="inline-flex items-center gap-2 text-base">
+                <Compass size={18} className="text-primary" aria-hidden="true" />
+                <span>{t("tabs.overview")}</span>
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <Field label={t("client")}>
+            <CardContent className="pt-4">
+              <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <Field label={t("client")} icon={Building2}>
                   <Link
                     href={`/clients/${client.id}`}
-                    className="hover:text-primary"
+                    className="hover:text-primary transition-colors inline-flex items-center gap-1.5"
                   >
-                    {client.nameAr ?? client.nameEn ?? client.id}
+                    <span>
+                      {(locale === "ar"
+                        ? client.nameAr || client.nameEn
+                        : client.nameEn || client.nameAr) ?? client.id}
+                    </span>
                   </Link>
                 </Field>
-                <Field label={t("currency")} ltr>
+                <Field label={t("currency")} ltr icon={Coins}>
                   {project.currency}
                 </Field>
-                <Field label={t("statusLabel")}>
-                  {t(`status.${project.status}`)}
+                <Field label={t("statusLabel")} icon={Clock}>
+                  <Badge tone={project.archivedAt ? "gray" : "blue"}>
+                    {t(`status.${project.status}`)}
+                  </Badge>
                 </Field>
-                <Field label={t("startDate")} ltr>
+                <Field label={t("startDate")} ltr icon={Calendar}>
                   {project.startDate ?? "-"}
                 </Field>
-                <Field label={t("endDate")} ltr>
+                <Field label={t("endDate")} ltr icon={Calendar}>
                   {project.endDate ?? "-"}
                 </Field>
                 {project.taskboardRef ? (
-                  <Field label={t("taskboardRef")} ltr>
+                  <Field label={t("taskboardRef")} ltr icon={ExternalLink}>
                     {taskboardHref ? (
                       <a
                         href={taskboardHref}
                         target="_blank"
                         rel="noopener noreferrer"
                         title={t("taskboardOpen")}
-                        className="text-primary hover:underline"
+                        className="text-primary hover:text-primary/80 no-underline inline-flex items-center gap-1"
                       >
-                        {project.taskboardRef}
+                        <span>{project.taskboardRef}</span>
+                        <ExternalLink size={12} aria-hidden />
                       </a>
                     ) : (
                       project.taskboardRef
@@ -197,7 +276,7 @@ export default async function ProjectDetailPage({
                     label={t("description")}
                     className="sm:col-span-2 lg:col-span-3"
                   >
-                    <span className="whitespace-pre-wrap">
+                    <span className="whitespace-pre-wrap leading-relaxed text-muted-foreground">
                       {project.description}
                     </span>
                   </Field>
@@ -207,43 +286,202 @@ export default async function ProjectDetailPage({
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>{t("summary.title")}</CardTitle>
+            <CardHeader className="border-b border-border/40 pb-3">
+              <CardTitle className="inline-flex items-center gap-2 text-base">
+                <FileSpreadsheet size={18} className="text-primary" aria-hidden="true" />
+                <span>{t("summary.title")}</span>
+              </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-4">
               {summary.length === 0 ? (
                 <EmptyState title={t("summary.empty")} />
               ) : (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-6">
                   {summary.map((row) => {
                     const currency = row.currency as CurrencyCode;
                     const money = (minor: number) =>
-                      formatMoney(minor, currency, "en");
+                      formatMoney(minor, currency, locale);
+
+                    const contracted = row.contractedMinor;
+                    const invoiced = row.invoicedMinor;
+                    const paid = row.paidMinor;
+                    const remaining = row.remainingToInvoiceMinor;
+                    const overdue = row.overdueMinor;
+
+                    const invoicedPct =
+                      contracted > 0
+                        ? Math.min(100, Math.round((invoiced / contracted) * 100))
+                        : 0;
+                    const paidPct =
+                      contracted > 0
+                        ? Math.min(100, Math.round((paid / contracted) * 100))
+                        : 0;
+                    const unbilledPct =
+                      contracted > 0 ? Math.max(0, 100 - invoicedPct) : 0;
+                    const outstandingPct =
+                      contracted > 0 ? Math.max(0, invoicedPct - paidPct) : 0;
+
                     return (
-                      <dl
+                      <div
                         key={row.currency}
-                        className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6"
-                        dir="ltr"
+                        className="flex flex-col gap-4 rounded border border-border/80 bg-background/40 p-4"
                       >
-                        <Field label={t("summary.contracted")}>
-                          {money(row.contractedMinor)}
-                        </Field>
-                        <Field label={t("summary.invoiced")}>
-                          {money(row.invoicedMinor)}
-                        </Field>
-                        <Field label={t("summary.paid")}>
-                          {money(row.paidMinor)}
-                        </Field>
-                        <Field label={t("summary.outstanding")}>
-                          {money(row.outstandingMinor)}
-                        </Field>
-                        <Field label={t("summary.overdue")}>
-                          {money(row.overdueMinor)}
-                        </Field>
-                        <Field label={t("summary.remaining")}>
-                          {money(row.remainingToInvoiceMinor)}
-                        </Field>
-                      </dl>
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/40 pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="flex h-7 w-7 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary font-mono text-xs font-bold">
+                              {currency}
+                            </span>
+                            <span className="text-sm font-bold text-foreground">
+                              {t("summary.contracted")}:{" "}
+                              <span className="tabular-nums font-mono">
+                                {money(contracted)}
+                              </span>
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs font-medium">
+                            <span className="rounded bg-emerald-500/10 px-2 py-0.5 text-emerald-600 dark:text-emerald-400 font-mono font-semibold">
+                              {paidPct}% {locale === "ar" ? "محصل" : "collected"}
+                            </span>
+                            <span className="rounded bg-primary/10 px-2 py-0.5 text-primary font-mono font-semibold">
+                              {invoicedPct}% {locale === "ar" ? "مفوتر" : "invoiced"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                          <div className="flex h-3 w-full overflow-hidden rounded bg-muted/60 shadow-inner">
+                            <div
+                              style={{ width: `${paidPct}%` }}
+                              className="bg-emerald-500 transition-all"
+                              title={`${t("summary.paid")}: ${money(paid)} (${paidPct}%)`}
+                            />
+                            <div
+                              style={{ width: `${outstandingPct}%` }}
+                              className="bg-sky-500 transition-all"
+                              title={`${t("summary.outstanding")}: ${money(row.outstandingMinor)} (${outstandingPct}%)`}
+                            />
+                            <div
+                              style={{ width: `${unbilledPct}%` }}
+                              className="bg-muted-foreground/20 transition-all"
+                              title={`${t("summary.remaining")}: ${money(remaining)} (${unbilledPct}%)`}
+                            />
+                          </div>
+                          <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted-foreground">
+                            <div className="flex flex-wrap items-center gap-3">
+                              <span className="inline-flex items-center gap-1.5">
+                                <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+                                <span>
+                                  {t("summary.paid")}:{" "}
+                                  <strong className="text-foreground font-mono">
+                                    {money(paid)}
+                                  </strong>
+                                </span>
+                              </span>
+                              <span className="inline-flex items-center gap-1.5">
+                                <span className="h-2 w-2 rounded-full bg-sky-500 shrink-0" />
+                                <span>
+                                  {t("summary.outstanding")}:{" "}
+                                  <strong className="text-foreground font-mono">
+                                    {money(row.outstandingMinor)}
+                                  </strong>
+                                </span>
+                              </span>
+                              <span className="inline-flex items-center gap-1.5">
+                                <span className="h-2 w-2 rounded-full bg-muted-foreground/40 shrink-0" />
+                                <span>
+                                  {t("summary.remaining")}:{" "}
+                                  <strong className="text-foreground font-mono">
+                                    {money(remaining)}
+                                  </strong>
+                                </span>
+                              </span>
+                            </div>
+                            {overdue > 0 ? (
+                              <span className="inline-flex items-center gap-1.5 font-semibold text-rose-500">
+                                <span className="h-2 w-2 rounded-full bg-rose-500 shrink-0" />
+                                <span>
+                                  {t("summary.overdue")}:{" "}
+                                  <strong className="font-mono">
+                                    {money(overdue)}
+                                  </strong>
+                                </span>
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6 pt-1">
+                          <div className="flex flex-col gap-0.5 rounded border border-border/70 bg-card p-2.5 shadow-2xs">
+                            <span className="text-[11px] font-medium text-muted-foreground">
+                              {t("summary.contracted")}
+                            </span>
+                            <span className="text-sm font-bold font-mono tabular-nums text-foreground">
+                              {money(contracted)}
+                            </span>
+                          </div>
+                          <div className="flex flex-col gap-0.5 rounded border border-border/70 bg-card p-2.5 shadow-2xs">
+                            <span className="text-[11px] font-medium text-muted-foreground">
+                              {t("summary.invoiced")}
+                            </span>
+                            <span className="text-sm font-bold font-mono tabular-nums text-primary">
+                              {money(invoiced)}
+                            </span>
+                          </div>
+                          <div className="flex flex-col gap-0.5 rounded border border-border/70 bg-card p-2.5 shadow-2xs">
+                            <span className="text-[11px] font-medium text-muted-foreground">
+                              {t("summary.paid")}
+                            </span>
+                            <span className="text-sm font-bold font-mono tabular-nums text-emerald-600 dark:text-emerald-400">
+                              {money(paid)}
+                            </span>
+                          </div>
+                          <div className="flex flex-col gap-0.5 rounded border border-border/70 bg-card p-2.5 shadow-2xs">
+                            <span className="text-[11px] font-medium text-muted-foreground">
+                              {t("summary.outstanding")}
+                            </span>
+                            <span className="text-sm font-bold font-mono tabular-nums text-foreground">
+                              {money(row.outstandingMinor)}
+                            </span>
+                          </div>
+                          <div
+                            className={cn(
+                              "flex flex-col gap-0.5 rounded border p-2.5 shadow-2xs",
+                              overdue > 0
+                                ? "border-rose-500/30 bg-rose-500/5"
+                                : "border-border/70 bg-card",
+                            )}
+                          >
+                            <span
+                              className={cn(
+                                "text-[11px] font-medium",
+                                overdue > 0
+                                  ? "text-rose-500 font-semibold"
+                                  : "text-muted-foreground",
+                              )}
+                            >
+                              {t("summary.overdue")}
+                            </span>
+                            <span
+                              className={cn(
+                                "text-sm font-bold font-mono tabular-nums",
+                                overdue > 0
+                                  ? "text-rose-600 dark:text-rose-400"
+                                  : "text-foreground",
+                              )}
+                            >
+                              {money(overdue)}
+                            </span>
+                          </div>
+                          <div className="flex flex-col gap-0.5 rounded border border-border/70 bg-card p-2.5 shadow-2xs">
+                            <span className="text-[11px] font-medium text-muted-foreground">
+                              {t("summary.remaining")}
+                            </span>
+                            <span className="text-sm font-bold font-mono tabular-nums text-muted-foreground">
+                              {money(remaining)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     );
                   })}
                 </div>
@@ -253,7 +491,10 @@ export default async function ProjectDetailPage({
 
           <Card>
             <CardHeader>
-              <CardTitle>{t("milestonesToInvoice")}</CardTitle>
+              <CardTitle className="inline-flex items-center gap-2">
+                <Layers size={18} className="text-primary" aria-hidden="true" />
+                <span>{t("milestonesToInvoice")}</span>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               {milestones.length === 0 ? (
@@ -292,7 +533,10 @@ export default async function ProjectDetailPage({
       {tab === "contracts" ? (
         <Card>
           <CardHeader>
-            <CardTitle>{t("tabs.contracts")}</CardTitle>
+            <CardTitle className="inline-flex items-center gap-2">
+              <FileText size={18} className="text-primary" aria-hidden="true" />
+              <span>{t("tabs.contracts")}</span>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {contracts.length === 0 ? (
@@ -318,16 +562,28 @@ export default async function ProjectDetailPage({
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Link
-                          href={`/contracts/${contract.id}`}
-                          className="font-medium text-foreground hover:text-primary"
-                        >
-                          <span dir="rtl" lang="ar">
-                            {contract.titleAr ?? contract.titleEn ?? "-"}
-                          </span>
-                        </Link>
+                        {(() => {
+                          const contractTitle =
+                            locale === "ar"
+                              ? (contract.titleAr || contract.titleEn || "-")
+                              : (contract.titleEn || contract.titleAr || "-");
+                          const contractDir =
+                            locale === "ar"
+                              ? (contract.titleAr ? "rtl" : "ltr")
+                              : (contract.titleEn ? "ltr" : "rtl");
+                          return (
+                            <Link
+                              href={`/contracts/${contract.id}`}
+                              className="font-medium text-foreground hover:text-primary"
+                            >
+                              <span dir={contractDir}>
+                                {contractTitle}
+                              </span>
+                            </Link>
+                          );
+                        })()}
                       </TableCell>
-                      <TableCell dir="ltr" className="text-start font-mono">
+                      <TableCell className="text-start font-mono">
                         {contract.number ?? "-"}
                       </TableCell>
                       <TableCell className="text-end">
@@ -350,7 +606,10 @@ export default async function ProjectDetailPage({
       {tab === "invoices" ? (
         <Card>
           <CardHeader>
-            <CardTitle>{t("tabs.invoices")}</CardTitle>
+            <CardTitle className="inline-flex items-center gap-2">
+              <Receipt size={18} className="text-primary" aria-hidden="true" />
+              <span>{t("tabs.invoices")}</span>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {projectInvoices.length === 0 ? (
@@ -371,7 +630,7 @@ export default async function ProjectDetailPage({
                 <TableBody>
                   {projectInvoices.map((invoice) => (
                     <TableRow key={invoice.id}>
-                      <TableCell dir="ltr" className="text-start font-mono">
+                      <TableCell className="text-start font-mono">
                         {invoice.number ?? "-"}
                       </TableCell>
                       <TableCell>
@@ -379,14 +638,14 @@ export default async function ProjectDetailPage({
                           {tinvoices(`status.${invoice.status}`)}
                         </Badge>
                       </TableCell>
-                      <TableCell dir="ltr" className="text-start tabular-nums">
+                      <TableCell className="text-start tabular-nums">
                         {formatMoney(
                           invoice.totalMinor,
                           invoice.currency as CurrencyCode,
-                          "en",
+                          user.locale,
                         )}
                       </TableCell>
-                      <TableCell dir="ltr" className="text-start">
+                      <TableCell className="text-start tabular-nums">
                         {invoice.dueDate ?? "-"}
                       </TableCell>
                       <TableCell className="text-end">
@@ -409,7 +668,10 @@ export default async function ProjectDetailPage({
       {tab === "files" ? (
         <Card>
           <CardHeader>
-            <CardTitle>{t("tabs.files")}</CardTitle>
+            <CardTitle className="inline-flex items-center gap-2">
+              <Paperclip size={18} className="text-primary" aria-hidden="true" />
+              <span>{t("tabs.files")}</span>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ProjectFiles
@@ -428,7 +690,10 @@ export default async function ProjectDetailPage({
       {tab === "activity" ? (
         <Card>
           <CardHeader>
-            <CardTitle>{t("tabs.activity")}</CardTitle>
+            <CardTitle className="inline-flex items-center gap-2">
+              <History size={18} className="text-primary" aria-hidden="true" />
+              <span>{t("tabs.activity")}</span>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {activity.length === 0 ? (
@@ -469,16 +734,21 @@ function Field({
   children,
   ltr,
   className,
+  icon: Icon,
 }: {
   label: string;
   children: React.ReactNode;
   ltr?: boolean;
   className?: string;
+  icon?: LucideIcon;
 }) {
   return (
-    <div className={cn("flex flex-col gap-0.5", className)}>
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="text-sm text-foreground" dir={ltr ? "ltr" : undefined}>
+    <div className={cn("flex flex-col gap-1.5 rounded border border-border/70 bg-card p-3 shadow-2xs transition-colors hover:border-primary/40", className)}>
+      <dt className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+        {Icon ? <Icon size={13} className="text-primary/70 shrink-0" aria-hidden /> : null}
+        <span>{label}</span>
+      </dt>
+      <dd className="text-sm font-semibold tracking-tight text-foreground break-words" dir={ltr ? "ltr" : undefined}>
         {children}
       </dd>
     </div>

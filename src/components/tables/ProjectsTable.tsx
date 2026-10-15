@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import type { GridColDef } from "@mui/x-data-grid";
-import MuiLink from "@mui/material/Link";
-import MuiStack from "@mui/material/Stack";
+import { useLocale } from "next-intl";
+import { FolderKanban } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge } from "@/components/ui/Badge";
 import { RowActionButton } from "@/components/forms/RowActionButton";
-import { ServerDataGrid } from "@/components/tables/ServerDataGrid";
+import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
 import type { ActionResult } from "@/lib/result";
 
 export type ProjectTableRow = {
@@ -58,100 +57,89 @@ export function ProjectsTable({
   clientNames: Record<string, string>;
   archiveAction: (raw: unknown) => Promise<ActionResult<null>>;
 }) {
-  const columns: GridColDef<ProjectTableRow>[] = [
+  const locale = useLocale();
+
+  const columns: ColumnDef<ProjectTableRow>[] = [
     {
-      field: "code",
-      headerName: labels.code,
-      width: 150,
-      sortable: false,
-      renderCell: (params) => (
-        <MuiLink
-          component={Link}
-          href={`/projects/${params.row.id}`}
-          underline="hover"
-          color="inherit"
-          sx={{ fontFamily: "monospace", fontWeight: 600 }}
+      id: "code",
+      header: labels.code,
+      className: "whitespace-nowrap font-mono font-medium text-xs",
+      render: (row) => (
+        <Link
+          href={`/projects/${row.id}`}
           dir="ltr"
+          className="text-foreground hover:text-primary transition-colors font-semibold"
         >
-          {params.row.code}
-        </MuiLink>
+          {row.code}
+        </Link>
       ),
     },
     {
-      field: "name",
-      headerName: labels.name,
-      flex: 1,
-      minWidth: 220,
-      sortable: false,
-      renderCell: (params) => (
-        <MuiLink
-          component={Link}
-          href={`/projects/${params.row.id}`}
-          underline="hover"
-          color="inherit"
-          sx={{ fontWeight: 600 }}
-        >
-          <span dir="rtl" lang="ar">
-            {params.row.nameAr ?? "-"}
-          </span>
-          {params.row.nameEn ? (
-            <>
-              {" / "}
-              <span dir="ltr" lang="en">
-                {params.row.nameEn}
-              </span>
-            </>
-          ) : null}
-        </MuiLink>
-      ),
+      id: "name",
+      header: labels.name,
+      render: (row) => {
+        const name =
+          locale === "ar"
+            ? (row.nameAr || row.nameEn || "-")
+            : (row.nameEn || row.nameAr || "-");
+        const dir =
+          locale === "ar"
+            ? (row.nameAr ? "rtl" : "ltr")
+            : (row.nameEn ? "ltr" : "rtl");
+        return (
+          <Link
+            href={`/projects/${row.id}`}
+            className="font-semibold text-foreground hover:text-primary transition-colors"
+          >
+            <span dir={dir}>{name}</span>
+          </Link>
+        );
+      },
     },
     {
-      field: "client",
-      headerName: labels.client,
-      width: 200,
-      sortable: false,
-      valueGetter: (_value, row) => clientNames[row.clientId ?? ""] ?? "-",
+      id: "client",
+      header: labels.client,
+      className: "text-muted-foreground",
+      render: (row) => clientNames[row.clientId ?? ""] ?? "-",
     },
     {
-      field: "status",
-      headerName: labels.statusLabel,
-      width: 140,
-      sortable: false,
-      renderCell: (params) => (
+      id: "status",
+      header: labels.statusLabel,
+      className: "whitespace-nowrap",
+      render: (row) => (
         <Badge tone="blue">
-          {labels.statusValues[params.row.status] ?? params.row.status}
+          {labels.statusValues[row.status] ?? row.status}
         </Badge>
       ),
     },
     {
-      field: "currency",
-      headerName: labels.currency,
-      width: 110,
-      sortable: false,
-      renderCell: (params) => <span dir="ltr">{params.row.currency}</span>,
+      id: "currency",
+      header: labels.currency,
+      className: "whitespace-nowrap font-mono text-xs text-muted-foreground",
+      render: (row) => <span dir="ltr">{row.currency}</span>,
     },
     {
-      field: "actions",
-      headerName: labels.actions,
-      width: 170,
-      sortable: false,
-      renderCell: (params) => (
-        <MuiStack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+      id: "actions",
+      header: labels.actions,
+      align: "end",
+      className: "whitespace-nowrap",
+      render: (row) => (
+        <div className="inline-flex items-center justify-end gap-1">
           <ActionLink
-            href={`/projects/${params.row.id}`}
+            href={`/projects/${row.id}`}
             action="preview"
             label={labels.preview}
           />
           {canWrite ? (
             <ActionLink
-              href={`/projects/${params.row.id}/edit`}
+              href={`/projects/${row.id}/edit`}
               action="edit"
               label={labels.edit}
             />
           ) : null}
-          {canWrite && !params.row.archivedAt ? (
+          {canWrite && !row.archivedAt ? (
             <RowActionButton
-              id={params.row.id}
+              id={row.id}
               action={archiveAction}
               kind="archive"
               label={labels.archive}
@@ -161,13 +149,13 @@ export function ProjectsTable({
               successTitle={labels.archivedToast}
             />
           ) : null}
-        </MuiStack>
+        </div>
       ),
     },
   ];
 
   return (
-    <ServerDataGrid
+    <ServerDataTable
       rows={rows}
       columns={columns}
       total={total}
@@ -176,6 +164,7 @@ export function ProjectsTable({
       basePath="/projects"
       query={query}
       noRowsLabel={labels.empty}
+      emptyIcon={<FolderKanban size={36} className="text-muted-foreground" aria-hidden="true" />}
     />
   );
 }

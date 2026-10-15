@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
+import { Pencil } from "lucide-react";
 import { getLocale } from "next-intl/server";
 import { db } from "@/db";
 import { clients, projects, templates } from "@/db/schema";
@@ -59,15 +60,34 @@ export default async function ContractEditPage({
     ? templateDefaultsSchema.parse(JSON.parse(template.defaultsJson))
     : null;
 
+  const rawLocale = await getLocale();
+  const locale = isLocale(rawLocale) ? rawLocale : "ar";
+
+  const projectName = project
+    ? (locale === "ar"
+        ? project.nameAr || project.nameEn
+        : project.nameEn || project.nameAr) ?? ""
+    : "";
+  const clientNameStr = client
+    ? (locale === "ar"
+        ? client.nameAr || client.nameEn
+        : client.nameEn || client.nameAr) ?? ""
+    : "";
+  const templateName = template
+    ? (locale === "ar"
+        ? template.nameAr || template.nameEn
+        : template.nameEn || template.nameAr) ?? ""
+    : "-";
+
   const builderDetail: BuilderDetail = {
     id: detail.contract.id,
     status: detail.contract.status,
     currency: detail.contract.currency,
     hasFees: detail.contract.hasFees,
     projectLabel: project
-      ? `${project.code} - ${project.nameAr ?? project.nameEn ?? ""}${client ? ` (${client.nameAr ?? client.nameEn ?? ""})` : ""}`
+      ? `${project.code} - ${projectName}${clientNameStr ? ` (${clientNameStr})` : ""}`
       : "-",
-    templateLabel: template ? `${template.nameAr} / ${template.nameEn}` : "-",
+    templateLabel: templateName,
     basics: {
       languageMode: detail.contract.languageMode,
       titleAr: detail.contract.titleAr ?? "",
@@ -118,8 +138,6 @@ export default async function ContractEditPage({
   };
 
   const signing = getSettings("signing");
-  const rawLocale = await getLocale();
-  const locale = isLocale(rawLocale) ? rawLocale : "ar";
   const clientRow = client;
   const clientName =
     (locale === "ar"
@@ -150,14 +168,25 @@ export default async function ContractEditPage({
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-bold text-foreground">
-          {builderDetail.basics.titleAr || builderDetail.basics.titleEn}
-        </h1>
-        <span className="font-mono text-sm text-muted-foreground" dir="ltr">
-          {detail.contract.number ?? ""}
-        </span>
+    <div className="flex flex-col gap-5 sm:gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+            <Pencil size={20} aria-hidden="true" />
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                {builderDetail.basics.titleAr || builderDetail.basics.titleEn}
+              </h1>
+              {detail.contract.number ? (
+                <span className="inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground translate-y-0.5" dir="ltr">
+                  {detail.contract.number}
+                </span>
+              ) : null}
+            </div>
+          </div>
+        </div>
       </div>
       <ContractBuilder
         detail={builderDetail}

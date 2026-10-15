@@ -86,7 +86,7 @@ export function Sidebar({
         }}
       >
         {collapsed ? null : (
-          <Link href="/" aria-label="Dossier" className="flex h-8 items-center">
+          <Link href="/" prefetch={false} aria-label="Dossier" className="flex h-8 items-center">
             <Logo />
           </Link>
         )}
@@ -96,9 +96,9 @@ export function Sidebar({
           aria-label={t(collapsed ? "expand" : "collapse")}
         >
           {collapsed ? (
-            <PanelLeftOpen size={18} aria-hidden="true" />
+            <PanelLeftOpen size={18} aria-hidden="true" className="rtl:-scale-x-100" />
           ) : (
-            <PanelLeftClose size={18} aria-hidden="true" />
+            <PanelLeftClose size={18} aria-hidden="true" className="rtl:-scale-x-100" />
           )}
         </MuiIconButton>
       </MuiBox>

@@ -110,13 +110,26 @@ export async function login(page: Page): Promise<void> {
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
 }
 
-// The app uses MUI's custom Select (role=combobox). Pick an option by value.
+// Pick a select option by value (supports both native <select> and custom dropdowns).
 export async function pickSelect(
   page: Page,
   selector: string,
   value: string,
 ): Promise<void> {
-  await page.locator(selector).click();
+  const loc = page.locator(selector);
+  const tagName = await loc.evaluate((el) => el.tagName.toLowerCase()).catch(() => "");
+  if (tagName === "select") {
+    await loc.selectOption(value);
+    await loc.dispatchEvent("change");
+    return;
+  }
+  const select = loc.locator("select");
+  if ((await select.count()) > 0) {
+    await select.selectOption(value);
+    await select.dispatchEvent("change");
+    return;
+  }
+  await loc.click();
   await page.locator(`li[data-value="${value}"]`).click();
 }
 
@@ -126,6 +139,19 @@ export async function pickSelectIndex(
   selector: string,
   index: number,
 ): Promise<void> {
-  await page.locator(selector).click();
+  const loc = page.locator(selector);
+  const tagName = await loc.evaluate((el) => el.tagName.toLowerCase()).catch(() => "");
+  if (tagName === "select") {
+    await loc.selectOption({ index });
+    await loc.dispatchEvent("change");
+    return;
+  }
+  const select = loc.locator("select");
+  if ((await select.count()) > 0) {
+    await select.selectOption({ index });
+    await select.dispatchEvent("change");
+    return;
+  }
+  await loc.click();
   await page.getByRole("option").nth(index).click();
 }

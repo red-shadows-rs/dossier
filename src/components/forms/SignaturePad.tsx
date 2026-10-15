@@ -8,6 +8,8 @@ import {
   forwardRef,
 } from "react";
 import SignaturePadLib from "signature_pad";
+import { RotateCcw } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/components/ui/cn";
 
@@ -22,6 +24,7 @@ export const SignaturePad = forwardRef<
   SignaturePadHandle,
   { onChange?: (valid: boolean) => void }
 >(function SignaturePad({ onChange }, ref) {
+  const t = useTranslations("signing");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const padRef = useRef<SignaturePadLib | null>(null);
   const [points, setPoints] = useState(0);
@@ -88,8 +91,10 @@ export const SignaturePad = forwardRef<
             setPoints(0);
             onChange?.(false);
           }}
+          className="gap-1.5"
         >
-          Clear
+          <RotateCcw className="h-3.5 w-3.5" />
+          <span>{t("clear")}</span>
         </Button>
       </div>
     </div>

@@ -11,8 +11,8 @@ function cookieOptions() {
   return {
     path: "/",
     sameSite: "lax" as const,
-    httpOnly: true,
-    secure: env.NODE_ENV === "production",
+    httpOnly: false,
+    secure: Boolean(env.APP_URL?.startsWith("https://")),
     maxAge: ONE_YEAR_SECONDS,
   };
 }

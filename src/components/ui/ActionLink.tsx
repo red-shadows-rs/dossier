@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { Download, Eye, Pencil, Trash2 } from "lucide-react";
-import MuiIconButton from "@mui/material/IconButton";
-import MuiTooltip from "@mui/material/Tooltip";
+import { Tooltip } from "@/components/ui/Tooltip";
+import { cn } from "@/components/ui/cn";
 
 const ICONS = {
   preview: Eye,
@@ -19,22 +19,29 @@ export function ActionLink({
   href,
   action,
   label,
+  className,
 }: {
   href: string;
   action: ActionKind;
   label: string;
+  className?: string;
 }) {
   const Icon = ICONS[action];
   return (
-    <MuiTooltip title={label}>
-      <MuiIconButton
-        component={Link}
+    <Tooltip content={label}>
+      <Link
         href={href}
+        prefetch={false}
         aria-label={label}
-        size="small"
+        className={cn(
+          "flex h-8 w-8 items-center justify-center rounded border border-border/70 bg-card text-muted-foreground hover:bg-muted hover:text-foreground hover:border-primary/50 transition-all shadow-2xs",
+          action === "delete" &&
+            "hover:border-destructive/50 hover:text-destructive hover:bg-destructive/10",
+          className,
+        )}
       >
-        <Icon size={18} aria-hidden="true" />
-      </MuiIconButton>
-    </MuiTooltip>
+        <Icon size={15} aria-hidden="true" />
+      </Link>
+    </Tooltip>
   );
 }

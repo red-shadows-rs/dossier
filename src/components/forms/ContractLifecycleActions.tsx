@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Ban, CheckCheck, FileEdit, Link2, X, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Dialog } from "@/components/ui/Dialog";
@@ -136,8 +137,10 @@ export function ContractLifecycleActions({
             variant="secondary"
             onClick={onRegenerate}
             loading={pending}
+            className="gap-1.5"
           >
-            {t("actions.regenerateLink")}
+            <Link2 size={16} aria-hidden="true" />
+            <span>{t("actions.regenerateLink")}</span>
           </Button>
         ) : null}
         {showRevise && canWrite ? (
@@ -145,13 +148,16 @@ export function ContractLifecycleActions({
             type="button"
             variant="secondary"
             onClick={() => setDialog("revise")}
+            className="gap-1.5"
           >
-            {t("actions.revise")}
+            <FileEdit size={16} aria-hidden="true" />
+            <span>{t("actions.revise")}</span>
           </Button>
         ) : null}
         {status === "signed" && canWrite ? (
-          <Button type="button" onClick={onComplete} loading={pending}>
-            {t("actions.complete")}
+          <Button type="button" onClick={onComplete} loading={pending} className="gap-1.5">
+            <CheckCheck size={16} aria-hidden="true" />
+            <span>{t("actions.complete")}</span>
           </Button>
         ) : null}
         {status === "signed" && canTerminate ? (
@@ -159,8 +165,10 @@ export function ContractLifecycleActions({
             type="button"
             variant="danger"
             onClick={() => setTerminateOpen(true)}
+            className="gap-1.5"
           >
-            {t("actions.terminate")}
+            <XCircle size={16} aria-hidden="true" />
+            <span>{t("actions.terminate")}</span>
           </Button>
         ) : null}
         {status !== "signed" && canCancel ? (
@@ -168,8 +176,10 @@ export function ContractLifecycleActions({
             type="button"
             variant="danger"
             onClick={() => setDialog("cancel")}
+            className="gap-1.5"
           >
-            {t("cancelAction")}
+            <Ban size={16} aria-hidden="true" />
+            <span>{t("cancelAction")}</span>
           </Button>
         ) : null}
       </div>
@@ -198,16 +208,20 @@ export function ContractLifecycleActions({
               variant="ghost"
               onClick={() => setTerminateOpen(false)}
               disabled={pending}
+              className="gap-1.5"
             >
-              {tc("cancel")}
+              <X size={15} aria-hidden="true" />
+              <span>{tc("cancel")}</span>
             </Button>
             <Button
               type="button"
               variant="danger"
               onClick={onTerminate}
               loading={pending}
+              className="gap-1.5"
             >
-              {t("actions.terminate")}
+              <XCircle size={15} aria-hidden="true" />
+              <span>{t("actions.terminate")}</span>
             </Button>
           </div>
         }
@@ -230,8 +244,14 @@ export function ContractLifecycleActions({
         description={t("linkOnce")}
         footer={
           <div className="flex justify-end">
-            <Button type="button" onClick={() => setLinkUrl(null)}>
-              {tc("close")}
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setLinkUrl(null)}
+              className="gap-1.5"
+            >
+              <X size={15} aria-hidden="true" />
+              <span>{tc("close")}</span>
             </Button>
           </div>
         }

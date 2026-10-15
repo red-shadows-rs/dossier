@@ -1,7 +1,7 @@
 import {
   FileText,
   FolderKanban,
-  LayoutDashboard,
+  Gauge,
   Layers,
   Receipt,
   ScrollText,
@@ -29,7 +29,7 @@ export const NAV: NavEntry[] = [
   {
     key: "dashboard",
     href: "/",
-    icon: LayoutDashboard,
+    icon: Gauge,
     permission: null,
     section: "main",
   },

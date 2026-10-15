@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Ban, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
@@ -57,16 +58,20 @@ export function ContractDraftActions({
             type="button"
             variant="danger"
             onClick={() => setDialog("delete")}
+            className="gap-1.5"
           >
-            {t("common.delete")}
+            <Trash2 size={16} aria-hidden="true" />
+            <span>{t("common.delete")}</span>
           </Button>
         ) : null}
         <Button
           type="button"
           variant="secondary"
           onClick={() => setDialog("cancel")}
+          className="gap-1.5"
         >
-          {t("contracts.cancelAction")}
+          <Ban size={16} aria-hidden="true" />
+          <span>{t("contracts.cancelAction")}</span>
         </Button>
       </div>
       <ConfirmDialog

@@ -1,8 +1,10 @@
 import { getTranslations } from "next-intl/server";
+import { Palette } from "lucide-react";
 import { ImageUploadField } from "@/components/forms/ImageUploadField";
 import {
   SettingsForm,
   type SettingsFieldDef,
+  type SettingsSectionDef,
   type SettingsValues,
 } from "@/components/forms/SettingsForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -14,14 +16,16 @@ import {
 } from "@/server/actions/settings";
 import { requireUserPage } from "@/server/auth/require-user";
 import { getSettings } from "@/server/services/settings";
+import { smoothLoading } from "@/lib/smooth-loader";
 
 export default async function CompanySettingsPage() {
+  await smoothLoading();
   const user = await requireUserPage();
   const canWrite = can(user, "settings.write");
   const t = await getTranslations("settings");
   const company = getSettings("company");
 
-  const fields: SettingsFieldDef[] = [
+  const companyFields: SettingsFieldDef[] = [
     { kind: "text", name: "nameAr", label: t("fields.nameAr"), dir: "rtl" },
     { kind: "text", name: "nameEn", label: t("fields.nameEn"), dir: "ltr" },
     {
@@ -58,6 +62,9 @@ export default async function CompanySettingsPage() {
       label: t("fields.addressEn"),
       dir: "ltr",
     },
+  ];
+
+  const bankFields: SettingsFieldDef[] = [
     {
       kind: "text",
       name: "bank.bankNameAr",
@@ -77,6 +84,17 @@ export default async function CompanySettingsPage() {
     },
     { kind: "text", name: "bank.iban", label: t("fields.iban"), dir: "ltr" },
     { kind: "text", name: "bank.swift", label: t("fields.swift"), dir: "ltr" },
+  ];
+
+  const sections: SettingsSectionDef[] = [
+    {
+      title: t("companyInfo"),
+      fields: companyFields,
+    },
+    {
+      title: t("bankInfo"),
+      fields: bankFields,
+    },
   ];
 
   const values: SettingsValues = {
@@ -99,13 +117,17 @@ export default async function CompanySettingsPage() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
+      {/* Branding Section */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("company")}</CardTitle>
+          <CardTitle className="inline-flex items-center gap-2">
+            <Palette size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("branding")}</span>
+          </CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <CardContent>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <ImageUploadField
               label={t("logo")}
               currentFileId={company.logoFileId}
@@ -119,14 +141,16 @@ export default async function CompanySettingsPage() {
               disabled={!canWrite}
             />
           </div>
-          <SettingsForm
-            fields={fields}
-            values={values}
-            action={updateCompanyAction}
-            disabled={!canWrite}
-          />
         </CardContent>
       </Card>
+
+      {/* Company Info & Bank Details Form */}
+      <SettingsForm
+        sections={sections}
+        values={values}
+        action={updateCompanyAction}
+        disabled={!canWrite}
+      />
     </div>
   );
 }

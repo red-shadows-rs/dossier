@@ -108,6 +108,8 @@ async function defaultRenderInvoiceAttachment(
   const pdf = await renderPdf(source.html, {
     docNumber: source.docNumber,
     code: null,
+    kind: "invoice",
+    lang: docLang,
   });
   return {
     filename: source.filename,

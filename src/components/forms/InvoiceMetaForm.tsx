@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Field } from "@/components/ui/Field";
@@ -10,7 +11,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { useToast } from "@/components/ui/Toast";
-import { LANG_MODES } from "@/lib/constants";
+import { INVOICE_LANG_MODES } from "@/lib/constants";
 import { updateInvoiceDraftAction } from "@/server/actions/invoices";
 
 export function InvoiceMetaForm({
@@ -66,12 +67,12 @@ export function InvoiceMetaForm({
             <Select
               id="inv-lang"
               name="languageMode"
-              defaultValue={initial.languageMode}
+              defaultValue={initial.languageMode === "en" ? "en" : "ar"}
               disabled={pending}
             >
-              {LANG_MODES.map((mode) => (
+              {INVOICE_LANG_MODES.map((mode) => (
                 <option key={mode} value={mode}>
-                  {t(`contracts.languageModes.${mode}`)}
+                  {t(`invoices.languageModes.${mode}`)}
                 </option>
               ))}
             </Select>
@@ -120,7 +121,8 @@ export function InvoiceMetaForm({
             />
           </Field>
           <div className="flex justify-end md:col-span-2">
-            <Button type="submit" loading={pending}>
+            <Button type="submit" loading={pending} className="gap-2">
+              <Save className="h-4 w-4" />
               {t("common.save")}
             </Button>
           </div>

@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { Activity, Mail } from "lucide-react";
 import {
   SettingsForm,
   type SettingsFieldDef,
@@ -64,7 +65,10 @@ export default async function EmailSettingsPage() {
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>{t("email")}</CardTitle>
+          <CardTitle className="inline-flex items-center gap-2">
+            <Mail size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("email")}</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <SettingsForm
@@ -78,7 +82,10 @@ export default async function EmailSettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("worker.title")}</CardTitle>
+          <CardTitle className="inline-flex items-center gap-2">
+            <Activity size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("worker.title")}</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-start gap-4">

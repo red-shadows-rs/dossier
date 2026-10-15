@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { Check, Trash2, X } from "lucide-react";
 import { Button } from "./Button";
 import { Dialog } from "./Dialog";
 
@@ -27,6 +28,8 @@ export function ConfirmDialog({
   pending,
   tone = "danger",
 }: ConfirmDialogProps) {
+  const ConfirmIcon = tone === "danger" ? Trash2 : Check;
+
   return (
     <Dialog
       open={open}
@@ -40,16 +43,20 @@ export function ConfirmDialog({
             variant="secondary"
             onClick={onClose}
             disabled={pending}
+            className="gap-1.5"
           >
-            {cancelLabel}
+            <X size={15} aria-hidden="true" />
+            <span>{cancelLabel}</span>
           </Button>
           <Button
             type="button"
             variant={tone}
             onClick={onConfirm}
             loading={pending}
+            className="gap-1.5"
           >
-            {confirmLabel}
+            {!pending ? <ConfirmIcon size={15} aria-hidden="true" /> : null}
+            <span>{confirmLabel}</span>
           </Button>
         </>
       }

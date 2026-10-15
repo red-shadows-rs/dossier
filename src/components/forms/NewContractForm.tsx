@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { FileSignature, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Field } from "@/components/ui/Field";
@@ -22,12 +23,14 @@ export function NewContractForm({
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     setPending(true);
     setFieldErrors({});
+    setStatusError(null);
     const result = await createContractAction({
       projectId: String(data.get("projectId") ?? ""),
       templateId: String(data.get("templateId") ?? ""),
@@ -39,7 +42,12 @@ export function NewContractForm({
       return;
     }
     if (result.error.fieldErrors) setFieldErrors(result.error.fieldErrors);
-    toast({ title: t(`errors.${result.error.code}`), tone: "error" });
+    const msg =
+      result.error.code === "VALIDATION_FAILED"
+        ? t("auth.requiredFields")
+        : t(`errors.${result.error.code}`);
+    setStatusError(msg);
+    toast({ title: msg, tone: "error" });
   }
 
   const err = (key: string): string | null => {
@@ -48,7 +56,15 @@ export function NewContractForm({
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+      {statusError ? (
+        <p
+          role="alert"
+          className="rounded border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm font-medium text-destructive"
+        >
+          {statusError}
+        </p>
+      ) : null}
       <Card>
         <CardHeader>
           <CardTitle>{t("contracts.newTitle")}</CardTitle>
@@ -64,7 +80,6 @@ export function NewContractForm({
               id="nc-project"
               name="projectId"
               disabled={pending}
-              required
             >
               <option value="">{t("contracts.selectProject")}</option>
               {projects.map((project) => (
@@ -84,7 +99,6 @@ export function NewContractForm({
               id="nc-template"
               name="templateId"
               disabled={pending}
-              required
             >
               <option value="">{t("contracts.selectTemplate")}</option>
               {templates.map((template) => (
@@ -103,10 +117,13 @@ export function NewContractForm({
           variant="secondary"
           onClick={() => router.back()}
           disabled={pending}
+          className="gap-2"
         >
+          <X className="h-4 w-4" />
           {t("common.cancel")}
         </Button>
-        <Button type="submit" loading={pending}>
+        <Button type="submit" loading={pending} className="gap-2">
+          <FileSignature className="h-4 w-4" />
           {t("contracts.createDraft")}
         </Button>
       </div>

@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
+import { Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
@@ -81,7 +82,7 @@ export function ContractBasicsStep({
         <CardHeader>
           <CardTitle>{t("contracts.builder.basicsTitle")}</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
           <Field label={t("contracts.project")} htmlFor="cb-project">
             <Input id="cb-project" value={projectLabel} disabled readOnly />
           </Field>
@@ -174,7 +175,7 @@ export function ContractBasicsStep({
             label={t("contracts.scopeAr")}
             htmlFor="cb-scope-ar"
             error={err("scopeAr")}
-            className="md:col-span-2"
+            className="md:col-span-2 2xl:col-span-3"
           >
             <Textarea
               id="cb-scope-ar"
@@ -190,7 +191,7 @@ export function ContractBasicsStep({
             label={t("contracts.scopeEn")}
             htmlFor="cb-scope-en"
             error={err("scopeEn")}
-            className="md:col-span-2"
+            className="md:col-span-2 2xl:col-span-3"
           >
             <Textarea
               id="cb-scope-en"
@@ -327,7 +328,7 @@ export function ContractBasicsStep({
             label={t("contracts.internalNotes")}
             htmlFor="cb-notes"
             error={err("internalNotes")}
-            className="md:col-span-2"
+            className="md:col-span-2 2xl:col-span-3"
           >
             <Textarea
               id="cb-notes"
@@ -340,7 +341,8 @@ export function ContractBasicsStep({
       </Card>
 
       <div className="flex justify-end">
-        <Button type="submit" loading={pending}>
+        <Button type="submit" loading={pending} className="gap-2">
+          <Save className="h-4 w-4" />
           {t("common.save")}
         </Button>
       </div>

@@ -2,7 +2,7 @@ import { z } from "zod";
 import {
   CURRENCIES,
   DISCOUNT_TYPES,
-  LANG_MODES,
+  INVOICE_LANG_MODES,
   MAX_MINOR,
   PAYMENT_METHODS,
   type CurrencyCode,
@@ -44,14 +44,14 @@ export const createInvoiceSchema = z.object({
     .string({ required_error: "errors.required" })
     .min(1, "errors.required"),
   contractId: z.string().min(1).nullable().optional(),
-  languageMode: z.enum(LANG_MODES).default("bilingual"),
+  languageMode: z.enum(INVOICE_LANG_MODES).default("ar"),
   notesAr: nullableOptText(),
   notesEn: nullableOptText(),
 });
 export type CreateInvoiceInput = z.infer<typeof createInvoiceSchema>;
 
 export const updateInvoiceDraftSchema = z.object({
-  languageMode: z.enum(LANG_MODES),
+  languageMode: z.enum(INVOICE_LANG_MODES),
   issueDate: nullableOptDate,
   dueDate: nullableOptDate,
   notesAr: nullableOptText(),

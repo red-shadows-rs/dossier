@@ -3,6 +3,16 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import {
+  Ban,
+  Check,
+  CheckCircle2,
+  CreditCard,
+  Pencil,
+  Send,
+  Trash2,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Dialog } from "@/components/ui/Dialog";
@@ -109,7 +119,8 @@ export function InvoiceActions({
         {status === "draft" && canWrite ? (
           <>
             <a href={`/invoices/${invoiceId}/edit`}>
-              <Button type="button" variant="secondary">
+              <Button type="button" variant="secondary" className="gap-2">
+                <Pencil className="h-4 w-4" />
                 {t("common.edit")}
               </Button>
             </a>
@@ -118,7 +129,9 @@ export function InvoiceActions({
                 type="button"
                 variant="danger"
                 onClick={() => setConfirm("delete")}
+                className="gap-2"
               >
+                <Trash2 className="h-4 w-4" />
                 {t("common.delete")}
               </Button>
             ) : null}
@@ -126,7 +139,8 @@ export function InvoiceActions({
         ) : null}
 
         {status === "draft" && canIssue ? (
-          <Button type="button" onClick={onIssue} loading={pending}>
+          <Button type="button" onClick={onIssue} loading={pending} className="gap-2">
+            <CheckCircle2 className="h-4 w-4" />
             {t("invoices.issueAction")}
           </Button>
         ) : null}
@@ -140,13 +154,16 @@ export function InvoiceActions({
             variant="secondary"
             onClick={onSendEmail}
             loading={pending}
+            className="gap-2"
           >
+            <Send className="h-4 w-4" />
             {t("invoices.sendEmail")}
           </Button>
         ) : null}
 
         {(status === "issued" || status === "partially_paid") && canPay ? (
-          <Button type="button" onClick={() => setPayOpen(true)}>
+          <Button type="button" onClick={() => setPayOpen(true)} className="gap-2">
+            <CreditCard className="h-4 w-4" />
             {t("invoices.recordPayment")}
           </Button>
         ) : null}
@@ -156,7 +173,9 @@ export function InvoiceActions({
             type="button"
             variant="danger"
             onClick={() => setConfirm("void")}
+            className="gap-2"
           >
+            <Ban className="h-4 w-4" />
             {t("invoices.voidAction")}
           </Button>
         ) : null}
@@ -211,12 +230,14 @@ export function PaymentDialog({
   const toast = useToast();
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     setPending(true);
     setFieldErrors({});
+    setStatusError(null);
     let amountMinor = 0;
     try {
       amountMinor = parseMajorToMinor(
@@ -226,6 +247,7 @@ export function PaymentDialog({
     } catch {
       setPending(false);
       setFieldErrors({ amountMinor: "errors.invalid" });
+      setStatusError(t("errors.invalid"));
       return;
     }
     const result = await recordPaymentAction({
@@ -243,7 +265,12 @@ export function PaymentDialog({
       return;
     }
     if (result.error.fieldErrors) setFieldErrors(result.error.fieldErrors);
-    toast({ title: t(`errors.${result.error.code}`), tone: "error" });
+    const msg =
+      result.error.code === "VALIDATION_FAILED"
+        ? t("auth.requiredFields")
+        : t(`errors.${result.error.code}`);
+    setStatusError(msg);
+    toast({ title: msg, tone: "error" });
   }
 
   const today = new Date().toISOString().slice(0, 10);
@@ -255,7 +282,15 @@ export function PaymentDialog({
       title={t("invoices.recordPayment")}
       footer={null}
     >
-      <form onSubmit={onSubmit} className="flex flex-col gap-3">
+      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-3">
+        {statusError ? (
+          <p
+            role="alert"
+            className="rounded border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm font-medium text-destructive"
+          >
+            {statusError}
+          </p>
+        ) : null}
         <Field
           label={t("invoices.amount", { currency })}
           htmlFor="pay-amount"
@@ -266,7 +301,6 @@ export function PaymentDialog({
             id="pay-amount"
             name="amount"
             dir="ltr"
-            required
             className="text-start"
           />
         </Field>
@@ -277,7 +311,6 @@ export function PaymentDialog({
             type="date"
             defaultValue={today}
             max={today}
-            required
             className="text-start"
           />
         </Field>
@@ -307,10 +340,13 @@ export function PaymentDialog({
             variant="secondary"
             onClick={onClose}
             disabled={pending}
+            className="gap-2"
           >
+            <X className="h-4 w-4" />
             {t("common.cancel")}
           </Button>
-          <Button type="submit" loading={pending}>
+          <Button type="submit" loading={pending} className="gap-2">
+            <Check className="h-4 w-4" />
             {t("common.save")}
           </Button>
         </div>
@@ -363,8 +399,9 @@ export function VoidPaymentButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-sm text-destructive hover:underline"
+        className="inline-flex items-center gap-1.5 text-sm text-destructive hover:opacity-80 transition-opacity"
       >
+        <Ban className="h-3.5 w-3.5" />
         {t("invoices.voidPayment", {
           amount: formatMoney(amountMinor, currency as CurrencyCode, "en"),
         })}

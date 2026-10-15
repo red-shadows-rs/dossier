@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Archive, Copy } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
@@ -61,16 +62,20 @@ export function TemplateActions({
           type="button"
           variant="secondary"
           onClick={() => setDialog("duplicate")}
+          className="gap-2"
         >
-          {t("templates.duplicate")}
+          <Copy size={16} aria-hidden="true" />
+          <span>{t("templates.duplicate")}</span>
         </Button>
         {isSystem ? null : (
           <Button
             type="button"
             variant="danger"
             onClick={() => setDialog("archive")}
+            className="gap-2"
           >
-            {t("templates.archive")}
+            <Archive size={16} aria-hidden="true" />
+            <span>{t("templates.archive")}</span>
           </Button>
         )}
       </div>

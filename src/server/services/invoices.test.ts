@@ -257,7 +257,7 @@ describe("issueInvoice", () => {
       user,
       id,
       {
-        languageMode: "bilingual",
+        languageMode: "ar",
         issueDate: "2026-10-20",
         dueDate: null,
         notesAr: null,
@@ -290,7 +290,7 @@ describe("issueInvoice", () => {
       user,
       id,
       {
-        languageMode: "bilingual",
+        languageMode: "ar",
         issueDate: "2027-01-02",
         dueDate: null,
         notesAr: null,
@@ -305,7 +305,7 @@ describe("issueInvoice", () => {
   it("requires at least one line and a positive total", () => {
     const id = createInvoice(
       user,
-      { projectId, languageMode: "bilingual", notesAr: null, notesEn: null },
+      { projectId, languageMode: "ar", notesAr: null, notesEn: null },
       META,
     );
     expect(() => issueInvoice(user, id, META)).toThrow(AppError);
@@ -328,7 +328,7 @@ describe("delete / void", () => {
   it("deletes an unnumbered draft but not an issued invoice", () => {
     const draft = createInvoice(
       user,
-      { projectId, languageMode: "bilingual", notesAr: null, notesEn: null },
+      { projectId, languageMode: "ar", notesAr: null, notesEn: null },
       META,
     );
     deleteDraftInvoice(user, draft, META);
@@ -363,7 +363,7 @@ describe("isOverdue (16.1 vectors)", () => {
   ) {
     const id = createInvoice(
       user,
-      { projectId, languageMode: "bilingual", notesAr: null, notesEn: null },
+      { projectId, languageMode: "ar", notesAr: null, notesEn: null },
       META,
     );
     db.update(invoices)
@@ -395,7 +395,7 @@ describe("isOverdue (16.1 vectors)", () => {
     const probe = `probe-${newId().slice(0, 8)}`;
     const overdue = createInvoice(
       user,
-      { projectId, languageMode: "bilingual", notesAr: null, notesEn: probe },
+      { projectId, languageMode: "ar", notesAr: null, notesEn: probe },
       META,
     );
     db.update(invoices)
@@ -404,7 +404,7 @@ describe("isOverdue (16.1 vectors)", () => {
       .run();
     const notOverdue = createInvoice(
       user,
-      { projectId, languageMode: "bilingual", notesAr: null, notesEn: null },
+      { projectId, languageMode: "ar", notesAr: null, notesEn: null },
       META,
     );
     db.update(invoices)

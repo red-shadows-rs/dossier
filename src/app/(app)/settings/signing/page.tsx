@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { FileSignature } from "lucide-react";
 import {
   SettingsForm,
   type SettingsFieldDef,
@@ -60,7 +61,10 @@ export default async function SigningSettingsPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("signing")}</CardTitle>
+        <CardTitle className="inline-flex items-center gap-2">
+          <FileSignature size={18} className="text-primary" aria-hidden="true" />
+          <span>{t("signing")}</span>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <SettingsForm

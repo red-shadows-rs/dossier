@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
+import { KeyRound, UserCheck, UserCog } from "lucide-react";
 import { UserForm } from "@/components/forms/UserForm";
 import { UserPasswordForm } from "@/components/forms/UserPasswordForm";
 import { UserStatusButton } from "@/components/forms/UserStatusButton";
@@ -13,6 +14,7 @@ import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
 import { getSettings } from "@/server/services/settings";
 import { getUser } from "@/server/services/users";
+import { smoothLoading } from "@/lib/smooth-loader";
 
 function Row({
   label,
@@ -39,6 +41,7 @@ export default async function UserDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await smoothLoading();
   const actor = await requireUserPage();
   assertCan(actor, "users.manage");
   const t = await getTranslations("users");
@@ -56,24 +59,36 @@ export default async function UserDetailPage({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-foreground">
-            {target.name}
-          </h1>
-          {target.status === "active" ? (
-            <Badge tone="green">{t("active")}</Badge>
-          ) : (
-            <Badge tone="gray">{t("disabled")}</Badge>
-          )}
+    <div className="flex flex-col gap-5 sm:gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+            <UserCog size={20} aria-hidden="true" />
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                {target.name}
+              </h1>
+              {target.status === "active" ? (
+                <Badge tone="green">{t("active")}</Badge>
+              ) : (
+                <Badge tone="gray">{t("disabled")}</Badge>
+              )}
+            </div>
+          </div>
         </div>
-        <UserStatusButton userId={target.id} status={target.status} />
+        <div className="flex flex-wrap items-center gap-2">
+          <UserStatusButton userId={target.id} status={target.status} />
+        </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("profile")}</CardTitle>
+          <CardTitle className="inline-flex items-center gap-2">
+            <UserCheck size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("profile")}</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -101,7 +116,10 @@ export default async function UserDetailPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("editTitle")}</CardTitle>
+          <CardTitle className="inline-flex items-center gap-2">
+            <UserCog size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("editTitle")}</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <UserForm
@@ -119,7 +137,10 @@ export default async function UserDetailPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("passwordTitle")}</CardTitle>
+          <CardTitle className="inline-flex items-center gap-2">
+            <KeyRound size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("passwordTitle")}</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <UserPasswordForm userId={target.id} />

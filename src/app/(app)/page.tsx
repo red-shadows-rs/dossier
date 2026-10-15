@@ -2,16 +2,21 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import {
   Activity,
+  AlertCircle,
   AlertTriangle,
   BarChart3,
   BellRing,
+  Calendar,
   CalendarClock,
+  CheckCircle2,
   Clock,
   FileCheck2,
   FileSignature,
   FileText,
   FolderKanban,
+  Gauge,
   History,
+  Layers,
   Receipt,
   TrendingUp,
   Users,
@@ -19,19 +24,12 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
-import MuiAlert from "@mui/material/Alert";
-import MuiBox from "@mui/material/Box";
-import MuiCard from "@mui/material/Card";
-import MuiCardContent from "@mui/material/CardContent";
-import MuiChip from "@mui/material/Chip";
-import MuiGrid from "@mui/material/Grid";
-import MuiStack from "@mui/material/Stack";
-import MuiTypography from "@mui/material/Typography";
+import { MonthlyChart, StatusDonut } from "@/components/dashboard/InteractiveCharts";
+import { cn } from "@/components/ui/cn";
 import {
   Table,
   TableBody,
   TableCell,
-  TableEmpty,
   TableHead,
   TableHeaderCell,
   TableRow,
@@ -46,20 +44,13 @@ import { requireUserPage } from "@/server/auth/require-user";
 import {
   getDashboard,
   type CurrencyAmount,
-  type MonthlyPoint,
 } from "@/server/services/dashboard";
 import { getInternalSetting, getSettings } from "@/server/services/settings";
+import { smoothLoading } from "@/lib/smooth-loader";
 
 const HEARTBEAT_STALE_MS = 5 * 60 * 1000;
 
-const CHART_COLORS = [
-  "var(--mui-palette-primary-main)",
-  "var(--mui-palette-info-main)",
-  "var(--mui-palette-warning-main)",
-  "var(--mui-palette-success-main)",
-  "var(--mui-palette-error-main)",
-  "var(--mui-palette-text-disabled)",
-];
+
 
 function SectionHeading({
   icon: Icon,
@@ -69,12 +60,10 @@ function SectionHeading({
   children: ReactNode;
 }) {
   return (
-    <MuiStack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
-      <Icon size={16} aria-hidden="true" />
-      <MuiTypography variant="overline" color="text.secondary">
-        {children}
-      </MuiTypography>
-    </MuiStack>
+    <div className="flex items-center gap-2 pt-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+      <Icon size={15} className="text-primary" aria-hidden="true" />
+      <span>{children}</span>
+    </div>
   );
 }
 
@@ -86,19 +75,14 @@ function CardHeading({
   children: ReactNode;
 }) {
   return (
-    <MuiStack
-      direction="row"
-      spacing={0.75}
-      sx={{ alignItems: "center", mb: 1 }}
-    >
-      <MuiBox
-        component="span"
-        sx={{ display: "inline-flex", color: "text.secondary" }}
-      >
-        <Icon size={18} aria-hidden="true" />
-      </MuiBox>
-      <MuiTypography variant="subtitle2">{children}</MuiTypography>
-    </MuiStack>
+    <div className="flex items-center gap-2 pb-3 mb-3 border-b border-border/40">
+      <span className="flex h-7 w-7 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary">
+        <Icon size={14} aria-hidden="true" />
+      </span>
+      <h2 className="text-sm font-semibold tracking-tight text-foreground">
+        {children}
+      </h2>
+    </div>
   );
 }
 
@@ -110,30 +94,16 @@ function AmountList({
   locale: Locale;
 }) {
   if (amounts.length === 0) {
-    return (
-      <MuiTypography component="span" color="text.secondary">
-        -
-      </MuiTypography>
-    );
+    return <span className="text-muted-foreground">-</span>;
   }
   return (
-    <MuiStack
-      component="span"
-      direction="row"
-      spacing={1}
-      dir="ltr"
-      sx={{
-        flexWrap: "wrap",
-        alignItems: "baseline",
-        fontVariantNumeric: "tabular-nums",
-      }}
-    >
+    <div className="flex flex-wrap items-baseline gap-2 font-mono tabular-nums">
       {amounts.map((entry) => (
-        <span key={entry.currency}>
+        <span key={entry.currency} className="font-bold">
           {formatMoney(entry.amountMinor, entry.currency as CurrencyCode, locale)}
         </span>
       ))}
-    </MuiStack>
+    </div>
   );
 }
 
@@ -142,321 +112,81 @@ function Kpi({
   value,
   hint,
   icon: Icon,
-  accent,
+  accent = "primary",
 }: {
   label: string;
   value: ReactNode;
   hint?: ReactNode;
   icon?: LucideIcon;
-  accent?: string;
+  accent?: "primary" | "info" | "warning" | "success" | "danger";
 }) {
+  const accentClasses = {
+    primary: "border-primary/20 bg-primary/10 text-primary",
+    info: "border-sky-500/20 bg-sky-500/10 text-sky-500",
+    warning: "border-amber-500/20 bg-amber-500/10 text-amber-500",
+    success: "border-emerald-500/20 bg-emerald-500/10 text-emerald-500",
+    danger: "border-rose-500/20 bg-rose-500/10 text-rose-500",
+  }[accent];
+
   return (
-    <MuiCard sx={{ height: "100%" }}>
-      <MuiCardContent
-        sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
-      >
-        <MuiStack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
-          {Icon ? (
-            <MuiBox
-              component="span"
-              sx={{ display: "inline-flex", color: accent ?? "text.disabled" }}
-            >
-              <Icon size={18} aria-hidden="true" />
-            </MuiBox>
-          ) : null}
-          <MuiTypography variant="caption" color="text.secondary">
-            {label}
-          </MuiTypography>
-        </MuiStack>
-        <MuiTypography
-          component="div"
-          variant="h6"
-          sx={{ fontWeight: 600, lineHeight: 1.35 }}
-        >
-          {value}
-        </MuiTypography>
-        {hint ? (
-          <MuiTypography variant="caption" color="text.secondary">
-            {hint}
-          </MuiTypography>
+    <div className="flex flex-col justify-between rounded border border-border/80 bg-card p-4 transition-all duration-150 hover:border-primary/40 hover:shadow-xs shadow-2xs">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-semibold text-muted-foreground">{label}</span>
+        {Icon ? (
+          <span
+            className={cn(
+              "flex h-8 w-8 shrink-0 items-center justify-center rounded border",
+              accentClasses,
+            )}
+          >
+            <Icon size={16} aria-hidden="true" />
+          </span>
         ) : null}
-      </MuiCardContent>
-    </MuiCard>
+      </div>
+      <div className="mt-3">
+        <div className="text-2xl font-bold tracking-tight font-mono tabular-nums text-foreground">
+          {value}
+        </div>
+        {hint ? (
+          <p className="mt-1 text-xs text-muted-foreground leading-normal">{hint}</p>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
 function ClientName({
   nameAr,
   nameEn,
+  locale,
 }: {
   nameAr: string | null;
   nameEn: string | null;
-}) {
-  return (
-    <MuiStack component="span" direction="column">
-      <span dir="rtl" lang="ar">
-        {nameAr ?? nameEn ?? "-"}
-      </span>
-      {nameEn && nameAr ? (
-        <MuiTypography
-          component="span"
-          variant="caption"
-          color="text.secondary"
-          dir="ltr"
-          lang="en"
-        >
-          {nameEn}
-        </MuiTypography>
-      ) : null}
-    </MuiStack>
-  );
-}
-
-function MonthlyChart({
-  points,
-  locale,
-  issuedLabel,
-  signedLabel,
-}: {
-  points: MonthlyPoint[];
   locale: Locale;
-  issuedLabel: string;
-  signedLabel: string;
 }) {
-  const max = Math.max(1, ...points.flatMap((p) => [p.issued, p.signed]));
-  const fmt = new Intl.DateTimeFormat(locale === "ar" ? "ar" : "en", {
-    month: "short",
-  });
-
-  const legend = (color: string, label: string) => (
-    <MuiStack
-      component="span"
-      direction="row"
-      spacing={0.75}
-      sx={{ alignItems: "center" }}
-    >
-      <MuiBox
-        component="span"
-        sx={{ width: 10, height: 10, borderRadius: "3px", bgcolor: color }}
-      />
-      <MuiTypography component="span" variant="caption" color="text.secondary">
-        {label}
-      </MuiTypography>
-    </MuiStack>
-  );
+  const name =
+    locale === "ar"
+      ? (nameAr || nameEn || "-")
+      : (nameEn || nameAr || "-");
+  const dir =
+    locale === "ar"
+      ? (nameAr ? "rtl" : "ltr")
+      : (nameEn ? "ltr" : "rtl");
 
   return (
-    <MuiBox>
-      <MuiStack direction="row" spacing={2} sx={{ mb: 1.5 }}>
-        {legend("primary.main", issuedLabel)}
-        {legend("info.main", signedLabel)}
-      </MuiStack>
-      <MuiBox
-        sx={{
-          position: "relative",
-          display: "flex",
-          alignItems: "flex-end",
-          gap: 1,
-          height: 190,
-        }}
-      >
-        {[0, 1, 2, 3].map((line) => (
-          <MuiBox
-            key={line}
-            aria-hidden="true"
-            sx={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              top: `${(line / 4) * 100}%`,
-              borderTop: "1px dashed",
-              borderColor: "divider",
-            }}
-          />
-        ))}
-        {points.map((point) => (
-          <MuiBox
-            key={point.month}
-            sx={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 0.5,
-              minWidth: 0,
-              zIndex: 1,
-            }}
-          >
-            <MuiStack
-              direction="row"
-              spacing={0.5}
-              sx={{
-                alignItems: "flex-end",
-                justifyContent: "center",
-                height: 150,
-                width: "100%",
-              }}
-            >
-              <MuiBox
-                title={`${issuedLabel}: ${point.issued}`}
-                sx={{
-                  width: 14,
-                  minHeight: 2,
-                  height: `${(point.issued / max) * 100}%`,
-                  bgcolor: "primary.main",
-                  borderRadius: "3px 3px 0 0",
-                }}
-              />
-              <MuiBox
-                title={`${signedLabel}: ${point.signed}`}
-                sx={{
-                  width: 14,
-                  minHeight: 2,
-                  height: `${(point.signed / max) * 100}%`,
-                  bgcolor: "info.main",
-                  borderRadius: "3px 3px 0 0",
-                }}
-              />
-            </MuiStack>
-            <MuiTypography variant="caption" color="text.secondary">
-              {fmt.format(new Date(`${point.month}-01T00:00:00Z`))}
-            </MuiTypography>
-          </MuiBox>
-        ))}
-      </MuiBox>
-    </MuiBox>
+    <span dir={dir} lang={dir === "rtl" ? "ar" : "en"}>
+      {name}
+    </span>
   );
 }
 
-function StatusDonut({
-  title,
-  icon,
-  statuses,
-  counts,
-  labels,
-}: {
-  title: string;
-  icon: LucideIcon;
-  statuses: readonly string[];
-  counts: Record<string, number>;
-  labels: (status: string) => string;
-}) {
-  const data = statuses
-    .map((status, index) => ({
-      id: index,
-      value: counts[status] ?? 0,
-      label: labels(status),
-      color: CHART_COLORS[index % CHART_COLORS.length],
-    }))
-    .filter((entry) => entry.value > 0);
-  const total = data.reduce((sum, entry) => sum + entry.value, 0);
-  const size = 168;
-  const stroke = 24;
-  const radius = (size - stroke) / 2;
-  const circumference = 2 * Math.PI * radius;
-  let acc = 0;
 
-  return (
-    <MuiCard sx={{ height: "100%" }}>
-      <MuiCardContent>
-        <CardHeading icon={icon}>{title}</CardHeading>
-        {total === 0 ? (
-          <MuiTypography variant="body2" color="text.secondary">
-            -
-          </MuiTypography>
-        ) : (
-          <MuiStack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={2}
-            sx={{ alignItems: "center" }}
-          >
-            <MuiBox
-              sx={{ position: "relative", width: size, height: size, flexShrink: 0 }}
-            >
-              <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-                <circle
-                  cx={size / 2}
-                  cy={size / 2}
-                  r={radius}
-                  fill="none"
-                  stroke="var(--mui-palette-divider)"
-                  strokeWidth={stroke}
-                />
-                {data.map((entry) => {
-                  const fraction = entry.value / total;
-                  const dash = fraction * circumference;
-                  const offset = -acc * circumference;
-                  acc += fraction;
-                  return (
-                    <circle
-                      key={entry.id}
-                      cx={size / 2}
-                      cy={size / 2}
-                      r={radius}
-                      fill="none"
-                      stroke={entry.color}
-                      strokeWidth={stroke}
-                      strokeDasharray={`${dash} ${circumference - dash}`}
-                      strokeDashoffset={offset}
-                      transform={`rotate(-90 ${size / 2} ${size / 2})`}
-                    />
-                  );
-                })}
-              </svg>
-              <MuiStack
-                sx={{
-                  position: "absolute",
-                  inset: 0,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <MuiTypography variant="h6" sx={{ fontWeight: 700, lineHeight: 1 }}>
-                  {total}
-                </MuiTypography>
-              </MuiStack>
-            </MuiBox>
-            <MuiStack spacing={0.75} sx={{ width: "100%" }}>
-              {data.map((entry) => (
-                <MuiStack
-                  key={entry.id}
-                  direction="row"
-                  sx={{ alignItems: "center", justifyContent: "space-between" }}
-                >
-                  <MuiStack
-                    direction="row"
-                    spacing={0.75}
-                    sx={{ alignItems: "center" }}
-                  >
-                    <MuiBox
-                      component="span"
-                      sx={{
-                        width: 10,
-                        height: 10,
-                        borderRadius: "50%",
-                        bgcolor: entry.color,
-                      }}
-                    />
-                    <MuiTypography variant="body2" color="text.secondary">
-                      {entry.label}
-                    </MuiTypography>
-                  </MuiStack>
-                  <MuiTypography variant="body2" sx={{ fontWeight: 600 }}>
-                    {entry.value}
-                  </MuiTypography>
-                </MuiStack>
-              ))}
-            </MuiStack>
-          </MuiStack>
-        )}
-      </MuiCardContent>
-    </MuiCard>
-  );
-}
 
 export default async function DashboardPage() {
+  await smoothLoading();
   const user = await requireUserPage();
   const t = await getTranslations("dashboard");
+  const tc = await getTranslations("common");
   const tContracts = await getTranslations("contracts");
   const tInvoices = await getTranslations("invoices");
   const tn = await getTranslations("nav");
@@ -493,33 +223,28 @@ export default async function DashboardPage() {
       value: <AmountList amounts={data.outstanding} locale={locale} />,
       hint: t("outstandingHint"),
       icon: Wallet,
-      accent: "primary.main",
+      accent: "primary" as const,
     },
     {
       label: t("overdue"),
       value: (
-        <MuiStack
-          component="span"
-          direction="row"
-          spacing={1}
-          sx={{ alignItems: "baseline" }}
-        >
-          <span dir="ltr" style={{ fontVariantNumeric: "tabular-nums" }}>
+        <div className="flex items-baseline gap-2">
+          <span className="tabular-nums font-bold">
             {data.overdue.count}
           </span>
           <AmountList amounts={data.overdue.amounts} locale={locale} />
-        </MuiStack>
+        </div>
       ),
       hint: t("overdueHint"),
       icon: AlertTriangle,
-      accent: "error.main",
+      accent: "danger" as const,
     },
     {
       label: t("collectedThisMonth"),
       value: <AmountList amounts={data.revenue.currentMonth} locale={locale} />,
       hint: `${t("lastMonth")}: ${currencyLines(data.revenue.previousMonth) ?? "-"}`,
       icon: TrendingUp,
-      accent: "success.main",
+      accent: "success" as const,
     },
     {
       label: t("issuedThisMonth"),
@@ -528,7 +253,7 @@ export default async function DashboardPage() {
       ),
       hint: t("invoicesCount", { count: data.issuedThisMonth.count }),
       icon: Receipt,
-      accent: "info.main",
+      accent: "info" as const,
     },
   ];
 
@@ -538,14 +263,14 @@ export default async function DashboardPage() {
       value: data.awaitingSignature.count,
       hint: t("awaitingHint"),
       icon: FileSignature,
-      accent: "warning.main",
+      accent: "warning" as const,
     },
     {
       label: t("contractsActive"),
       value: data.contractsActive,
       hint: t("signedLast30Days", { count: data.signedLast30Days }),
       icon: FileCheck2,
-      accent: "success.main",
+      accent: "success" as const,
     },
     {
       label: t("projectsActive"),
@@ -555,55 +280,64 @@ export default async function DashboardPage() {
         invoices: data.draftInvoices,
       }),
       icon: FolderKanban,
-      accent: "primary.main",
+      accent: "primary" as const,
     },
     {
       label: t("clients"),
       value: data.clientsTotal,
       hint: t("clientsNew", { count: data.clientsNewThisMonth }),
       icon: Users,
-      accent: "info.main",
+      accent: "info" as const,
     },
   ];
 
   return (
-    <MuiStack spacing={2}>
-      <MuiStack spacing={0.5}>
-        <MuiTypography component="h1" variant="h5" sx={{ fontWeight: 700 }}>
-          {t("title")}
-        </MuiTypography>
-        <MuiTypography variant="body2" color="text.secondary">
-          {t("subtitle")}
-        </MuiTypography>
-      </MuiStack>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+            <Gauge size={20} aria-hidden="true" />
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">{t("title")}</h1>
+            <p className="text-xs text-muted-foreground">{t("subtitle")}</p>
+          </div>
+        </div>
+      </div>
 
       {workerStale ? (
-        <MuiAlert severity="warning">{t("workerStale")}</MuiAlert>
+        <div className="flex items-center gap-2.5 rounded border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-600 dark:text-amber-400">
+          <AlertTriangle size={18} className="shrink-0" aria-hidden="true" />
+          <span>{t("workerStale")}</span>
+        </div>
       ) : null}
 
-      <SectionHeading icon={Wallet}>{t("finance")}</SectionHeading>
-      <MuiGrid container spacing={2}>
-        {financial.map((item) => (
-          <MuiGrid key={item.label} size={{ xs: 12, sm: 6, md: 3 }}>
+      <div className="flex flex-col gap-3">
+        <SectionHeading icon={Wallet}>{t("finance")}</SectionHeading>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {financial.map((item) => (
             <Kpi
+              key={item.label}
               label={item.label}
               value={item.value}
               hint={item.hint}
               icon={item.icon}
               accent={item.accent}
             />
-          </MuiGrid>
-        ))}
-      </MuiGrid>
+          ))}
+        </div>
 
-      <SectionHeading icon={Activity}>{t("operations")}</SectionHeading>
-      <MuiGrid container spacing={2}>
-        {operations.map((item) => (
-          <MuiGrid key={item.label} size={{ xs: 12, sm: 6, md: 3 }}>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <SectionHeading icon={Activity}>{t("operations")}</SectionHeading>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {operations.map((item) => (
             <Kpi
+              key={item.label}
               label={item.label}
               value={
-                <span dir="ltr" style={{ fontVariantNumeric: "tabular-nums" }}>
+                <span className="tabular-nums font-bold">
                   {item.value}
                 </span>
               }
@@ -611,176 +345,195 @@ export default async function DashboardPage() {
               icon={item.icon}
               accent={item.accent}
             />
-          </MuiGrid>
-        ))}
-      </MuiGrid>
+          ))}
+        </div>
+      </div>
 
-      <MuiCard>
-        <MuiCardContent>
-          <CardHeading icon={BarChart3}>{t("monthlyTitle")}</CardHeading>
-          <MonthlyChart
-            points={data.monthlyActivity}
-            locale={locale}
-            issuedLabel={t("seriesIssued")}
-            signedLabel={t("seriesSigned")}
-          />
-        </MuiCardContent>
-      </MuiCard>
+      <div className="rounded border border-border/80 bg-card p-4 sm:p-5 shadow-xs">
+        <CardHeading icon={BarChart3}>{t("monthlyTitle")}</CardHeading>
+        <MonthlyChart
+          points={data.monthlyActivity}
+          locale={locale}
+          issuedLabel={t("seriesIssued")}
+          signedLabel={t("seriesSigned")}
+        />
+      </div>
 
-      <MuiGrid container spacing={2}>
-        <MuiGrid size={{ xs: 12, md: 6 }}>
-          <StatusDonut
-            title={t("contractsByStatus")}
-            icon={FileText}
-            statuses={CONTRACT_STATUSES}
-            counts={data.contractsByStatus}
-            labels={(status) => tContracts(`status.${status}`)}
-          />
-        </MuiGrid>
-        <MuiGrid size={{ xs: 12, md: 6 }}>
-          <StatusDonut
-            title={t("invoicesByStatus")}
-            icon={Receipt}
-            statuses={INVOICE_STATUSES}
-            counts={data.invoicesByStatus}
-            labels={(status) => tInvoices(`status.${status}`)}
-          />
-        </MuiGrid>
-      </MuiGrid>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <StatusDonut
+          title={t("contractsByStatus")}
+          kind="contracts"
+          statuses={CONTRACT_STATUSES}
+          counts={data.contractsByStatus}
+          totalLabel={tc("total")}
+          labels={Object.fromEntries(
+            CONTRACT_STATUSES.map((status) => [
+              status,
+              tContracts(`status.${status}`),
+            ]),
+          )}
+        />
+        <StatusDonut
+          title={t("invoicesByStatus")}
+          kind="invoices"
+          statuses={INVOICE_STATUSES}
+          counts={data.invoicesByStatus}
+          totalLabel={tc("total")}
+          labels={Object.fromEntries(
+            INVOICE_STATUSES.map((status) => [
+              status,
+              tInvoices(`status.${status}`),
+            ]),
+          )}
+        />
+      </div>
 
-      <SectionHeading icon={BellRing}>{t("attention")}</SectionHeading>
+      <div className="flex flex-col gap-3">
+        <SectionHeading icon={BellRing}>{t("attention")}</SectionHeading>
 
-      <MuiCard>
-        <MuiCardContent>
-          <MuiStack
-            direction="row"
-            sx={{ alignItems: "center", justifyContent: "space-between", mb: 1 }}
-          >
-            <MuiStack
-              direction="row"
-              spacing={0.75}
-              sx={{ alignItems: "center" }}
-            >
-              <MuiBox
-                component="span"
-                sx={{ display: "inline-flex", color: "text.secondary" }}
-              >
-                <FileSignature size={18} aria-hidden="true" />
-              </MuiBox>
-              <MuiTypography variant="subtitle1" sx={{ fontWeight: 600 }}>
+        <div className="overflow-hidden rounded border border-border/80 bg-card shadow-xs">
+          <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <FileSignature size={16} className="text-primary" aria-hidden="true" />
+              <span className="text-sm font-semibold tracking-tight text-foreground">
                 {t("awaitingTitle")}
-              </MuiTypography>
-            </MuiStack>
-            <MuiChip
-              size="small"
-              variant="outlined"
-              label={data.awaitingSignature.count}
-            />
-          </MuiStack>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeaderCell>{t("number")}</TableHeaderCell>
-                <TableHeaderCell>{t("client")}</TableHeaderCell>
-                <TableHeaderCell className="text-end">
-                  {t("daysWaiting")}
-                </TableHeaderCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.awaitingSignature.rows.length === 0 ? (
-                <TableEmpty colSpan={3}>{t("awaitingEmpty")}</TableEmpty>
-              ) : (
-                data.awaitingSignature.rows.map((row) => (
-                  <TableRow key={row.id}>
+              </span>
+            </div>
+            <span className="inline-flex items-center gap-1 rounded border border-border/60 bg-card px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground">
+              <Clock size={12} aria-hidden="true" />
+              <span>{data.awaitingSignature.count}</span>
+            </span>
+          </div>
+
+          {data.awaitingSignature.rows.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground text-center">
+              <CheckCircle2 size={32} className="text-emerald-500/80 mb-1" aria-hidden="true" />
+              <span className="text-sm font-medium text-foreground">{t("awaitingEmpty")}</span>
+            </div>
+          ) : (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeaderCell>
+                    <span className="inline-flex items-center gap-1.5">
+                      <FileSignature size={14} className="text-muted-foreground" aria-hidden="true" />
+                      {t("number")}
+                    </span>
+                  </TableHeaderCell>
+                  <TableHeaderCell>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Users size={14} className="text-muted-foreground" aria-hidden="true" />
+                      {t("client")}
+                    </span>
+                  </TableHeaderCell>
+                  <TableHeaderCell className="text-end">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Clock size={14} className="text-muted-foreground" aria-hidden="true" />
+                      {t("daysWaiting")}
+                    </span>
+                  </TableHeaderCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.awaitingSignature.rows.map((row) => (
+                  <TableRow key={row.id} className="hover:bg-muted/30 transition-colors">
                     <TableCell>
                       <Link
                         href={`/contracts/${row.id}`}
-                        className="font-medium text-foreground hover:text-primary"
-                        dir="ltr"
+                        className="inline-flex items-center gap-1.5 font-medium font-mono text-foreground hover:text-primary transition-colors"
                       >
-                        {row.number ?? "-"}
+                        <FileText size={15} className="text-muted-foreground" aria-hidden="true" />
+                        <span>{row.number ?? "-"}</span>
                       </Link>
                     </TableCell>
                     <TableCell>
                       <ClientName
                         nameAr={row.clientNameAr}
                         nameEn={row.clientNameEn}
+                        locale={locale}
                       />
                     </TableCell>
-                    <TableCell className="text-end" dir="ltr">
+                    <TableCell className="text-end tabular-nums font-medium">
                       {t("days", { count: row.daysWaiting })}
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </MuiCardContent>
-      </MuiCard>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </div>
 
-      <MuiCard>
-        <MuiCardContent>
-          <MuiStack
-            direction="row"
-            sx={{ alignItems: "center", justifyContent: "space-between", mb: 1 }}
-          >
-            <MuiStack
-              direction="row"
-              spacing={0.75}
-              sx={{ alignItems: "center" }}
-            >
-              <MuiBox
-                component="span"
-                sx={{ display: "inline-flex", color: "text.secondary" }}
-              >
-                <Clock size={18} aria-hidden="true" />
-              </MuiBox>
-              <MuiTypography variant="subtitle1" sx={{ fontWeight: 600 }}>
+        <div className="overflow-hidden rounded border border-border/80 bg-card shadow-xs">
+          <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Clock size={16} className="text-amber-500" aria-hidden="true" />
+              <span className="text-sm font-semibold tracking-tight text-foreground">
                 {t("dueSoonTitle")}
-              </MuiTypography>
-            </MuiStack>
-            <MuiChip
-              size="small"
-              variant="outlined"
-              label={data.dueSoon.length}
-            />
-          </MuiStack>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeaderCell>{t("number")}</TableHeaderCell>
-                <TableHeaderCell>{t("client")}</TableHeaderCell>
-                <TableHeaderCell>{t("dueDate")}</TableHeaderCell>
-                <TableHeaderCell className="text-end">
-                  {t("outstanding")}
-                </TableHeaderCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.dueSoon.length === 0 ? (
-                <TableEmpty colSpan={4}>{t("dueSoonEmpty")}</TableEmpty>
-              ) : (
-                data.dueSoon.map((row) => (
-                  <TableRow key={row.id}>
+              </span>
+            </div>
+            <span className="inline-flex items-center gap-1 rounded border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-mono font-medium text-amber-500">
+              <AlertCircle size={12} aria-hidden="true" />
+              <span>{data.dueSoon.length}</span>
+            </span>
+          </div>
+
+          {data.dueSoon.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground text-center">
+              <CheckCircle2 size={32} className="text-emerald-500/80 mb-1" aria-hidden="true" />
+              <span className="text-sm font-medium text-foreground">{t("dueSoonEmpty")}</span>
+            </div>
+          ) : (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeaderCell>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Receipt size={14} className="text-muted-foreground" aria-hidden="true" />
+                      {t("number")}
+                    </span>
+                  </TableHeaderCell>
+                  <TableHeaderCell>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Users size={14} className="text-muted-foreground" aria-hidden="true" />
+                      {t("client")}
+                    </span>
+                  </TableHeaderCell>
+                  <TableHeaderCell>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Calendar size={14} className="text-muted-foreground" aria-hidden="true" />
+                      {t("dueDate")}
+                    </span>
+                  </TableHeaderCell>
+                  <TableHeaderCell className="text-end">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Wallet size={14} className="text-muted-foreground" aria-hidden="true" />
+                      {t("outstanding")}
+                    </span>
+                  </TableHeaderCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.dueSoon.map((row) => (
+                  <TableRow key={row.id} className="hover:bg-muted/30 transition-colors">
                     <TableCell>
                       <Link
                         href={`/invoices/${row.id}`}
-                        className="font-medium text-foreground hover:text-primary"
-                        dir="ltr"
+                        className="inline-flex items-center gap-1.5 font-medium font-mono text-foreground hover:text-primary transition-colors"
                       >
-                        {row.number ?? "-"}
+                        <Receipt size={15} className="text-muted-foreground" aria-hidden="true" />
+                        <span>{row.number ?? "-"}</span>
                       </Link>
                     </TableCell>
                     <TableCell>
                       <ClientName
                         nameAr={row.clientNameAr}
                         nameEn={row.clientNameEn}
+                        locale={locale}
                       />
                     </TableCell>
-                    <TableCell dir="ltr">{row.dueDate}</TableCell>
+                    <TableCell className="tabular-nums font-mono text-xs">{row.dueDate}</TableCell>
                     <TableCell className="text-end">
-                      <span dir="ltr" className="tabular-nums">
+                      <span className="tabular-nums font-semibold font-mono">
                         {formatMoney(
                           row.outstandingMinor,
                           row.currency as CurrencyCode,
@@ -789,108 +542,123 @@ export default async function DashboardPage() {
                       </span>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </MuiCardContent>
-      </MuiCard>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </div>
 
-      <MuiCard>
-        <MuiCardContent>
-          <MuiStack
-            direction="row"
-            sx={{ alignItems: "center", justifyContent: "space-between", mb: 1 }}
-          >
-            <MuiStack
-              direction="row"
-              spacing={0.75}
-              sx={{ alignItems: "center" }}
-            >
-              <MuiBox
-                component="span"
-                sx={{ display: "inline-flex", color: "text.secondary" }}
-              >
-                <CalendarClock size={18} aria-hidden="true" />
-              </MuiBox>
-              <MuiTypography variant="subtitle1" sx={{ fontWeight: 600 }}>
+        <div className="overflow-hidden rounded border border-border/80 bg-card shadow-xs">
+          <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <CalendarClock size={16} className="text-sky-500" aria-hidden="true" />
+              <span className="text-sm font-semibold tracking-tight text-foreground">
                 {t("endingSoonTitle")}
-              </MuiTypography>
-            </MuiStack>
-            <MuiChip
-              size="small"
-              variant="outlined"
-              label={data.endingSoon.count}
-            />
-          </MuiStack>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeaderCell>{t("number")}</TableHeaderCell>
-                <TableHeaderCell>{t("client")}</TableHeaderCell>
-                <TableHeaderCell>{t("endDate")}</TableHeaderCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.endingSoon.rows.length === 0 ? (
-                <TableEmpty colSpan={3}>{t("endingSoonEmpty")}</TableEmpty>
-              ) : (
-                data.endingSoon.rows.map((row) => (
-                  <TableRow key={row.id}>
+              </span>
+            </div>
+            <span className="inline-flex items-center gap-1 rounded border border-border/60 bg-card px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground">
+              <CalendarClock size={12} aria-hidden="true" />
+              <span>{data.endingSoon.count}</span>
+            </span>
+          </div>
+
+          {data.endingSoon.rows.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground text-center">
+              <CheckCircle2 size={32} className="text-emerald-500/80 mb-1" aria-hidden="true" />
+              <span className="text-sm font-medium text-foreground">{t("endingSoonEmpty")}</span>
+            </div>
+          ) : (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeaderCell>
+                    <span className="inline-flex items-center gap-1.5">
+                      <FileText size={14} className="text-muted-foreground" aria-hidden="true" />
+                      {t("number")}
+                    </span>
+                  </TableHeaderCell>
+                  <TableHeaderCell>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Users size={14} className="text-muted-foreground" aria-hidden="true" />
+                      {t("client")}
+                    </span>
+                  </TableHeaderCell>
+                  <TableHeaderCell>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Calendar size={14} className="text-muted-foreground" aria-hidden="true" />
+                      {t("endDate")}
+                    </span>
+                  </TableHeaderCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.endingSoon.rows.map((row) => (
+                  <TableRow key={row.id} className="hover:bg-muted/30 transition-colors">
                     <TableCell>
                       <Link
                         href={`/contracts/${row.id}`}
-                        className="font-medium text-foreground hover:text-primary"
-                        dir="ltr"
+                        className="inline-flex items-center gap-1.5 font-medium font-mono text-foreground hover:text-primary transition-colors"
                       >
-                        {row.number ?? "-"}
+                        <FileText size={15} className="text-muted-foreground" aria-hidden="true" />
+                        <span>{row.number ?? "-"}</span>
                       </Link>
                     </TableCell>
                     <TableCell>
                       <ClientName
                         nameAr={row.clientNameAr}
                         nameEn={row.clientNameEn}
+                        locale={locale}
                       />
                     </TableCell>
-                    <TableCell dir="ltr">{row.endDate}</TableCell>
+                    <TableCell className="tabular-nums font-mono text-xs">{row.endDate}</TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </MuiCardContent>
-      </MuiCard>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </div>
 
-      <MuiCard>
-        <MuiCardContent>
-          <MuiStack
-            direction="row"
-            spacing={0.75}
-            sx={{ alignItems: "center", mb: 1 }}
-          >
-            <MuiBox
-              component="span"
-              sx={{ display: "inline-flex", color: "text.secondary" }}
-            >
-              <History size={18} aria-hidden="true" />
-            </MuiBox>
-            <MuiTypography component="h2" variant="subtitle1" sx={{ fontWeight: 600 }}>
-              {t("activityTitle")}
-            </MuiTypography>
-          </MuiStack>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeaderCell>{t("when")}</TableHeaderCell>
-                <TableHeaderCell>{t("action")}</TableHeaderCell>
-                <TableHeaderCell>{t("entity")}</TableHeaderCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.recentActivity.length === 0 ? (
-                <TableEmpty colSpan={3}>{t("activityEmpty")}</TableEmpty>
-              ) : (
-                data.recentActivity.map((row) => {
+        <div className="overflow-hidden rounded border border-border/80 bg-card shadow-xs">
+          <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <History size={16} className="text-muted-foreground" aria-hidden="true" />
+              <span className="text-sm font-semibold tracking-tight text-foreground">
+                {t("activityTitle")}
+              </span>
+            </div>
+          </div>
+
+          {data.recentActivity.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground text-center">
+              <History size={32} className="text-muted-foreground/60 mb-1" aria-hidden="true" />
+              <span className="text-sm font-medium text-foreground">{t("activityEmpty")}</span>
+            </div>
+          ) : (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeaderCell>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Clock size={14} className="text-muted-foreground" aria-hidden="true" />
+                      {t("when")}
+                    </span>
+                  </TableHeaderCell>
+                  <TableHeaderCell>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Activity size={14} className="text-muted-foreground" aria-hidden="true" />
+                      {t("action")}
+                    </span>
+                  </TableHeaderCell>
+                  <TableHeaderCell>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Layers size={14} className="text-muted-foreground" aria-hidden="true" />
+                      {t("entity")}
+                    </span>
+                  </TableHeaderCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.recentActivity.map((row) => {
                   const href =
                     row.entityType === "contract"
                       ? `/contracts/${row.entityId}`
@@ -904,33 +672,43 @@ export default async function DashboardPage() {
                         ? tn("invoices")
                         : row.entityType;
                   return (
-                    <TableRow key={row.id}>
-                      <TableCell className="whitespace-nowrap">
+                    <TableRow key={row.id} className="hover:bg-muted/30 transition-colors">
+                      <TableCell className="whitespace-nowrap tabular-nums font-mono text-xs text-muted-foreground">
                         {formatInstant(row.ts, timezone, locale)}
                       </TableCell>
-                      <TableCell dir="ltr" className="text-start">
-                        {row.action}
+                      <TableCell>
+                        <span className="rounded border border-border/60 bg-muted/30 px-2 py-0.5 font-mono text-xs font-medium text-foreground">
+                          {row.action}
+                        </span>
                       </TableCell>
                       <TableCell>
                         {href ? (
                           <Link
                             href={href}
-                            className="text-foreground hover:text-primary"
+                            className="inline-flex items-center gap-1.5 font-medium text-foreground hover:text-primary transition-colors"
                           >
-                            {entityLabel}
+                            {row.entityType === "contract" ? (
+                              <FileText size={15} className="text-primary" aria-hidden="true" />
+                            ) : (
+                              <Receipt size={15} className="text-sky-500" aria-hidden="true" />
+                            )}
+                            <span>{entityLabel}</span>
                           </Link>
                         ) : (
-                          <span>{entityLabel}</span>
+                          <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                            <FolderKanban size={15} aria-hidden="true" />
+                            <span>{entityLabel}</span>
+                          </span>
                         )}
                       </TableCell>
                     </TableRow>
                   );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </MuiCardContent>
-      </MuiCard>
-    </MuiStack>
+                })}
+              </TableBody>
+            </Table>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

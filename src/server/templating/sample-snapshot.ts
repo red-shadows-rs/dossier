@@ -101,7 +101,7 @@ export const SAMPLE_SNAPSHOT: ContractSnapshotV1 = {
   milestones: [
     {
       position: 1,
-      titleAr: "دفعة مقدّمة عند التوقيع",
+      titleAr: "دفعة مقدمة عند التوقيع",
       titleEn: "Advance upon signing",
       percentBp: 4000,
       amountMinor: 760000,
@@ -151,7 +151,7 @@ export const SAMPLE_SNAPSHOT: ContractSnapshotV1 = {
       titleAr: "الغرض من العقد",
       titleEn: "Purpose of the Agreement",
       bodyAr:
-        "ينظّم هذا العقد تعاقد العميل مع المزوّد لتنفيذ مشروع **{{project.name}}** (مرجع {{project.code}}).",
+        "ينظم هذا العقد تعاقد العميل مع المزود لتنفيذ مشروع **{{project.name}}** (مرجع {{project.code}}).",
       bodyEn:
         "This Agreement governs the engagement of the Provider by the Client for the project **{{project.name}}** (Ref. {{project.code}}).",
     },

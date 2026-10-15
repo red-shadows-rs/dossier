@@ -93,7 +93,7 @@ test.describe.serial("contract lifecycle (16.2 #1 + #2)", () => {
     await expect(
       page.getByRole("heading", { name: "Verify your email" }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Send me a code" }).click();
+    await page.getByRole("button", { name: /Send (me a )?code/ }).click();
     await expect(page.getByText("Code sent")).toBeVisible();
 
     const otp = await waitForOutbox("contract_otp");
@@ -106,7 +106,7 @@ test.describe.serial("contract lifecycle (16.2 #1 + #2)", () => {
     await page.locator('input[type="checkbox"]').check();
     await page.getByRole("button", { name: "Sign contract" }).click();
     await expect(
-      page.getByText("Thank you, your signature was recorded"),
+      page.getByText(/Signature recorded successfully|Thank you, your signature was recorded/),
     ).toBeVisible();
 
     // 10. Contract is signed and the sealed PDF downloads
@@ -151,7 +151,7 @@ test.describe.serial("contract lifecycle (16.2 #1 + #2)", () => {
 
     await page.goto("/v/ZZZZ-ZZZZ-ZZZZ");
     await expect(
-      page.getByText("No document matches this code"),
+      page.getByText(/Document not found|No document matches this code/),
     ).toBeVisible();
   });
 });

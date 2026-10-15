@@ -2,6 +2,13 @@
 @import "tailwindcss";
 @config "../../tailwind.config.mjs";
 
+@theme {
+  --radius-lg: 4px;
+  --radius-md: 4px;
+  --radius-sm: 2px;
+  --radius: 4px;
+}
+
 /* Theme tokens per DOSSIER_PLAN.md 5.8 — dark is the default */
 :root {
   --background: #0b0b0f;
@@ -34,6 +41,22 @@
 }
 
 .dark {
+  --background: #0b0b0f;
+  --surface: #14141a;
+  --border: #26262e;
+  --text: #ededf0;
+  --muted: #9a9aa6;
+  --foreground: #ededf0;
+  --card: #14141a;
+  --card-foreground: #ededf0;
+  --popover: #14141a;
+  --popover-foreground: #ededf0;
+  --secondary: #14141a;
+  --secondary-foreground: #ededf0;
+  --accent: #14141a;
+  --accent-foreground: #ededf0;
+  --muted-foreground: #9a9aa6;
+  --input: #26262e;
   color-scheme: dark;
 }
 
@@ -43,6 +66,17 @@
   --border: #e4e4e9;
   --text: #16161a;
   --muted: #6b6b76;
+  --foreground: #16161a;
+  --card: #f6f6f8;
+  --card-foreground: #16161a;
+  --popover: #f6f6f8;
+  --popover-foreground: #16161a;
+  --secondary: #f6f6f8;
+  --secondary-foreground: #16161a;
+  --accent: #f6f6f8;
+  --accent-foreground: #16161a;
+  --muted-foreground: #6b6b76;
+  --input: #e4e4e9;
   color-scheme: light;
 }
 
@@ -65,6 +99,17 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
+  }
+  button,
+  [role="button"],
+  select,
+  summary {
+    cursor: pointer;
+  }
+  button:disabled,
+  [role="button"][aria-disabled="true"],
+  select:disabled {
+    cursor: not-allowed;
   }
 }
 
@@ -96,3 +141,22 @@ input:-webkit-autofill:active {
   caret-color: var(--text);
   transition: background-color 9999s ease-in-out 0s;
 }
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="date"]::-webkit-inner-spin-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
+
+

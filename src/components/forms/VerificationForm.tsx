@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { FileSearch, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
+import { FileUpload } from "@/components/ui/FileUpload";
 import { Input } from "@/components/ui/Input";
 import {
   checkPdfAction,
@@ -25,11 +27,11 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
   const t = useTranslations("verification");
   const tr = useTranslations();
   const locale = useLocale();
-  const fileRef = useRef<HTMLInputElement>(null);
 
   const [code, setCode] = useState(initialCode ?? "");
   const [result, setResult] = useState<VerificationResult | null>(null);
   const [checked, setChecked] = useState(false);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfCheck, setPdfCheck] = useState<PdfCheckResult | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +53,7 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
 
   async function onCheckPdf(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const file = fileRef.current?.files?.[0];
+    const file = pdfFile;
     if (!file) {
       setError(tr("errors.FILE_REJECTED"));
       return;
@@ -70,7 +72,7 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <form onSubmit={onLookup} className="flex items-end gap-2">
+      <form onSubmit={onLookup} noValidate className="flex items-end gap-2">
         <Field label={t("codeLabel")} htmlFor="verify-code" className="flex-1">
           <Input
             id="verify-code"
@@ -80,10 +82,10 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
             className="font-mono uppercase"
             placeholder="XXXX-XXXX-XXXX"
             disabled={pending}
-            required
           />
         </Field>
-        <Button type="submit" loading={pending}>
+        <Button type="submit" loading={pending} className="gap-2">
+          <ShieldCheck className="h-4 w-4" />
           {t("verify")}
         </Button>
       </form>
@@ -98,14 +100,14 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
         result === null ? (
           <p
             role="status"
-            className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm text-foreground"
+            className="rounded border border-destructive/40 bg-destructive/10 p-4 text-sm text-foreground"
           >
             {t("notFound")}
           </p>
         ) : (
           <div
             role="status"
-            className="rounded-md border border-success/40 bg-success/10 p-4 text-sm text-foreground"
+            className="rounded border border-success/40 bg-success/10 p-4 text-sm text-foreground"
           >
             <p className="font-medium">{t("found")}</p>
             <p className="mt-1 text-muted-foreground">
@@ -115,7 +117,7 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
             </p>
             <a
               href={`/v/${code}?lang=${locale}`}
-              className="mt-2 inline-block text-primary underline"
+              className="mt-2 inline-block text-primary hover:underline"
             >
               {t("viewDetails")}
             </a>
@@ -125,23 +127,25 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
 
       <form
         onSubmit={onCheckPdf}
-        className="flex flex-col gap-3 rounded-md border border-border p-4"
+        noValidate
+        className="flex flex-col gap-3 rounded border border-border bg-card p-4"
       >
-        <div className="flex flex-col gap-1">
-          <span className="text-sm font-medium text-foreground">
-            {t("pdfTitle")}
-          </span>
-          <span className="text-xs text-muted-foreground">{t("pdfHint")}</span>
-        </div>
-        <input
-          ref={fileRef}
-          type="file"
+        <FileUpload
+          label={t("pdfTitle")}
+          hint={t("pdfHint")}
           accept="application/pdf"
           disabled={pending}
-          className="block w-full text-xs text-muted-foreground file:me-2 file:rounded-md file:border file:border-border file:bg-surface file:px-2 file:py-1 file:text-foreground"
+          pending={pending}
+          onFileSelect={(file) => {
+            setPdfFile(file);
+          }}
+          onClear={() => {
+            setPdfFile(null);
+          }}
         />
         <div className="flex items-center gap-3">
-          <Button type="submit" variant="secondary" loading={pending}>
+          <Button type="submit" variant="secondary" loading={pending} className="gap-2">
+            <FileSearch className="h-4 w-4" />
             {t("pdfCheck")}
           </Button>
           {pdfCheck ? (

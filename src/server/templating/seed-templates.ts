@@ -34,7 +34,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "This Agreement governs the engagement of the Provider by the Client for the project **{{project.name}}** (Ref. {{project.code}}) under Agreement No. {{contract.number}} dated {{contract.date}}.\n\nBy signing this Agreement, each Party confirms that it has the legal capacity and authority to enter into it.",
     bodyAr:
-      "ينظّم هذا العقد تعاقد العميل مع المزوّد لتنفيذ مشروع **{{project.name}}** (مرجع {{project.code}}) بموجب العقد رقم {{contract.number}} المؤرخ في {{contract.date}}.\n\nبتوقيع هذا العقد يُقرّ كل طرف بأن لديه الأهلية والصلاحية القانونية للتعاقد.",
+      "ينظم هذا العقد تعاقد العميل مع المزود لتنفيذ مشروع **{{project.name}}** (مرجع {{project.code}}) بموجب العقد رقم {{contract.number}} المؤرخ في {{contract.date}}.\n\nبتوقيع هذا العقد يقر كل طرف بأن لديه الأهلية والصلاحية القانونية للتعاقد.",
   },
   scope: {
     titleEn: "Scope of Work",
@@ -42,7 +42,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "The Provider shall perform the following services (the **Services**):\n\n> {{contract.scope}}\n\nAny work not expressly described above is outside the scope of this Agreement and is subject to the Change Requests clause.",
     bodyAr:
-      "يلتزم المزوّد بتنفيذ الخدمات التالية («الخدمات»):\n\n> {{contract.scope}}\n\nيُعدّ أي عمل غير منصوص عليه صراحةً أعلاه خارج نطاق هذا العقد، ويخضع لبند طلبات التغيير.",
+      "يلتزم المزود بتنفيذ الخدمات التالية («الخدمات»):\n\n> {{contract.scope}}\n\nيعد أي عمل غير منصوص عليه صراحة أعلاه خارج نطاق هذا العقد، ويخضع لبند طلبات التغيير.",
   },
   fees: {
     titleEn: "Fees and Payment",
@@ -50,7 +50,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "The total fee for the Services is **{{contract.total}}**, comprising a net amount of {{contract.net}} and tax of {{contract.tax}} ({{contract.tax_rate}}), as detailed below.\n\n{{block.pricing_table}}\n\nThe fee shall be paid according to the following payment schedule.\n\n{{block.payment_schedule}}\n\nEach invoice is payable within **{{contract.payment_terms_days}}** days from its issue date, by bank transfer to the account stated on the invoice.\n\nAmounts already paid for work performed are non-refundable unless otherwise agreed in writing.",
     bodyAr:
-      "إجمالي أتعاب الخدمات **{{contract.total}}**، ويشمل مبلغاً صافياً قدره {{contract.net}} وضريبة قدرها {{contract.tax}} ({{contract.tax_rate}})، وفق التفصيل الآتي.\n\n{{block.pricing_table}}\n\nتُسدَّد الأتعاب وفق جدول الدفعات الآتي.\n\n{{block.payment_schedule}}\n\nتُستحق كل فاتورة خلال **{{contract.payment_terms_days}}** يوماً من تاريخ إصدارها، ويتم السداد بالتحويل البنكي إلى الحساب المبيّن في الفاتورة.\n\nلا تُسترد المبالغ المدفوعة عن أعمال تم تنفيذها ما لم يُتفق كتابةً على خلاف ذلك.",
+      "إجمالي أتعاب الخدمات **{{contract.total}}**، ويشمل مبلغا صافيا قدره {{contract.net}} وضريبة قدرها {{contract.tax}} ({{contract.tax_rate}})، وفق التفصيل الآتي.\n\n{{block.pricing_table}}\n\nتسدد الأتعاب وفق جدول الدفعات الآتي.\n\n{{block.payment_schedule}}\n\nتستحق كل فاتورة خلال **{{contract.payment_terms_days}}** يوما من تاريخ إصدارها، ويتم السداد بالتحويل البنكي إلى الحساب المبين في الفاتورة.\n\nلا تسترد المبالغ المدفوعة عن أعمال تم تنفيذها ما لم يتفق كتابة على خلاف ذلك.",
   },
   timeline: {
     titleEn: "Term and Timeline",
@@ -58,7 +58,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "This Agreement takes effect on **{{contract.start_date}}** and, unless terminated earlier in accordance with its terms, remains in force until **{{contract.end_date}}**.\n\nDelivery dates depend on the Client providing content, approvals and access on time. Delays caused by the Client extend the timeline accordingly.",
     bodyAr:
-      "يسري هذا العقد اعتباراً من **{{contract.start_date}}** ويظل نافذاً حتى **{{contract.end_date}}** ما لم يُنهَ قبل ذلك وفق أحكامه.\n\nتعتمد مواعيد التسليم على تزويد العميل بالمحتوى والموافقات والصلاحيات في الوقت المناسب، وأي تأخير ناتج عن العميل يمدّد الجدول الزمني بمقداره.",
+      "يسري هذا العقد اعتبارا من **{{contract.start_date}}** ويظل نافذا حتى **{{contract.end_date}}** ما لم ينه قبل ذلك وفق أحكامه.\n\nتعتمد مواعيد التسليم على تزويد العميل بالمحتوى والموافقات والصلاحيات في الوقت المناسب، وأي تأخير ناتج عن العميل يمدد الجدول الزمني بمقداره.",
   },
   client_obligations: {
     titleEn: "Client Obligations",
@@ -66,15 +66,15 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "The Client shall:\n\n- provide all content, materials, credentials and information reasonably required, in a timely manner;\n- appoint a representative authorized to give approvals and feedback;\n- review deliverables and respond within 5 business days of submission;\n- pay all amounts when due.",
     bodyAr:
-      "يلتزم العميل بما يلي:\n\n- تزويد المزوّد في الوقت المناسب بالمحتوى والمواد وبيانات الدخول والمعلومات اللازمة؛\n- تعيين ممثل مفوّض بإبداء الموافقات والملاحظات؛\n- مراجعة المخرجات والرد خلال 5 أيام عمل من تسليمها؛\n- سداد المبالغ المستحقة في مواعيدها.",
+      "يلتزم العميل بما يلي:\n\n- تزويد المزود في الوقت المناسب بالمحتوى والمواد وبيانات الدخول والمعلومات اللازمة؛\n- تعيين ممثل مفوض بإبداء الموافقات والملاحظات؛\n- مراجعة المخرجات والرد خلال 5 أيام عمل من تسليمها؛\n- سداد المبالغ المستحقة في مواعيدها.",
   },
   provider_obligations: {
     titleEn: "Provider Obligations",
-    titleAr: "التزامات المزوّد",
+    titleAr: "التزامات المزود",
     bodyEn:
       "The Provider shall perform the Services with reasonable skill and care in line with generally accepted professional standards, assign suitably qualified personnel, and keep the Client reasonably informed of progress.",
     bodyAr:
-      "يلتزم المزوّد بتنفيذ الخدمات بالعناية والمهارة المعقولتين وفق المعايير المهنية المتعارف عليها، وتكليف كوادر مؤهلة، وإطلاع العميل على سير العمل بصورة معقولة.",
+      "يلتزم المزود بتنفيذ الخدمات بالعناية والمهارة المعقولتين وفق المعايير المهنية المتعارف عليها، وتكليف كوادر مؤهلة، وإطلاع العميل على سير العمل بصورة معقولة.",
   },
   change_requests: {
     titleEn: "Change Requests",
@@ -82,7 +82,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "Either Party may request changes to the Services. No change takes effect until agreed in writing (email is sufficient), stating its effect on fees and timeline.\n\nApproved changes are invoiced as additional work.",
     bodyAr:
-      "لأي من الطرفين طلب تعديل الخدمات، ولا يسري أي تعديل إلا بعد الاتفاق عليه كتابةً (ويكفي البريد الإلكتروني) مع بيان أثره على الأتعاب والجدول الزمني.\n\nتُفوتَر التعديلات المعتمدة كأعمال إضافية.",
+      "لأي من الطرفين طلب تعديل الخدمات، ولا يسري أي تعديل إلا بعد الاتفاق عليه كتابة (ويكفي البريد الإلكتروني) مع بيان أثره على الأتعاب والجدول الزمني.\n\nتفوتر التعديلات المعتمدة كأعمال إضافية.",
   },
   acceptance: {
     titleEn: "Delivery and Acceptance",
@@ -90,7 +90,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "Upon delivery of each deliverable the Client shall test it and either accept it or give written, reasonable grounds for rejection within 5 business days.\n\nA deliverable is deemed accepted if the Client does not respond within that period or uses it in production.\n\nThe Provider shall correct, free of charge, material non-conformities with the agreed scope.",
     bodyAr:
-      "عند تسليم كل مخرَج، يفحصه العميل ويقبله أو يبدي كتابةً أسباباً معقولة للرفض خلال 5 أيام عمل.\n\nيُعدّ المخرَج مقبولاً إذا لم يرد العميل خلال هذه المدة أو استخدمه فعلياً في بيئة التشغيل.\n\nيصحّح المزوّد دون مقابل العيوب الجوهرية المخالفة للنطاق المتفق عليه.",
+      "عند تسليم كل مخرج، يفحصه العميل ويقبله أو يبدي كتابة أسبابا معقولة للرفض خلال 5 أيام عمل.\n\nيعد المخرج مقبولا إذا لم يرد العميل خلال هذه المدة أو استخدمه فعليا في بيئة التشغيل.\n\nيصحح المزود دون مقابل العيوب الجوهرية المخالفة للنطاق المتفق عليه.",
   },
   third_party_hosting: {
     titleEn: "Third-Party Services and Hosting",
@@ -98,7 +98,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "Domains, hosting, software subscriptions, API usage and other third-party services are not included in the fees unless stated in the Scope of Work.\n\nWhere the Provider procures them on the Client's behalf, they are billed at cost and the related accounts remain the Client's property.",
     bodyAr:
-      "لا تشمل الأتعاب النطاقات والاستضافة واشتراكات البرمجيات واستهلاك واجهات البرمجة وسائر خدمات الأطراف الثالثة ما لم يرد ذلك في نطاق العمل.\n\nوإذا اشترى المزوّد شيئاً منها نيابةً عن العميل فيُفوتَر بالتكلفة الفعلية وتظل الحسابات المرتبطة به مملوكة للعميل.",
+      "لا تشمل الأتعاب النطاقات والاستضافة واشتراكات البرمجيات واستهلاك واجهات البرمجة وسائر خدمات الأطراف الثالثة ما لم يرد ذلك في نطاق العمل.\n\nوإذا اشترى المزود شيئا منها نيابة عن العميل فيفوتر بالتكلفة الفعلية وتظل الحسابات المرتبطة به مملوكة للعميل.",
   },
   platform_terms: {
     titleEn: "Third-Party Platforms",
@@ -106,7 +106,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "The deliverables may interact with third-party platforms and APIs. The Client is responsible for complying with those platforms' terms of use.\n\nThe Provider is not responsible for changes, restrictions or suspensions imposed by third-party platforms that affect operation. Adapting the deliverables to such changes is subject to the Change Requests clause.",
     bodyAr:
-      "قد تتعامل المخرجات مع منصات وواجهات برمجة تابعة لأطراف ثالثة، ويلتزم العميل بشروط استخدام تلك المنصات.\n\nلا يتحمل المزوّد مسؤولية التغييرات أو القيود أو الإيقاف الذي تفرضه المنصات الخارجية وتتأثر به عملية التشغيل، ويخضع تكييف المخرجات مع هذه التغييرات لبند طلبات التغيير.",
+      "قد تتعامل المخرجات مع منصات وواجهات برمجة تابعة لأطراف ثالثة، ويلتزم العميل بشروط استخدام تلك المنصات.\n\nلا يتحمل المزود مسؤولية التغييرات أو القيود أو الإيقاف الذي تفرضه المنصات الخارجية وتتأثر به عملية التشغيل، ويخضع تكييف المخرجات مع هذه التغييرات لبند طلبات التغيير.",
   },
   lawful_use: {
     titleEn: "Lawful Use",
@@ -122,7 +122,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "Upon receipt of full payment, the Provider assigns to the Client ownership of the custom deliverables created specifically for the Client under this Agreement.\n\nThe Provider retains ownership of its pre-existing tools, libraries, know-how and general methodologies, and grants the Client a non-exclusive, perpetual license to use them as embedded in the deliverables.\n\nThird-party and open-source components remain subject to their own licenses.\n\nThe Provider may reference the project in its portfolio unless the Client objects in writing.",
     bodyAr:
-      "بعد سداد كامل الأتعاب، يتنازل المزوّد للعميل عن ملكية المخرجات المُنجزة خصيصاً له بموجب هذا العقد.\n\nيحتفظ المزوّد بملكية أدواته ومكتباته وخبراته ومنهجياته السابقة على العقد، ويمنح العميل ترخيصاً غير حصري ودائماً باستخدامها بالصورة المضمّنة في المخرجات.\n\nتظل المكوّنات الخاصة بأطراف ثالثة والمفتوحة المصدر خاضعة لتراخيصها.\n\nيجوز للمزوّد الإشارة إلى المشروع ضمن أعماله ما لم يعترض العميل كتابةً.",
+      "بعد سداد كامل الأتعاب، يتنازل المزود للعميل عن ملكية المخرجات المنجزة خصيصا له بموجب هذا العقد.\n\nيحتفظ المزود بملكية أدواته ومكتباته وخبراته ومنهجياته السابقة على العقد، ويمنح العميل ترخيصا غير حصري ودائما باستخدامها بالصورة المضمنة في المخرجات.\n\nتظل المكونات الخاصة بأطراف ثالثة والمفتوحة المصدر خاضعة لتراخيصها.\n\nيجوز للمزود الإشارة إلى المشروع ضمن أعماله ما لم يعترض العميل كتابة.",
   },
   confidentiality: {
     titleEn: "Confidentiality",
@@ -138,7 +138,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "For 30 days after final acceptance (the **Warranty Period**) the Provider shall fix, free of charge, defects that cause a deliverable to deviate materially from the agreed scope.\n\nThe warranty excludes issues caused by modifications made by third parties, misuse, third-party services, or hosting changes.\n\nSupport beyond the Warranty Period is available under a separate agreement.",
     bodyAr:
-      "خلال 30 يوماً من القبول النهائي («مدة الضمان») يصلح المزوّد مجاناً العيوب التي تجعل المخرَج مخالفاً بصورة جوهرية للنطاق المتفق عليه.\n\nيُستثنى من الضمان ما نتج عن تعديلات أجراها أطراف ثالثة، أو سوء الاستخدام، أو خدمات الأطراف الثالثة، أو تغيّر الاستضافة.\n\nيتاح الدعم بعد مدة الضمان بموجب اتفاق منفصل.",
+      "خلال 30 يوما من القبول النهائي («مدة الضمان») يصلح المزود مجانا العيوب التي تجعل المخرج مخالفا بصورة جوهرية للنطاق المتفق عليه.\n\nيستثنى من الضمان ما نتج عن تعديلات أجراها أطراف ثالثة، أو سوء الاستخدام، أو خدمات الأطراف الثالثة، أو تغير الاستضافة.\n\nيتاح الدعم بعد مدة الضمان بموجب اتفاق منفصل.",
   },
   liability: {
     titleEn: "Limitation of Liability",
@@ -146,7 +146,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "To the maximum extent permitted by law, neither Party is liable for indirect or consequential loss, or for loss of profit, revenue or data.\n\nEach Party's total aggregate liability under this Agreement is limited to the fees paid or payable under it.\n\nNothing in this clause limits liability that cannot be limited by law.",
     bodyAr:
-      "إلى أقصى حد يسمح به القانون، لا يتحمل أي من الطرفين مسؤولية عن الخسائر غير المباشرة أو التبعية، ولا عن فقدان الأرباح أو الإيرادات أو البيانات.\n\nيُحدّ إجمالي مسؤولية كل طرف بموجب هذا العقد بقيمة الأتعاب المدفوعة أو المستحقة بموجبه.\n\nلا يُحدّ هذا البند أي مسؤولية لا يجوز تحديدها قانوناً.",
+      "إلى أقصى حد يسمح به القانون، لا يتحمل أي من الطرفين مسؤولية عن الخسائر غير المباشرة أو التبعية، ولا عن فقدان الأرباح أو الإيرادات أو البيانات.\n\nيحد إجمالي مسؤولية كل طرف بموجب هذا العقد بقيمة الأتعاب المدفوعة أو المستحقة بموجبه.\n\nلا يحد هذا البند أي مسؤولية لا يجوز تحديدها قانونا.",
   },
   termination: {
     titleEn: "Termination",
@@ -154,7 +154,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "Either Party may terminate this Agreement by written notice if the other Party materially breaches it and does not remedy the breach within 14 days of written notice.\n\nThe Client may terminate without cause on 14 days' written notice, paying for all work performed up to the termination date and any non-cancellable costs.\n\nOn termination the Provider shall deliver the work completed to date, subject to payment.",
     bodyAr:
-      "يجوز لأي طرف إنهاء هذا العقد بإشعار كتابي إذا أخلّ الطرف الآخر إخلالاً جوهرياً ولم يعالج الإخلال خلال 14 يوماً من إشعاره كتابةً.\n\nيجوز للعميل الإنهاء دون سبب بإشعار كتابي مدته 14 يوماً، مع سداد قيمة الأعمال المنفّذة حتى تاريخ الإنهاء وأي تكاليف غير قابلة للإلغاء.\n\nعند الإنهاء يسلّم المزوّد الأعمال المنجزة حتى ذلك التاريخ، مقابل سداد المستحقات.",
+      "يجوز لأي طرف إنهاء هذا العقد بإشعار كتابي إذا أخل الطرف الآخر إخلالا جوهريا ولم يعالج الإخلال خلال 14 يوما من إشعاره كتابة.\n\nيجوز للعميل الإنهاء دون سبب بإشعار كتابي مدته 14 يوما، مع سداد قيمة الأعمال المنفذة حتى تاريخ الإنهاء وأي تكاليف غير قابلة للإلغاء.\n\nعند الإنهاء يسلم المزود الأعمال المنجزة حتى ذلك التاريخ، مقابل سداد المستحقات.",
   },
   force_majeure: {
     titleEn: "Force Majeure",
@@ -162,7 +162,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "Neither Party is liable for delay or failure caused by events beyond its reasonable control, such as natural disasters, war, government action, or network and utility outages.\n\nThe affected Party shall notify the other promptly and use reasonable efforts to resume performance. If the event lasts more than 60 days, either Party may terminate by written notice.",
     bodyAr:
-      "لا يُسأل أي طرف عن التأخر أو الإخفاق الناتج عن أحداث خارجة عن إرادته المعقولة، كالكوارث الطبيعية والحروب والقرارات الحكومية وانقطاع الشبكات أو المرافق.\n\nيُخطر الطرف المتأثر الآخر فوراً ويبذل جهداً معقولاً لاستئناف التنفيذ. وإذا استمر الحدث أكثر من 60 يوماً جاز لأي طرف الإنهاء بإشعار كتابي.",
+      "لا يسأل أي طرف عن التأخر أو الإخفاق الناتج عن أحداث خارجة عن إرادته المعقولة، كالكوارث الطبيعية والحروب والقرارات الحكومية وانقطاع الشبكات أو المرافق.\n\nيخطر الطرف المتأثر الآخر فورا ويبذل جهدا معقولا لاستئناف التنفيذ. وإذا استمر الحدث أكثر من 60 يوما جاز لأي طرف الإنهاء بإشعار كتابي.",
   },
   governing_law: {
     titleEn: "Governing Law and Disputes",
@@ -170,7 +170,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "This Agreement is governed by the laws of **{{contract.governing_law}}**.\n\nThe Parties shall first try to resolve any dispute amicably; failing that, the competent courts of **{{contract.jurisdiction}}** have jurisdiction.",
     bodyAr:
-      "يخضع هذا العقد لأحكام **{{contract.governing_law}}**.\n\nيسعى الطرفان أولاً إلى تسوية أي نزاع وديّاً، وإن تعذّر ذلك فيكون الاختصاص للمحاكم المختصة في **{{contract.jurisdiction}}**.",
+      "يخضع هذا العقد لأحكام **{{contract.governing_law}}**.\n\nيسعى الطرفان أولا إلى تسوية أي نزاع وديا، وإن تعذر ذلك فيكون الاختصاص للمحاكم المختصة في **{{contract.jurisdiction}}**.",
   },
   notices: {
     titleEn: "Notices",
@@ -178,7 +178,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "Notices under this Agreement must be in writing and sent to the email addresses stated in this Agreement ({{provider.email}} for the Provider and {{client.email}} for the Client), or to any other address notified in writing.\n\nNotices sent by email are deemed received on the next business day.",
     bodyAr:
-      "تكون الإشعارات المتعلقة بهذا العقد كتابية وتُرسل إلى البريد الإلكتروني المبيّن في هذا العقد ({{provider.email}} للمزوّد و{{client.email}} للعميل) أو إلى أي عنوان آخر يُخطر به كتابةً.\n\nتُعدّ الإشعارات المرسلة بالبريد الإلكتروني مستلمة في يوم العمل التالي.",
+      "تكون الإشعارات المتعلقة بهذا العقد كتابية وترسل إلى البريد الإلكتروني المبين في هذا العقد ({{provider.email}} للمزود و{{client.email}} للعميل) أو إلى أي عنوان آخر يخطر به كتابة.\n\nتعد الإشعارات المرسلة بالبريد الإلكتروني مستلمة في يوم العمل التالي.",
   },
   entire_agreement: {
     titleEn: "Entire Agreement and Amendments",
@@ -186,7 +186,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "This Agreement is the entire agreement between the Parties on its subject and supersedes all prior discussions.\n\nIt may be amended only in writing signed by both Parties.\n\nIf any provision is held invalid, the remaining provisions stay in force. Neither Party may assign this Agreement without the other's written consent.",
     bodyAr:
-      "يمثّل هذا العقد الاتفاق الكامل بين الطرفين بشأن موضوعه ويحلّ محل كل ما سبقه من مناقشات.\n\nلا يجوز تعديله إلا كتابةً بتوقيع الطرفين.\n\nإذا ثبت بطلان أي حكم منه بقيت سائر الأحكام نافذة، ولا يجوز لأي طرف التنازل عن هذا العقد دون موافقة كتابية من الطرف الآخر.",
+      "يمثل هذا العقد الاتفاق الكامل بين الطرفين بشأن موضوعه ويحل محل كل ما سبقه من مناقشات.\n\nلا يجوز تعديله إلا كتابة بتوقيع الطرفين.\n\nإذا ثبت بطلان أي حكم منه بقيت سائر الأحكام نافذة، ولا يجوز لأي طرف التنازل عن هذا العقد دون موافقة كتابية من الطرف الآخر.",
   },
   electronic_signature: {
     titleEn: "Electronic Signature and Counterparts",
@@ -194,7 +194,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "The Parties agree that this Agreement may be executed electronically, and that electronic signatures together with the signing evidence recorded by the platform (timestamps, IP address and email verification) have the same effect as handwritten signatures to the extent permitted by applicable law.\n\nThis Agreement may be signed in counterparts.",
     bodyAr:
-      "يتفق الطرفان على جواز إبرام هذا العقد إلكترونياً، وعلى أن التوقيعات الإلكترونية مع أدلة التوقيع التي تسجّلها المنصة (الأوقات وعنوان IP والتحقق عبر البريد الإلكتروني) لها ذات أثر التوقيع بخط اليد بالقدر الذي يسمح به القانون المعمول به.\n\nيجوز توقيع هذا العقد على نسخ متعددة.",
+      "يتفق الطرفان على جواز إبرام هذا العقد إلكترونيا، وعلى أن التوقيعات الإلكترونية مع أدلة التوقيع التي تسجلها المنصة (الأوقات وعنوان IP والتحقق عبر البريد الإلكتروني) لها ذات أثر التوقيع بخط اليد بالقدر الذي يسمح به القانون المعمول به.\n\nيجوز توقيع هذا العقد على نسخ متعددة.",
   },
   signatures: {
     titleEn: "Signatures",
@@ -209,7 +209,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "The Provider shall provide ongoing maintenance and support for the following systems (the **Systems**):\n\n> {{contract.scope}}\n\nThe Services include bug fixes, security updates, minor adjustments, and technical support through the channels agreed by the Parties.\n\nNew features and major changes are outside the fixed fees and are quoted separately under the Change Requests clause.",
     bodyAr:
-      "يقدّم المزوّد خدمات الصيانة والدعم المستمرة للأنظمة التالية («الأنظمة»):\n\n> {{contract.scope}}\n\nتشمل الخدمات إصلاح الأخطاء والتحديثات الأمنية والتعديلات الطفيفة والدعم الفني عبر القنوات المتفق عليها بين الطرفين.\n\nتُعدّ الميزات الجديدة والتغييرات الكبيرة خارج الأتعاب الثابتة وتُسعَّر منفصلةً وفق بند طلبات التغيير.",
+      "يقدم المزود خدمات الصيانة والدعم المستمرة للأنظمة التالية («الأنظمة»):\n\n> {{contract.scope}}\n\nتشمل الخدمات إصلاح الأخطاء والتحديثات الأمنية والتعديلات الطفيفة والدعم الفني عبر القنوات المتفق عليها بين الطرفين.\n\nتعد الميزات الجديدة والتغييرات الكبيرة خارج الأتعاب الثابتة وتسعر منفصلة وفق بند طلبات التغيير.",
   },
   sla: {
     titleEn: "Service Levels",
@@ -217,7 +217,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "Support requests are acknowledged within 1 business day. For critical issues (a system being unavailable) the target first response time is 4 business hours.\n\nBusiness hours are those notified by the Provider to the Client. Response targets are commitments of effort and do not guarantee resolution times.",
     bodyAr:
-      "يُقرّ المزوّد باستلام طلبات الدعم خلال يوم عمل واحد، ويكون زمن الاستجابة الأولى المستهدف للحالات الحرجة (تعطّل النظام) 4 ساعات عمل.\n\nساعات العمل هي التي يُبلغ بها المزوّد العميل. وتمثّل أهداف الاستجابة التزاماً ببذل العناية ولا تضمن مدد الحل.",
+      "يقر المزود باستلام طلبات الدعم خلال يوم عمل واحد، ويكون زمن الاستجابة الأولى المستهدف للحالات الحرجة (تعطل النظام) 4 ساعات عمل.\n\nساعات العمل هي التي يبلغ بها المزود العميل. وتمثل أهداف الاستجابة التزاما ببذل العناية ولا تضمن مدد الحل.",
   },
   // ── NDA-specific ──
   nda_purpose: {
@@ -234,7 +234,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "**Confidential Information** means all non-public information, in any form, disclosed by or on behalf of a Party (the **Disclosing Party**) to the other Party (the **Receiving Party**) in connection with the Purpose, including business plans, source code, designs, data, pricing, customer information and technical know-how, whether or not marked confidential.",
     bodyAr:
-      "«المعلومات السرية» هي جميع المعلومات غير المعلنة، بأي شكل، التي يفصح عنها طرف («الطرف المُفصح») أو من ينوب عنه للطرف الآخر («الطرف المتلقي») بشأن الغرض، بما في ذلك الخطط التجارية والشيفرة المصدرية والتصاميم والبيانات والأسعار ومعلومات العملاء والخبرات التقنية، سواء وُسمت بالسرية أم لا.",
+      "«المعلومات السرية» هي جميع المعلومات غير المعلنة، بأي شكل، التي يفصح عنها طرف («الطرف المفصح») أو من ينوب عنه للطرف الآخر («الطرف المتلقي») بشأن الغرض، بما في ذلك الخطط التجارية والشيفرة المصدرية والتصاميم والبيانات والأسعار ومعلومات العملاء والخبرات التقنية، سواء وسمت بالسرية أم لا.",
   },
   nda_obligations: {
     titleEn: "Obligations of the Receiving Party",
@@ -250,7 +250,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "These obligations do not apply to information that:\n\n- is or becomes public through no breach by the Receiving Party;\n- was lawfully known to the Receiving Party before disclosure;\n- is lawfully received from a third party without restriction;\n- is independently developed without use of the Confidential Information.\n\nThe Receiving Party may disclose Confidential Information if required by law or court order, after giving the Disclosing Party prompt notice where lawful.",
     bodyAr:
-      "لا تنطبق هذه الالتزامات على المعلومات التي:\n\n- أصبحت عامة دون إخلال من الطرف المتلقي؛\n- كانت معلومة للطرف المتلقي بصورة مشروعة قبل الإفصاح؛\n- تلقاها من طرف ثالث بصورة مشروعة ودون قيود؛\n- طوّرها بصورة مستقلة دون استخدام المعلومات السرية.\n\nيجوز للطرف المتلقي الإفصاح عن المعلومات السرية إذا اقتضى القانون أو أمر قضائي ذلك، بعد إخطار الطرف المُفصح فوراً متى كان ذلك جائزاً قانوناً.",
+      "لا تنطبق هذه الالتزامات على المعلومات التي:\n\n- أصبحت عامة دون إخلال من الطرف المتلقي؛\n- كانت معلومة للطرف المتلقي بصورة مشروعة قبل الإفصاح؛\n- تلقاها من طرف ثالث بصورة مشروعة ودون قيود؛\n- طورها بصورة مستقلة دون استخدام المعلومات السرية.\n\nيجوز للطرف المتلقي الإفصاح عن المعلومات السرية إذا اقتضى القانون أو أمر قضائي ذلك، بعد إخطار الطرف المفصح فورا متى كان ذلك جائزا قانونا.",
   },
   nda_term: {
     titleEn: "Term",
@@ -258,7 +258,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "This Agreement applies to disclosures made from **{{contract.start_date}}** until **{{contract.end_date}}**.\n\nThe confidentiality obligations continue for 3 years after that end date and, for trade secrets, for as long as they remain trade secrets.",
     bodyAr:
-      "ينطبق هذا العقد على الإفصاحات التي تتم اعتباراً من **{{contract.start_date}}** حتى **{{contract.end_date}}**.\n\nتستمر التزامات السرية 3 سنوات بعد تاريخ الانتهاء المذكور، وبالنسبة للأسرار التجارية طوال مدة بقائها أسراراً تجارية.",
+      "ينطبق هذا العقد على الإفصاحات التي تتم اعتبارا من **{{contract.start_date}}** حتى **{{contract.end_date}}**.\n\nتستمر التزامات السرية 3 سنوات بعد تاريخ الانتهاء المذكور، وبالنسبة للأسرار التجارية طوال مدة بقائها أسرارا تجارية.",
   },
   nda_return: {
     titleEn: "Return or Destruction",
@@ -266,7 +266,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "On written request, and in any event when the Purpose ends, the Receiving Party shall promptly return or securely destroy all Confidential Information and confirm in writing that it has done so.\n\nCopies that must be kept by law or that sit in routine backups remain subject to this Agreement.",
     bodyAr:
-      "بناءً على طلب كتابي، وفي جميع الأحوال عند انتهاء الغرض، يعيد الطرف المتلقي جميع المعلومات السرية أو يتلفها بصورة آمنة فوراً ويؤكد ذلك كتابةً.\n\nتظل النسخ التي يجب الاحتفاظ بها بموجب القانون أو الموجودة في النسخ الاحتياطية الاعتيادية خاضعة لهذا العقد.",
+      "بناء على طلب كتابي، وفي جميع الأحوال عند انتهاء الغرض، يعيد الطرف المتلقي جميع المعلومات السرية أو يتلفها بصورة آمنة فورا ويؤكد ذلك كتابة.\n\nتظل النسخ التي يجب الاحتفاظ بها بموجب القانون أو الموجودة في النسخ الاحتياطية الاعتيادية خاضعة لهذا العقد.",
   },
   nda_remedies: {
     titleEn: "Remedies",
@@ -274,7 +274,7 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn:
       "Each Party acknowledges that a breach of this Agreement may cause irreparable harm for which damages alone may be inadequate, and that the Disclosing Party may seek injunctive relief in addition to any other remedy available by law.",
     bodyAr:
-      "يُقرّ كل طرف بأن الإخلال بهذا العقد قد يسبب ضرراً جسيماً لا يكفي التعويض وحده لجبره، وبأن للطرف المُفصح طلب التدابير التحفظية أو الوقتية إضافةً إلى سائر سبل الانتصاف المتاحة قانوناً.",
+      "يقر كل طرف بأن الإخلال بهذا العقد قد يسبب ضررا جسيما لا يكفي التعويض وحده لجبره، وبأن للطرف المفصح طلب التدابير التحفظية أو الوقتية إضافة إلى سائر سبل الانتصاف المتاحة قانونا.",
   },
 };
 
@@ -300,7 +300,7 @@ export const TEMPLATES: TemplateDef[] = [
         rows: [
           {
             titleEn: "Advance upon signing",
-            titleAr: "دفعة مقدّمة عند التوقيع",
+            titleAr: "دفعة مقدمة عند التوقيع",
             percentBp: 4000,
             triggerNoteEn: "Upon signing",
             triggerNoteAr: "عند التوقيع",
@@ -361,7 +361,7 @@ export const TEMPLATES: TemplateDef[] = [
         rows: [
           {
             titleEn: "Advance upon signing",
-            titleAr: "دفعة مقدّمة عند التوقيع",
+            titleAr: "دفعة مقدمة عند التوقيع",
             percentBp: 5000,
           },
           {
