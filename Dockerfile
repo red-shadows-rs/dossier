@@ -16,7 +16,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
 # ── Dependencies ──
 FROM base AS deps
 COPY package.json package-lock.json ./
-RUN npm ci --include=dev
+RUN npm install --include=dev
 
 # ── Build ──
 FROM deps AS build
