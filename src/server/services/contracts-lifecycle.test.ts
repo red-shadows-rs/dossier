@@ -239,7 +239,6 @@ describe("reviseContract (recall)", () => {
       .all();
     expect(recalled).toHaveLength(1);
 
-    // Re-send creates version 2 with a different hash and the same number.
     const { clientToken: newToken } = send(id);
     expect(newToken).not.toBe(clientToken);
     const resent = getContract(id);
@@ -299,8 +298,6 @@ describe("expireContracts", () => {
   it("expires a sent contract past its signing deadline and revokes tokens", () => {
     const id = createValidDraft("2027-01-31");
     send(id);
-    // Move the deadline into the past directly (validation forbids sending an
-    // already-past deadline).
     db.update(contracts)
       .set({ signingDeadline: "2020-01-01" })
       .where(eq(contracts.id, id))

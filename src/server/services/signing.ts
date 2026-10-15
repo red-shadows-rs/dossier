@@ -38,7 +38,6 @@ const RATE_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT = 60;
 const rateBuckets = new Map<string, { count: number; resetAt: number }>();
 
-// 9.7 — coarse per-IP limit for the public /s/* endpoints.
 export function assertSigningRateLimit(ip: string | null): void {
   const key = ip ?? "unknown";
   const now = nowMs();
@@ -84,7 +83,6 @@ function invalid(): AppError {
   return new AppError("TOKEN_INVALID", "This link is invalid or has expired");
 }
 
-// 7.7 step 1 — resolve + validate the token; every failure is generic.
 export function resolveSignatory(rawToken: string): Resolved {
   const tokenHash = hmacToken(rawToken, env.APP_SECRET);
   const signatory = db
@@ -139,7 +137,6 @@ function localeForContract(contractId: string, mode: string): Locale {
   return client?.preferredLanguage ?? "ar";
 }
 
-// 7.7 step 5 — first view records viewed_at + audit.
 export function getSigningContext(
   rawToken: string,
   meta: RequestMeta,
@@ -181,7 +178,6 @@ export function getSigningContext(
   };
 }
 
-// 7.7 step 3 — request a 6-digit code (60 s cooldown, 5/hour).
 export function requestSigningOtp(
   rawToken: string,
   meta: RequestMeta,
@@ -255,7 +251,6 @@ export function requestSigningOtp(
   return { expiresAt };
 }
 
-// 7.7 step 3 — verify the code (max 5 attempts, then invalidated).
 export function verifySigningOtp(
   rawToken: string,
   code: string,
@@ -331,8 +326,6 @@ function decodeSignaturePng(dataUrl: string): Buffer {
   return buffer;
 }
 
-// 7.7 step 6 / 7.8 — record the client signature, then finalize + seal when the
-// last signatory signs. PDF I/O happens after the transaction (R12).
 export async function submitClientSignature(
   rawToken: string,
   input: ClientSignInput,
@@ -356,7 +349,6 @@ export async function submitClientSignature(
     });
   }
 
-  // File I/O happens outside the transaction (R12).
   let signatureFileId: string | null = null;
   let typedName: string | null = null;
   if (input.signature.method === "drawn" && input.signature.dataUrl) {
@@ -416,7 +408,6 @@ export async function submitClientSignature(
   return { signed: true, finalized };
 }
 
-// 7.7 step 7 — decline; revoke the tokens and notify the creator.
 export function declineContract(
   rawToken: string,
   reason: string | undefined,

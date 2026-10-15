@@ -184,7 +184,6 @@ function insertClauses(
   });
 }
 
-// Save-time rules from 11.6 + the signatures/sequence rules from 7.5 rule 10.
 function assertValidClauses(
   clauses: TemplateClauseInput[],
   hasFees: boolean,

@@ -98,7 +98,6 @@ function toAmounts(map: Map<string, number>): CurrencyAmount[] {
     .sort((a, b) => a.currency.localeCompare(b.currency));
 }
 
-// 7.12.5 — calendar-month boundaries in the business timezone.
 function monthBounds(today: string): {
   currentStart: string;
   currentEnd: string;
@@ -118,7 +117,6 @@ function monthBounds(today: string): {
   return { currentStart, currentEnd, previousStart, previousEnd };
 }
 
-// 7.12.5 — revenue from non-voided payments by paidOn, grouped per currency.
 function revenueInRange(start: string, end: string): CurrencyAmount[] {
   const rows = db
     .select({
@@ -142,7 +140,6 @@ function revenueInRange(start: string, end: string): CurrencyAmount[] {
   return toAmounts(map);
 }
 
-// 7.12.1 — contracts awaiting signature.
 function awaitingSignature(): {
   count: number;
   rows: AwaitingSignatureRow[];
@@ -180,7 +177,6 @@ function awaitingSignature(): {
   };
 }
 
-// 7.12.2 — contracts signed in the last 30 days.
 function signedLast30Days(): number {
   const cutoff = nowMs() - SIGNED_WINDOW_DAYS * MS_PER_DAY;
   return (
@@ -192,7 +188,6 @@ function signedLast30Days(): number {
   );
 }
 
-// 7.12.4 — outstanding and overdue invoices grouped per currency.
 function invoiceTotals(today: string): {
   outstanding: CurrencyAmount[];
   overdue: { count: number; amounts: CurrencyAmount[] };
@@ -229,7 +224,6 @@ function invoiceTotals(today: string): {
   };
 }
 
-// 7.12.4 — invoices due in the next 7 days.
 function dueSoon(today: string): DueSoonRow[] {
   const until = addDays(today, DUE_SOON_DAYS);
   return db
@@ -257,7 +251,6 @@ function dueSoon(today: string): DueSoonRow[] {
     .filter((row): row is DueSoonRow => row.dueDate !== null);
 }
 
-// 7.12.6 — signed/completed contracts ending within 30 days.
 function endingSoon(today: string): { count: number; rows: EndingSoonRow[] } {
   const until = addDays(today, ENDING_WINDOW_DAYS);
   const rows = db
@@ -285,7 +278,6 @@ function endingSoon(today: string): { count: number; rows: EndingSoonRow[] } {
   return { count: rows.length, rows };
 }
 
-// 7.12.7 — last 15 audit rows on contracts/invoices/payments.
 function recentActivity(): ActivityRow[] {
   return db
     .select()
@@ -296,7 +288,6 @@ function recentActivity(): ActivityRow[] {
     .all();
 }
 
-// 7.12.8 — clients: total (non-archived) and created in the current month.
 function clientCounts(currentStart: string): {
   total: number;
   newThisMonth: number;
@@ -317,7 +308,6 @@ function clientCounts(currentStart: string): {
   return { total, newThisMonth };
 }
 
-// 7.12.9 — active projects (non-archived, status = active).
 function activeProjects(): number {
   return (
     db
@@ -328,7 +318,6 @@ function activeProjects(): number {
   );
 }
 
-// 7.12.10 — contracts in force (signed or completed).
 function activeContracts(): number {
   return (
     db
@@ -361,7 +350,6 @@ function invoiceStatusCounts(): Record<string, number> {
   return out;
 }
 
-// 7.12.11 — invoices issued in the current month (count + totals per currency).
 function issuedInRange(start: string, end: string): {
   count: number;
   amounts: CurrencyAmount[];
@@ -388,7 +376,6 @@ function issuedInRange(start: string, end: string): {
   return { count: rows.length, amounts: toAmounts(map) };
 }
 
-// 7.12.12 — monthly activity over the last N months (issued invoices + signed contracts).
 function lastMonths(today: string, count: number): string[] {
   const months: string[] = [];
   let year = Number(today.slice(0, 4));
@@ -444,7 +431,6 @@ function monthlyActivity(today: string, count = 6): MonthlyPoint[] {
   );
 }
 
-// DOSSIER_PLAN.md 7.12 — dashboard metrics.
 export function getDashboard(
   today = todayInTz(getSettings("defaults").timezone),
 ): DashboardData {

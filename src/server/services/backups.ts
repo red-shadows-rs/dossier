@@ -51,7 +51,6 @@ function weekdayInTz(ms: number, tz: string): number {
   return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(label);
 }
 
-// 15.4 — online backup via the better-sqlite3 backup API.
 export async function createDatabaseBackup(
   ms: number,
   tz: string,
@@ -63,7 +62,6 @@ export async function createDatabaseBackup(
   return path;
 }
 
-// 15.4 — weekly (Sunday) files archive via tar with constant arguments only.
 export async function createFilesArchive(
   ms: number,
   tz: string,
@@ -86,8 +84,6 @@ export async function createFilesArchive(
   return archive;
 }
 
-// 15.4 — delete backups older than the retention window, always keeping the
-// newest three regardless of age. Returns the deleted file names.
 export function applyRetention(
   retentionDays: number,
   atMs: number = nowMs(),
@@ -136,8 +132,6 @@ function auditBackup(
   }
 }
 
-// 15.2/15.4 — the 03:00 business-time backup: DB snapshot, a weekly files tar
-// on Sundays, retention, and an audit entry.
 export async function runBackup(atMs: number = nowMs()): Promise<BackupResult> {
   const tz = getSettings("defaults").timezone;
   const entityId = dateStamp(atMs, tz);

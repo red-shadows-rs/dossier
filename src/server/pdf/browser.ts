@@ -26,7 +26,6 @@ export async function closeBrowser(): Promise<void> {
     const browser = await pending;
     await browser.close();
   } catch {
-    // already gone
   }
 }
 
@@ -40,7 +39,6 @@ function shutdown(): void {
 process.once("SIGTERM", shutdown);
 process.once("SIGINT", shutdown);
 
-// 12.2 — tiny semaphore, capacity PDF_CONCURRENCY.
 class Semaphore {
   private available: number;
   private readonly queue: Array<() => void> = [];

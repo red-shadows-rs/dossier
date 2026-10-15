@@ -37,9 +37,6 @@ function hourInTz(ms: number, tz: string): number {
   return Number(hour) % 24;
 }
 
-// 7.9 — overdue reminders. Only when enabled, only on the configured offsets,
-// and at most once per day per invoice (business tz). The PDF is rendered by
-// the email worker at send time (never here, never inside a transaction).
 export function sendOverdueReminders(
   today: string,
   atMs: number = nowMs(),
@@ -127,8 +124,6 @@ export function sendOverdueReminders(
   return sent;
 }
 
-// 15.2 — runs every 15 min. Reminders once per business-tz date at hour 08;
-// the DB/files backup once per date at hour 03.
 export async function runDailyJobs(atMs: number = nowMs()): Promise<void> {
   const tz = getSettings("defaults").timezone;
   const today = dateInTz(atMs, tz);

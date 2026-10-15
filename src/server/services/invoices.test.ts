@@ -122,7 +122,6 @@ function seedFixture(contractStatus: "signed" | "draft" = "signed"): void {
     return id;
   });
   if (contractStatus === "signed") {
-    // Milestones only insert while the contract is a draft; sign it afterwards.
     db.update(contracts)
       .set({
         status: "signed",
@@ -137,9 +136,6 @@ function seedFixture(contractStatus: "signed" | "draft" = "signed"): void {
 }
 
 beforeEach(async () => {
-  // Signed contracts / issued invoices are immutable, so tests never clean up
-  // shared rows: each test creates its own company-independent fixture with
-  // unique ids (same approach as the trigger integrity tests).
   user = await ownerUser();
   updateSettings(
     "company",
@@ -181,7 +177,6 @@ describe("createInvoiceFromMilestone (16.1 vectors)", () => {
   });
 
   it("requires a signed or completed contract", () => {
-    // A separate draft contract (never signed) cannot produce an invoice.
     const draftContractId = newId();
     const now = nowMs();
     db.insert(contracts)

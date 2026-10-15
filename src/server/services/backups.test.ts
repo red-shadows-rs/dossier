@@ -52,7 +52,6 @@ function backupNames(): string[] {
 }
 
 beforeEach(() => {
-  // Each test starts with an empty backups directory.
   rmSync(backupsDir(), { recursive: true, force: true });
 });
 
@@ -79,7 +78,6 @@ describe("applyRetention", () => {
     names.forEach((name, i) => {
       const file = join(dir, name);
       writeFileSync(file, "x");
-      // i=4 is the newest; the rest get progressively older (all > 30 days).
       const age = (5 - i) * 40 * MS_PER_DAY;
       const secs = (now - age) / 1000;
       utimesSync(file, secs, secs);
@@ -87,7 +85,6 @@ describe("applyRetention", () => {
 
     const deleted = applyRetention(30, now);
 
-    // 5 files → keep 3 newest (indices 4,3,2) → delete the 2 oldest.
     expect(deleted.sort()).toEqual(["dossier-20260600-0300.sqlite", "dossier-20260601-0300.sqlite"]);
     const remaining = backupNames().filter((n) => n.startsWith("dossier-"));
     expect(remaining.sort()).toEqual([
@@ -105,7 +102,7 @@ describe("applyRetention", () => {
     names.forEach((name, i) => {
       const file = join(dir, name);
       writeFileSync(file, "x");
-      const secs = (now - i * MS_PER_DAY) / 1000; // 0..3 days old
+      const secs = (now - i * MS_PER_DAY) / 1000; 
       utimesSync(file, secs, secs);
     });
 
@@ -118,7 +115,7 @@ describe("runBackup", () => {
   it("creates a DB backup and audits backup.completed", async () => {
     await useUtc();
     const before = backupNames().length;
-    const result = await runBackup(Date.UTC(2026, 5, 15, 3, 0)); // Monday
+    const result = await runBackup(Date.UTC(2026, 5, 15, 3, 0)); 
     expect(result.filesPath).toBeNull();
     expect(backupNames().length).toBe(before + 1);
 
@@ -137,7 +134,6 @@ describe("runBackup", () => {
     mkdirSync(join(env.DATA_DIR, "files"), { recursive: true });
     writeFileSync(join(env.DATA_DIR, "files", "note.txt"), "hello");
 
-    // 2024-01-07 is a Sunday.
     const result = await runBackup(Date.UTC(2024, 0, 7, 3, 0));
     expect(result.filesPath).not.toBeNull();
     expect(statSync(result.filesPath ?? "").isFile()).toBe(true);
@@ -152,7 +148,6 @@ describe("runDailyJobs — backup pass", () => {
     const count = backupNames().length;
     expect(count).toBeGreaterThan(0);
 
-    // A later tick the same date does not back up again.
     await runDailyJobs(Date.UTC(2026, 5, 15, 3, 15));
     expect(backupNames().length).toBe(count);
   });

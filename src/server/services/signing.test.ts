@@ -37,7 +37,6 @@ import {
 
 const META = { ip: "1.2.3.4", userAgent: "vitest" };
 
-// 1x1 transparent PNG.
 const PNG =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
 
@@ -334,7 +333,6 @@ describe("requestSigningOtp / verifySigningOtp", () => {
       }
     }
 
-    // The code is invalidated, so even the correct code fails now.
     try {
       verifySigningOtp(clientToken, code, META);
       throw new Error("expected throw");
@@ -380,7 +378,6 @@ describe("submitClientSignature", () => {
       .all();
     expect(signed.some((row) => row.actorType === "signer")).toBe(true);
 
-    // 7.8 — both parties signed, so the contract is finalized.
     const contract = db
       .select()
       .from(contracts)

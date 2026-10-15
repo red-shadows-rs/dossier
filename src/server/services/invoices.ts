@@ -718,7 +718,6 @@ export function voidInvoice(
   });
 }
 
-// 15.1 — invoices use the invoice language rule; bilingual → client preference.
 export function localeForInvoice(
   mode: "ar" | "en" | "bilingual",
   preferredLanguage: Locale,
@@ -730,8 +729,6 @@ export function localeForInvoice(
 
 export type SendInvoiceEmailOptions = { toEmail?: string };
 
-// 7.9 / actions table — enqueue `invoice_issued` (PDF rendered by the worker at
-// send time); status unchanged.
 export function sendInvoiceEmail(
   user: SessionUser,
   id: string,

@@ -39,9 +39,6 @@ export type MailSender = {
 
 export type OutboxRow = typeof emailOutbox.$inferSelect;
 
-// Injectable so tests can avoid launching Chromium; the worker uses the real
-// renderer. 15.1/7.9: the invoice PDF is rendered at send time, never inside a
-// transaction.
 export type OutboxDeps = {
   renderInvoiceAttachment?: (
     invoiceId: string,
@@ -55,7 +52,6 @@ const BASE_BACKOFF_MS = 60_000;
 const MAX_BACKOFF_MS = 60 * 60 * 1000;
 const REDACT_KEYS = new Set(["url", "token", "otp"]);
 
-// 15.1 — nodemailer transport from env; null when SMTP is not configured.
 export function createTransport(): MailSender | null {
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_SECURE } = env;
   if (!SMTP_HOST || SMTP_PORT === undefined) return null;
@@ -80,7 +76,6 @@ function resolveSender(sender: MailSender | null): MailSender {
       "SMTP configuration is required in production",
     );
   }
-  // Development fallback: never log the body (it may contain tokens/OTP — R13).
   return {
     sendMail: async (mail) => {
       logger.info("email_console", { to: mail.to, subject: mail.subject });
@@ -95,7 +90,6 @@ function parsePayload(payloadJson: string): Record<string, unknown> {
       return parsed as Record<string, unknown>;
     }
   } catch {
-    // Corrupt payloads render with empty values rather than crashing the loop.
   }
   return {};
 }
@@ -163,10 +157,9 @@ function redactPayload(payloadJson: string): string {
       return JSON.stringify(out);
     }
   } catch {
-    // Leave the payload untouched if it is not valid JSON.
   }
   return payloadJson;
-}// 15.1 — claim a row race-safely; returns the number of rows changed.
+}
 export function claimOutboxRow(id: string): number {
   return db
     .update(emailOutbox)
@@ -276,7 +269,6 @@ async function deliver(
   }
 }
 
-// 15.1 — send up to 10 due pending rows; returns how many were claimed.
 export async function processOutbox(
   sender: MailSender | null,
   deps: OutboxDeps = {},

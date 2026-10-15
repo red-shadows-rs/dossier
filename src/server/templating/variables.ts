@@ -11,7 +11,7 @@ export type ContractSnapshotV1 = {
     versionNo: number;
     languageMode: "ar" | "en" | "bilingual";
     hasFees: boolean;
-    issueDate: string; // 'YYYY-MM-DD'
+    issueDate: string; 
     titleAr: string | null;
     titleEn: string | null;
     scopeAr: string | null;

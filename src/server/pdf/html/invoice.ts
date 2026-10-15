@@ -1025,7 +1025,6 @@ function instructionsBlock(input: InvoiceHtmlInput): string {
       .map((line) => `<div class="instruction-line">${esc(line)}</div>`)
       .join("");
   } else {
-    // Bilingual mode
     if (!arRaw && !enRaw) return "";
     if (arRaw && !enRaw) {
       const lines = splitInstructionLines(arRaw);
@@ -1126,7 +1125,6 @@ function verificationBlock(input: InvoiceHtmlInput): string {
   `;
 }
 
-// 12.6 — invoice HTML.
 export function renderInvoiceHtml(input: InvoiceHtmlInput): string {
   const lang: SharedDocLang = input.lang;
   const watermark =

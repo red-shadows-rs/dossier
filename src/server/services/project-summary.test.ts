@@ -153,7 +153,6 @@ describe("getProjectSummary (7.11)", () => {
     expect(sar.invoicedMinor).toBe(655500);
     expect(sar.paidMinor).toBe(100000);
     expect(sar.outstandingMinor).toBe(555500);
-    // Remaining = the other two milestones.
     expect(sar.remainingToInvoiceMinor).toBe(874000 + 655500);
   });
 

@@ -114,7 +114,6 @@ export async function updateEmailAction(
   });
 }
 
-// 15.1 — enqueue a test email for the current user (the worker sends it).
 export async function sendTestEmailAction(): Promise<ActionResult<null>> {
   return runAction(async () => {
     const user = await requireUser();

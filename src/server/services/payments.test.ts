@@ -167,7 +167,6 @@ describe("recordPayment (16.1 vectors)", () => {
   it("paying beyond the balance → PAYMENT_EXCEEDS_BALANCE", () => {
     recordPayment(user, invoiceId, paymentInput(100000), META);
     try {
-      // Remaining balance is 360001.
       recordPayment(user, invoiceId, paymentInput(360002), META);
       throw new Error("expected throw");
     } catch (error) {

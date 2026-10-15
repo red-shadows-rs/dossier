@@ -26,7 +26,6 @@ export function listContractSignatories(
     .all();
 }
 
-// 7.4 — revoke every signing token/OTP for a contract (recall/cancel/expire).
 function revokeTokens(tx: DbTx, contractId: string): void {
   tx.update(contractSignatories)
     .set({
@@ -49,8 +48,6 @@ function requireStatus(
   }
 }
 
-// 7.4 sent|declined|expired → draft (recall). Old signatory rows stay as
-// history; the next send creates a new version + signatories.
 export function reviseContract(
   user: SessionUser,
   id: string,
@@ -89,7 +86,6 @@ export function reviseContract(
   });
 }
 
-// 7.4 sent → fresh client token (old invalid); returns the URL once.
 export function regenerateSigningLink(
   user: SessionUser,
   id: string,
@@ -196,7 +192,6 @@ export function regenerateSigningLink(
   return { url: `${env.APP_URL}/s/${token}` };
 }
 
-// 7.4 / 15.2 — worker job: sent contracts past their signing deadline expire.
 export function expireContracts(): number {
   const tz = getSettings("defaults").timezone;
   const today = todayInTz(tz);
@@ -238,7 +233,6 @@ export function expireContracts(): number {
   return rows.length;
 }
 
-// 7.4 signed → completed.
 export function completeContract(
   user: SessionUser,
   id: string,
@@ -270,7 +264,6 @@ export function completeContract(
   });
 }
 
-// 7.4 signed → terminated (owner); reason required.
 export function terminateContract(
   user: SessionUser,
   id: string,

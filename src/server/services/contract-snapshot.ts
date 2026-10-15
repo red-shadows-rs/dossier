@@ -29,9 +29,6 @@ function pickSha(fileId: string | null): string | null {
   return getFileRow(fileId)?.sha256 ?? null;
 }
 
-// DOSSIER_PLAN.md 7.6 — deterministic snapshot from live rows + company profile.
-// `signatories` are supplied by the send flow (they are created after the
-// snapshot). For an already-sent contract, they are read from the DB.
 export function buildContractSnapshot(
   contractId: string,
   signatories: SnapshotSignatory[] = [],
@@ -208,7 +205,6 @@ export function hashSnapshot(snapshot: ContractSnapshotV1): string {
   return sha256Hex(canonicalize(snapshot));
 }
 
-// Convenience for tests/callers that need "now" for issueDate parity.
 export function snapshotNowMs(): number {
   return nowMs();
 }

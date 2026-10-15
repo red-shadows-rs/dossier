@@ -269,7 +269,6 @@ describe("lookupVerification", () => {
     expect(result.contentHash).not.toBeNull();
     expect(result.number).toContain("DOS-C-");
 
-    // 7.10 — the public DTO must not leak client email/phone or amounts.
     const json = JSON.stringify(result);
     expect(json).not.toContain(CLIENT_EMAIL);
     expect(json).not.toContain(CLIENT_PHONE);
@@ -356,7 +355,6 @@ describe("checkPdfUpload", () => {
     expect(checkPdfUpload(code, pdf)).toBe("match");
 
     const modified = Buffer.from(pdf);
-    // Flip a byte well inside the file body.
     modified[modified.length - 20] ^= 0xff;
     expect(checkPdfUpload(code, modified)).toBe("mismatch");
   });

@@ -33,7 +33,6 @@ export type EnqueueEmailInput = {
   scheduledAt?: number;
 };
 
-// 15.1 — insert an outbox row inside the caller's transaction.
 export function enqueueEmail(tx: DbTx, input: EnqueueEmailInput): string {
   const id = `${nowMs().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
   tx.insert(emailOutbox)

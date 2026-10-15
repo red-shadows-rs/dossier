@@ -294,7 +294,6 @@ function renderHeader(
     `;
   }
 
-  // Single language (ar or en)
   const docBadgeText = isArabic ? "عقد اتفاق قانوني" : "LEGAL AGREEMENT";
   const mainTitle = isArabic
     ? esc(c.titleAr || c.titleEn || "عقد اتفاق")
@@ -328,7 +327,6 @@ function renderHeader(
   `;
 }
 
-// 12.5
 export function renderContractHtml(input: ContractHtmlInput): string {
   const { snapshot, lang, mode } = input;
   const c = snapshot.contract;

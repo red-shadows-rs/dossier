@@ -21,7 +21,6 @@ function toDataUri(mime: string, buffer: Buffer): string {
   return `data:${mime};base64,${buffer.toString("base64")}`;
 }
 
-// 12.8 — image by sha256 (missing file → null, never a crash).
 function imageBySha(sha256: string | null): string | null {
   if (!sha256) return null;
   const row = findFileBySha256(sha256);
@@ -48,8 +47,6 @@ export function resolveDocLang(
   return lang;
 }
 
-// 7.6 / 7.7 — a versioned (non-draft) contract renders from its stored
-// snapshot; a draft renders from live tables.
 export function snapshotForRendering(
   contract: ContractRow,
 ): ContractSnapshotV1 {
@@ -86,7 +83,6 @@ export async function buildContractHtml(
   });
 }
 
-// 12.9 — filename safe = [A-Za-z0-9._-] only.
 export function safePdfFilename(
   contract: Pick<ContractRow, "number">,
   lang: DocLang,
@@ -104,7 +100,6 @@ export type ContractPdfSource =
   | { kind: "sealed"; fileId: string; filename: string }
   | { kind: "render"; html: string; filename: string; docNumber: string };
 
-// Decides how to serve a contract PDF per 12.9.
 export async function resolveContractPdf(
   contractId: string,
   requestedLang: string | undefined,

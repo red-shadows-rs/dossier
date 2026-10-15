@@ -1,7 +1,6 @@
 import { nowMs } from "@/lib/dates";
 import { AppError } from "@/lib/errors";
 
-// 9.3: single-instance assumption (A-05) allows an in-memory limiter.
 const WINDOW_MS = 15 * 60 * 1000;
 const EMAIL_LIMIT = 5;
 const IP_LIMIT = 30;

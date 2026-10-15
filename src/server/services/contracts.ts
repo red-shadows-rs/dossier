@@ -707,7 +707,6 @@ export function cancelContract(
     if (!contract) {
       throw new AppError("NOT_FOUND", "Contract not found");
     }
-    // 7.4 — draft, sent, declined and expired contracts can be cancelled.
     const cancellable: ContractStatus[] = [
       "draft",
       "sent",

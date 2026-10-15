@@ -48,7 +48,6 @@ function tzStamp(ms: number, timeZone: string): string {
   return `${get("year")}-${get("month")}-${get("day")} ${get("hour")}:${get("minute")}:${get("second")}`;
 }
 
-// 12.7 — appended to the sealed contract (break-before: page).
 export function renderCertificateSection(
   ctx: CertificateContext,
   cert: CertificateData,
@@ -216,7 +215,6 @@ export function renderCertificateSection(
     `;
   }
 
-  // Single language
   const isArabic = lang === "ar";
   const title = isArabic ? "شهادة إتمام التوقيع" : "Certificate of Completion";
   const badge = isArabic ? "شهادة إثبات التوثيق" : "AUTHENTICATION CERTIFICATE";

@@ -1,10 +1,6 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
 // 9.12 / 20.4 — table-driven authorization test. It enumerates every
-// session-guarded server action and asserts that (a) an unauthenticated caller
-// gets UNAUTHENTICATED and (b) a viewer gets FORBIDDEN on any action whose
-// permission excludes viewers. The session cookie is injected through a mock
-// of `next/headers`.
 const authState = vi.hoisted(() => ({ token: null as string | null }));
 
 vi.mock("next/headers", () => ({
@@ -105,8 +101,6 @@ import {
 type Action = (raw?: unknown) => Promise<unknown>;
 type Entry = { name: string; action: Action; viewerForbidden: boolean };
 
-// Every action that calls requireUser() + assertCan(). `viewerForbidden` is
-// false only for read permissions (which viewers hold).
 const TABLE: Entry[] = [
   { name: "createClientAction", action: createClientAction, viewerForbidden: true },
   { name: "updateClientAction", action: updateClientAction, viewerForbidden: true },
@@ -171,7 +165,6 @@ const TABLE: Entry[] = [
   { name: "setUserStatusAction", action: setUserStatusAction, viewerForbidden: true },
   { name: "setUserPasswordAction", action: setUserPasswordAction, viewerForbidden: true },
 
-  // Account actions require only a session (any role), no assertCan.
   { name: "updateAccountAction", action: updateAccountAction, viewerForbidden: false },
   { name: "changePasswordAction", action: changePasswordAction, viewerForbidden: false },
 ];
@@ -217,8 +210,6 @@ describe("authorization table (9.12 / 20.4)", () => {
     const failures: string[] = [];
     for (const entry of TABLE.filter((item) => !item.viewerForbidden)) {
       const result = (await entry.action({})) as Result;
-      // Read/account actions may still fail validation (bad payload), but they
-      // must never be rejected by the permission layer.
       if (result?.ok === false && result.error?.code === "FORBIDDEN") {
         failures.push(`${entry.name} → FORBIDDEN`);
       }

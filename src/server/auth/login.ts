@@ -27,7 +27,6 @@ export async function login(
     .where(eq(users.email, normalized))
     .get();
 
-  // Always run a verify (dummy hash when the user is unknown) for uniform timing.
   const passwordOk = await verifyPassword(
     record?.passwordHash ?? null,
     password,

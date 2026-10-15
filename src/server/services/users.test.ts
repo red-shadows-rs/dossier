@@ -34,8 +34,6 @@ function actor(id: string): SessionUser {
   };
 }
 
-// The service does not check the actor's permission (the action layer does), so
-// actors are members here to keep the active-owner count at zero.
 async function asActor(role: "owner" | "member" = "member"): Promise<SessionUser> {
   const created = await createTestUser({ role });
   return actor(created.id);
@@ -145,7 +143,6 @@ describe("setUserStatus", () => {
 
     setUserStatus(admin, target.id, "disabled", META);
 
-    // The old session is gone the moment the user is disabled.
     expect(validateSession(token)).toBeNull();
     const remaining = db
       .select()
@@ -192,9 +189,6 @@ describe("setUserPassword", () => {
   });
 });
 
-// Ordered last on purpose and built around a single shared owner: no earlier
-// test in this file creates an owner, so `soleOwner` is the only active owner
-// until the final test adds a second one.
 describe("last-owner guard", () => {
   let admin: SessionUser;
   let soleOwner: { id: string; name: string };

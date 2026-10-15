@@ -11,7 +11,6 @@ import { createInvoiceFromMilestone, issueInvoice } from "@/server/services/invo
 import { recordPayment, voidPayment } from "@/server/services/payments";
 import { updateSettings } from "@/server/services/settings";
 
-// 20.5 — data-integrity invariants checked as queries over real rows.
 const META = { ip: "1.2.3.4", userAgent: "vitest" };
 const TODAY = todayInTz("Asia/Riyadh");
 
@@ -135,7 +134,6 @@ describe("data integrity invariants (20.5)", () => {
       META,
     );
 
-    // Query check over every contract that has milestones.
     const contractsWithData = db.select().from(contracts).all();
     expect(contractsWithData.length).toBeGreaterThan(0);
 
@@ -187,7 +185,6 @@ describe("data integrity invariants (20.5)", () => {
     expect(milestone).toBeDefined();
     if (!milestone) return;
 
-    // Milestones become invoiceable only once the contract is signed.
     db.update(contracts)
       .set({ status: "signed", number: "DOS-C-2026-0001" })
       .where(eq(contracts.id, contractId))

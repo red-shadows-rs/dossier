@@ -122,10 +122,8 @@ describe("renderInvoiceHtml — money and totals", () => {
     const paidInvoice = renderInvoiceHtml(paidInput);
     expect(paidInvoice).toContain("Paid / المدفوع");
     expect(paidInvoice).toContain("Balance due / المتبقي");
-    // Invoice document does not contain the payments breakdown table
     expect(paidInvoice).not.toContain("Payments / الدفعات");
 
-    // Dedicated receipt voucher contains the payment details
     const receiptHtml = renderReceiptHtml(paidInput);
     expect(receiptHtml).toContain("RECEIPT");
     expect(receiptHtml).toContain("TX1");

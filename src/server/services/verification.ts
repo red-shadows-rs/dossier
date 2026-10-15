@@ -37,12 +37,10 @@ function hit(
   }
 }
 
-// 7.10 — 30 lookups/minute/IP.
 export function assertLookupRateLimit(ip: string | null): void {
   hit(lookupBuckets, ip, LOOKUP_LIMIT, LOOKUP_WINDOW_MS);
 }
 
-// 7.10 — 10 file checks/minute/IP.
 export function assertFileCheckRateLimit(ip: string | null): void {
   hit(fileBuckets, ip, FILE_LIMIT, FILE_WINDOW_MS);
 }
@@ -149,7 +147,6 @@ function invoiceDto(invoiceId: string, locale: Locale): InvoiceVerification | nu
   };
 }
 
-// 7.10 — resolve a normalized code to a minimal public DTO (or null).
 export function lookupVerification(
   rawCode: string,
   locale: Locale = "ar",
@@ -185,8 +182,6 @@ export function lookupVerification(
 
 export type PdfCheckResult = "match" | "mismatch" | "unknown";
 
-// 7.10 — compare an uploaded PDF's SHA-256 with the stored sealed hash. The
-// upload is never stored. Invoices have no sealed hash, so only contracts match.
 export function checkPdfUpload(
   rawCode: string,
   buffer: Buffer,

@@ -20,7 +20,6 @@ async function renderOnce(html: string, footer: FooterMeta): Promise<Buffer> {
   const context = await browser.newContext({ javaScriptEnabled: false });
   try {
     const page = await context.newPage();
-    // Block every network request; data: URIs are not intercepted (verified).
     await page.route("**/*", (route) => route.abort());
     await page.setContent(html, {
       waitUntil: "load",
@@ -62,7 +61,6 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   });
 }
 
-// 12.2/12.10 — concurrency-limited, one retry, then PDF_FAILED.
 export async function renderPdf(
   html: string,
   footer: FooterMeta,

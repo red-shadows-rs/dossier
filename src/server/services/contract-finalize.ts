@@ -48,8 +48,6 @@ function uniqueVerificationCode(tx: DbTx): string {
   throw new AppError("INTERNAL", "Failed to generate a unique code");
 }
 
-// 7.8 — finalize inside the caller's transaction when the last signatory signs.
-// Returns true when the contract was finalized by this call.
 export function finalizeContractTx(
   tx: DbTx,
   contractId: string,
@@ -330,8 +328,6 @@ function recordPdfFailure(contractId: string): number {
   });
 }
 
-// 7.8 — render + store the sealed PDF, then mark the contract. Runs OUTSIDE any
-// transaction (R12); a failure is recorded and retried by the worker.
 export async function generateSealedPdf(
   contractId: string,
   options: SealedPdfOptions = {},
@@ -408,7 +404,6 @@ export async function generateSealedPdf(
   }
 }
 
-// 7.8 / 15.2 — worker job: retry signed contracts whose sealed PDF is missing.
 export async function retryPendingFinalizations(): Promise<number> {
   const rows = db
     .select({ id: contracts.id })

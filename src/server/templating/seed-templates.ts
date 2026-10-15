@@ -20,7 +20,6 @@ export type TemplateDef = {
   clauseKeys: string[];
 };
 
-// DOSSIER_PLAN.md 11.7.1 — clause library (text kept byte-for-byte).
 export const CLAUSES: Record<string, ClauseDef> = {
   parties: {
     titleEn: "Parties",
@@ -202,7 +201,6 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyEn: "{{block.signatures}}",
     bodyAr: "{{block.signatures}}",
   },
-  // ── maintenance-specific ──
   maint_services: {
     titleEn: "Maintenance and Support Services",
     titleAr: "خدمات الصيانة والدعم",
@@ -219,7 +217,6 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyAr:
       "يقر المزود باستلام طلبات الدعم خلال يوم عمل واحد، ويكون زمن الاستجابة الأولى المستهدف للحالات الحرجة (تعطل النظام) 4 ساعات عمل.\n\nساعات العمل هي التي يبلغ بها المزود العميل. وتمثل أهداف الاستجابة التزاما ببذل العناية ولا تضمن مدد الحل.",
   },
-  // ── NDA-specific ──
   nda_purpose: {
     titleEn: "Purpose",
     titleAr: "الغرض",
@@ -278,7 +275,6 @@ export const CLAUSES: Record<string, ClauseDef> = {
   },
 };
 
-// DOSSIER_PLAN.md 11.7.2 — template definitions.
 export const TEMPLATES: TemplateDef[] = [
   {
     key: "web-development",

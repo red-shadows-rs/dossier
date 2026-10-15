@@ -39,7 +39,6 @@ function bump(
   return fresh;
 }
 
-// DOSSIER_PLAN.md 7.11 — project financial summary grouped per currency.
 export function getProjectSummary(projectId: string): CurrencySummary[] {
   const today = todayInTz(getSettings("defaults").timezone);
   const map = new Map<string, CurrencySummary>();
@@ -82,7 +81,6 @@ export function getProjectSummary(projectId: string): CurrencySummary[] {
     }
   }
 
-  // Milestones of signed/completed contracts with no active invoice.
   const activeContractIds = contractRows
     .filter((c) => c.status === "signed" || c.status === "completed")
     .map((c) => c.id);
@@ -112,7 +110,6 @@ export function getProjectSummary(projectId: string): CurrencySummary[] {
 
 export type ProjectActivityRow = typeof auditLog.$inferSelect;
 
-// Activity = audit rows for the project and its contracts/invoices.
 export function listProjectActivity(projectId: string): ProjectActivityRow[] {
   const contractIds = db
     .select({ id: contracts.id })

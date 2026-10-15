@@ -6,7 +6,6 @@ import type { ContractSnapshotV1 } from "@/server/templating/variables";
 
 export type { DocLang } from "@/lib/doc-lang";
 
-// 12.1 — single escaping helper used by every dynamic string.
 export const esc = (s: string): string =>
   s
     .replace(/&/g, "&amp;")
@@ -38,7 +37,6 @@ export function fmtQty(qtyMilli: number): string {
   return `${whole}.${String(frac).padStart(3, "0").replace(/0+$/, "")}`;
 }
 
-// 12.4 — normative base CSS with premium SaaS branding matching invoice elegance.
 export function baseCss(fonts: string): string {
   return `${fonts}
 @page {
@@ -553,7 +551,6 @@ export function documentShell(input: {
   }${input.body}</body></html>`;
 }
 
-// 12.2 — footer template (Latin only; footer templates do not inherit page fonts).
 export function buildFooterTemplate(meta: {
   docNumber: string;
   code: string | null;
@@ -575,8 +572,6 @@ export function buildFooterTemplate(meta: {
     : "";
   return `<div style="font-size:8px;width:100%;padding:0 14mm;display:flex;justify-content:space-between;direction:ltr;color:#71717a;font-family:'IBM Plex Sans Arabic',Arial,sans-serif;font-weight:600;"><span>${esc(meta.docNumber)}</span><span>${esc(grouped)}</span><span><span class="pageNumber"></span> / <span class="totalPages"></span></span></div>`;
 }
-
-// ───────── block renderers (12.4) ─────────
 
 export function renderPartiesBlock(
   snapshot: ContractSnapshotV1,

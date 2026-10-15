@@ -128,8 +128,6 @@ function recordingSender(): { sender: MailSender; sent: OutgoingMail[] } {
 }
 
 beforeEach(() => {
-  // email_outbox has no immutability trigger; issued invoices cannot be
-  // deleted, so each test seeds its own dated fixtures instead.
   db.delete(emailOutbox).run();
 });
 
@@ -274,7 +272,6 @@ describe("sendOverdueReminders", () => {
       .find((entry) => entry.entityId === id);
     expect(auditRow).toBeDefined();
 
-    // Same day: no second reminder for the same invoice.
     expect(sendOverdueReminders("2021-01-01", atMs)).toBe(0);
     expect(outboxRows()).toHaveLength(1);
   });
@@ -321,7 +318,6 @@ describe("runDailyJobs", () => {
     await runDailyJobs(atHour8);
     expect(outboxRows()).toHaveLength(1);
 
-    // Second run at 08:45 the same date does not enqueue again.
     await runDailyJobs(Date.UTC(2026, 5, 15, 8, 45, 0));
     expect(outboxRows()).toHaveLength(1);
   });

@@ -6,9 +6,9 @@ export type DiscountType = "none" | "percent" | "fixed";
 
 export type CalcInput = {
   items: { unitPriceMinor: number; qtyMilli: number }[];
-  discount: { type: DiscountType; value: number }; // value: bp (percent) or minor (fixed)
-  taxRateBp: number; // 0..10000
-  fixedTaxMinor?: number; // override (milestone invoices only)
+  discount: { type: DiscountType; value: number }; 
+  taxRateBp: number; 
+  fixedTaxMinor?: number; 
 };
 
 export type CalcOutput = {
@@ -28,7 +28,6 @@ function assertMinor(value: number, field: string): void {
   }
 }
 
-// DOSSIER_PLAN.md 7.2 — order is normative.
 export function calcTotals(input: CalcInput): CalcOutput {
   const lineTotals = input.items.map((item) =>
     mulDivRound(item.unitPriceMinor, item.qtyMilli, 1000),

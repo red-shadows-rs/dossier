@@ -79,7 +79,6 @@ export function validateMilestones(input: MilestonePlanInput): string[] {
   return issues;
 }
 
-// DOSSIER_PLAN.md 7.3 — pure recomputation of the milestone plan.
 export function planMilestones(input: MilestonePlanInput): PlannedMilestone[] {
   if (input.rows.length === 0) return [];
 

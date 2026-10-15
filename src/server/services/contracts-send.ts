@@ -56,7 +56,6 @@ function storeSignatureFile(
   contractId: string,
   dataUrl: string,
 ): string {
-  // File I/O happens outside any transaction (R12).
   const buffer = decodeSignaturePng(dataUrl);
   const saved = saveFile({
     kind: "signature",
@@ -92,8 +91,6 @@ function consentHash(text: string): string {
   return sha256Hex(text.normalize("NFC"));
 }
 
-// 7.4 draft → sent. Reads/validation happen before the transaction; all writes
-// are one transaction so a failure rolls back everything.
 export function sendContract(
   user: SessionUser,
   contractId: string,

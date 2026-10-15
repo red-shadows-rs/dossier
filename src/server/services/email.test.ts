@@ -100,7 +100,6 @@ describe("processOutbox", () => {
     expect(row?.status).toBe("pending");
     expect(row?.attempts).toBe(1);
     expect(row?.lastError).toBe("boom");
-    // attempts=1 → 60s * 2 = 120s.
     const delay = (row?.scheduledAt ?? 0) - before;
     expect(delay).toBeGreaterThanOrEqual(120_000);
     expect(delay).toBeLessThan(125_000);

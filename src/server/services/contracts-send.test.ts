@@ -31,7 +31,6 @@ import { sendContract, signAsProvider } from "./contracts-send";
 
 const META = { ip: "1.2.3.4", userAgent: "vitest" };
 
-// 1x1 transparent PNG.
 const PNG =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
 
@@ -213,11 +212,9 @@ describe("sendContract (16.1 Send success)", () => {
       .where(eq(contractVersions.id, contract.currentVersionId ?? ""))
       .get();
     expect(version).toBeDefined();
-    // Hash equals sha256(canonicalize(snapshot)).
     expect(
       sha256Hex(canonicalize(JSON.parse(version?.snapshotJson ?? ""))),
     ).toBe(version?.contentHash);
-    // Number is stored in the snapshot.
     expect(JSON.parse(version?.snapshotJson ?? "{}").contract.number).toBe(
       contract.number,
     );
@@ -236,7 +233,6 @@ describe("sendContract (16.1 Send success)", () => {
     expect(client?.status).toBe("pending");
     expect(client?.tokenHash).not.toBeNull();
 
-    // Only the hash is stored on the signatory.
     expect(client?.tokenHash).toBe(hmacToken(clientToken, env.APP_SECRET));
     expect(client?.tokenHash).not.toBe(clientToken);
 
@@ -291,7 +287,6 @@ describe("sendContract (16.1 Send success)", () => {
       .where(eq(contracts.id, id))
       .run();
     expect(() => sendContract(user, id, sendInput(), META)).toThrow(AppError);
-    // Still a draft, nothing written.
     expect(getContract(id).status).toBe("draft");
     expect(getContract(id).number).toBeNull();
   });
@@ -301,8 +296,6 @@ describe("sendContract (16.1 Send success)", () => {
     const first = sendContract(user, id, sendInput(), META);
     const number = getContract(id).number;
 
-    // Revise: back to draft, versionNo+1, tokens revoked (done inline here as a
-    // minimal proxy for T-034's reviseContract).
     db.update(contractSignatories)
       .set({ tokenHash: null })
       .where(eq(contractSignatories.contractId, id))

@@ -5,7 +5,6 @@ let cachedFontCss: string | null = null;
 
 const FONT_FILE = join(process.cwd(), "assets", "fonts", "Cairo.ttf");
 
-// 12.3 — read Cairo once, base64-encode, cache. Used by every document.
 export function getFontCss(): string {
   if (cachedFontCss !== null) return cachedFontCss;
   const buffer = readFileSync(FONT_FILE);

@@ -1,7 +1,6 @@
 import { hash, verify } from "@node-rs/argon2";
 import { AppError } from "@/lib/errors";
 
-// 9.1: Argon2id with memory >= 19 MiB, t=2, p=1 (the library defaults match).
 const ARGON2_OPTIONS = {
   memoryCost: 19456,
   timeCost: 2,

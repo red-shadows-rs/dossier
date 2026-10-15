@@ -12,8 +12,6 @@ import { addDays, nowMs } from "@/lib/dates";
 import { newId } from "@/lib/ids";
 import { getDashboard } from "./dashboard";
 
-// A fixed "today" makes the month boundaries deterministic; 2026-06-15 is
-// mid-month so the current (June) and previous (May) windows are unambiguous.
 const TODAY = "2026-06-15";
 const MS_PER_DAY = 86_400_000;
 const NOW = nowMs();
@@ -120,7 +118,6 @@ beforeAll(() => {
     })
     .run();
 
-  // Contracts.
   sentId = insertContract({
     status: "sent",
     number: "DOS-C-2026-0001",
@@ -141,7 +138,6 @@ beforeAll(() => {
   insertContract({ status: "draft" });
   insertContract({ status: "draft" });
 
-  // Invoices (SAR + AED to exercise per-currency grouping).
   insertInvoice({
     status: "issued",
     number: "DOS-I-2026-0001",
@@ -187,7 +183,6 @@ beforeAll(() => {
     dueDate: addDays(TODAY, -1),
   });
 
-  // Payments: current month (June), previous month (May), voided and older.
   insertPayment(aedInvoiceId, 30_000, "2026-06-05");
   insertPayment(paidInvoiceId, 100_000, "2026-06-10");
   insertPayment(paidInvoiceId, 50_000, "2026-06-14");
@@ -197,7 +192,6 @@ beforeAll(() => {
   insertPayment(paidInvoiceId, 888_888, "2026-04-10");
   insertPayment(paidInvoiceId, 999_999, "2026-06-12", NOW);
 
-  // Audit rows: contracts/invoices/payments only; the client row is excluded.
   const insertAudit = (
     entityType: string,
     action: string,
@@ -217,7 +211,7 @@ beforeAll(() => {
   insertAudit("contract", "contract.signed", NOW - 1000);
   insertAudit("invoice", "invoice.issued", NOW - 2000);
   insertAudit("payment", "payment.recorded", NOW - 3000);
-  insertAudit("client", "client.created", NOW); // newest but must be excluded
+  insertAudit("client", "client.created", NOW); 
 });
 
 describe("getDashboard (7.12)", () => {

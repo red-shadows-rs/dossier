@@ -1,6 +1,5 @@
 import QRCode from "qrcode";
 
-// 12.8 — SVG QR as a base64 data URI (no network).
 export async function makeQrDataUri(url: string): Promise<string> {
   const svg = await QRCode.toString(url, {
     type: "svg",

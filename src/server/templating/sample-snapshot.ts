@@ -1,7 +1,5 @@
 import type { ContractSnapshotV1 } from "@/server/templating/variables";
 
-// Worked example from DOSSIER_PLAN.md 21.6 — used as the shared fixture for
-// template rendering/preview tests and as the live-preview sample data.
 export const SAMPLE_SNAPSHOT: ContractSnapshotV1 = {
   schema: "dossier.contract.v1",
   contract: {

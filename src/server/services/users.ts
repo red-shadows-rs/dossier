@@ -51,7 +51,6 @@ export function getUser(id: string): UserRow {
   return row;
 }
 
-// 8 — the last active owner can never be demoted or disabled.
 function isLastActiveOwner(tx: DbTx, userId: string): boolean {
   const target = tx.select().from(users).where(eq(users.id, userId)).get();
   if (!target || target.role !== "owner" || target.status !== "active") {
@@ -216,7 +215,6 @@ export async function setUserPassword(
       .set({ passwordHash, updatedAt: now })
       .where(eq(users.id, id))
       .run();
-    // Force a fresh sign-in everywhere for that user.
     tx.delete(sessions).where(eq(sessions.userId, id)).run();
     audit(tx, {
       actorType: "user",

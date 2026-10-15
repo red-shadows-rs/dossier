@@ -68,7 +68,6 @@ describe("seedSystemTemplates", () => {
     expect(() => getTemplate("missing")).toThrow(AppError);
   });
 
-  // Keep last: mutates the shared template rows.
   it("never overwrites a non-system template with the same key", () => {
     db.delete(templates).run();
     const now = nowMs();

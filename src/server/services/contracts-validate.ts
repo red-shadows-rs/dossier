@@ -161,7 +161,6 @@ function buildSignatories(
   ];
 }
 
-// DOSSIER_PLAN.md 7.5
 export function validateContractForSend(
   id: string,
   options: SendValidationOptions = {},
@@ -175,7 +174,6 @@ export function validateContractForSend(
 
   const snapshot = buildContractSnapshot(id, buildSignatories(id, options));
 
-  // Rule 1 — language completeness.
   for (const lang of langs) {
     const title = lang === "ar" ? contract.titleAr : contract.titleEn;
     const scope = lang === "ar" ? contract.scopeAr : contract.scopeEn;
@@ -229,7 +227,6 @@ export function validateContractForSend(
     }
   }
 
-  // Rule 2 — currency and fee presence.
   if (!(contract.currency in CURRENCIES)) {
     issues.push(error("currencyInvalid", "currency"));
   }
@@ -240,7 +237,6 @@ export function validateContractForSend(
     issues.push(error("feesNotAllowed", "hasFees"));
   }
 
-  // Rule 3 — milestones.
   if (contract.hasFees) {
     if (milestones.length < 1) {
       issues.push(error("noMilestones", "milestones"));
@@ -262,7 +258,6 @@ export function validateContractForSend(
     }
   }
 
-  // Rule 4 — dates.
   if (!contract.startDate) {
     issues.push(error("startDateRequired", "startDate"));
   } else if (
@@ -278,12 +273,10 @@ export function validateContractForSend(
     issues.push(error("signingDeadlinePast", "signingDeadline"));
   }
 
-  // Rule 5 — clauses.
   if (clauses.length < 1) {
     issues.push(error("noClauses", "clauses"));
   }
 
-  // Rule 6 — every variable resolves non-empty for each required language.
   for (const lang of langs) {
     const map = buildVariableMap(snapshot, lang);
     for (const clause of clauses) {
@@ -292,8 +285,6 @@ export function validateContractForSend(
       for (const variable of extractVariables(body)) {
         if (seen.has(variable)) continue;
         seen.add(variable);
-        // The number is allocated at send time, so a draft legitimately has
-        // none; it can never be "missing" when the contract is actually sent.
         if (variable === "contract.number") continue;
         if (!map[variable]) {
           issues.push(
@@ -308,7 +299,6 @@ export function validateContractForSend(
     }
   }
 
-  // Rule 7 — client signatory name + email.
   const clientLang: Locale = contract.languageMode === "en" ? "en" : "ar";
   const clientRow = snapshot.client;
   const clientName =
@@ -325,12 +315,10 @@ export function validateContractForSend(
     issues.push(error("clientEmailInvalid", "clientSignatoryEmail"));
   }
 
-  // Rule 8 — provider signer.
   if (!resolveProviderSigner(options.providerSignerUserId)) {
     issues.push(error("providerSignerRequired", "providerSignerUserId"));
   }
 
-  // Rule 10 — template structure.
   let signaturesCount = 0;
   let paymentScheduleCount = 0;
   for (const clause of clauses) {
@@ -355,7 +343,6 @@ export function validateContractForSend(
     issues.push(error("paymentScheduleBlock", "blocks"));
   }
 
-  // Warnings.
   if (contract.taxRateBp > 0 && !company.taxNumber) {
     issues.push(warning("companyTaxNumberMissing", "company.taxNumber"));
   }

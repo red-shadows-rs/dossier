@@ -162,7 +162,6 @@ let clientId: string;
 let projectId: string;
 
 beforeEach(async () => {
-  // Reset to draft so the immutability/no-delete triggers allow cleanup.
   db.update(contracts).set({ status: "draft", number: null }).run();
   db.delete(paymentMilestones).run();
   db.delete(contractClauses).run();
@@ -388,7 +387,6 @@ describe("listContracts filters, sort whitelist and pagination", () => {
     expect(listContracts({ clientId: contract.clientId }).total).toBe(1);
     expect(listContracts({ projectId: "missing" }).total).toBe(0);
 
-    // Number search is only possible once a number is assigned.
     db.update(contracts)
       .set({ number: "DOS-C-2026-0042" })
       .where(eq(contracts.id, id))
@@ -404,7 +402,6 @@ describe("listContracts filters, sort whitelist and pagination", () => {
     const rows = listContracts({ sort: "drop table; --" }).rows.map(
       (r) => r.id,
     );
-    // Newest first: the second created contract comes first.
     expect(rows[0]).toBe(second);
     expect(rows).toContain(first);
   });
@@ -413,7 +410,6 @@ describe("listContracts filters, sort whitelist and pagination", () => {
     const a = createValidContract();
     const b = createFrom("nda");
     const byNumberAsc = listContracts({ sort: "number", dir: "asc" }).rows;
-    // NULL numbers sort first in SQLite ascending order.
     expect(byNumberAsc.length).toBeGreaterThanOrEqual(2);
     expect(byNumberAsc.map((r) => r.id)).toContain(a);
     expect(byNumberAsc.map((r) => r.id)).toContain(b);

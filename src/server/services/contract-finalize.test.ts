@@ -34,7 +34,6 @@ import { submitClientSignature } from "./signing";
 
 const META = { ip: "1.2.3.4", userAgent: "vitest" };
 
-// 1x1 transparent PNG.
 const PNG =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
 
@@ -230,12 +229,10 @@ describe("finalization (7.8)", () => {
     expect(rows.every((row) => row.tokenHash === null)).toBe(true);
     expect(rows.every((row) => row.otpHash === null)).toBe(true);
 
-    // Stored sealed PDF matches the recorded sha256.
     const file = readFile(contract?.finalPdfFileId ?? "");
     expect(file.buffer.subarray(0, 5).toString("ascii")).toBe("%PDF-");
     expect(sha256Hex(file.buffer)).toBe(contract?.pdfSha256);
 
-    // A signed copy is queued for the client, provider and creator.
     const copies = db
       .select()
       .from(emailOutbox)
@@ -251,7 +248,6 @@ describe("finalization (7.8)", () => {
   it("aborts the transaction when the snapshot hash does not match", async () => {
     const { id, token } = sendAndReturnToken();
 
-    // Tamper the stored content hash while the contract is still 'sent'.
     db.update(contracts)
       .set({ contentHash: "deadbeef" })
       .where(eq(contracts.id, id))
@@ -264,7 +260,6 @@ describe("finalization (7.8)", () => {
       expect((error as AppError).code).toBe("INTERNAL");
     }
 
-    // The whole transaction rolled back: still sent, signature not recorded.
     const contract = db
       .select()
       .from(contracts)
@@ -282,8 +277,6 @@ describe("finalization (7.8)", () => {
 
   it("records a render failure and the worker retry succeeds", async () => {
     const { id, token } = sendAndReturnToken();
-    // Mark both signatories signed without sealing (simulate a finalized
-    // contract whose PDF generation failed).
     db.update(contractSignatories)
       .set({ status: "signed", signedAt: nowMs() })
       .where(eq(contractSignatories.contractId, id))

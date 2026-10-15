@@ -75,8 +75,6 @@ function checkBody(
   }
 }
 
-// Save-time validation per 11.6, plus the signatures-count and bilingual
-// block-sequence rules required by 7.5 rule 10.
 export function validateTemplateClauses(
   clauses: TemplateClauseInput[],
   hasFees: boolean,
