@@ -7,9 +7,10 @@ ARG PLAYWRIGHT_VERSION=1.64.0
 FROM mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-noble AS base
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1 TZ=UTC
-RUN apt-get update \
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+ && apt-get remove -y nodejs \
  && apt-get install -y --no-install-recommends \
-      fonts-noto-core tar ca-certificates build-essential python3 \
+      nodejs fonts-noto-core tar ca-certificates build-essential python3 \
  && rm -rf /var/lib/apt/lists/*
 
 # ── Dependencies ──
