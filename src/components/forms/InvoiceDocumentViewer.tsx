@@ -67,10 +67,8 @@ export function InvoiceDocumentViewer({
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Top Document Controls Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
-          {/* Document Switcher: Invoice vs Receipt */}
           {hasPayments ? (
             <div
               role="tablist"
@@ -109,7 +107,6 @@ export function InvoiceDocumentViewer({
             </div>
           ) : null}
 
-          {/* Language Selector */}
           {langs.length > 1 ? (
             <div className="flex gap-1">
               {langs.map((value) => (
@@ -176,7 +173,6 @@ export function InvoiceDocumentViewer({
                 }
               }
             } catch {
-              // fallback
             }
           }}
           style={{ height: `${iframeHeight}px` }}

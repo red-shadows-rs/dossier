@@ -141,7 +141,6 @@ export function FileUpload({
         {isImage && hasCurrent && imageSource ? (
           <div className="flex flex-col items-center gap-2.5 w-full py-1">
             <div className="relative flex h-20 w-36 items-center justify-center overflow-hidden rounded border border-border/80 bg-card p-1.5 shadow-2xs">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={imageSource}
                 alt={label ?? "preview"}

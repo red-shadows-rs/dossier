@@ -49,16 +49,10 @@ export function TabsSkeleton({ count = 5 }: { count?: number }) {
   );
 }
 
-/* =========================================================================
-   TABLE SKELETONS (Accurately reflecting each table's columns and toolbars)
-   ========================================================================= */
-
-// Clients Table: Name (Avatar+Title), Type Badge, Email, Phone, City, Status, Actions
 export function ClientsTableSkeleton() {
   return (
     <div className="flex flex-col gap-4">
       <PageHeaderSkeleton actionWidth="w-32" />
-      {/* Clients Toolbar with Search + Filter + Archived Toggle */}
       <div className="rounded border border-border bg-card p-3 sm:p-4">
         <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
           <div className="flex flex-1 items-center gap-2 min-w-[240px]">
@@ -69,7 +63,6 @@ export function ClientsTableSkeleton() {
           <Skeleton className="h-10 w-36 rounded" />
         </div>
       </div>
-      {/* Clients Table */}
       <div className="rounded border border-border bg-card overflow-hidden">
         <div className="flex items-center gap-4 border-b border-border bg-muted/30 px-4 py-3.5">
           <Skeleton className="h-4 w-32" />
@@ -107,7 +100,6 @@ export function ClientsTableSkeleton() {
   );
 }
 
-// Projects Table: Code Pill, Name, Client, Status Badge, Budget, Actions
 export function ProjectsTableSkeleton() {
   return (
     <div className="flex flex-col gap-4">
@@ -153,7 +145,6 @@ export function ProjectsTableSkeleton() {
   );
 }
 
-// Contracts Table: Number Pill, Title, Project, Client, Status Badge, Value, Actions
 export function ContractsTableSkeleton() {
   return (
     <div className="flex flex-col gap-4">
@@ -201,7 +192,6 @@ export function ContractsTableSkeleton() {
   );
 }
 
-// Invoices Table: Number Pill, Project, Client, Status Badge, Total Amount, Due Balance, Actions
 export function InvoicesTableSkeleton() {
   return (
     <div className="flex flex-col gap-4">
@@ -246,7 +236,6 @@ export function InvoicesTableSkeleton() {
   );
 }
 
-// Templates Grid/Table
 export function TemplatesTableSkeleton() {
   return (
     <div className="flex flex-col gap-4">
@@ -279,7 +268,6 @@ export function TemplatesTableSkeleton() {
   );
 }
 
-// Users Table: Avatar, Name, Email, Role Pill, Signature, Status, Actions
 export function UsersTableSkeleton() {
   return (
     <div className="flex flex-col gap-4">
@@ -319,7 +307,6 @@ export function UsersTableSkeleton() {
   );
 }
 
-// Audit Logs Table
 export function AuditTableSkeleton() {
   return (
     <div className="flex flex-col gap-4">
@@ -356,15 +343,9 @@ export function AuditTableSkeleton() {
   );
 }
 
-/* =========================================================================
-   DETAIL SKELETONS (Accurately reflecting each detail page's tabs & cards)
-   ========================================================================= */
-
-// Project Detail: Header (code+status), 5 Tabs, Overview card with dl grid + Financial summary card
 export function ProjectDetailSkeleton() {
   return (
     <div className="flex flex-col gap-4">
-      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Skeleton className="h-11 w-11 rounded shrink-0" />
@@ -382,10 +363,8 @@ export function ProjectDetailSkeleton() {
         </div>
       </div>
 
-      {/* 5 Tabs Bar */}
       <TabsSkeleton count={5} />
 
-      {/* Project Overview dl Card */}
       <div className="rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <Skeleton className="h-5 w-5 rounded" />
@@ -401,7 +380,6 @@ export function ProjectDetailSkeleton() {
         </div>
       </div>
 
-      {/* Financial Summary Card with 4 KPI amounts */}
       <div className="rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <Skeleton className="h-5 w-5 rounded" />
@@ -420,11 +398,9 @@ export function ProjectDetailSkeleton() {
   );
 }
 
-// Contract Detail: Header (number+status+actions), 4 Tabs, Summary Card with amounts & milestones
 export function ContractDetailSkeleton() {
   return (
     <div className="flex flex-col gap-4">
-      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Skeleton className="h-11 w-11 rounded shrink-0" />
@@ -442,10 +418,8 @@ export function ContractDetailSkeleton() {
         </div>
       </div>
 
-      {/* 4 Tabs Bar */}
       <TabsSkeleton count={4} />
 
-      {/* Contract Summary Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
           <div className="flex items-center gap-2">
@@ -474,11 +448,9 @@ export function ContractDetailSkeleton() {
   );
 }
 
-// Invoice Detail: Header (number+status+actions), 4 KPI Cards, Lines Editor Card, Payments Card
 export function InvoiceDetailSkeleton() {
   return (
     <div className="flex flex-col gap-4">
-      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Skeleton className="h-11 w-11 rounded shrink-0" />
@@ -497,7 +469,6 @@ export function InvoiceDetailSkeleton() {
         </div>
       </div>
 
-      {/* 4 Invoice KPI Cards: Total, Tax, Paid, Due */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {Array.from({ length: 4 }).map((_, i) => (
           <div
@@ -510,7 +481,6 @@ export function InvoiceDetailSkeleton() {
         ))}
       </div>
 
-      {/* Invoice Lines Card */}
       <div className="rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -531,7 +501,6 @@ export function InvoiceDetailSkeleton() {
             </div>
           ))}
         </div>
-        {/* Totals Box */}
         <div className="ms-auto w-64 flex flex-col gap-2 pt-4 border-t border-border">
           <div className="flex justify-between">
             <Skeleton className="h-4 w-20" />
@@ -551,11 +520,9 @@ export function InvoiceDetailSkeleton() {
   );
 }
 
-// Client Detail: Header, 3 Cards (Identity, Projects, Contracts)
 export function ClientDetailSkeleton() {
   return (
     <div className="flex flex-col gap-4">
-      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Skeleton className="h-11 w-11 rounded shrink-0" />
@@ -569,7 +536,6 @@ export function ClientDetailSkeleton() {
         <Skeleton className="h-9 w-24 rounded" />
       </div>
 
-      {/* Identity Card */}
       <div className="rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <Skeleton className="h-5 w-5 rounded" />
@@ -585,7 +551,6 @@ export function ClientDetailSkeleton() {
         </div>
       </div>
 
-      {/* Related Projects Card */}
       <div className="rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <Skeleton className="h-5 w-5 rounded" />
@@ -607,7 +572,6 @@ export function ClientDetailSkeleton() {
   );
 }
 
-// User Detail Skeleton
 export function UserDetailSkeleton() {
   return (
     <div className="flex flex-col gap-4">
@@ -645,7 +609,6 @@ export function UserDetailSkeleton() {
   );
 }
 
-// Template Detail Skeleton
 export function TemplateDetailSkeleton() {
   return (
     <div className="flex flex-col gap-4">
@@ -664,15 +627,9 @@ export function TemplateDetailSkeleton() {
   );
 }
 
-/* =========================================================================
-   CREATE & EDIT SKELETONS (Accurately reflecting builders, wizards & forms)
-   ========================================================================= */
-
-// Contract Builder Edit: 5 Stepper Steps + Active Step Form
 export function ContractEditSkeleton() {
   return (
     <div className="flex flex-col gap-5">
-      {/* Contract Title Banner */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Skeleton className="h-10 w-10 rounded shrink-0" />
@@ -684,7 +641,6 @@ export function ContractEditSkeleton() {
         <Skeleton className="h-9 w-28 rounded" />
       </div>
 
-      {/* 5-Step Stepper Progress Bar */}
       <div className="grid grid-cols-5 gap-2 border-b border-border pb-3">
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="flex flex-col gap-1.5 items-center text-center">
@@ -694,7 +650,6 @@ export function ContractEditSkeleton() {
         ))}
       </div>
 
-      {/* Active Step Content Card */}
       <div className="rounded border border-border bg-card p-4 sm:p-6 flex flex-col gap-5">
         <Skeleton className="h-5 w-36" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -714,18 +669,15 @@ export function ContractEditSkeleton() {
   );
 }
 
-// Settings Skeleton: Settings Header + 5 Tabs Navigation + Settings Card
 export function SettingsSkeleton() {
   return (
     <div className="flex flex-col gap-4">
-      {/* Settings Navigation Tabs */}
       <div className="flex gap-2 overflow-x-auto border-b border-border pb-1">
         {Array.from({ length: 5 }).map((_, i) => (
           <Skeleton key={i} className="h-9 w-28 sm:w-36 rounded shrink-0" />
         ))}
       </div>
 
-      {/* Settings Card */}
       <div className="rounded border border-border bg-card p-4 sm:p-6 flex flex-col gap-5">
         <div className="flex items-center gap-2 pb-2 border-b border-border/40">
           <Skeleton className="h-5 w-5 rounded" />
@@ -747,13 +699,11 @@ export function SettingsSkeleton() {
   );
 }
 
-// Account Skeleton: Profile Card, Appearance Card, Password Card
 export function AccountSkeleton() {
   return (
     <div className="flex flex-col gap-4">
       <PageHeaderSkeleton hasAction={false} />
 
-      {/* Profile Card */}
       <div className="rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <Skeleton className="h-5 w-5 rounded" />
@@ -772,7 +722,6 @@ export function AccountSkeleton() {
         <Skeleton className="h-10 w-24 rounded ms-auto" />
       </div>
 
-      {/* Theme Card */}
       <div className="rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-3">
         <Skeleton className="h-5 w-20" />
         <div className="flex gap-2">
@@ -782,7 +731,6 @@ export function AccountSkeleton() {
         </div>
       </div>
 
-      {/* Password Card */}
       <div className="rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
         <Skeleton className="h-5 w-28" />
         <div className="flex flex-col gap-3 max-w-md">
@@ -796,7 +744,6 @@ export function AccountSkeleton() {
   );
 }
 
-// Standard Form Skeleton
 export function FormSkeleton({ fieldsCount = 6 }: { fieldsCount?: number }) {
   return (
     <div className="flex flex-col gap-4">
@@ -819,7 +766,6 @@ export function FormSkeleton({ fieldsCount = 6 }: { fieldsCount?: number }) {
   );
 }
 
-// Dashboard Overview Skeleton
 export function DashboardSkeleton() {
   return (
     <div className="flex flex-col gap-6">
@@ -890,7 +836,6 @@ export function DashboardSkeleton() {
   );
 }
 
-// Document Preview Skeleton
 export function DocumentSkeleton({
   withToolbar = false,
   className,
@@ -963,7 +908,6 @@ export function DocumentSkeleton({
   );
 }
 
-// Fallback Generic Table Skeleton
 export function TableSkeleton({ rowsCount: _rowsCount = 6 }: { rowsCount?: number } = {}) {
   return <ClientsTableSkeleton />;
 }

@@ -277,10 +277,6 @@ export function TemplateForm({
     toast({ title: msg, tone: "error" });
   }
 
-  // Server field errors carry message keys only (no interpolation params), so
-  // only translate plain `errors.*` keys; anything else falls back to the
-  // generic message. Clause-specific detail is shown by the live validator,
-  // which has the full issue params.
   function fieldError(name: string): string | null {
     const key = fieldErrors[name];
     if (!key) return null;

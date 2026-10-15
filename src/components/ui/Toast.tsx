@@ -101,7 +101,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 cfg.border,
               )}
             >
-              {/* Leading accent edge */}
               <div
                 className={cn("absolute inset-y-0 start-0 w-1", cfg.accentBar)}
                 aria-hidden="true"

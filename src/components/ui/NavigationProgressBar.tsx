@@ -9,7 +9,6 @@ export function NavigationProgressBar() {
   const [navigating, setNavigating] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  // Complete progress whenever URL path or search query changes
   useEffect(() => {
     setProgress(100);
     const timer = setTimeout(() => {
@@ -19,7 +18,6 @@ export function NavigationProgressBar() {
     return () => clearTimeout(timer);
   }, [pathname, searchParams]);
 
-  // Intercept internal link clicks to trigger instant visual progress
   useEffect(() => {
     const handleAnchorClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null;
@@ -43,7 +41,6 @@ export function NavigationProgressBar() {
         return;
       }
 
-      // Skip if clicking current URL
       const currentUrl = window.location.pathname + window.location.search;
       if (href === currentUrl) return;
 
@@ -64,7 +61,6 @@ export function NavigationProgressBar() {
     };
   }, []);
 
-  // Smoothly increment while waiting for server response
   useEffect(() => {
     if (!navigating) return;
 

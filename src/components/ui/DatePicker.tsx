@@ -155,7 +155,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
       return { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() };
     }, [todayIso]);
 
-    // View state for month/year currently browsing in the calendar
     const [browseYear, setBrowseYear] = useState<number>(
       () => parsedVal?.year ?? parsedToday.year,
     );
@@ -163,7 +162,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
       () => parsedVal?.month ?? parsedToday.month,
     );
 
-    // Keep internalVal in sync when controlled
     useEffect(() => {
       if (isControlled) {
         const nextVal = String(value ?? "");
@@ -180,7 +178,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
     const containerRef = useRef<HTMLDivElement | null>(null);
     const popoverRef = useRef<HTMLDivElement | null>(null);
 
-    // Close on click outside
     useEffect(() => {
       if (!open) return;
       const handleClickOutside = (e: globalThis.MouseEvent) => {
@@ -266,7 +263,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
       setBrowseYear((y) => y + 1);
     };
 
-    // Keyboard navigation
     const handleKeyDown = (e: KeyboardEvent) => {
       if (disabled) return;
       if (e.key === "Escape") {
@@ -288,7 +284,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
       }
     };
 
-    // Calculate days grid
     const daysInCurrentMonth = getDaysInMonth(browseYear, browseMonth);
     const firstDayOfWeek = getFirstDayOfWeek(browseYear, browseMonth);
 
@@ -310,7 +305,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
         isToday: boolean;
       }> = [];
 
-      // Leading days from previous month
       for (let i = firstDayOfWeek - 1; i >= 0; i--) {
         const d = prevMonthDaysCount - i;
         const prevM = browseMonth === 1 ? 12 : browseMonth - 1;
@@ -326,7 +320,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
         });
       }
 
-      // Current month days
       for (let d = 1; d <= daysInCurrentMonth; d++) {
         const iso = formatIso(browseYear, browseMonth, d);
         list.push({
@@ -339,7 +332,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
         });
       }
 
-      // Trailing days from next month to fill grid
       const remaining = 42 - list.length;
       for (let d = 1; d <= remaining; d++) {
         const nextM = browseMonth === 12 ? 1 : browseMonth + 1;
@@ -373,7 +365,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
 
     const currentMonthLabel = monthNames[browseMonth - 1];
 
-    // Years grid for quick picking (12 years)
     const yearGridStart = Math.floor(browseYear / 12) * 12;
     const yearGrid = useMemo(() => {
       return Array.from({ length: 12 }, (_, i) => yearGridStart + i);
@@ -385,7 +376,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
         className={cn("relative w-full", className)}
         onKeyDown={handleKeyDown}
       >
-        {/* Custom Input Trigger */}
         <div
           onClick={() => {
             if (!disabled) {
@@ -448,7 +438,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
           </button>
         </div>
 
-        {/* Floating Custom Calendar Popover */}
         {open && !disabled ? (
           <div
             ref={popoverRef}
@@ -456,7 +445,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
               "absolute z-50 mt-1.5 w-72 start-0 rounded-lg border border-border bg-popover p-3 text-popover-foreground shadow-2xl transition-all duration-150 animate-in fade-in-50 zoom-in-95",
             )}
           >
-            {/* Header: Month / Year Navigation */}
             <div className="flex items-center justify-between pb-2.5 mb-2 border-b border-border/60">
               <div className="flex items-center gap-1">
                 <button
@@ -477,7 +465,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
                 </button>
               </div>
 
-              {/* View Switcher: click to toggle days/months/years */}
               <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
                 <button
                   type="button"
@@ -519,7 +506,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
               </div>
             </div>
 
-            {/* View Mode: Months Grid */}
             {viewMode === "months" ? (
               <div className="grid grid-cols-3 gap-1.5 py-2">
                 {monthNames.map((mName, idx) => {
@@ -547,7 +533,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
               </div>
             ) : null}
 
-            {/* View Mode: Years Grid */}
             {viewMode === "years" ? (
               <div className="grid grid-cols-3 gap-1.5 py-2">
                 {yearGrid.map((y) => {
@@ -574,10 +559,8 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
               </div>
             ) : null}
 
-            {/* View Mode: Days Calendar Grid */}
             {viewMode === "days" ? (
               <div>
-                {/* Weekdays Row */}
                 <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-semibold text-muted-foreground/80 mb-1">
                   {weekdayNames.map((wName) => (
                     <span key={wName} className="py-0.5 select-none">
@@ -586,7 +569,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
                   ))}
                 </div>
 
-                {/* Days Grid */}
                 <div className="grid grid-cols-7 gap-1">
                   {daysList.map((item, index) => {
                     const isSelected = item.isSelected;
@@ -620,7 +602,6 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
               </div>
             ) : null}
 
-            {/* Footer Quick Actions */}
             <div className="flex items-center justify-between pt-2.5 mt-2.5 border-t border-border/60 text-xs">
               <button
                 type="button"

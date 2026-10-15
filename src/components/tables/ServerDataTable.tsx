@@ -54,7 +54,6 @@ export function ServerDataTable<R extends { id: string | number }>({
     ? rows
     : rows.slice((clientPage - 1) * effectivePageSize, clientPage * effectivePageSize);
 
-  // If no rows, hide headers completely and show EmptyState
   if (effectiveTotal === 0 && !externalLoading) {
     return (
       <EmptyState
@@ -172,6 +171,5 @@ export function ServerDataTable<R extends { id: string | number }>({
   );
 }
 
-// Re-export for compatibility
 export const ServerDataGrid = ServerDataTable;
 export const DataTable = ServerDataTable;

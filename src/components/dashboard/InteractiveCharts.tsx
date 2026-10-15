@@ -8,12 +8,12 @@ import { cn } from "@/components/ui/cn";
 
 const CHART_COLORS = [
   "var(--primary)",
-  "#38bdf8", // sky
-  "#fbbf24", // amber
-  "#34d399", // emerald
-  "#f87171", // rose
-  "#a78bfa", // violet
-  "#94a3b8", // slate
+  "#38bdf8", 
+  "#fbbf24", 
+  "#34d399", 
+  "#f87171", 
+  "#a78bfa", 
+  "#94a3b8", 
 ];
 
 export function StatusDonut({
@@ -71,7 +71,6 @@ export function StatusDonut({
         </div>
       ) : (
         <div className="relative flex flex-col items-center justify-center gap-6 py-2 sm:flex-row">
-          {/* Donut SVG */}
           <div
             className="relative shrink-0 select-none cursor-pointer"
             style={{ width: size, height: size }}
@@ -116,7 +115,6 @@ export function StatusDonut({
               })}
             </svg>
 
-            {/* Inner Center Statistics */}
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
               {activeEntry ? (
                 <>
@@ -143,7 +141,6 @@ export function StatusDonut({
             </div>
           </div>
 
-          {/* Legend and stats list */}
           <div className="flex w-full max-w-xs flex-col gap-2">
             {data.map((entry) => {
               const isHovered = hoveredIdx === entry.id;
@@ -205,7 +202,6 @@ export function MonthlyChart({
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Chart Legend */}
       <div className="flex items-center gap-4 text-xs">
         <div className="flex items-center gap-1.5 font-medium text-muted-foreground">
           <span className="h-3 w-3 rounded-xs bg-primary shadow-[0_0_6px_var(--primary)]" />
@@ -238,7 +234,6 @@ export function MonthlyChart({
                 isHovered ? "bg-muted/30" : "hover:bg-muted/15",
               )}
             >
-              {/* Premium Floating Tooltip Card */}
               {isHovered ? (
                 <div
                   className="pointer-events-none absolute -top-24 z-30 flex flex-col items-center animate-in fade-in-0 zoom-in-95 duration-150"
@@ -277,7 +272,6 @@ export function MonthlyChart({
                 </div>
               ) : null}
 
-              {/* Bars with opacity highlight */}
               <div className="flex h-36 w-full items-end justify-center gap-1 sm:gap-1.5">
                 <div
                   style={{ height: `${(point.issued / max) * 100}%` }}

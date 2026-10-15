@@ -36,7 +36,6 @@ function parseOptions(children: ReactNode): OptionData[] {
           disabled?: boolean;
           hidden?: boolean;
         };
-        // Don't render hidden options in custom popover menu
         if (p.hidden) return;
         options.push({
           value: String(p.value ?? ""),
@@ -117,7 +116,6 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
       }
     }, [isControlled, defaultValue]);
 
-    // Calculate smart placement (bottom vs top) when opened
     useEffect(() => {
       if (!open || !containerRef.current) return;
       const updatePlacement = () => {
@@ -143,7 +141,6 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
       };
     }, [open]);
 
-    // Scroll selected option into view when opened
     useEffect(() => {
       if (open && listboxRef.current) {
         const selectedEl = listboxRef.current.querySelector<HTMLElement>('[aria-selected="true"]');
@@ -153,7 +150,6 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
       }
     }, [open]);
 
-    // Handle clicks outside container
     useEffect(() => {
       if (!open) return;
       const handleClickOutside = (e: globalThis.MouseEvent) => {
@@ -264,7 +260,6 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         ref={containerRef}
         className={cn("relative w-full select-none", open && "z-50", className)}
       >
-        {/* Hidden native select for form data and accessibility */}
         <select
           ref={(node) => {
             hiddenSelectRef.current = node;
@@ -295,7 +290,6 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           {children}
         </select>
 
-        {/* Custom Trigger Button */}
         <button
           type="button"
           disabled={disabled}
@@ -321,7 +315,6 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           </span>
         </button>
 
-        {/* Floating Custom Menu Popover */}
         {open ? (
           <div
             ref={listboxRef}
