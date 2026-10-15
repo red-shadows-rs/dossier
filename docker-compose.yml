@@ -1,3 +1,8 @@
+# ─────────────────────────────────────────────
+# Dossier - Docker Compose
+# ─────────────────────────────────────────────
+
+# ── Application Services ──
 services:
   app:
     build: .
@@ -7,7 +12,7 @@ services:
       - PORT=3000
     volumes:
       - ./data:/app/data
-    ipc: host # Chromium stability
+    ipc: host
     healthcheck:
       test:
         [
@@ -22,11 +27,11 @@ services:
       start_period: 30s
     ports:
       - "127.0.0.1:3000:3000"
+
   worker:
     build: .
     restart: unless-stopped
     env_file: .env
-    # Exactly ONE worker replica: it owns the outbox, scheduler and backups.
     command: ["npx", "tsx", "scripts/worker.ts"]
     volumes:
       - ./data:/app/data

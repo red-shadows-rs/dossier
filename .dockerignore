@@ -1,3 +1,8 @@
+# ─────────────────────────────────────────────
+# Dossier - Docker Ignore
+# ─────────────────────────────────────────────
+
+# ── Dependencies & Build ──
 node_modules
 .next
 .git
@@ -7,19 +12,25 @@ tmp
 .env
 .env.*
 npm-debug.log*
+
+# ── Configuration & Metadata ──
 Dockerfile
 docker-compose.yml
 .dockerignore
 .kilo
 .vscode
 .idea
+.github
+*.md
+
+# ── Testing & Reporting ──
 playwright-report
 test-results
 coverage
 tests
 nginx
-.github
-*.md
+
+# ── Database Artifacts ──
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
