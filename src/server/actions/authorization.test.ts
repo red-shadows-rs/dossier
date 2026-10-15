@@ -1,6 +1,5 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
-// 9.12 / 20.4 — table-driven authorization test. It enumerates every
 const authState = vi.hoisted(() => ({ token: null as string | null }));
 
 vi.mock("next/headers", () => ({
