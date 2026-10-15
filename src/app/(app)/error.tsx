@@ -29,7 +29,6 @@ export default function AppError({
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    // Keep a diagnostic record in development console
     console.error("Dossier application error boundary:", error);
   }, [error]);
 
@@ -40,40 +39,33 @@ export default function AppError({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Ignore clipboard write errors if permission denied
     }
   }, [error.digest]);
 
   return (
     <div className="flex min-h-[65vh] w-full items-center justify-center py-10 px-4">
       <Card className="w-full max-w-lg overflow-hidden border border-border/80 bg-card shadow-sm">
-        {/* Accent alert top stripe */}
         <div className="h-1 w-full bg-destructive/80" />
 
         <div className="flex flex-col items-center p-6 text-center sm:p-8">
-          {/* Layered icon badge */}
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-destructive/25 bg-destructive/10 text-destructive shadow-sm">
             <AlertCircle size={28} strokeWidth={2} aria-hidden="true" />
           </div>
 
-          {/* System error badge */}
           <div className="mb-3">
             <Badge tone="red" dot>
               {t("systemError")}
             </Badge>
           </div>
 
-          {/* Heading */}
           <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
             {t("somethingWentWrong")}
           </h1>
 
-          {/* Description */}
           <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
             {t("errorDescription")}
           </p>
 
-          {/* Error Digest (if present) */}
           {error.digest ? (
             <div className="mt-4 flex w-full max-w-xs items-center justify-between gap-2 rounded-lg border border-border/70 bg-muted/30 px-3 py-1.5 text-xs font-mono text-muted-foreground">
               <span className="truncate">
@@ -101,7 +93,6 @@ export default function AppError({
             </div>
           ) : null}
 
-          {/* Actions */}
           <div className="mt-6 flex w-full flex-col-reverse gap-2.5 sm:flex-row sm:items-center sm:justify-center">
             <Link href="/" className="w-full sm:w-auto">
               <Button
@@ -123,7 +114,6 @@ export default function AppError({
             </Button>
           </div>
 
-          {/* Previous page secondary action */}
           <button
             type="button"
             onClick={() => router.back()}
@@ -138,7 +128,6 @@ export default function AppError({
           </button>
         </div>
 
-        {/* Footer Support hint */}
         <div className="border-t border-border/60 bg-muted/20 px-6 py-2.5 text-center text-xs text-muted-foreground">
           {t("supportHint")}
         </div>

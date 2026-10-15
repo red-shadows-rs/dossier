@@ -10,7 +10,6 @@ import {
   resolveSignatory,
 } from "@/server/services/signing";
 
-// 12.9 — public, token-validated unsigned PDF.
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ token: string }> },

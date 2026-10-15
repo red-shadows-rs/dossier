@@ -43,7 +43,6 @@ export default function RootError({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Ignore clipboard error
     }
   }, [error.digest]);
 

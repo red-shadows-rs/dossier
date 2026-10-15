@@ -101,7 +101,6 @@ export default function GlobalError({
               overflow: "hidden",
             }}
           >
-            {/* Accent alert top stripe */}
             <div
               style={{
                 height: "4px",
@@ -119,7 +118,6 @@ export default function GlobalError({
                 alignItems: "center",
               }}
             >
-              {/* Icon Container */}
               <div
                 style={{
                   marginBottom: "1rem",
@@ -137,7 +135,6 @@ export default function GlobalError({
                 <AlertCircle size={28} strokeWidth={2} />
               </div>
 
-              {/* Status Badge */}
               <div
                 style={{
                   marginBottom: "0.75rem",
@@ -164,7 +161,6 @@ export default function GlobalError({
                 <span>خطأ في النظام</span>
               </div>
 
-              {/* Heading */}
               <h1
                 style={{
                   fontSize: "1.375rem",
@@ -176,7 +172,6 @@ export default function GlobalError({
                 حدث خطأ غير متوقع
               </h1>
 
-              {/* Description */}
               <p
                 style={{
                   fontSize: "0.875rem",
@@ -190,7 +185,6 @@ export default function GlobalError({
                 أو العودة للرئيسية.
               </p>
 
-              {/* Digest if present */}
               {error?.digest ? (
                 <div
                   style={{
@@ -212,7 +206,6 @@ export default function GlobalError({
                 </div>
               ) : null}
 
-              {/* Actions */}
               <div
                 style={{
                   display: "flex",
@@ -266,7 +259,6 @@ export default function GlobalError({
               </div>
             </div>
 
-            {/* Footer Support hint */}
             <div
               style={{
                 borderTop: "1px solid var(--border)",

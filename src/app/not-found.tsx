@@ -29,11 +29,9 @@ export default async function NotFound() {
 
       <main className="flex flex-1 items-center justify-center p-4">
         <Card className="w-full max-w-lg overflow-hidden border border-border/80 bg-card text-center shadow-sm">
-          {/* Subtle accent top stripe */}
           <div className="h-1 w-full bg-primary/70" />
 
           <div className="flex flex-col items-center p-6 sm:p-8">
-            {/* 404 Watermark & Icon */}
             <div className="relative mb-3 flex items-center justify-center">
               <span className="select-none font-mono text-7xl font-black tracking-widest text-muted-foreground/15 sm:text-8xl">
                 404
@@ -43,14 +41,12 @@ export default async function NotFound() {
               </div>
             </div>
 
-            {/* Status Badge */}
             <div className="mb-3">
               <Badge tone="gray" dot>
                 {t("notFoundTitle")}
               </Badge>
             </div>
 
-            {/* Title & Description */}
             <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
               {t("notFoundTitle")}
             </h1>
@@ -58,7 +54,6 @@ export default async function NotFound() {
               {t("notFoundDescription")}
             </p>
 
-            {/* Action */}
             <div className="mt-6 flex w-full justify-center">
               <Link href="/">
                 <Button

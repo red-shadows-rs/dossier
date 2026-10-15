@@ -118,7 +118,6 @@ export default async function CompanySettingsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Branding Section */}
       <Card>
         <CardHeader>
           <CardTitle className="inline-flex items-center gap-2">
@@ -144,7 +143,6 @@ export default async function CompanySettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Company Info & Bank Details Form */}
       <SettingsForm
         sections={sections}
         values={values}

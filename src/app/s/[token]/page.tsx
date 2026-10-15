@@ -64,8 +64,6 @@ export default async function SigningPage({
   );
   const messages = (await import(`../../../../messages/${locale}.json`))
     .default;
-  // `getTranslations({locale})` is not honored without locale routing, so the
-  // chosen-locale bundle is used directly for server-rendered strings.
   const t = messages.signing;
   const dir = locale === "ar" ? "rtl" : "ltr";
 

@@ -167,11 +167,8 @@ export default async function InvoiceDetailPage({
         </div>
       </div>
 
-      {/* Two-Column Layout */}
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-        {/* Main Column (8 cols): Document Viewer & Lines Table */}
         <div className="flex flex-col gap-6 lg:col-span-8">
-          {/* Live Document Viewer Card */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <CardTitle className="inline-flex items-center gap-2">
@@ -189,7 +186,6 @@ export default async function InvoiceDetailPage({
             </CardContent>
           </Card>
 
-          {/* Line Items Card */}
           <Card>
             <CardHeader>
               <CardTitle className="inline-flex items-center gap-2">
@@ -259,9 +255,7 @@ export default async function InvoiceDetailPage({
           </Card>
         </div>
 
-        {/* Side Column (4 cols): Financial Breakdown, Client/Project, Payments */}
         <div className="flex flex-col gap-6 lg:col-span-4">
-          {/* Financial Summary Card with Progress Bar */}
           <Card>
             <CardHeader>
               <CardTitle className="inline-flex items-center gap-2">
@@ -270,7 +264,6 @@ export default async function InvoiceDetailPage({
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
-              {/* Visual Payment Progress Bar */}
               <div className="flex flex-col gap-2 rounded border border-border bg-surface p-3.5">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">{t("paid")}</span>
@@ -297,7 +290,6 @@ export default async function InvoiceDetailPage({
                 </div>
               </div>
 
-              {/* Breakdown List */}
               <dl className="flex flex-col gap-2 text-sm">
                 <Money
                   label={t("subtotal")}
@@ -348,7 +340,6 @@ export default async function InvoiceDetailPage({
             </CardContent>
           </Card>
 
-          {/* Client & Project Info Card */}
           <Card>
             <CardHeader>
               <CardTitle className="inline-flex items-center gap-2">
@@ -409,7 +400,6 @@ export default async function InvoiceDetailPage({
             </CardContent>
           </Card>
 
-          {/* Payment History Card */}
           <Card>
             <CardHeader>
               <CardTitle className="inline-flex items-center gap-2">
