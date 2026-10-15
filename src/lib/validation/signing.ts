@@ -44,7 +44,6 @@ export const signAsProviderInputSchema = z.object({
 
 export type SignAsProviderInput = z.infer<typeof signAsProviderInputSchema>;
 
-// 7.7 client side (public signing link).
 export const clientSignInputSchema = z.object({
   fullName: z
     .string()

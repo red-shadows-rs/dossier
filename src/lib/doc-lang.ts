@@ -3,9 +3,6 @@ export type DocLang = (typeof DOC_LANGS)[number];
 
 export type LanguageMode = "ar" | "en" | "bilingual";
 
-// A document may be exported in a language compatible with the contract mode:
-// ar-only contracts cannot export en, and vice versa. Bilingual contracts may
-// also be exported as a single-language view.
 export function allowedDocLangs(mode: LanguageMode): DocLang[] {
   if (mode === "ar") return ["ar"];
   if (mode === "en") return ["en"];

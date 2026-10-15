@@ -37,7 +37,6 @@ const ALL: Role[] = ["owner", "member", "viewer"];
 const WRITERS: Role[] = ["owner", "member"];
 const OWNER_ONLY: Role[] = ["owner"];
 
-// Section 8 permission matrix.
 const MATRIX: Record<Permission, Role[]> = {
   "clients.read": ALL,
   "clients.write": WRITERS,
