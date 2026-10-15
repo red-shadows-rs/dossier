@@ -28,6 +28,8 @@ playwright-report
 test-results
 coverage
 tests
+playwright.config.ts
+vitest.config.ts
 nginx
 
 # ── Database Artifacts ──
