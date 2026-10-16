@@ -302,7 +302,7 @@ export function ContractReviewStep({
             className="gap-2"
           >
             <ArrowRight className="h-4 w-4 rtl:rotate-0 rotate-180" />
-            <span>{t("contracts.builder.step.clauses")}</span>
+            <span>{t("builder.step.clauses")}</span>
           </Button>
         ) : (
           <div />

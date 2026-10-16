@@ -176,13 +176,13 @@ export function ContractClausesStep({
                 variant="outline"
                 size="sm"
                 onClick={toggleCollapseAll}
-                className="gap-1.5 text-xs"
+                className="gap-1.5 text-xs font-semibold"
               >
                 <ChevronsUpDown className="h-3.5 w-3.5" />
                 <span>
                   {collapsedIndices.size === clauses.length
-                    ? t("common.showMore")
-                    : t("common.showLess")}
+                    ? "توسيع الكل"
+                    : "طي الكل"}
                 </span>
               </Button>
 
