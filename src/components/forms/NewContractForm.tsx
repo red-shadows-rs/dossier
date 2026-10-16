@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { FileSignature, X } from "lucide-react";
+import { FileSignature, FolderKanban, ScrollText, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Field } from "@/components/ui/Field";
@@ -56,62 +56,84 @@ export function NewContractForm({
   };
 
   return (
-    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
       {statusError ? (
         <p
           role="alert"
-          className="rounded border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm font-medium text-destructive"
+          className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-xs font-semibold text-destructive"
         >
           {statusError}
         </p>
       ) : null}
+
       <Card>
-        <CardHeader>
-          <CardTitle>{t("contracts.newTitle")}</CardTitle>
+        <CardHeader className="flex flex-row items-center gap-2.5 pb-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <FileSignature className="h-4 w-4" />
+          </div>
+          <div>
+            <CardTitle className="text-base font-semibold">
+              {t("contracts.newTitle")}
+            </CardTitle>
+            <p className="text-xs text-muted-foreground">
+              اختر المشروع والقالب القانوني لتهيئة مسودة العقد
+            </p>
+          </div>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <Field
-            label={t("contracts.project")}
-            htmlFor="nc-project"
-            error={err("projectId")}
-            required
-          >
-            <Select
-              id="nc-project"
-              name="projectId"
-              disabled={pending}
+
+        <CardContent className="flex flex-col gap-6">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <Field
+              label={t("contracts.project")}
+              htmlFor="nc-project"
+              error={err("projectId")}
+              required
             >
-              <option value="">{t("contracts.selectProject")}</option>
-              {projects.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.label}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <Field
-            label={t("contracts.template")}
-            htmlFor="nc-template"
-            error={err("templateId")}
-            required
-          >
-            <Select
-              id="nc-template"
-              name="templateId"
-              disabled={pending}
+              <Select id="nc-project" name="projectId" disabled={pending}>
+                <option value="">{t("contracts.selectProject")}</option>
+                {projects.map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.label}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+
+            <Field
+              label={t("contracts.template")}
+              htmlFor="nc-template"
+              error={err("templateId")}
+              required
             >
-              <option value="">{t("contracts.selectTemplate")}</option>
-              {templates.map((template) => (
-                <option key={template.id} value={template.id}>
-                  {template.label}
-                </option>
-              ))}
-            </Select>
-          </Field>
+              <Select id="nc-template" name="templateId" disabled={pending}>
+                <option value="">{t("contracts.selectTemplate")}</option>
+                {templates.map((template) => (
+                  <option key={template.id} value={template.id}>
+                    {template.label}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          </div>
+
+          {/* Helpful next steps callout */}
+          <div className="flex items-start gap-3 rounded-xl border border-border/80 bg-muted/30 p-4 text-xs text-muted-foreground">
+            <Sparkles className="h-4 w-4 shrink-0 text-primary mt-0.5" />
+            <div className="flex flex-col gap-1">
+              <span className="font-semibold text-foreground">
+                ما الذي سيحدث بعد إنشاء المسودة؟
+              </span>
+              <p className="leading-relaxed">
+                ستنتقل تلقائياً إلى منشئ العقود الذكي المكون من 5 خطوات لمراجعة
+                البيانات الأساسية، وضبط التسعير، وجدول الدفعات، وتخصيص البنود
+                القانونية، ثم معاينة المستند وإرساله للتوقيع الإلكتروني.
+              </p>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-2.5">
         <Button
           type="button"
           variant="secondary"
@@ -120,11 +142,11 @@ export function NewContractForm({
           className="gap-2"
         >
           <X className="h-4 w-4" />
-          {t("common.cancel")}
+          <span>{t("common.cancel")}</span>
         </Button>
         <Button type="submit" loading={pending} className="gap-2">
           <FileSignature className="h-4 w-4" />
-          {t("contracts.createDraft")}
+          <span>{t("contracts.createDraft")}</span>
         </Button>
       </div>
     </form>

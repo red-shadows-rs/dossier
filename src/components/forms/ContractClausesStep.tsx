@@ -1,8 +1,22 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
-import { ArrowDown, ArrowUp, Copy, Plus, Save, Trash2 } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
+  Copy,
+  Plus,
+  Save,
+  ScrollText,
+  Search,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Field } from "@/components/ui/Field";
@@ -16,12 +30,17 @@ import type { BuilderClause } from "./ContractBuilder";
 export function ContractClausesStep({
   id,
   initial,
+  hasFees,
   onSaved,
+  onPrev,
+  onNext,
 }: {
   id: string;
   initial: BuilderClause[];
   hasFees: boolean;
   onSaved: () => void;
+  onPrev?: () => void;
+  onNext?: () => void;
 }) {
   const t = useTranslations();
   const toast = useToast();
@@ -37,6 +56,10 @@ export function ContractClausesStep({
             bodyEn: "",
           },
         ],
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [collapsedIndices, setCollapsedIndices] = useState<Set<number>>(
+    new Set(),
   );
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -66,10 +89,30 @@ export function ContractClausesStep({
       next.splice(index + 1, 0, copy);
       return next;
     });
+    toast({ title: t("contracts.saved"), tone: "info" });
   }
 
-  async function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function toggleCollapse(index: number) {
+    setCollapsedIndices((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
+  }
+
+  function toggleCollapseAll() {
+    if (collapsedIndices.size === clauses.length) {
+      setCollapsedIndices(new Set());
+    } else {
+      setCollapsedIndices(new Set(clauses.map((_, i) => i)));
+    }
+  }
+
+  async function handleSave(advance: boolean = false) {
     setPending(true);
     setFieldErrors({});
     const result = await saveClausesAction({ id, clauses });
@@ -77,149 +120,296 @@ export function ContractClausesStep({
     if (result.ok) {
       toast({ title: t("contracts.saved"), tone: "success" });
       onSaved();
+      if (advance && onNext) {
+        onNext();
+      }
       return;
     }
     if (result.error.fieldErrors) setFieldErrors(result.error.fieldErrors);
     toast({ title: t(`errors.${result.error.code}`), tone: "error" });
   }
 
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void handleSave(false);
+  }
+
+  const filteredClauses = useMemo(() => {
+    if (!searchQuery.trim()) return clauses.map((c, i) => ({ clause: c, index: i }));
+    const query = searchQuery.toLowerCase().trim();
+    return clauses
+      .map((clause, index) => ({ clause, index }))
+      .filter(
+        ({ clause }) =>
+          clause.titleAr.toLowerCase().includes(query) ||
+          clause.titleEn.toLowerCase().includes(query) ||
+          clause.bodyAr.toLowerCase().includes(query) ||
+          clause.bodyEn.toLowerCase().includes(query),
+      );
+  }, [clauses, searchQuery]);
+
   const generalError = Object.values(fieldErrors)[0];
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} className="flex flex-col gap-6">
       <Card>
-        <CardHeader>
-          <CardTitle>{t("contracts.builder.clausesTitle")}</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          {clauses.map((clause, index) => (
-            <div
-              key={index}
-              className="flex flex-col gap-3 rounded-md border border-border p-3"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-sm text-muted-foreground" dir="ltr">
-                  {index + 1}
-                </span>
-                <div className="flex items-center gap-1">
-                  <Tooltip content={t("contracts.clause.up")}>
-                    <button
-                      type="button"
-                      aria-label={t("contracts.clause.up")}
-                      onClick={() => move(index, -1)}
-                      disabled={index === 0}
-                      className="flex h-7 w-7 items-center justify-center rounded border border-border/70 bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-                    >
-                      <ArrowUp size={14} aria-hidden="true" />
-                    </button>
-                  </Tooltip>
-                  <Tooltip content={t("contracts.clause.down")}>
-                    <button
-                      type="button"
-                      aria-label={t("contracts.clause.down")}
-                      onClick={() => move(index, 1)}
-                      disabled={index === clauses.length - 1}
-                      className="flex h-7 w-7 items-center justify-center rounded border border-border/70 bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-                    >
-                      <ArrowDown size={14} aria-hidden="true" />
-                    </button>
-                  </Tooltip>
-                  <Tooltip content={t("contracts.clause.duplicate")}>
-                    <button
-                      type="button"
-                      aria-label={t("contracts.clause.duplicate")}
-                      onClick={() => duplicate(index)}
-                      className="flex h-7 w-7 items-center justify-center rounded border border-border/70 bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
-                    >
-                      <Copy size={14} aria-hidden="true" />
-                    </button>
-                  </Tooltip>
-                  <Tooltip content={t("common.delete")}>
-                    <button
-                      type="button"
-                      aria-label={t("common.delete")}
-                      onClick={() =>
-                        setClauses((current) =>
-                          current.length > 1
-                            ? current.filter((_, i) => i !== index)
-                            : current,
-                        )
-                      }
-                      disabled={clauses.length <= 1}
-                      className="flex h-7 w-7 items-center justify-center rounded border border-border/70 bg-card text-muted-foreground transition-colors hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-                    >
-                      <Trash2 size={14} aria-hidden="true" />
-                    </button>
-                  </Tooltip>
-                </div>
+        {/* Card Header & Controls Toolbar */}
+        <CardHeader className="flex flex-col gap-4 pb-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <ScrollText className="h-4 w-4" />
               </div>
-
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                <Field
-                  label={t("contracts.clause.titleAr")}
-                  htmlFor={`cl-title-ar-${index}`}
-                >
-                  <Input
-                    id={`cl-title-ar-${index}`}
-                    dir="rtl"
-                    lang="ar"
-                    value={clause.titleAr}
-                    onChange={(event) =>
-                      update(index, { titleAr: event.target.value })
-                    }
-                    className="text-start"
-                  />
-                </Field>
-                <Field
-                  label={t("contracts.clause.titleEn")}
-                  htmlFor={`cl-title-en-${index}`}
-                >
-                  <Input
-                    id={`cl-title-en-${index}`}
-                    dir="ltr"
-                    lang="en"
-                    value={clause.titleEn}
-                    onChange={(event) =>
-                      update(index, { titleEn: event.target.value })
-                    }
-                    className="text-start"
-                  />
-                </Field>
-                <Field
-                  label={t("contracts.clause.bodyAr")}
-                  htmlFor={`cl-body-ar-${index}`}
-                >
-                  <Textarea
-                    id={`cl-body-ar-${index}`}
-                    dir="rtl"
-                    lang="ar"
-                    rows={6}
-                    value={clause.bodyAr}
-                    onChange={(event) =>
-                      update(index, { bodyAr: event.target.value })
-                    }
-                    className="text-start"
-                  />
-                </Field>
-                <Field
-                  label={t("contracts.clause.bodyEn")}
-                  htmlFor={`cl-body-en-${index}`}
-                >
-                  <Textarea
-                    id={`cl-body-en-${index}`}
-                    dir="ltr"
-                    lang="en"
-                    rows={6}
-                    value={clause.bodyEn}
-                    onChange={(event) =>
-                      update(index, { bodyEn: event.target.value })
-                    }
-                    className="text-start"
-                  />
-                </Field>
+              <div>
+                <CardTitle className="text-base font-semibold">
+                  {t("contracts.builder.clausesTitle")}
+                </CardTitle>
+                <p className="text-xs text-muted-foreground">
+                  {t("contracts.clauses")} ({clauses.length})
+                </p>
               </div>
             </div>
-          ))}
+
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={toggleCollapseAll}
+                className="gap-1.5 text-xs"
+              >
+                <ChevronsUpDown className="h-3.5 w-3.5" />
+                <span>
+                  {collapsedIndices.size === clauses.length
+                    ? t("common.showMore")
+                    : t("common.showLess")}
+                </span>
+              </Button>
+
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="gap-1.5 text-xs"
+                onClick={() =>
+                  setClauses((current) => [
+                    ...current,
+                    {
+                      key: null,
+                      titleAr: "",
+                      titleEn: "",
+                      bodyAr: "",
+                      bodyEn: "",
+                    },
+                  ])
+                }
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>{t("contracts.clause.add")}</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Search Box */}
+          <div className="relative">
+            <Input
+              type="search"
+              placeholder={t("common.search")}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="ps-9 text-xs"
+            />
+            <Search className="pointer-events-none absolute inset-y-0 start-3 my-auto h-4 w-4 text-muted-foreground" />
+          </div>
+        </CardHeader>
+
+        <CardContent className="flex flex-col gap-4">
+          {generalError ? (
+            <p
+              role="alert"
+              className="rounded-lg border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-xs font-medium text-destructive"
+            >
+              {t(generalError)}
+            </p>
+          ) : null}
+
+          {filteredClauses.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-border p-8 text-center text-xs text-muted-foreground">
+              {t("common.noResults")}
+            </div>
+          ) : null}
+
+          <div className="flex flex-col gap-3.5">
+            {filteredClauses.map(({ clause, index }) => {
+              const isCollapsed = collapsedIndices.has(index);
+
+              return (
+                <div
+                  key={index}
+                  className="group flex flex-col rounded-xl border border-border/80 bg-card shadow-2xs transition-all hover:border-border hover:shadow-xs"
+                >
+                  {/* Clause Header Bar */}
+                  <div className="flex items-center justify-between border-b border-border/50 bg-muted/20 px-4 py-2.5 rounded-t-xl">
+                    <div
+                      className="flex flex-1 items-center gap-3 cursor-pointer select-none overflow-hidden pe-2"
+                      onClick={() => toggleCollapse(index)}
+                    >
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-bold text-foreground font-mono">
+                        {index + 1}
+                      </span>
+                      <span className="truncate text-xs font-semibold text-foreground">
+                        {clause.titleAr || clause.titleEn || (
+                          <span className="italic text-muted-foreground">
+                            {t("contracts.clause.add")} #{index + 1}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Tooltip content={t("contracts.clause.up")}>
+                        <button
+                          type="button"
+                          aria-label={t("contracts.clause.up")}
+                          onClick={() => move(index, -1)}
+                          disabled={index === 0}
+                          className="flex h-7 w-7 items-center justify-center rounded-md border border-border/70 text-muted-foreground transition-all hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
+                        >
+                          <ArrowUp className="h-3.5 w-3.5" />
+                        </button>
+                      </Tooltip>
+
+                      <Tooltip content={t("contracts.clause.down")}>
+                        <button
+                          type="button"
+                          aria-label={t("contracts.clause.down")}
+                          onClick={() => move(index, 1)}
+                          disabled={index === clauses.length - 1}
+                          className="flex h-7 w-7 items-center justify-center rounded-md border border-border/70 text-muted-foreground transition-all hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
+                        >
+                          <ArrowDown className="h-3.5 w-3.5" />
+                        </button>
+                      </Tooltip>
+
+                      <Tooltip content={t("contracts.clause.duplicate")}>
+                        <button
+                          type="button"
+                          aria-label={t("contracts.clause.duplicate")}
+                          onClick={() => duplicate(index)}
+                          className="flex h-7 w-7 items-center justify-center rounded-md border border-border/70 text-muted-foreground transition-all hover:bg-muted hover:text-foreground cursor-pointer"
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </button>
+                      </Tooltip>
+
+                      <Tooltip content={t("common.delete")}>
+                        <button
+                          type="button"
+                          aria-label={t("common.delete")}
+                          onClick={() =>
+                            setClauses((current) =>
+                              current.length > 1
+                                ? current.filter((_, i) => i !== index)
+                                : current,
+                            )
+                          }
+                          disabled={clauses.length <= 1}
+                          className="flex h-7 w-7 items-center justify-center rounded-md border border-border/70 text-muted-foreground transition-all hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </Tooltip>
+
+                      <div className="h-4 w-px bg-border/80 mx-1" />
+
+                      <button
+                        type="button"
+                        onClick={() => toggleCollapse(index)}
+                        className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+                      >
+                        {isCollapsed ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronUp className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Clause Body (Collapsible) */}
+                  {!isCollapsed ? (
+                    <div className="flex flex-col gap-3.5 p-4">
+                      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                        <Field
+                          label={t("contracts.clause.titleAr")}
+                          htmlFor={`cl-title-ar-${index}`}
+                        >
+                          <Input
+                            id={`cl-title-ar-${index}`}
+                            dir="rtl"
+                            lang="ar"
+                            value={clause.titleAr}
+                            onChange={(event) =>
+                              update(index, { titleAr: event.target.value })
+                            }
+                            className="text-start"
+                          />
+                        </Field>
+                        <Field
+                          label={t("contracts.clause.titleEn")}
+                          htmlFor={`cl-title-en-${index}`}
+                        >
+                          <Input
+                            id={`cl-title-en-${index}`}
+                            dir="ltr"
+                            lang="en"
+                            value={clause.titleEn}
+                            onChange={(event) =>
+                              update(index, { titleEn: event.target.value })
+                            }
+                            className="text-start"
+                          />
+                        </Field>
+                        <Field
+                          label={t("contracts.clause.bodyAr")}
+                          htmlFor={`cl-body-ar-${index}`}
+                        >
+                          <Textarea
+                            id={`cl-body-ar-${index}`}
+                            dir="rtl"
+                            lang="ar"
+                            rows={5}
+                            value={clause.bodyAr}
+                            onChange={(event) =>
+                              update(index, { bodyAr: event.target.value })
+                            }
+                            className="text-start font-normal leading-relaxed"
+                          />
+                        </Field>
+                        <Field
+                          label={t("contracts.clause.bodyEn")}
+                          htmlFor={`cl-body-en-${index}`}
+                        >
+                          <Textarea
+                            id={`cl-body-en-${index}`}
+                            dir="ltr"
+                            lang="en"
+                            rows={5}
+                            value={clause.bodyEn}
+                            onChange={(event) =>
+                              update(index, { bodyEn: event.target.value })
+                            }
+                            className="text-start font-normal leading-relaxed"
+                          />
+                        </Field>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
 
           <Button
             type="button"
@@ -233,23 +423,55 @@ export function ContractClausesStep({
               ])
             }
           >
-            <Plus size={15} aria-hidden="true" />
+            <Plus className="h-4 w-4" />
             <span>{t("contracts.clause.add")}</span>
           </Button>
-
-          {generalError ? (
-            <p role="alert" className="text-sm text-destructive">
-              {t(generalError)}
-            </p>
-          ) : null}
         </CardContent>
       </Card>
 
-      <div className="flex justify-end">
-        <Button type="submit" loading={pending} className="gap-2">
-          <Save size={16} aria-hidden="true" />
-          <span>{t("common.save")}</span>
-        </Button>
+      {/* Unified Action Footer */}
+      <div className="flex flex-col-reverse items-stretch justify-between gap-3 sm:flex-row sm:items-center">
+        {onPrev ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onPrev}
+            className="gap-2"
+          >
+            <ArrowRight className="h-4 w-4 rtl:rotate-0 rotate-180" />
+            <span>
+              {hasFees
+                ? t("contracts.builder.step.schedule")
+                : t("contracts.builder.step.basics")}
+            </span>
+          </Button>
+        ) : (
+          <div />
+        )}
+
+        <div className="flex items-center gap-2">
+          <Button
+            type="submit"
+            variant="secondary"
+            loading={pending}
+            className="gap-2"
+          >
+            <Save className="h-4 w-4" />
+            <span>{t("common.save")}</span>
+          </Button>
+
+          {onNext ? (
+            <Button
+              type="button"
+              loading={pending}
+              onClick={() => void handleSave(true)}
+              className="gap-2"
+            >
+              <span>{t("contracts.builder.step.review")}</span>
+              <ArrowLeft className="h-4 w-4 rtl:rotate-0 rotate-180" />
+            </Button>
+          ) : null}
+        </div>
       </div>
     </form>
   );

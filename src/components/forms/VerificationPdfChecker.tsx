@@ -123,3 +123,4 @@ export function VerificationPdfChecker({ code }: { code: string }) {
     </div>
   );
 }
+

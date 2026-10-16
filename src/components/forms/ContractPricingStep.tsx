@@ -2,7 +2,16 @@
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
-import { Plus, Save, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Calculator,
+  Percent,
+  Plus,
+  Receipt,
+  Save,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Field } from "@/components/ui/Field";
@@ -50,6 +59,8 @@ export function ContractPricingStep({
   initialDiscount,
   initialTaxRateBp,
   onSaved,
+  onPrev,
+  onNext,
 }: {
   id: string;
   currency: string;
@@ -57,6 +68,8 @@ export function ContractPricingStep({
   initialDiscount: { type: "none" | "percent" | "fixed"; value: number };
   initialTaxRateBp: number;
   onSaved: () => void;
+  onPrev?: () => void;
+  onNext?: () => void;
 }) {
   const t = useTranslations();
   const toast = useToast();
@@ -141,8 +154,7 @@ export function ContractPricingStep({
     );
   }
 
-  async function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function handleSave(advance: boolean = false) {
     if (!payload) {
       toast({ title: t("errors.VALIDATION_FAILED"), tone: "error" });
       return;
@@ -153,10 +165,18 @@ export function ContractPricingStep({
     if (result.ok) {
       toast({ title: t("contracts.saved"), tone: "success" });
       onSaved();
+      if (advance && onNext) {
+        onNext();
+      }
       return;
     }
     setError(result.error.fieldErrors?.discountValue ?? null);
     toast({ title: t(`errors.${result.error.code}`), tone: "error" });
+  }
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void handleSave(false);
   }
 
   function money(minor: number): string {
@@ -164,18 +184,55 @@ export function ContractPricingStep({
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} className="flex flex-col gap-6">
+      {/* Items Section */}
       <Card>
-        <CardHeader>
-          <CardTitle>{t("contracts.builder.pricingTitle")}</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Receipt className="h-4 w-4" />
+            </div>
+            <div>
+              <CardTitle className="text-base font-semibold">
+                {t("contracts.builder.pricingTitle")}
+              </CardTitle>
+              <p className="text-xs text-muted-foreground">
+                {t("contracts.items")} ({rows.length})
+              </p>
+            </div>
+          </div>
+          <span className="rounded-md border border-border/70 bg-muted/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground">
+            {currency}
+          </span>
         </CardHeader>
-        <CardContent className="flex flex-col gap-3">
+
+        <CardContent className="flex flex-col gap-4">
           <div className="flex flex-col gap-3">
             {rows.map((row, index) => (
               <div
                 key={index}
-                className="grid grid-cols-1 gap-2 rounded-md border border-border p-3 md:grid-cols-12"
+                className="group relative grid grid-cols-1 gap-3 rounded-xl border border-border/80 bg-card p-3.5 shadow-2xs transition-all hover:border-border hover:shadow-xs md:grid-cols-12 md:items-start"
               >
+                <div className="flex items-center justify-between md:hidden pb-1">
+                  <span className="text-xs font-bold text-muted-foreground font-mono">
+                    #{index + 1}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setRows((current) =>
+                        current.length > 1
+                          ? current.filter((_, i) => i !== index)
+                          : current,
+                      )
+                    }
+                    disabled={rows.length <= 1}
+                    className="text-muted-foreground hover:text-destructive disabled:opacity-30"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+
                 <Field
                   label={t("contracts.item.descriptionAr")}
                   htmlFor={`item-ar-${index}`}
@@ -192,6 +249,7 @@ export function ContractPricingStep({
                     className="text-start"
                   />
                 </Field>
+
                 <Field
                   label={t("contracts.item.descriptionEn")}
                   htmlFor={`item-en-${index}`}
@@ -208,6 +266,7 @@ export function ContractPricingStep({
                     className="text-start"
                   />
                 </Field>
+
                 <Field
                   label={t("contracts.item.qty")}
                   htmlFor={`item-qty-${index}`}
@@ -220,9 +279,10 @@ export function ContractPricingStep({
                     onChange={(event) =>
                       updateRow(index, { qty: event.target.value })
                     }
-                    className="text-start"
+                    className="text-start font-mono"
                   />
                 </Field>
+
                 <Field
                   label={t("contracts.item.unit")}
                   htmlFor={`item-unit-${index}`}
@@ -235,10 +295,11 @@ export function ContractPricingStep({
                     onChange={(event) =>
                       updateRow(index, { unit: event.target.value })
                     }
-                    className="text-start"
+                    className="text-start font-mono"
                   />
                 </Field>
-                <div className="flex items-end justify-center pb-1 md:col-span-1">
+
+                <div className="hidden md:flex h-[38px] items-center justify-center pt-6 md:col-span-1">
                   <Tooltip content={t("common.delete")}>
                     <button
                       type="button"
@@ -251,9 +312,9 @@ export function ContractPricingStep({
                         )
                       }
                       disabled={rows.length <= 1}
-                      className="flex h-8 w-8 items-center justify-center rounded border border-border/70 bg-card text-muted-foreground transition-colors hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/70 bg-card text-muted-foreground transition-all hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer shadow-2xs"
                     >
-                      <Trash2 size={15} aria-hidden="true" />
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </Tooltip>
                 </div>
@@ -273,116 +334,174 @@ export function ContractPricingStep({
               ])
             }
           >
-            <Plus size={15} aria-hidden="true" />
+            <Plus className="h-4 w-4" />
             <span>{t("contracts.item.add")}</span>
           </Button>
         </CardContent>
       </Card>
 
+      {/* Totals & Tax Calculation Card */}
       <Card>
-        <CardHeader>
-          <CardTitle>{t("contracts.builder.totalsTitle")}</CardTitle>
+        <CardHeader className="flex flex-row items-center gap-2.5 pb-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+            <Calculator className="h-4 w-4" />
+          </div>
+          <div>
+            <CardTitle className="text-base font-semibold">
+              {t("contracts.builder.totalsTitle")}
+            </CardTitle>
+            <p className="text-xs text-muted-foreground">
+              {t("contracts.discountLabel")}، {t("contracts.taxRate")}،{" "}
+              {t("common.total")}
+            </p>
+          </div>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <Field label={t("contracts.discountType")} htmlFor="cb-disc-type">
-            <Select
-              id="cb-disc-type"
-              value={discountType}
-              onChange={(event) =>
-                setDiscountType(
-                  event.target.value as "none" | "percent" | "fixed",
-                )
-              }
-            >
-              {DISCOUNT_TYPES.map((type) => (
-                <option key={type} value={type}>
-                  {t(`contracts.discount.${type}`)}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <Field
-            label={t("contracts.discountValue")}
-            htmlFor="cb-disc-value"
-            error={error ? t(error) : null}
-          >
-            <Input
-              id="cb-disc-value"
-              dir="ltr"
-              value={discountValue}
-              onChange={(event) => setDiscountValue(event.target.value)}
-              disabled={discountType === "none"}
-              className="text-start"
-            />
-          </Field>
-          <Field label={t("contracts.taxRate")} htmlFor="cb-tax">
-            <Input
-              id="cb-tax"
-              dir="ltr"
-              value={taxPercent}
-              onChange={(event) => setTaxPercent(event.target.value)}
-              className="text-start"
-            />
-          </Field>
 
-          <dl className="flex flex-col gap-1 md:col-span-3" dir="ltr">
+        <CardContent className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          {/* Controls Column */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:col-span-7">
+            <Field label={t("contracts.discountType")} htmlFor="cb-disc-type">
+              <Select
+                id="cb-disc-type"
+                value={discountType}
+                onChange={(event) =>
+                  setDiscountType(
+                    event.target.value as "none" | "percent" | "fixed",
+                  )
+                }
+              >
+                {DISCOUNT_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {t(`contracts.discount.${type}`)}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+
+            <Field
+              label={t("contracts.discountValue")}
+              htmlFor="cb-disc-value"
+              error={error ? t(error) : null}
+            >
+              <Input
+                id="cb-disc-value"
+                dir="ltr"
+                value={discountValue}
+                onChange={(event) => setDiscountValue(event.target.value)}
+                disabled={discountType === "none"}
+                className="text-start font-mono"
+              />
+            </Field>
+
+            <Field label={t("contracts.taxRate")} htmlFor="cb-tax">
+              <div className="relative">
+                <Input
+                  id="cb-tax"
+                  dir="ltr"
+                  value={taxPercent}
+                  onChange={(event) => setTaxPercent(event.target.value)}
+                  className="pe-8 text-start font-mono"
+                />
+                <span className="pointer-events-none absolute inset-y-0 end-2.5 flex items-center text-xs text-muted-foreground">
+                  <Percent className="h-3.5 w-3.5" />
+                </span>
+              </div>
+            </Field>
+          </div>
+
+          {/* Breakdown Card Column */}
+          <div className="rounded-xl border border-border/80 bg-muted/30 p-4 lg:col-span-5">
             {totals ? (
-              <>
-                <Line
-                  label={t("common.subtotal")}
-                  value={money(totals.subtotal)}
-                />
-                <Line
-                  label={t("contracts.discountLabel")}
-                  value={money(totals.discount)}
-                />
-                <Line label={t("contracts.net")} value={money(totals.net)} />
-                <Line label={t("contracts.tax")} value={money(totals.tax)} />
-                <Line
-                  label={t("common.total")}
-                  value={money(totals.total)}
-                  strong
-                />
-              </>
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{t("common.subtotal")}</span>
+                  <span className="font-mono font-medium text-foreground">
+                    {money(totals.subtotal)}
+                  </span>
+                </div>
+
+                {totals.discount > 0 ? (
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>{t("contracts.discountLabel")}</span>
+                    <span className="font-mono font-medium text-destructive">
+                      -{money(totals.discount)}
+                    </span>
+                  </div>
+                ) : null}
+
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{t("contracts.net")}</span>
+                  <span className="font-mono font-medium text-foreground">
+                    {money(totals.net)}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>
+                    {t("contracts.tax")} ({taxPercent}%)
+                  </span>
+                  <span className="font-mono font-medium text-foreground">
+                    {money(totals.tax)}
+                  </span>
+                </div>
+
+                <div className="mt-1 flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm font-bold text-foreground">
+                  <span>{t("common.total")}</span>
+                  <span className="text-base font-bold text-primary font-mono" dir="ltr">
+                    {money(totals.total)}
+                  </span>
+                </div>
+              </div>
             ) : (
-              <p className="text-sm text-muted-foreground">
+              <div className="flex h-full min-h-[100px] items-center justify-center text-center text-xs text-muted-foreground">
                 {t("contracts.builder.totalsHint")}
-              </p>
+              </div>
             )}
-          </dl>
+          </div>
         </CardContent>
       </Card>
 
-      <div className="flex justify-end">
-        <Button type="submit" loading={pending} className="gap-2">
-          <Save size={16} aria-hidden="true" />
-          <span>{t("common.save")}</span>
-        </Button>
+      {/* Unified Action Footer */}
+      <div className="flex flex-col-reverse items-stretch justify-between gap-3 sm:flex-row sm:items-center">
+        {onPrev ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onPrev}
+            className="gap-2"
+          >
+            <ArrowRight className="h-4 w-4 rtl:rotate-0 rotate-180" />
+            <span>{t("contracts.builder.step.basics")}</span>
+          </Button>
+        ) : (
+          <div />
+        )}
+
+        <div className="flex items-center gap-2">
+          <Button
+            type="submit"
+            variant="secondary"
+            loading={pending}
+            className="gap-2"
+          >
+            <Save className="h-4 w-4" />
+            <span>{t("common.save")}</span>
+          </Button>
+
+          {onNext ? (
+            <Button
+              type="button"
+              loading={pending}
+              onClick={() => void handleSave(true)}
+              className="gap-2"
+            >
+              <span>{t("contracts.builder.step.schedule")}</span>
+              <ArrowLeft className="h-4 w-4 rtl:rotate-0 rotate-180" />
+            </Button>
+          ) : null}
+        </div>
       </div>
     </form>
-  );
-}
-
-function Line({
-  label,
-  value,
-  strong,
-}: {
-  label: string;
-  value: string;
-  strong?: boolean;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-4 text-sm">
-      <dt className="text-muted-foreground">{label}</dt>
-      <dd
-        className={
-          strong ? "font-semibold text-foreground tabular-nums" : "tabular-nums"
-        }
-      >
-        {value}
-      </dd>
-    </div>
   );
 }
 
