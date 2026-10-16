@@ -82,8 +82,8 @@ export function ServerDataTable<R extends { id: string | number }>({
         </div>
       ) : null}
 
-      <div className="w-full overflow-x-auto">
-        <table className="w-full text-start text-sm border-collapse">
+      <div className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin]">
+        <table className="w-full min-w-[640px] text-start text-sm border-collapse">
           <thead>
             <tr className="border-b border-border bg-muted/40 text-xs font-semibold text-muted-foreground">
               {columns.map((col) => (

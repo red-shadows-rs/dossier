@@ -79,7 +79,7 @@ export function InvoicesTable({
     {
       id: "project",
       header: labels.project,
-      className: "text-muted-foreground",
+      className: "min-w-[150px] sm:min-w-[180px] text-muted-foreground",
       render: (row) => projectNames[row.projectId ?? ""] ?? "-",
     },
     {

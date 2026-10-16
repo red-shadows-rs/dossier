@@ -129,26 +129,26 @@ function Kpi({
   }[accent];
 
   return (
-    <div className="flex flex-col justify-between rounded border border-border/80 bg-card p-4 transition-all duration-150 hover:border-primary/40 hover:shadow-xs shadow-2xs">
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-semibold text-muted-foreground">{label}</span>
+    <div className="flex flex-col justify-between rounded border border-border/80 bg-card p-3 sm:p-4 transition-all duration-150 hover:border-primary/40 hover:shadow-xs shadow-2xs">
+      <div className="flex items-center justify-between gap-1.5 sm:gap-2">
+        <span className="text-[11px] sm:text-xs font-semibold text-muted-foreground truncate">{label}</span>
         {Icon ? (
           <span
             className={cn(
-              "flex h-8 w-8 shrink-0 items-center justify-center rounded border",
+              "flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded border",
               accentClasses,
             )}
           >
-            <Icon size={16} aria-hidden="true" />
+            <Icon size={14} className="sm:size-4" aria-hidden="true" />
           </span>
         ) : null}
       </div>
-      <div className="mt-3">
-        <div className="text-2xl font-bold tracking-tight font-mono tabular-nums text-foreground">
+      <div className="mt-2 sm:mt-3">
+        <div className="text-xl sm:text-2xl font-bold tracking-tight font-mono tabular-nums text-foreground truncate">
           {value}
         </div>
         {hint ? (
-          <p className="mt-1 text-xs text-muted-foreground leading-normal">{hint}</p>
+          <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-xs text-muted-foreground leading-normal truncate">{hint}</p>
         ) : null}
       </div>
     </div>
@@ -314,7 +314,7 @@ export default async function DashboardPage() {
 
       <div className="flex flex-col gap-3">
         <SectionHeading icon={Wallet}>{t("finance")}</SectionHeading>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
           {financial.map((item) => (
             <Kpi
               key={item.label}
@@ -331,7 +331,7 @@ export default async function DashboardPage() {
 
       <div className="flex flex-col gap-3">
         <SectionHeading icon={Activity}>{t("operations")}</SectionHeading>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
           {operations.map((item) => (
             <Kpi
               key={item.label}

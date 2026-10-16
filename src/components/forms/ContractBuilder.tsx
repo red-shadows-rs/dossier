@@ -171,7 +171,7 @@ export function ContractBuilder({
       <div className="sticky top-14 z-30 rounded-2xl border border-border/80 bg-card/95 p-2 shadow-sm backdrop-blur">
         <nav
           aria-label={t("builder.steps")}
-          className="flex items-center gap-1.5 overflow-x-auto no-scrollbar sm:gap-2"
+          className="flex items-center gap-1.5 overflow-x-auto touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:gap-2 snap-x snap-mandatory"
         >
           {STEPS.map((value, index) => {
             const disabled = stepDisabled(value);
@@ -190,7 +190,7 @@ export function ContractBuilder({
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 className={cn(
-                  "group flex flex-1 min-w-[130px] items-center gap-2.5 rounded-xl border px-3 py-2 text-xs font-semibold transition-all select-none",
+                  "group flex shrink-0 sm:flex-1 min-w-[115px] sm:min-w-[130px] snap-start items-center gap-2 rounded-xl border px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs font-semibold transition-all select-none",
                   active
                     ? "border-primary bg-primary text-primary-foreground shadow-xs ring-2 ring-primary/20"
                     : completed

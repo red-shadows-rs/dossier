@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { FileSignature, FolderKanban, ScrollText, Sparkles, X } from "lucide-react";
+import { FileSignature, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Field } from "@/components/ui/Field";
@@ -114,21 +114,6 @@ export function NewContractForm({
                 ))}
               </Select>
             </Field>
-          </div>
-
-          {/* Helpful next steps callout */}
-          <div className="flex items-start gap-3 rounded-xl border border-border/80 bg-muted/30 p-4 text-xs text-muted-foreground">
-            <Sparkles className="h-4 w-4 shrink-0 text-primary mt-0.5" />
-            <div className="flex flex-col gap-1">
-              <span className="font-semibold text-foreground">
-                ما الذي سيحدث بعد إنشاء المسودة؟
-              </span>
-              <p className="leading-relaxed">
-                ستنتقل تلقائياً إلى منشئ العقود الذكي المكون من 5 خطوات لمراجعة
-                البيانات الأساسية، وضبط التسعير، وجدول الدفعات، وتخصيص البنود
-                القانونية، ثم معاينة المستند وإرساله للتوقيع الإلكتروني.
-              </p>
-            </div>
           </div>
         </CardContent>
       </Card>

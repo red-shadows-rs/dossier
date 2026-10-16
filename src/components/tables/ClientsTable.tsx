@@ -70,6 +70,7 @@ export function ClientsTable({
     {
       id: "name",
       header: labels.name,
+      className: "min-w-[170px]",
       render: (row) => {
         const name =
           locale === "ar"

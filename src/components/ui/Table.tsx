@@ -18,8 +18,8 @@ export function Table({
   ...props
 }: HTMLAttributes<HTMLTableElement>) {
   return (
-    <MuiTableContainer>
-      <MuiTable size="small" className={className} {...props}>
+    <MuiTableContainer sx={{ overflowX: "auto", width: "100%", scrollbarWidth: "thin" }}>
+      <MuiTable size="small" className={className} sx={{ minWidth: 520 }} {...props}>
         {children}
       </MuiTable>
     </MuiTableContainer>

@@ -30,7 +30,7 @@ export function SettingsNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center gap-1.5 overflow-x-auto border-b border-border/60 pb-2">
+    <nav className="flex items-center gap-1.5 overflow-x-auto touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden border-b border-border/60 pb-2">
       {SECTIONS.map((section) => {
         const active = pathname === section.href;
         const Icon = section.icon;

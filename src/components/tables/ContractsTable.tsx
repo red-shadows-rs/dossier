@@ -67,6 +67,7 @@ export function ContractsTable({
     {
       id: "name",
       header: labels.name,
+      className: "min-w-[180px] sm:min-w-[220px]",
       render: (row) => {
         const title =
           locale === "ar"
