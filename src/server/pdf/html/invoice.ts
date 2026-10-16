@@ -140,34 +140,44 @@ body {
   background: #ffffff;
 }
 .invoice-page {
-  width: 100%;
+  width: 210mm;
   max-width: 100%;
-  min-height: 100vh;
+  height: 284mm;
+  max-height: 284mm;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
   background: #ffffff;
   box-sizing: border-box;
+  page-break-after: always;
+  break-after: page;
+  overflow: hidden;
+}
+.invoice-page:last-child {
+  page-break-after: auto;
+  break-after: auto;
 }
 
 /* Angular 3D Geometric Brand Header — Matching Dossier Identity */
 .hero-header {
   position: relative;
   min-height: 48mm;
-  margin-top: -1.5mm;
+  margin-top: -2mm;
   margin-bottom: 2mm;
-  width: 100%;
+  width: calc(100% + 6mm);
+  margin-left: -3mm;
+  margin-right: -3mm;
   overflow: hidden;
 }
 .hero-svg-bg {
   position: absolute;
-  top: -2mm;
-  left: -2mm;
-  right: -2mm;
-  bottom: -1mm;
-  width: calc(100% + 4mm);
-  height: calc(100% + 3mm);
+  top: -3mm;
+  left: -4mm;
+  right: -4mm;
+  bottom: -2mm;
+  width: calc(100% + 8mm);
+  height: calc(100% + 5mm);
   pointer-events: none;
   z-index: 1;
 }
@@ -177,7 +187,9 @@ body {
   display: flex;
   min-height: 48mm;
   width: 100%;
-  padding-top: 1.5mm;
+  padding-top: 2mm;
+  padding-left: 3mm;
+  padding-right: 3mm;
 }
 .hero-red-box {
   width: 42%;
@@ -264,23 +276,113 @@ body {
   display: flex;
   align-items: center;
   gap: 2.5mm;
-  text-align: end;
+  text-align: start;
+  max-width: 55mm;
+  flex-shrink: 0;
 }
-.brand-logo-img {
-  max-height: 14mm;
-  max-width: 40mm;
-  object-fit: contain;
+.brand-text-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 38mm;
+  overflow: hidden;
 }
 .brand-name {
-  font-size: 10pt;
-  font-weight: 900;
-  letter-spacing: 0.03em;
-  line-height: 1.2;
+  font-size: 9.5pt;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
   color: #ffffff;
+  word-break: break-word;
 }
 .brand-sub {
-  font-size: 7pt;
+  font-size: 6.8pt;
   color: #9a9aa6;
+  line-height: 1.2;
+  margin-top: 0.4mm;
+  word-break: break-word;
+}
+.brand-logo-frame {
+  width: 13mm;
+  height: 13mm;
+  min-width: 13mm;
+  min-height: 13mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.brand-logo-img {
+  max-height: 13mm;
+  max-width: 13mm;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* Subsequent Page Header (Page 2+) */
+.subsequent-header {
+  height: 12mm;
+  padding: 2.5mm 8mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 0.45mm solid #e11d48;
+  margin-bottom: 3.5mm;
+  background: #ffffff;
+}
+.sub-header-left {
+  display: flex;
+  align-items: center;
+}
+.sub-doc-meta {
+  font-size: 8pt;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 1.5mm;
+}
+.sub-meta-lbl {
+  color: #94a3b8;
+}
+.sub-meta-val {
+  font-family: monospace;
+  font-weight: 700;
+  color: #14141a;
+}
+.sub-meta-sep {
+  color: #cbd5e1;
+}
+.sub-header-right {
+  display: flex;
+  align-items: center;
+  gap: 2.5mm;
+}
+.sub-brand-name {
+  font-size: 8.5pt;
+  font-weight: 800;
+  color: #14141a;
+}
+.sub-brand-logo {
+  max-height: 10mm;
+  max-width: 18mm;
+  object-fit: contain;
+}
+
+.invoice-page-main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-continued-indicator {
+  padding: 3mm 8mm;
+  text-align: end;
+  font-size: 7.5pt;
+  font-weight: 700;
+  color: #94a3b8;
+  border-top: 0.25mm dashed #e2e8f0;
 }
 
 /* Dedicated Invoice Body with 8mm inset margins */
@@ -621,35 +723,44 @@ table.inv-items-table tbody tr:last-child td {
   break-inside: avoid;
   flex-shrink: 0;
 }
-tr.split-page {
-  break-after: page !important;
-  page-break-after: always !important;
-}
 @media print {
   html, body {
-    height: auto !important;
-    min-height: auto !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   .invoice-page {
-    display: block !important;
-    min-height: auto !important;
-  }
-  .invoice-body {
-    display: block !important;
-  }
-  tr.split-page {
-    break-after: page !important;
+    width: 210mm !important;
+    height: 284mm !important;
+    max-height: 284mm !important;
     page-break-after: always !important;
+    break-after: page !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    overflow: hidden !important;
+    background: #ffffff !important;
   }
-  .inv-footer-wrap {
-    margin-top: 4mm !important;
-    break-inside: avoid;
-    page-break-inside: avoid;
+  .invoice-page:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
   }
   .bottom-red-bar {
     display: none !important;
   }
 }
+@media screen {
+  body {
+    background: #f1f5f9;
+    padding: 8mm 0;
+  }
+  .invoice-page {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    margin: 0 auto 10mm auto;
+  }
+}
+
 `;
 
 function heroHeader(input: InvoiceHtmlInput): string {
@@ -695,20 +806,40 @@ function heroHeader(input: InvoiceHtmlInput): string {
     ? esc(formatDateLong(inv.dueDate, ui))
     : "—";
 
+  const sellerLegal = pick(s.legalNameAr ?? null, s.legalNameEn ?? null, lang);
+  const brandSubHtml =
+    sellerLegal && sellerLegal !== sellerName
+      ? `<div class="brand-sub">${sellerLegal}</div>`
+      : "";
+
   const brandMarkSvg = input.logoDataUri
-    ? `<img class="brand-logo-img" src="${esc(input.logoDataUri)}" alt="" />`
+    ? `
+      <div class="brand-box">
+        <div class="brand-text-col">
+          <div class="brand-name">${sellerName}</div>
+          ${brandSubHtml}
+        </div>
+        <div class="brand-logo-frame">
+          <img class="brand-logo-img" src="${esc(input.logoDataUri)}" alt="${sellerName}" />
+        </div>
+      </div>
+    `
     : `
       <div class="brand-box">
-        <div>
+        <div class="brand-text-col">
           <div class="brand-name">${sellerName}</div>
+          ${brandSubHtml}
         </div>
-        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-          <polygon points="16,2 30,10 16,18 2,10" fill="#e11d48" />
-          <polygon points="2,10 16,18 16,30 2,22" fill="#9f1239" />
-          <polygon points="30,10 16,18 16,30 30,22" fill="#fb7185" />
-        </svg>
+        <div class="brand-logo-frame">
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+            <polygon points="16,2 30,10 16,18 2,10" fill="#e11d48" />
+            <polygon points="2,10 16,18 16,30 2,22" fill="#9f1239" />
+            <polygon points="30,10 16,18 16,30 30,22" fill="#fb7185" />
+          </svg>
+        </div>
       </div>
     `;
+
 
   const svgTransform = isRtlDoc
     ? 'transform="scale(-1, 1) translate(-1000, 0)"'
@@ -749,9 +880,9 @@ function heroHeader(input: InvoiceHtmlInput): string {
   <header class="hero-header">
     <svg class="hero-svg-bg" viewBox="0 0 1000 240" preserveAspectRatio="none" style="overflow: visible;">
       <g ${svgTransform}>
-        <polygon points="415,-20 1040,-20 1040,195 370,195" fill="#14141a" />
+        <polygon points="415,-30 1050,-30 1050,195 370,195" fill="#14141a" />
         <polygon points="370,195 470,195 370,260" fill="#9f1239" />
-        <polygon points="-40,-20 425,-20 370,195 370,260 -40,260" fill="#e11d48" />
+        <polygon points="-50,-30 425,-30 370,195 370,260 -50,260" fill="#e11d48" />
       </g>
     </svg>
 
@@ -779,7 +910,7 @@ function heroHeader(input: InvoiceHtmlInput): string {
             </tr>
             <tr>
               <td class="lbl">${lblDue}</td>
-              <td class="val-std">${dueDateFormatted}${overdueTag}</td>
+              <td class="val-std">${inv.dueDate ? `${dueDateFormatted}${overdueTag}` : "—"}</td>
             </tr>
             <tr>
               <td class="lbl">${lblProject}</td>
@@ -830,12 +961,78 @@ function billToSection(input: InvoiceHtmlInput): string {
   `;
 }
 
-function linesTable(input: InvoiceHtmlInput): string {
+function subsequentHeader(
+  input: InvoiceHtmlInput,
+  _pageNumber: number,
+  _pageTotal: number,
+): string {
+  const s = input.seller;
+  const lang = input.lang;
+  const inv = input.invoice;
+  const sellerName = pick(s.nameAr, s.nameEn, lang);
+
+  const docNoLabel =
+    lang === "ar"
+      ? "رقم الفاتورة:"
+      : lang === "en"
+        ? "Invoice No:"
+        : '<span dir="ltr">Invoice No</span> / <span dir="rtl">رقم الفاتورة</span>:';
+
+  const logoHtml = input.logoDataUri
+    ? `<img class="sub-brand-logo" src="${esc(input.logoDataUri)}" alt="" />`
+    : "";
+
+  return `
+  <header class="subsequent-header">
+    <div class="sub-header-left">
+      <div class="sub-doc-meta">
+        <span class="sub-meta-lbl">${docNoLabel}</span>
+        <span class="sub-meta-val" dir="ltr">${esc(inv.number ?? "DRAFT")}</span>
+        ${
+          inv.projectLabel
+            ? `<span class="sub-meta-sep">·</span><span class="sub-meta-project">${esc(
+                inv.projectLabel,
+              )}</span>`
+            : ""
+        }
+      </div>
+    </div>
+    <div class="sub-header-right">
+      <div class="sub-brand-name">${sellerName}</div>
+      ${logoHtml}
+    </div>
+  </header>
+  `;
+}
+
+export function paginateInvoiceLines(lines: InvoiceLineHtml[]): InvoiceLineHtml[][] {
+  if (lines.length <= 10) {
+    return [lines];
+  }
+  const pages: InvoiceLineHtml[][] = [];
+  pages.push(lines.slice(0, 10));
+  let remaining = lines.slice(10);
+  while (remaining.length > 0) {
+    if (remaining.length <= 14) {
+      pages.push(remaining);
+      break;
+    }
+    pages.push(remaining.slice(0, 18));
+    remaining = remaining.slice(18);
+  }
+  return pages;
+}
+
+function linesTable(
+  input: InvoiceHtmlInput,
+  linesOverride?: InvoiceLineHtml[],
+): string {
   const currency = input.invoice.currency as CurrencyCode;
   const lang = uiLang(input.lang);
   const isBilingual = input.lang === "bilingual";
-  const rows = input.lines
-    .map((line, index) => {
+  const linesToRender = linesOverride ?? input.lines;
+  const rows = linesToRender
+    .map((line) => {
       let descHtml = "";
       if (isBilingual) {
         const en = line.descriptionEn ? `<div class="item-title">${esc(line.descriptionEn)}</div>` : "";
@@ -845,10 +1042,7 @@ function linesTable(input: InvoiceHtmlInput): string {
         const primary = pick(line.descriptionAr, line.descriptionEn, input.lang);
         descHtml = `<div class="item-title">${primary}</div>`;
       }
-      const shouldBreakAfter =
-        input.lines.length > 10 &&
-        (index === 9 || (index > 9 && (index - 9) % 14 === 0 && index < input.lines.length - 1));
-      return `<tr class="${shouldBreakAfter ? "split-page" : ""}">
+      return `<tr>
         <td class="col-num">${num(String(line.position))}</td>
         <td class="col-desc">${descHtml}</td>
         <td class="col-price">${num(formatMoney(line.unitPriceMinor, currency, lang))}</td>
@@ -898,6 +1092,7 @@ function linesTable(input: InvoiceHtmlInput): string {
   </table>
   `;
 }
+
 
 function totalsBlock(input: InvoiceHtmlInput): string {
   const inv = input.invoice;
@@ -1182,35 +1377,65 @@ export function renderInvoiceHtml(input: InvoiceHtmlInput): string {
         : '<span dir="ltr">Thank you.</span> / <span dir="rtl">شكرا لتعاملكم معنا.</span>';
   const footerSystemName = "Dossier";
 
-  const body = `
-<div class="invoice-page">
-  ${heroHeader(input)}
-  <div class="invoice-body">
-    ${billToSection(input)}
-    ${linesTable(input)}
-    ${totalsBlock(input)}
-  </div>
+  const linePages = paginateInvoiceLines(input.lines);
+  const pageCount = linePages.length;
 
-  <div class="inv-footer-wrap">
-    <div class="inv-footer">
-      <div class="footer-info">
-        ${instructionsBlock(input)}
-        ${notesBlock(input)}
-        <div class="thank-you">${thankYouText}</div>
-      </div>
-      <div class="footer-verification">
-        ${verificationBlock(input)}
-        ${stampImg}
-      </div>
+  const body = linePages
+    .map((chunk, pageIndex) => {
+      const isFirstPage = pageIndex === 0;
+      const isLastPage = pageIndex === pageCount - 1;
+
+      const headerHtml = isFirstPage
+        ? heroHeader(input)
+        : subsequentHeader(input, pageIndex + 1, pageCount);
+
+      const billToHtml = isFirstPage ? billToSection(input) : "";
+      const tableHtml = linesTable(input, chunk);
+      const totalsHtml = isLastPage ? totalsBlock(input) : "";
+
+      let footerContentHtml = "";
+      if (isLastPage) {
+        footerContentHtml = `
+        <div class="inv-footer-wrap">
+          <div class="inv-footer">
+            <div class="footer-info">
+              ${instructionsBlock(input)}
+              ${notesBlock(input)}
+              <div class="thank-you">${thankYouText}</div>
+            </div>
+            <div class="footer-verification">
+              ${verificationBlock(input)}
+              ${stampImg}
+            </div>
+          </div>
+        </div>
+        `;
+      } else {
+        footerContentHtml = "";
+      }
+
+      return `
+<div class="invoice-page">
+  <div class="invoice-page-main">
+    ${headerHtml}
+    <div class="invoice-body">
+      ${billToHtml}
+      ${tableHtml}
+      ${totalsHtml}
     </div>
   </div>
 
+  ${footerContentHtml}
+
   <div class="bottom-red-bar">
     <span dir="ltr">${esc(footerSystemName)}</span>
-    <span class="page-num-display" dir="ltr">1 / 1</span>
+    <span class="page-num-display" dir="ltr">${pageIndex + 1} / ${pageCount}</span>
   </div>
 </div>
-`;
+      `;
+    })
+    .join("\n");
+
 
   return documentShell({
     lang,

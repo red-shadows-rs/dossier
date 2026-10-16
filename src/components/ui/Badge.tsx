@@ -66,7 +66,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold tracking-tight border transition-colors select-none",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold tracking-tight border transition-colors select-none whitespace-nowrap shrink-0",
         t.bg,
         t.text,
         t.border,
@@ -80,7 +80,7 @@ export function Badge({
           aria-hidden="true"
         />
       ) : null}
-      <span>{children}</span>
+      <span className="inline-flex items-center gap-1 whitespace-nowrap">{children}</span>
     </span>
   );
 }

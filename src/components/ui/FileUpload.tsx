@@ -122,12 +122,27 @@ export function FileUpload({
           }
         }}
         className={clsx(
-          "group relative flex flex-col items-center justify-center rounded border border-dashed p-3.5 transition-all cursor-pointer select-none",
-          isDragging
-            ? "border-primary bg-primary/10"
-            : "border-border/80 hover:border-primary/60 hover:bg-muted/30 bg-background/40",
+          "group relative flex flex-col items-center justify-center rounded-xl transition-all select-none overflow-hidden w-full h-40",
+          isImage && hasCurrent && imageSource
+            ? "border border-border/80 bg-card/50 shadow-2xs cursor-default"
+            : clsx(
+                "border border-dashed p-4 cursor-pointer",
+                isDragging
+                  ? "border-primary bg-primary/10"
+                  : "border-border/80 hover:border-primary/60 hover:bg-muted/30 bg-background/40",
+              ),
           disabled && "opacity-60 cursor-not-allowed hover:border-border hover:bg-transparent",
         )}
+        style={
+          isImage && hasCurrent && imageSource
+            ? {
+                backgroundImage:
+                  "linear-gradient(45deg, rgba(128, 128, 128, 0.05) 25%, transparent 25%), linear-gradient(-45deg, rgba(128, 128, 128, 0.05) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(128, 128, 128, 0.05) 75%), linear-gradient(-45deg, transparent 75%, rgba(128, 128, 128, 0.05) 75%)",
+                backgroundSize: "16px 16px",
+                backgroundPosition: "0 0, 0 8px, 8px -8px, -8px 0px",
+              }
+            : undefined
+        }
       >
         <input
           ref={inputRef}
@@ -139,34 +154,63 @@ export function FileUpload({
         />
 
         {isImage && hasCurrent && imageSource ? (
-          <div className="flex flex-col items-center gap-2.5 w-full py-1">
-            <div className="relative flex h-20 w-36 items-center justify-center overflow-hidden rounded border border-border/80 bg-card p-1.5 shadow-2xs">
+          <div className="relative flex flex-col items-center justify-center w-full h-full p-3">
+            {/* Status indicator */}
+            <div className="absolute top-2.5 end-2.5 z-10 flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400 backdrop-blur-xs">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              <span>
+                {currentFileName
+                  ? `${currentFileName}${currentFileSize ? ` (${formatSize(currentFileSize)})` : ""}`
+                  : "تم الرفع"}
+              </span>
+            </div>
+
+            {/* Centered Image Preview */}
+            <div className="flex h-full w-full items-center justify-center py-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={imageSource}
                 alt={label ?? "preview"}
-                className="max-h-full max-w-full object-contain"
+                className="max-h-24 max-w-[75%] object-contain drop-shadow-sm transition-transform duration-200 group-hover:scale-102"
               />
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground font-mono" dir="ltr">
-                {selectedFile
-                  ? `${selectedFile.name} (${formatSize(selectedFile.size)})`
-                  : currentFileName
-                    ? `${currentFileName}${currentFileSize ? ` (${formatSize(currentFileSize)})` : ""}`
-                    : ""}
-              </span>
+
+            {/* Action Buttons */}
+            <div className="absolute bottom-2.5 inset-x-2.5 z-10 flex items-center justify-between gap-2">
               <button
                 type="button"
+                disabled={disabled || pending}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleReset();
                 }}
-                className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-destructive transition-colors"
-                title="إزالة"
+                className="inline-flex items-center gap-1.5 rounded-md border border-border/80 bg-background/90 px-2.5 py-1 text-xs font-medium text-muted-foreground shadow-2xs backdrop-blur-xs transition-colors hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:opacity-50 cursor-pointer"
+                title="حذف الملف"
               >
-                <Trash2 size={14} aria-hidden="true" />
+                <Trash2 size={13} aria-hidden="true" />
+                <span>حذف</span>
+              </button>
+
+              <button
+                type="button"
+                disabled={disabled || pending}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  inputRef.current?.click();
+                }}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border/80 bg-background/90 px-2.5 py-1 text-xs font-medium text-foreground shadow-2xs backdrop-blur-xs transition-colors hover:border-primary/50 hover:bg-primary/10 hover:text-primary disabled:opacity-50 cursor-pointer"
+                title="استبدال الملف"
+              >
+                <RotateCcw size={13} aria-hidden="true" />
+                <span>استبدال</span>
               </button>
             </div>
+
+            {pending ? (
+              <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-xs">
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              </div>
+            ) : null}
           </div>
         ) : !isImage && hasCurrent && selectedFile ? (
           <div className="flex items-center justify-between gap-3 w-full rounded border border-border bg-card p-3">
@@ -195,7 +239,7 @@ export function FileUpload({
             </button>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center gap-1.5 py-2 text-center">
+          <div className="flex flex-col items-center justify-center gap-1.5 py-2 text-center w-full h-full">
             <div className="flex h-9 w-9 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary transition-transform group-hover:scale-105">
               {isImage ? (
                 <ImageIcon size={18} aria-hidden="true" />

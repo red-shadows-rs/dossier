@@ -559,10 +559,20 @@ export function buildFooterTemplate(meta: {
 }): string {
   if (meta.kind === "invoice") {
     const isRtlDoc = meta.lang === "ar";
-    return `<div style="position: absolute; bottom: 0; left: 0; right: 0; width: 100%; height: 13mm; margin: 0; padding: 0 8mm; background-color: #e11d48; -webkit-print-color-adjust: exact; color: #ffffff; font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 8pt; font-weight: 700; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; direction: ${isRtlDoc ? "rtl" : "ltr"};">
-      <span dir="ltr">Dossier</span>
-      <span dir="ltr"><span class="pageNumber"></span> / <span class="totalPages"></span></span>
-    </div>`;
+    return `
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+</style>
+<div style="position: absolute; bottom: -2mm; left: -5mm; width: calc(100% + 10mm); height: 17mm; margin: 0; padding: 0 calc(8mm + 5mm); background-color: #e11d48; -webkit-print-color-adjust: exact; color: #ffffff; font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 8pt; font-weight: 700; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; direction: ${isRtlDoc ? "rtl" : "ltr"};">
+  <span dir="ltr">Dossier</span>
+  <span dir="ltr"><span class="pageNumber"></span> / <span class="totalPages"></span></span>
+</div>`;
   }
   const grouped = meta.code
     ? meta.code

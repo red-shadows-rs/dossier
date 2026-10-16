@@ -28,6 +28,7 @@ async function renderOnce(html: string, footer: FooterMeta): Promise<Buffer> {
     const isInvoice = footer.kind === "invoice";
     const pdf = await page.pdf({
       format: "A4",
+      preferCSSPageSize: true,
       printBackground: true,
       displayHeaderFooter: true,
       headerTemplate: "<div style=\"font-size:0;height:0;margin:0;padding:0;display:none;\"></div>",
