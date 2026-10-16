@@ -214,6 +214,42 @@ function handleFailure(row: OutboxRow, error: unknown, now: number): void {
   });
 }
 
+export function resolveSenderFrom(
+  rawConfiguredFrom: string | undefined,
+  fromNameSetting?: string | null,
+  companyName?: string | null,
+): string {
+  const raw = (rawConfiguredFrom ?? "").trim();
+  let extractedName = "";
+  let extractedEmail = raw;
+
+  const angleMatch = raw.match(/^(.*?)(?:<([^>]+)>)?$/);
+  if (angleMatch && angleMatch[2]) {
+    extractedName = (angleMatch[1] || "").trim().replace(/^["']|["']$/g, "");
+    extractedEmail = angleMatch[2].trim();
+  } else {
+    extractedEmail = raw.replace(/[<>"]/g, "").trim();
+  }
+
+  if (!extractedEmail || !extractedEmail.includes("@")) {
+    extractedEmail =
+      extractedEmail && extractedEmail !== ""
+        ? extractedEmail
+        : "no-reply@localhost";
+  }
+
+  const displayName =
+    fromNameSetting?.trim() ||
+    extractedName ||
+    companyName?.trim() ||
+    "Dossier";
+
+  const cleanDisplayName =
+    displayName.replace(/["\r\n]/g, "").trim() || "Dossier";
+
+  return `"${cleanDisplayName}" <${extractedEmail}>`;
+}
+
 async function deliver(
   row: OutboxRow,
   sender: MailSender,
@@ -231,8 +267,11 @@ async function deliver(
     const company = getSettings("company");
     const companyName = company.nameEn || company.nameAr || "Dossier";
     const emailSettings = getSettings("email");
-    const fromName = emailSettings.fromName || companyName;
-    const fromAddress = env.SMTP_FROM ?? "no-reply@localhost";
+    const from = resolveSenderFrom(
+      env.SMTP_FROM,
+      emailSettings.fromName,
+      companyName,
+    );
     const payload = parsePayload(row.payloadJson);
 
     const rendered = renderEmail(
@@ -245,7 +284,7 @@ async function deliver(
     const attachments = await loadAttachments(payload, deps);
 
     await sender.sendMail({
-      from: `${fromName} <${fromAddress}>`,
+      from,
       to: row.toEmail,
       subject: rendered.subject,
       text: rendered.text,

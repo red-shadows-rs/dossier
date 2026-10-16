@@ -100,34 +100,6 @@ describe("projectInputSchema", () => {
     ).toBe(true);
   });
 
-  it("accepts and validates the task-board reference", () => {
-    const ok = projectInputSchema.safeParse({
-      clientId: "c1",
-      nameEn: "Store",
-      currency: "SAR",
-      taskboardRef: "  PROJ-42  ",
-    });
-    expect(ok.success).toBe(true);
-    if (ok.success) expect(ok.data.taskboardRef).toBe("PROJ-42");
-
-    const empty = projectInputSchema.safeParse({
-      clientId: "c1",
-      nameEn: "Store",
-      currency: "SAR",
-      taskboardRef: "   ",
-    });
-    expect(empty.success).toBe(true);
-    if (empty.success) expect(empty.data.taskboardRef).toBeNull();
-
-    const tooLong = projectInputSchema.safeParse({
-      clientId: "c1",
-      nameEn: "Store",
-      currency: "SAR",
-      taskboardRef: "x".repeat(201),
-    });
-    expect(tooLong.success).toBe(false);
-  });
-
   it("rejects an end date before the start date", () => {
     const bad = projectInputSchema.safeParse({
       clientId: "c1",
@@ -185,16 +157,6 @@ describe("createProject", () => {
     expect(() => createProject(user, input("missing"), META)).toThrow(AppError);
   });
 
-  it("persists the task-board reference", async () => {
-    const user = await sessionUser();
-    const clientId = makeClient();
-    const created = createProject(
-      user,
-      input(clientId, { taskboardRef: "PROJ-42" }),
-      META,
-    );
-    expect(getProject(created.id).taskboardRef).toBe("PROJ-42");
-  });
 });
 
 describe("listProjects", () => {

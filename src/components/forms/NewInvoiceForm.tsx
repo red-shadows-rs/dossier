@@ -10,7 +10,7 @@ import { Field } from "@/components/ui/Field";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { useToast } from "@/components/ui/Toast";
-import { INVOICE_LANG_MODES } from "@/lib/constants";
+import { CURRENCIES, INVOICE_LANG_MODES } from "@/lib/constants";
 import { createInvoiceAction } from "@/server/actions/invoices";
 
 export function NewInvoiceForm({
@@ -38,6 +38,7 @@ export function NewInvoiceForm({
     setStatusError(null);
     const result = await createInvoiceAction({
       projectId,
+      currency: String(data.get("currency") ?? "SAR"),
       languageMode: String(data.get("languageMode") ?? "ar"),
       notesAr: String(data.get("notesAr") ?? ""),
       notesEn: String(data.get("notesEn") ?? ""),
@@ -100,6 +101,20 @@ export function NewInvoiceForm({
                 {INVOICE_LANG_MODES.map((value) => (
                   <option key={value} value={value}>
                     {t(`invoices.languageModes.${value}`)}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <Field label={t("invoices.currency")} htmlFor="ni-currency">
+              <Select
+                id="ni-currency"
+                name="currency"
+                defaultValue="SAR"
+                disabled={pending}
+              >
+                {Object.keys(CURRENCIES).map((code) => (
+                  <option key={code} value={code}>
+                    {code}
                   </option>
                 ))}
               </Select>

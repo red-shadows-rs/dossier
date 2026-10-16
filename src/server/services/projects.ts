@@ -170,7 +170,6 @@ export function createProject(
         endDate: input.endDate,
         budgetMinor: input.budgetMinor,
         currency: input.currency,
-        taskboardRef: input.taskboardRef,
         notes: input.notes,
         createdBy: user.id,
         createdAt: now,
@@ -220,7 +219,6 @@ export function updateProject(
         endDate: input.endDate,
         budgetMinor: input.budgetMinor,
         currency: input.currency,
-        taskboardRef: input.taskboardRef,
         notes: input.notes,
         updatedAt: now,
       })

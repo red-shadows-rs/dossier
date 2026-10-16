@@ -27,7 +27,6 @@ export type ProjectFormValues = {
   endDate: string;
   budget: string;
   currency: string;
-  taskboardRef: string;
   notes: string;
 };
 
@@ -229,20 +228,6 @@ export function ProjectForm({
                 </option>
               ))}
             </Select>
-          </Field>
-          <Field
-            label={t("projects.taskboardRef")}
-            htmlFor="project-taskboard"
-            error={fieldError("taskboardRef")}
-          >
-            <Input
-              id="project-taskboard"
-              name="taskboardRef"
-              dir="ltr"
-              defaultValue={initial.taskboardRef}
-              disabled={pending}
-              className="text-start"
-            />
           </Field>
           <Field
             label={t("projects.description")}

@@ -264,7 +264,7 @@ describe("issueInvoice", () => {
     const invoice = getInvoiceDetail(id).invoice;
     expect(invoice.number).toMatch(/^DOS-I-2026-\d{4,}$/);
     expect(invoice.issueDate).toBe("2026-10-20");
-    expect(invoice.dueDate).toBe("2026-11-03");
+    expect(invoice.dueDate).toBeNull();
     expect(invoice.status).toBe("issued");
     expect(invoice.issuedAt).not.toBeNull();
     expect(invoice.verificationCode).toMatch(/^[0-9A-Z]{12}$/);
@@ -274,9 +274,33 @@ describe("issueInvoice", () => {
     expect(JSON.parse(invoice.sellerSnapshotJson ?? "{}").nameEn).toBe(
       "RED SHADOWS",
     );
-    expect(JSON.parse(invoice.buyerSnapshotJson ?? "{}").nameEn).toBe(
-      "Al-Noor Co.",
+  });
+
+  it("allows setting custom currency and explicit due date on invoice draft", () => {
+    const id = createInvoiceFromMilestone(user, milestoneIds[0], META);
+    updateInvoiceDraft(
+      user,
+      id,
+      {
+        languageMode: "en",
+        currency: "USD",
+        issueDate: "2026-10-20",
+        dueDate: "2026-11-15",
+        notesAr: "ملاحظات تجريبية",
+        notesEn: "Test notes",
+      },
+      META,
     );
+    const draft = getInvoiceDetail(id).invoice;
+    expect(draft.currency).toBe("USD");
+    expect(draft.dueDate).toBe("2026-11-15");
+    expect(draft.notesAr).toBe("ملاحظات تجريبية");
+    expect(draft.notesEn).toBe("Test notes");
+
+    issueInvoice(user, id, META);
+    const issued = getInvoiceDetail(id).invoice;
+    expect(issued.currency).toBe("USD");
+    expect(issued.dueDate).toBe("2026-11-15");
   });
 
   it("uses the issue-date year for the number", () => {

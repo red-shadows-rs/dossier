@@ -305,6 +305,14 @@ export default async function ContractDetailPage({
                 />
                 <Row label={t("endDate")} value={contract.endDate ?? "-"} ltr icon={Calendar} />
               </dl>
+              {contract.internalNotes ? (
+                <div className="flex flex-col gap-1 border-t border-border/40 pt-3">
+                  <span className="text-xs font-medium text-muted-foreground">{t("internalNotes")}</span>
+                  <p className="rounded border border-border/60 bg-muted/20 p-3 text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+                    {contract.internalNotes}
+                  </p>
+                </div>
+              ) : null}
             </CardContent>
           </Card>
 

@@ -46,10 +46,21 @@ function shell(
 ): string {
   const dir = locale === "ar" ? "rtl" : "ltr";
   const align = locale === "ar" ? "right" : "left";
+  const fontStack =
+    locale === "ar"
+      ? "'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans Arabic', 'Geeza Pro', Arial, sans-serif"
+      : "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+
   const footer =
     locale === "ar"
-      ? `أرسلت من ${escapeHtml(companyName)}`
-      : `Sent by ${escapeHtml(companyName)}`;
+      ? `أرسلت من ${escapeHtml(companyName)} عبر نظام Dossier`
+      : `Sent by ${escapeHtml(companyName)} via Dossier`;
+
+  const footerTagline =
+    locale === "ar"
+      ? "نظام Dossier لإدارة الفواتير والعقود الرقمية"
+      : "Dossier — Digital Invoicing & Contracts Management";
+
   return `<!doctype html>
 <html dir="${dir}" lang="${locale}">
 <head>
@@ -57,16 +68,71 @@ function shell(
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(companyName)}</title>
 </head>
-<body style="margin:0;padding:0;background:#f4f4f5;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:24px 0;">
+<body style="margin:0;padding:0;background-color:#f4f4f5;font-family:${fontStack};-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f5;padding:32px 12px;">
 <tr><td align="center">
-<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:8px;overflow:hidden;">
-<tr><td style="padding:32px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.7;color:#18181b;direction:${dir};text-align:${align};">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border:1px solid #e4e4e7;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.06);">
+  <!-- Brand Header -->
+  <tr>
+    <td style="background-color:#14141a;padding:16px 24px;border-bottom:3px solid #e11d48;direction:${dir};">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <!-- Project Logo & Name -->
+          <td align="${align}" style="vertical-align:middle;">
+            <table role="presentation" cellpadding="0" cellspacing="0" style="display:inline-table;">
+              <tr>
+                <td style="vertical-align:middle;padding:0;line-height:0;">
+                  <img src="https://dossier.red-shadows-rs.com/apple-touch-icon.png" width="28" height="28" alt="Dossier" style="display:block;width:28px;height:28px;border-radius:6px;border:0;outline:0;text-decoration:none;" />
+                </td>
+                <td style="vertical-align:middle;padding-${locale === "ar" ? "right" : "left"}:10px;">
+                  <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:16px;font-weight:700;color:#ffffff;letter-spacing:0.3px;line-height:1;">Dossier</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+
+          <!-- Company Logo & Name -->
+          <td align="${locale === "ar" ? "left" : "right"}" style="vertical-align:middle;">
+            <table role="presentation" cellpadding="0" cellspacing="0" style="display:inline-table;direction:ltr;">
+              <tr>
+                <td style="vertical-align:middle;padding:0;line-height:0;">
+                  <img src="https://dossier.red-shadows-rs.com/red-shadows-logo.png" width="35" height="24" alt="RED SHADOWS" style="display:block;width:35px;height:24px;border:0;outline:0;text-decoration:none;" />
+                </td>
+                <td style="vertical-align:middle;padding-left:10px;">
+                  <span style="font-family:${fontStack};font-size:14px;font-weight:700;color:#ffffff;letter-spacing:0.5px;line-height:1;">${escapeHtml(companyName)}</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Main Content Body -->
+  <tr>
+    <td style="padding:32px 28px;font-family:${fontStack};font-size:15px;line-height:1.7;color:#18181b;direction:${dir};text-align:${align};">
 ${inner}
-</td></tr>
-<tr><td style="padding:16px 32px;border-top:1px solid #e4e4e7;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#71717a;direction:${dir};text-align:${align};">
-${footer}
-</td></tr>
+    </td>
+  </tr>
+
+  <!-- Branded Footer -->
+  <tr>
+    <td style="padding:20px 28px;background-color:#fafafa;border-top:1px solid #e4e4e7;font-family:${fontStack};direction:${dir};text-align:${align};">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="${align}">
+            <div style="font-size:13px;font-weight:500;color:#52525b;margin-bottom:4px;">
+              ${footer}
+            </div>
+            <div style="font-size:11px;color:#a1a1aa;">
+              ${footerTagline}
+            </div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
 </table>
 </td></tr>
 </table>
@@ -75,13 +141,76 @@ ${footer}
 }
 
 function button(url: string, label: string): string {
-  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0;"><tr><td style="border-radius:6px;background:#18181b;">
-<a href="${escapeHtml(url)}" style="display:inline-block;padding:12px 24px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#ffffff;text-decoration:none;">${escapeHtml(label)}</a>
+  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0;"><tr><td style="border-radius:6px;background-color:#e11d48;">
+<a href="${escapeHtml(url)}" style="display:inline-block;padding:12px 28px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:6px;background-color:#e11d48;">${escapeHtml(label)}</a>
 </td></tr></table>`;
 }
 
 function codeBlock(code: string): string {
-  return `<p style="margin:16px 0;font-family:'Courier New',monospace;font-size:28px;font-weight:bold;letter-spacing:6px;">${escapeHtml(code)}</p>`;
+  return `<div style="margin:20px 0;padding:18px;background-color:#f4f4f5;border:1px dashed #d4d4d8;border-radius:8px;text-align:center;">
+<span style="font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:32px;font-weight:bold;letter-spacing:8px;color:#18181b;">${escapeHtml(code)}</span>
+</div>`;
+}
+
+function renderBankCard(bankLine: string, locale: Locale): string {
+  if (!bankLine) return "";
+  const ar = locale === "ar";
+  const parts = bankLine
+    .split(/\r?\n|\|/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const title = ar ? "بيانات الحساب البنكي للسداد" : "Bank Transfer Details";
+
+  const rowsHtml = parts
+    .map((part) => {
+      const isIban = /IBAN|الآيبان|آيبان/i.test(part);
+      const isSwift = /SWIFT|سويفت/i.test(part);
+      const colonIdx = part.indexOf(":");
+
+      if (isIban) {
+        if (colonIdx !== -1) {
+          const lbl = part.slice(0, colonIdx + 1);
+          const val = part.slice(colonIdx + 1).trim();
+          return `<div style="margin:8px 0;padding:8px 12px;background:#ffffff;border:1px solid #e4e4e7;border-radius:6px;font-size:13px;direction:${
+            ar ? "rtl" : "ltr"
+          };text-align:${ar ? "right" : "left"};"><span style="color:#71717a;font-weight:500;">${escapeHtml(
+            lbl,
+          )}</span> <strong dir="ltr" style="font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;color:#18181b;letter-spacing:1px;margin:0 4px;">${escapeHtml(
+            val,
+          )}</strong></div>`;
+        }
+        return `<div style="margin:8px 0;padding:8px 12px;background:#ffffff;border:1px solid #e4e4e7;border-radius:6px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px;font-weight:600;color:#18181b;direction:ltr;text-align:${
+          ar ? "right" : "left"
+        };">${escapeHtml(part)}</div>`;
+      }
+
+      if (isSwift && colonIdx !== -1) {
+        const lbl = part.slice(0, colonIdx + 1);
+        const val = part.slice(colonIdx + 1).trim();
+        return `<div style="margin:4px 0;font-size:13px;color:#3f3f46;direction:${
+          ar ? "rtl" : "ltr"
+        };text-align:${ar ? "right" : "left"};"><span style="color:#71717a;">${escapeHtml(
+          lbl,
+        )}</span> <strong dir="ltr" style="font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;color:#18181b;">${escapeHtml(
+          val,
+        )}</strong></div>`;
+      }
+
+      return `<div style="margin:4px 0;font-size:13px;color:#3f3f46;direction:${
+        ar ? "rtl" : "ltr"
+      };text-align:${ar ? "right" : "left"};">${escapeHtml(part)}</div>`;
+    })
+    .join("\n");
+
+  return `<div style="margin:20px 0;padding:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;direction:${
+    ar ? "rtl" : "ltr"
+  };text-align:${ar ? "right" : "left"};">
+<div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">${escapeHtml(
+    title,
+  )}</div>
+${rowsHtml}
+</div>`;
 }
 
 function renderSigningLink(
@@ -120,14 +249,17 @@ function renderSigningLink(
   const html = shell(
     locale,
     [
-      `<p style="margin:0 0 16px;">${escapeHtml(greetingRaw)}</p>`,
-      `<p style="margin:0 0 16px;">${escapeHtml(leadRaw)}</p>`,
-      `<p style="margin:0 0 8px;font-weight:bold;">${escapeHtml(title)} (${escapeHtml(number)})</p>`,
+      `<div style="font-size:16px;font-weight:600;color:#18181b;margin-bottom:12px;">${escapeHtml(greetingRaw)}</div>`,
+      `<div style="font-size:14px;color:#52525b;margin-bottom:20px;line-height:1.6;">${escapeHtml(leadRaw)}</div>`,
+      `<div style="background:#fcfcfc;border:1px solid #e4e4e7;border-radius:10px;padding:18px 20px;margin-bottom:20px;">`,
+      `  <div style="font-size:15px;font-weight:700;color:#18181b;margin-bottom:8px;">${escapeHtml(title)} <span style="display:inline-block;background:#18181b;color:#ffffff;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:3px 8px;border-radius:4px;letter-spacing:0.5px;margin-right:6px;margin-left:6px;">${escapeHtml(number)}</span></div>`,
+      `  <div style="font-size:13px;color:#71717a;">${ar ? "يرجى الضغط على الزر أدناه لمعاينة بنود العقد والتوقيع عليه إلكترونياً." : "Please click the button below to review the contract terms and sign electronically."}</div>`,
+      `</div>`,
       button(url, ar ? "المراجعة والتوقيع" : "Review and sign"),
       validRaw
-        ? `<p style="margin:0 0 8px;color:#71717a;font-size:13px;">${escapeHtml(validRaw)}</p>`
+        ? `<div style="margin:16px 0 8px;color:#71717a;font-size:13px;">⏱ ${escapeHtml(validRaw)}</div>`
         : "",
-      `<p style="margin:0;color:#71717a;font-size:13px;">${escapeHtml(ignoreRaw)}</p>`,
+      `<div style="margin:0;color:#a1a1aa;font-size:12px;">${escapeHtml(ignoreRaw)}</div>`,
     ]
       .filter(Boolean)
       .join("\n"),
@@ -174,11 +306,11 @@ function renderOtp(
   const html = shell(
     locale,
     [
-      `<p style="margin:0 0 16px;">${escapeHtml(greetingRaw)}</p>`,
-      `<p style="margin:0 0 8px;">${escapeHtml(leadRaw)}</p>`,
+      `<div style="font-size:16px;font-weight:600;color:#18181b;margin-bottom:12px;">${escapeHtml(greetingRaw)}</div>`,
+      `<div style="font-size:14px;color:#52525b;margin-bottom:12px;">${escapeHtml(leadRaw)}</div>`,
       codeBlock(otp),
-      `<p style="margin:0 0 8px;color:#71717a;font-size:13px;">${escapeHtml(expiresRaw)}</p>`,
-      `<p style="margin:0;color:#71717a;font-size:13px;">${escapeHtml(shareRaw)}</p>`,
+      `<div style="margin:16px 0 6px;color:#71717a;font-size:13px;">⏱ ${escapeHtml(expiresRaw)}</div>`,
+      `<div style="margin:0;color:#e11d48;font-size:13px;font-weight:500;">🔒 ${escapeHtml(shareRaw)}</div>`,
     ].join("\n"),
     companyName,
   );
@@ -214,18 +346,22 @@ function renderSignedCopy(
       : `Verification code: ${code}`
     : "";
 
+  const attachmentNote = ar
+    ? "تم إرفاق النسخة الرسمية الموقعة (PDF) مع هذا البريد."
+    : "The official signed copy (PDF) is attached to this email.";
+
   const html = shell(
     locale,
     [
-      `<p style="margin:0 0 16px;">${escapeHtml(greetingRaw)}</p>`,
-      `<p style="margin:0 0 16px;">${escapeHtml(leadRaw)}</p>`,
-      `<p style="margin:0 0 8px;font-weight:bold;">${escapeHtml(title)} (${escapeHtml(number)})</p>`,
-      verifyRaw
-        ? `<p style="margin:0 0 8px;color:#71717a;font-size:13px;">${escapeHtml(verifyRaw)}</p>`
-        : "",
-      url
-        ? `<p style="margin:0;color:#71717a;font-size:13px;" dir="ltr">${escapeHtml(url)}</p>`
-        : "",
+      `<div style="font-size:16px;font-weight:600;color:#18181b;margin-bottom:12px;">${escapeHtml(greetingRaw)}</div>`,
+      `<div style="display:inline-block;background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-size:13px;font-weight:600;padding:6px 12px;border-radius:6px;margin-bottom:16px;">✓ ${escapeHtml(leadRaw)}</div>`,
+      `<div style="background:#fcfcfc;border:1px solid #e4e4e7;border-radius:10px;padding:18px 20px;margin-bottom:20px;">`,
+      `  <div style="font-size:15px;font-weight:700;color:#18181b;margin-bottom:8px;">${escapeHtml(title)} <span style="display:inline-block;background:#18181b;color:#ffffff;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:3px 8px;border-radius:4px;letter-spacing:0.5px;margin-right:6px;margin-left:6px;">${escapeHtml(number)}</span></div>`,
+      verifyRaw ? `  <div style="font-size:13px;color:#52525b;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">${escapeHtml(verifyRaw)}</div>` : "",
+      `</div>`,
+      url ? button(url, ar ? "معاينة العقد" : "View Contract") : "",
+      url ? `<div style="margin:12px 0;font-size:12px;color:#71717a;" dir="ltr"><a href="${escapeHtml(url)}" style="color:#71717a;text-decoration:none;">${escapeHtml(url)}</a></div>` : "",
+      `<div style="background:#f4f4f5;border-radius:6px;padding:10px 14px;font-size:13px;color:#52525b;margin-top:16px;">📎 ${escapeHtml(attachmentNote)}</div>`,
     ]
       .filter(Boolean)
       .join("\n"),
@@ -272,12 +408,12 @@ function renderDeclinedNotice(
   const html = shell(
     locale,
     [
-      `<p style="margin:0 0 16px;">${escapeHtml(greetingRaw)}</p>`,
-      `<p style="margin:0 0 8px;font-weight:bold;">${escapeHtml(title)} (${escapeHtml(number)})</p>`,
-      `<p style="margin:0 0 8px;">${escapeHtml(whoRaw)}</p>`,
-      reasonRaw
-        ? `<p style="margin:0;color:#71717a;font-size:13px;">${escapeHtml(reasonRaw)}</p>`
-        : "",
+      `<div style="font-size:16px;font-weight:600;color:#18181b;margin-bottom:12px;">${escapeHtml(greetingRaw)}</div>`,
+      `<div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:10px;padding:18px 20px;margin-bottom:20px;">`,
+      `  <div style="font-size:15px;font-weight:700;color:#9f1239;margin-bottom:8px;">${escapeHtml(title)} <span style="display:inline-block;background:#be123c;color:#ffffff;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:3px 8px;border-radius:4px;letter-spacing:0.5px;margin-right:6px;margin-left:6px;">${escapeHtml(number)}</span></div>`,
+      `  <div style="font-size:14px;color:#881337;font-weight:500;margin-bottom:6px;">${escapeHtml(whoRaw)}</div>`,
+      reasonRaw ? `  <div style="font-size:13px;color:#9f1239;">${escapeHtml(reasonRaw)}</div>` : "",
+      `</div>`,
     ]
       .filter(Boolean)
       .join("\n"),
@@ -322,21 +458,45 @@ function renderInvoiceIssued(
       : `Due date: ${dueDate}`
     : "";
 
+  const bankCardHtml = renderBankCard(bankLine, locale);
+  const attachmentNote = ar
+    ? "تم إرفاق نسخة الفاتورة الرسمية (PDF) مع هذا البريد."
+    : "The official invoice (PDF) is attached to this email.";
+
   const html = shell(
     locale,
     [
-      `<p style="margin:0 0 16px;">${escapeHtml(greetingRaw)}</p>`,
-      `<p style="margin:0 0 8px;">${escapeHtml(leadRaw)}</p>`,
-      `<p style="margin:0 0 8px;font-weight:bold;">${escapeHtml(number)}</p>`,
-      amountRaw
-        ? `<p style="margin:0 0 8px;">${escapeHtml(amountRaw)}</p>`
+      `<div style="font-size:16px;font-weight:600;color:#18181b;margin-bottom:12px;">${escapeHtml(greetingRaw)}</div>`,
+      `<div style="font-size:14px;color:#52525b;margin-bottom:20px;line-height:1.6;">${escapeHtml(leadRaw)}</div>`,
+      `<div style="background:#fcfcfc;border:1px solid #e4e4e7;border-radius:10px;padding:20px;margin-bottom:20px;">`,
+      `  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">`,
+      `    <tr>`,
+      `      <td align="${ar ? "right" : "left"}" style="vertical-align:middle;">`,
+      `        <span style="display:inline-block;background:#18181b;color:#ffffff;font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;padding:5px 12px;border-radius:6px;letter-spacing:0.5px;">${escapeHtml(number)}</span>`,
+      `      </td>`,
+      dueDate
+        ? `      <td align="${ar ? "left" : "right"}" style="vertical-align:middle;font-size:13px;color:#71717a;">` +
+          `        <span style="color:#a1a1aa;">${ar ? "تاريخ الاستحقاق:" : "Due date:"}</span> <strong style="color:#18181b;">${escapeHtml(dueDate)}</strong>` +
+          `      </td>`
+        : `      <td align="${ar ? "left" : "right"}" style="vertical-align:middle;font-size:13px;color:#71717a;">` +
+          `        <span style="color:#a1a1aa;">${ar ? "تاريخ الاستحقاق:" : "Due date:"}</span> <strong style="color:#18181b;">—</strong>` +
+          `      </td>`,
+      `    </tr>`,
+      `  </table>`,
+      amount
+        ? [
+            `  <div style="background:#fff1f2;border:1px solid #ffe4e6;border-radius:8px;padding:16px;text-align:${ar ? "right" : "left"};">`,
+            `    <div style="font-size:12px;font-weight:700;color:#e11d48;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${ar ? "إجمالي المبلغ المستحق" : "Total Amount Due"}</div>`,
+            `    <div style="font-size:26px;font-weight:800;color:#be123c;line-height:1.2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${escapeHtml(amount)}</div>`,
+            `  </div>`,
+          ].join("\n")
         : "",
-      dueRaw
-        ? `<p style="margin:0 0 8px;">${escapeHtml(dueRaw)}</p>`
-        : "",
-      bankLine
-        ? `<p style="margin:0;color:#71717a;font-size:13px;">${escapeHtml(bankLine)}</p>`
-        : "",
+      `</div>`,
+      bankCardHtml,
+      `<div style="display:table;width:100%;box-sizing:border-box;background:#f4f4f5;border-radius:6px;padding:10px 14px;font-size:13px;color:#52525b;">`,
+      `  <span style="font-size:15px;${ar ? "margin-left:8px;" : "margin-right:8px;"}">📎</span>`,
+      `  <span>${escapeHtml(attachmentNote)}</span>`,
+      `</div>`,
     ]
       .filter(Boolean)
       .join("\n"),
@@ -367,6 +527,7 @@ function renderInvoiceOverdueReminder(
   const number = readText(payload, "number");
   const balance = readText(payload, "balanceFormatted");
   const dueDate = readText(payload, "dueDate");
+  const bankLine = readText(payload, "bankLine");
   const name = readText(payload, "recipientName");
 
   const subject = ar
@@ -388,25 +549,51 @@ function renderInvoiceOverdueReminder(
       : `Due date: ${dueDate}`
     : "";
 
+  const bankCardHtml = renderBankCard(bankLine, locale);
+
   const html = shell(
     locale,
     [
-      `<p style="margin:0 0 16px;">${escapeHtml(greetingRaw)}</p>`,
-      `<p style="margin:0 0 8px;">${escapeHtml(leadRaw)}</p>`,
-      `<p style="margin:0 0 8px;font-weight:bold;">${escapeHtml(number)}</p>`,
-      balanceRaw
-        ? `<p style="margin:0 0 8px;">${escapeHtml(balanceRaw)}</p>`
+      `<div style="font-size:16px;font-weight:600;color:#18181b;margin-bottom:12px;">${escapeHtml(greetingRaw)}</div>`,
+      `<div style="font-size:14px;color:#e11d48;font-weight:600;margin-bottom:20px;line-height:1.6;">⚠️ ${escapeHtml(leadRaw)}</div>`,
+      `<div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:10px;padding:20px;margin-bottom:20px;">`,
+      `  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">`,
+      `    <tr>`,
+      `      <td align="${ar ? "right" : "left"}" style="vertical-align:middle;">`,
+      `        <span style="display:inline-block;background:#be123c;color:#ffffff;font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;padding:5px 12px;border-radius:6px;letter-spacing:0.5px;">${escapeHtml(number)}</span>`,
+      `      </td>`,
+      dueDate
+        ? `      <td align="${ar ? "left" : "right"}" style="vertical-align:middle;font-size:13px;color:#9f1239;">` +
+          `        <span>${ar ? "تاريخ الاستحقاق:" : "Due date:"}</span> <strong>${escapeHtml(dueDate)}</strong>` +
+          `      </td>`
         : "",
-      dueRaw
-        ? `<p style="margin:0;color:#71717a;font-size:13px;">${escapeHtml(dueRaw)}</p>`
+      `    </tr>`,
+      `  </table>`,
+      balance
+        ? [
+            `  <div style="background:#ffffff;border:1px solid #fecdd3;border-radius:8px;padding:16px;text-align:${ar ? "right" : "left"};">`,
+            `    <div style="font-size:12px;font-weight:700;color:#9f1239;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${ar ? "الرصيد المستحق للسداد" : "Outstanding Balance Due"}</div>`,
+            `    <div style="font-size:26px;font-weight:800;color:#be123c;line-height:1.2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${escapeHtml(balance)}</div>`,
+            `  </div>`,
+          ].join("\n")
         : "",
+      `</div>`,
+      bankCardHtml,
     ]
       .filter(Boolean)
       .join("\n"),
     companyName,
   );
 
-  const text = [greetingRaw, "", leadRaw, number, balanceRaw, dueRaw]
+  const text = [
+    greetingRaw,
+    "",
+    leadRaw,
+    number,
+    balanceRaw,
+    dueRaw,
+    bankLine,
+  ]
     .filter((line) => line !== "")
     .join("\n");
 
@@ -426,12 +613,16 @@ function renderTestEmail(
   const bodyRaw = ar
     ? "هذه رسالة اختبار للتأكد من أن إعداد البريد الإلكتروني (SMTP) يعمل بنجاح."
     : "This is a test email confirming that your email (SMTP) configuration works.";
+  const noteRaw = ar
+    ? "إذا تلقيت هذه الرسالة، فهذا يعني أن نظام Dossier جاهز لإرسال الفواتير والعقود للعملاء."
+    : "If you received this email, the Dossier system is configured and ready to send invoices and contracts.";
 
   const html = shell(
     locale,
     [
-      `<p style="margin:0 0 16px;">${escapeHtml(greetingRaw)}</p>`,
-      `<p style="margin:0;">${escapeHtml(bodyRaw)}</p>`,
+      `<div style="font-size:16px;font-weight:600;color:#18181b;margin-bottom:12px;">${escapeHtml(greetingRaw)}</div>`,
+      `<div style="display:inline-block;background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-size:13px;font-weight:600;padding:6px 12px;border-radius:6px;margin-bottom:16px;">✓ ${escapeHtml(bodyRaw)}</div>`,
+      `<div style="background:#fcfcfc;border:1px solid #e4e4e7;border-radius:8px;padding:16px;color:#52525b;font-size:13px;line-height:1.6;">${escapeHtml(noteRaw)}</div>`,
     ].join("\n"),
     companyName,
   );

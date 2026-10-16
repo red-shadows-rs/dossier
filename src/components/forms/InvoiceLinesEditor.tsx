@@ -11,7 +11,7 @@ import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { useToast } from "@/components/ui/Toast";
-import { DISCOUNT_TYPES, type CurrencyCode } from "@/lib/constants";
+import { CURRENCIES, DISCOUNT_TYPES, type CurrencyCode } from "@/lib/constants";
 import { formatMoney, parseMajorToMinor } from "@/lib/money";
 import {
   previewInvoiceTotalsAction,
@@ -34,12 +34,14 @@ type Totals = {
   total: number;
 };
 
-function toRows(items: BuilderItem[]): Row[] {
+function toRows(items: BuilderItem[], currency: string): Row[] {
+  const exp = CURRENCIES[currency as CurrencyCode] ?? 2;
+  const factor = 10 ** exp;
   return items.map((item) => ({
     descriptionAr: item.descriptionAr,
     descriptionEn: item.descriptionEn,
     qty: String(item.qtyMilli / 1000),
-    unit: String(item.unitPriceMinor / 100),
+    unit: String(item.unitPriceMinor / factor),
   }));
 }
 
@@ -67,9 +69,11 @@ export function InvoiceLinesEditor({
   const t = useTranslations();
   const toast = useToast();
   const router = useRouter();
+  const currencyCode = currency as CurrencyCode;
+  const factor = 10 ** (CURRENCIES[currencyCode] ?? 2);
   const [rows, setRows] = useState<Row[]>(() =>
     initialLines.length > 0
-      ? toRows(initialLines)
+      ? toRows(initialLines, currency)
       : [{ descriptionAr: "", descriptionEn: "", qty: "1", unit: "" }],
   );
   const [discountType, setDiscountType] = useState(initialDiscount.type);
@@ -77,7 +81,7 @@ export function InvoiceLinesEditor({
     initialDiscount.type === "percent"
       ? String(initialDiscount.value / 100)
       : initialDiscount.type === "fixed"
-        ? String(initialDiscount.value / 100)
+        ? String(initialDiscount.value / factor)
         : "0",
   );
   const [taxPercent, setTaxPercent] = useState(String(initialTaxRateBp / 100));
@@ -85,7 +89,6 @@ export function InvoiceLinesEditor({
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const currencyCode = currency as CurrencyCode;
 
   const payload = useMemo(() => {
     const lines: {

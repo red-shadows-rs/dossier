@@ -43,6 +43,89 @@ export const PAYMENT_METHODS = [
   "cheque",
   "other",
 ] as const;
+
+export const BANK_PROVIDERS = [
+  {
+    id: "alrajhi",
+    nameAr: "مصرف الراجحي",
+    nameEn: "Al Rajhi Bank",
+    icon: "/assets/banks/alrajhi.svg",
+    color: "#221AFB",
+    type: "bank",
+    identifierLabelAr: "رقم الآيبان (IBAN)",
+    identifierLabelEn: "IBAN",
+    placeholder: "SA0000000000000000000000",
+  },
+  {
+    id: "snb",
+    nameAr: "البنك الأهلي",
+    nameEn: "SNB",
+    icon: "/assets/banks/snb.svg",
+    color: "#006C35",
+    type: "bank",
+    identifierLabelAr: "رقم الآيبان (IBAN)",
+    identifierLabelEn: "IBAN",
+    placeholder: "SA0000000000000000000000",
+  },
+  {
+    id: "barq",
+    nameAr: "محفظة برق",
+    nameEn: "Barq",
+    icon: "/assets/banks/barq.svg",
+    color: "#000000",
+    type: "wallet",
+    identifierLabelAr: "رقم المحفظة / الآيبان",
+    identifierLabelEn: "Wallet ID / IBAN",
+    placeholder: "رقم المحفظة أو الآيبان",
+  },
+  {
+    id: "stcpay",
+    nameAr: "stc pay",
+    nameEn: "stc pay",
+    icon: "/assets/banks/stcpay.svg",
+    color: "#4F008C",
+    type: "wallet",
+    identifierLabelAr: "رقم الجوال / الآيبان",
+    identifierLabelEn: "Mobile / IBAN",
+    placeholder: "05xxxxxxxx أو SA...",
+  },
+  {
+    id: "paypal",
+    nameAr: "بايبال",
+    nameEn: "PayPal",
+    icon: "/assets/banks/paypal.svg",
+    color: "#003087",
+    type: "gateway",
+    identifierLabelAr: "بريد PayPal الإلكتروني",
+    identifierLabelEn: "PayPal Email",
+    placeholder: "billing@red-shadows-rs.com",
+  },
+  {
+    id: "binance",
+    nameAr: "باينانس",
+    nameEn: "Binance",
+    icon: "/assets/banks/binance.svg",
+    color: "#F3BA2F",
+    type: "crypto",
+    identifierLabelAr: "Binance Pay ID / عنوان المحفظة (USDT)",
+    identifierLabelEn: "Binance Pay ID / USDT Address",
+    placeholder: "Pay ID أو عنوان المحفظة TRC20/BEP20",
+  },
+  {
+    id: "other",
+    nameAr: "حساب بنكي آخر",
+    nameEn: "Other Bank",
+    icon: null,
+    color: "#64748B",
+    type: "custom",
+    identifierLabelAr: "رقم الحساب / الآيبان",
+    identifierLabelEn: "Account / IBAN",
+    placeholder: "رقم الحساب أو الآيبان",
+  },
+] as const;
+
+export type BankProviderId = (typeof BANK_PROVIDERS)[number]["id"];
+
 export const SIGNATORY_ROLES = ["provider", "client"] as const;
 export const SIGNATORY_STATUSES = ["pending", "signed", "declined"] as const;
 export const SIGNATURE_METHODS = ["drawn", "typed"] as const;

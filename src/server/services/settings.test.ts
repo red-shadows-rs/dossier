@@ -150,6 +150,57 @@ describe("buildPaymentInstructions", () => {
       "البنك: بنك المثال | اسم صاحب الحساب: شركة | سويفت: XXXX",
     );
   });
+
+  it("builds multiple bank accounts instructions joined by newlines", () => {
+    const company = getSettings("company");
+    const text = buildPaymentInstructions(
+      {
+        ...company,
+        bankAccounts: [
+          {
+            id: "1",
+            provider: "alrajhi",
+            bankNameAr: "مصرف الراجحي",
+            bankNameEn: "Al Rajhi Bank",
+            accountHolder: "شركة الظلال الحمراء",
+            iban: "SA1234567890",
+            swift: "RJHISARI",
+            currency: "SAR",
+            isActive: true,
+            isPrimary: true,
+          },
+          {
+            id: "2",
+            provider: "paypal",
+            bankNameAr: "بايبال",
+            bankNameEn: "PayPal",
+            accountHolder: "Red Shadows",
+            iban: "billing@red-shadows-rs.com",
+            swift: "",
+            currency: "USD",
+            isActive: true,
+            isPrimary: false,
+          },
+          {
+            id: "3",
+            provider: "binance",
+            bankNameAr: "باينانس",
+            bankNameEn: "Binance",
+            accountHolder: "",
+            iban: "12345678",
+            swift: "",
+            currency: "USDT",
+            isActive: false, // inactive, should not appear
+            isPrimary: false,
+          },
+        ],
+      },
+      "ar",
+    );
+    expect(text).toContain("مصرف الراجحي | المستفيد: شركة الظلال الحمراء | الآيبان: SA1234567890 | سويفت: RJHISARI");
+    expect(text).toContain("بايبال | المستفيد: Red Shadows | حساب PayPal: billing@red-shadows-rs.com");
+    expect(text).not.toContain("باينانس");
+  });
 });
 
 describe("internal settings", () => {

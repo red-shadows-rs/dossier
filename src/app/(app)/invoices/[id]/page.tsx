@@ -6,7 +6,6 @@ import {
   Calendar,
   Clock,
   CreditCard,
-  ExternalLink,
   FileText,
   FolderKanban,
   ListOrdered,
@@ -40,7 +39,7 @@ import { can } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
 import { getInvoiceDetail, isOverdue } from "@/server/services/invoices";
 import { listPayments } from "@/server/services/payments";
-import { getSettings } from "@/server/services/settings";
+import { getSettings, buildPaymentInstructions } from "@/server/services/settings";
 import { smoothLoading } from "@/lib/smooth-loader";
 
 export default async function InvoiceDetailPage({
@@ -82,6 +81,13 @@ export default async function InvoiceDetailPage({
     100,
     Math.round((invoice.paidMinor / (invoice.totalMinor || 1)) * 100),
   );
+  const company = getSettings("company");
+  const fallbackInstructions = buildPaymentInstructions(company, locale);
+  const paymentInstructions =
+    (locale === "ar"
+      ? invoice.paymentInstructionsAr || invoice.paymentInstructionsEn
+      : invoice.paymentInstructionsEn || invoice.paymentInstructionsAr) ||
+    fallbackInstructions;
 
   return (
     <div className="flex flex-col gap-5 sm:gap-6">
@@ -109,10 +115,10 @@ export default async function InvoiceDetailPage({
                   </span>
                 </span>
               ) : null}
-              {invoice.dueDate ? (
-                <span className="inline-flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5" />
-                  <span>{t("dueDate")}:</span>
+              <span className="inline-flex items-center gap-1">
+                <Clock className="h-3.5 w-3.5" />
+                <span>{t("dueDate")}:</span>
+                {invoice.dueDate ? (
                   <span
                     dir="ltr"
                     className={`font-mono ${
@@ -123,8 +129,10 @@ export default async function InvoiceDetailPage({
                   >
                     {invoice.dueDate}
                   </span>
-                </span>
-              ) : null}
+                ) : (
+                  <span className="text-muted-foreground">{t("noDueDate")}</span>
+                )}
+              </span>
             </div>
           </div>
         </div>
@@ -253,6 +261,43 @@ export default async function InvoiceDetailPage({
               )}
             </CardContent>
           </Card>
+
+          {invoice.notesAr || invoice.notesEn || paymentInstructions ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="inline-flex items-center gap-2">
+                  <FileText size={18} className="text-primary" aria-hidden="true" />
+                  <span>{t("notes")}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4">
+                {invoice.notesAr ? (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs font-medium text-muted-foreground">{t("notesAr")}</span>
+                    <p className="rounded border border-border/60 bg-muted/20 p-3 text-sm text-foreground whitespace-pre-wrap leading-relaxed" dir="rtl">
+                      {invoice.notesAr}
+                    </p>
+                  </div>
+                ) : null}
+                {invoice.notesEn ? (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs font-medium text-muted-foreground">{t("notesEn")}</span>
+                    <p className="rounded border border-border/60 bg-muted/20 p-3 text-sm text-foreground whitespace-pre-wrap leading-relaxed" dir="ltr">
+                      {invoice.notesEn}
+                    </p>
+                  </div>
+                ) : null}
+                {paymentInstructions ? (
+                  <div className="flex flex-col gap-1 border-t border-border/40 pt-3">
+                    <span className="text-xs font-medium text-muted-foreground">{t("paymentInstructions")}</span>
+                    <p className="rounded border border-border/60 bg-muted/20 p-3 text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+                      {paymentInstructions}
+                    </p>
+                  </div>
+                ) : null}
+              </CardContent>
+            </Card>
+          ) : null}
         </div>
 
         <div className="flex flex-col gap-6 lg:col-span-4">
@@ -353,40 +398,44 @@ export default async function InvoiceDetailPage({
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
               {project ? (
-                <div className="flex flex-col gap-1 rounded border border-border bg-surface p-3">
-                  <span className="text-xs text-muted-foreground">
+                <div className="flex flex-col gap-1 rounded-lg border border-border/70 bg-card p-3 transition-colors hover:border-primary/40">
+                  <span className="text-xs font-medium text-muted-foreground">
                     {t("project")}
                   </span>
                   <Link
                     href={`/projects/${project.id}`}
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-foreground transition-colors hover:text-primary"
                   >
+                    <FolderKanban className="h-4 w-4 text-primary/70 shrink-0" aria-hidden="true" />
                     <span>
                       {(locale === "ar"
                         ? project.nameAr || project.nameEn
                         : project.nameEn || project.nameAr) ?? project.code}
                     </span>
-                    <ExternalLink className="h-3 w-3" />
+                    {project.code && (project.nameAr || project.nameEn) ? (
+                      <span className="font-mono text-xs text-muted-foreground font-normal" dir="ltr">
+                        ({project.code})
+                      </span>
+                    ) : null}
                   </Link>
                 </div>
               ) : null}
 
               {client ? (
-                <div className="flex flex-col gap-1 rounded border border-border bg-surface p-3">
-                  <span className="text-xs text-muted-foreground">
+                <div className="flex flex-col gap-1 rounded-lg border border-border/70 bg-card p-3 transition-colors hover:border-primary/40">
+                  <span className="text-xs font-medium text-muted-foreground">
                     {t("client")}
                   </span>
                   <Link
                     href={`/clients/${client.id}`}
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-foreground transition-colors hover:text-primary"
                   >
-                    <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+                    <Building2 className="h-4 w-4 text-primary/70 shrink-0" aria-hidden="true" />
                     <span>
                       {(locale === "ar"
                         ? client.nameAr || client.nameEn
                         : client.nameEn || client.nameAr) ?? ""}
                     </span>
-                    <ExternalLink className="h-3 w-3" />
                   </Link>
                 </div>
               ) : null}
@@ -395,6 +444,18 @@ export default async function InvoiceDetailPage({
                 <span>{t("currency")}</span>
                 <span className="font-mono font-semibold text-foreground">
                   {invoice.currency}
+                </span>
+              </div>
+              <div className="flex items-center justify-between px-1 text-xs text-muted-foreground">
+                <span>{t("languageMode")}</span>
+                <span className="font-semibold text-foreground">
+                  {t(`languageModes.${invoice.languageMode}`)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between px-1 text-xs text-muted-foreground">
+                <span>{t("dueDate")}</span>
+                <span className="font-semibold text-foreground">
+                  {invoice.dueDate ?? "—"}
                 </span>
               </div>
             </CardContent>

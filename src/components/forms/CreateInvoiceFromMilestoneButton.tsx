@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Receipt } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Tooltip } from "@/components/ui/Tooltip";
 import { useToast } from "@/components/ui/Toast";
 import { createInvoiceFromMilestoneAction } from "@/server/actions/invoices";
 
@@ -31,15 +32,18 @@ export function CreateInvoiceFromMilestoneButton({
   }
 
   return (
-    <Button
-      type="button"
-      size="sm"
-      onClick={onClick}
-      loading={pending}
-      className="gap-1.5"
-    >
-      <Receipt size={14} aria-hidden="true" />
-      <span>{t("createInvoice")}</span>
-    </Button>
+    <Tooltip content={t("createInvoice")}>
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        onClick={onClick}
+        loading={pending}
+        aria-label={t("createInvoice")}
+        className="flex h-8 w-8 items-center justify-center p-0 rounded border border-border/70 bg-card text-muted-foreground hover:bg-muted hover:text-foreground hover:border-primary/50 transition-all shadow-2xs"
+      >
+        <Receipt size={15} aria-hidden="true" />
+      </Button>
+    </Tooltip>
   );
 }

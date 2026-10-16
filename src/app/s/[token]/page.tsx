@@ -142,7 +142,7 @@ export default async function SigningPage({
           href={`/s/${token}/pdf?lang=${docLang}`}
           target="_blank"
           rel="noreferrer"
-          className="self-start text-sm text-primary underline"
+          className="self-start text-sm font-medium text-primary hover:text-primary/80 no-underline"
         >
           {t.downloadPdf}
         </a>

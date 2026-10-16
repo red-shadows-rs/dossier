@@ -1,5 +1,4 @@
 import { getTranslations } from "next-intl/server";
-import { BadgePercent, Globe, Scale } from "lucide-react";
 import {
   SettingsForm,
   type SettingsFieldDef,
@@ -129,19 +128,19 @@ export default async function DefaultsSettingsPage() {
     {
       title: t("regionalInfo"),
       description: t("regionalInfoDesc"),
-      icon: Globe,
+      icon: "globe",
       fields: regionalFields,
     },
     {
       title: t("financialTerms"),
       description: t("financialTermsDesc"),
-      icon: BadgePercent,
+      icon: "percent",
       fields: financialFields,
     },
     {
       title: t("legalInfo"),
       description: t("legalInfoDesc"),
-      icon: Scale,
+      icon: "scale",
       fields: legalFields,
     },
   ];

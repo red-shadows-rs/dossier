@@ -7,6 +7,7 @@ import { logger } from "@/lib/logger";
 import type { Locale } from "@/lib/constants";
 import {
   SETTINGS_SCHEMAS,
+  type BankAccount,
   type CompanySettings,
   type SettingsFor,
   type SettingsSection,
@@ -121,11 +122,78 @@ export function setInternalSetting(key: string, value: unknown): void {
   });
 }
 
+export function getCompanyBankAccounts(company: CompanySettings): BankAccount[] {
+  if (company.bankAccounts && company.bankAccounts.length > 0) {
+    return company.bankAccounts;
+  }
+  const bank = company.bank;
+  if (bank && (bank.iban || bank.bankNameAr || bank.bankNameEn)) {
+    return [
+      {
+        id: "default-bank",
+        provider: "other",
+        bankNameAr: bank.bankNameAr,
+        bankNameEn: bank.bankNameEn,
+        accountHolder: bank.accountHolder,
+        iban: bank.iban,
+        swift: bank.swift,
+        currency: "SAR",
+        isActive: true,
+        isPrimary: true,
+      },
+    ];
+  }
+  return [];
+}
+
 export function buildPaymentInstructions(
   company: CompanySettings,
   lang: Locale,
 ): string {
+  const accounts = (company.bankAccounts ?? []).filter((a) => a.isActive);
+
+  if (accounts.length > 0) {
+    return accounts
+      .map((acc) => {
+        const bankName =
+          lang === "ar"
+            ? acc.bankNameAr || acc.bankNameEn
+            : acc.bankNameEn || acc.bankNameAr;
+
+        let idLabel = lang === "ar" ? "الآيبان" : "IBAN";
+        if (acc.provider === "paypal") {
+          idLabel = lang === "ar" ? "حساب PayPal" : "PayPal Email";
+        } else if (acc.provider === "binance") {
+          idLabel = lang === "ar" ? "معرف باينانس / المحفظة" : "Binance Pay ID / Wallet";
+        } else if (acc.provider === "barq" || acc.provider === "stcpay") {
+          idLabel = lang === "ar" ? "رقم المحفظة / الجوال" : "Wallet / Mobile";
+        }
+
+        const parts: Array<string | null> = [
+          bankName ? bankName : null,
+          acc.accountHolder
+            ? lang === "ar"
+              ? `المستفيد: ${acc.accountHolder}`
+              : `Beneficiary: ${acc.accountHolder}`
+            : null,
+          acc.iban ? `${idLabel}: ${acc.iban}` : null,
+          acc.swift
+            ? lang === "ar"
+              ? `سويفت: ${acc.swift}`
+              : `SWIFT: ${acc.swift}`
+            : null,
+        ];
+        return parts.filter((part): part is string => part !== null).join(" | ");
+      })
+      .filter((line) => line.length > 0)
+      .join("\n");
+  }
+
+  // Fallback to legacy single bank
   const bank = company.bank;
+  if (!bank.bankNameAr && !bank.bankNameEn && !bank.iban) {
+    return "";
+  }
   if (lang === "ar") {
     const parts: Array<string | null> = [
       bank.bankNameAr ? `البنك: ${bank.bankNameAr}` : null,

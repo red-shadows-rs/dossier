@@ -15,6 +15,7 @@ export type DialogProps = {
   children?: ReactNode;
   footer?: ReactNode;
   className?: string;
+  maxWidth?: "xs" | "sm" | "md" | "lg" | "xl" | false;
 };
 
 export function Dialog({
@@ -25,6 +26,7 @@ export function Dialog({
   children,
   footer,
   className,
+  maxWidth = "sm",
 }: DialogProps) {
   const descriptionId = useId();
 
@@ -33,7 +35,7 @@ export function Dialog({
       open={open}
       onClose={onClose}
       fullWidth
-      maxWidth="sm"
+      maxWidth={maxWidth}
       className={className}
       aria-describedby={description ? descriptionId : undefined}
     >

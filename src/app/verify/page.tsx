@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
+import { ShieldCheck } from "lucide-react";
+import { Footer } from "@/components/layout/Footer";
+import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
+import { Logo } from "@/components/layout/Logo";
+import { ThemeSwitch } from "@/components/layout/ThemeSwitch";
 import { VerificationForm } from "@/components/forms/VerificationForm";
 import type { Locale } from "@/lib/constants";
 import { env } from "@/lib/env";
-import { isLocale, LOCALE_COOKIE } from "@/lib/i18n";
+import { isLocale, LOCALE_COOKIE, resolveTheme, THEME_COOKIE } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -26,20 +31,48 @@ export default async function VerifyPage({
   const sp = await searchParams;
   const store = await cookies();
   const locale = pickLocale(sp.lang, store.get(LOCALE_COOKIE)?.value);
+  const theme = resolveTheme(store.get(THEME_COOKIE)?.value);
   const messages = (await import(`../../../messages/${locale}.json`)).default;
   const t = messages.verification;
   const dir = locale === "ar" ? "rtl" : "ltr";
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <main
-        dir={dir}
-        className="mx-auto flex min-h-dvh w-full max-w-lg flex-col gap-4 p-6"
-      >
-        <h1 className="text-xl font-semibold text-foreground">{t.title}</h1>
-        <p className="text-sm text-muted-foreground">{t.subtitle}</p>
-        <VerificationForm initialCode={sp.code} />
-      </main>
+      <div className="flex min-h-dvh flex-col bg-background">
+        {/* Navigation Header */}
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border/60 bg-background/80 px-4 py-3 sm:px-8 backdrop-blur">
+          <Logo />
+          <div className="flex items-center gap-2">
+            <ThemeSwitch current={theme} />
+            <LocaleSwitch />
+          </div>
+        </header>
+
+        {/* Main Content Area */}
+        <main dir={dir} className="flex-1 px-4 py-8 sm:px-6 sm:py-12">
+          <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
+            {/* Hero Header */}
+            <div className="flex flex-col items-center text-center gap-2.5">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-8 ring-primary/5">
+                <ShieldCheck className="h-7 w-7" />
+              </div>
+              <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                {t.title}
+              </h1>
+              <p className="text-sm text-muted-foreground max-w-md">
+                {locale === "ar"
+                  ? "تحقق من صحة الفواتير والعقود الصادرة ومطابقتها للسجلات الرسمية المشفرة."
+                  : "Verify the authenticity and integrity of issued invoices and contracts against cryptographic records."}
+              </p>
+            </div>
+
+            <VerificationForm initialCode={sp.code} />
+          </div>
+        </main>
+
+        <Footer bordered={false} />
+      </div>
     </NextIntlClientProvider>
   );
 }
+

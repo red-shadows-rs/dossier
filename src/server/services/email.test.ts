@@ -8,6 +8,7 @@ import { saveFile } from "./files";
 import {
   claimOutboxRow,
   processOutbox,
+  resolveSenderFrom,
   type MailSender,
   type OutgoingMail,
 } from "./email-worker";
@@ -195,5 +196,42 @@ describe("claimOutboxRow (race safety)", () => {
     expect(claimOutboxRow(id)).toBe(1);
     expect(claimOutboxRow(id)).toBe(0);
     expect(getRow(id)?.status).toBe("sending");
+  });
+});
+
+describe("resolveSenderFrom", () => {
+  it("extracts clean address and formats RFC display name from env with brackets", () => {
+    expect(
+      resolveSenderFrom(
+        "Dossier <billing@red-shadows-rs.com>",
+        "Dossier",
+        "RED SHADOWS",
+      ),
+    ).toBe('"Dossier" <billing@red-shadows-rs.com>');
+  });
+
+  it("handles plain email address and uses custom fromName", () => {
+    expect(
+      resolveSenderFrom(
+        "billing@red-shadows-rs.com",
+        "My Custom Team",
+        "RED SHADOWS",
+      ),
+    ).toBe('"My Custom Team" <billing@red-shadows-rs.com>');
+  });
+
+  it("extracts display name from SMTP_FROM when fromNameSetting is empty", () => {
+    expect(
+      resolveSenderFrom("Dossier <billing@red-shadows-rs.com>", null, null),
+    ).toBe('"Dossier" <billing@red-shadows-rs.com>');
+  });
+
+  it("falls back to companyName and then Dossier", () => {
+    expect(
+      resolveSenderFrom("billing@red-shadows-rs.com", "", "Company Corp"),
+    ).toBe('"Company Corp" <billing@red-shadows-rs.com>');
+    expect(resolveSenderFrom(undefined, null, null)).toBe(
+      '"Dossier" <no-reply@localhost>',
+    );
   });
 });

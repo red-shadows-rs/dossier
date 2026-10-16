@@ -1,5 +1,4 @@
 import { getTranslations } from "next-intl/server";
-import { FileSignature, ScrollText } from "lucide-react";
 import {
   SettingsForm,
   type SettingsFieldDef,
@@ -59,13 +58,13 @@ export default async function SigningSettingsPage() {
     {
       title: t("signingSecurity"),
       description: t("signingSecurityDesc"),
-      icon: FileSignature,
+      icon: "signature",
       fields: policyFields,
     },
     {
       title: t("consentText"),
       description: t("consentTextDesc"),
-      icon: ScrollText,
+      icon: "scroll",
       fields: consentFields,
     },
   ];

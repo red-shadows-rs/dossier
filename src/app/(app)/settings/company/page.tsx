@@ -1,13 +1,14 @@
 import { getTranslations } from "next-intl/server";
-import { Building2, Landmark, Palette } from "lucide-react";
+import { Palette } from "lucide-react";
 import { ImageUploadField } from "@/components/forms/ImageUploadField";
+import { BankAccountsManager } from "@/components/forms/BankAccountsManager";
 import {
   SettingsForm,
   type SettingsFieldDef,
   type SettingsSectionDef,
   type SettingsValues,
 } from "@/components/forms/SettingsForm";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { can } from "@/lib/permissions";
 import {
   deleteLogoAction,
@@ -17,7 +18,7 @@ import {
   uploadStampAction,
 } from "@/server/actions/settings";
 import { requireUserPage } from "@/server/auth/require-user";
-import { getSettings } from "@/server/services/settings";
+import { getCompanyBankAccounts, getSettings } from "@/server/services/settings";
 import { smoothLoading } from "@/lib/smooth-loader";
 
 export default async function CompanySettingsPage() {
@@ -26,6 +27,7 @@ export default async function CompanySettingsPage() {
   const canWrite = can(user, "settings.write");
   const t = await getTranslations("settings");
   const company = getSettings("company");
+  const bankAccounts = getCompanyBankAccounts(company);
 
   const companyFields: SettingsFieldDef[] = [
     { kind: "text", name: "nameAr", label: t("fields.nameAr"), dir: "rtl" },
@@ -66,40 +68,11 @@ export default async function CompanySettingsPage() {
     },
   ];
 
-  const bankFields: SettingsFieldDef[] = [
-    {
-      kind: "text",
-      name: "bank.bankNameAr",
-      label: t("fields.bankNameAr"),
-      dir: "rtl",
-    },
-    {
-      kind: "text",
-      name: "bank.bankNameEn",
-      label: t("fields.bankNameEn"),
-      dir: "ltr",
-    },
-    {
-      kind: "text",
-      name: "bank.accountHolder",
-      label: t("fields.accountHolder"),
-    },
-    { kind: "text", name: "bank.iban", label: t("fields.iban"), dir: "ltr" },
-    { kind: "text", name: "bank.swift", label: t("fields.swift"), dir: "ltr" },
-  ];
-
   const sections: SettingsSectionDef[] = [
     {
       title: t("companyInfo"),
-      description: t("companyInfoDesc"),
-      icon: Building2,
+      icon: "building",
       fields: companyFields,
-    },
-    {
-      title: t("bankInfo"),
-      description: t("bankInfoDesc"),
-      icon: Landmark,
-      fields: bankFields,
     },
   ];
 
@@ -115,11 +88,6 @@ export default async function CompanySettingsPage() {
     website: company.website,
     addressAr: company.addressAr,
     addressEn: company.addressEn,
-    "bank.bankNameAr": company.bank.bankNameAr,
-    "bank.bankNameEn": company.bank.bankNameEn,
-    "bank.accountHolder": company.bank.accountHolder,
-    "bank.iban": company.bank.iban,
-    "bank.swift": company.bank.swift,
   };
 
   return (
@@ -130,7 +98,6 @@ export default async function CompanySettingsPage() {
             <Palette size={18} className="text-primary" aria-hidden="true" />
             <span>{t("branding")}</span>
           </CardTitle>
-          <CardDescription>{t("brandingDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -156,6 +123,11 @@ export default async function CompanySettingsPage() {
         sections={sections}
         values={values}
         action={updateCompanyAction}
+        disabled={!canWrite}
+      />
+
+      <BankAccountsManager
+        initialAccounts={bankAccounts}
         disabled={!canWrite}
       />
     </div>

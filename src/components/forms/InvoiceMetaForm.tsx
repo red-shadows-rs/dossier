@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { useToast } from "@/components/ui/Toast";
-import { INVOICE_LANG_MODES } from "@/lib/constants";
+import { CURRENCIES, INVOICE_LANG_MODES, type CurrencyCode } from "@/lib/constants";
 import { updateInvoiceDraftAction } from "@/server/actions/invoices";
 
 export function InvoiceMetaForm({
@@ -21,6 +21,7 @@ export function InvoiceMetaForm({
   id: string;
   initial: {
     languageMode: "ar" | "en" | "bilingual";
+    currency: CurrencyCode;
     issueDate: string;
     dueDate: string;
     notesAr: string;
@@ -31,6 +32,7 @@ export function InvoiceMetaForm({
   const toast = useToast();
   const router = useRouter();
   const [pending, setPending] = useState(false);
+  const [noDueDate, setNoDueDate] = useState(!initial.dueDate);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -39,8 +41,9 @@ export function InvoiceMetaForm({
     const result = await updateInvoiceDraftAction({
       id,
       languageMode: String(data.get("languageMode") ?? "bilingual"),
+      currency: String(data.get("currency") ?? initial.currency),
       issueDate: String(data.get("issueDate") ?? "") || null,
-      dueDate: String(data.get("dueDate") ?? "") || null,
+      dueDate: noDueDate ? null : String(data.get("dueDate") ?? "") || null,
       notesAr: String(data.get("notesAr") ?? ""),
       notesEn: String(data.get("notesEn") ?? ""),
     });
@@ -77,7 +80,20 @@ export function InvoiceMetaForm({
               ))}
             </Select>
           </Field>
-          <span />
+          <Field label={t("invoices.currency")} htmlFor="inv-currency">
+            <Select
+              id="inv-currency"
+              name="currency"
+              defaultValue={initial.currency}
+              disabled={pending}
+            >
+              {Object.keys(CURRENCIES).map((code) => (
+                <option key={code} value={code}>
+                  {code}
+                </option>
+              ))}
+            </Select>
+          </Field>
           <Field label={t("invoices.issueDate")} htmlFor="inv-issue">
             <Input
               id="inv-issue"
@@ -88,16 +104,28 @@ export function InvoiceMetaForm({
               className="text-start"
             />
           </Field>
-          <Field label={t("invoices.dueDate")} htmlFor="inv-due">
-            <Input
-              id="inv-due"
-              name="dueDate"
-              type="date"
-              defaultValue={initial.dueDate}
-              disabled={pending}
-              className="text-start"
-            />
-          </Field>
+          <div className="flex flex-col gap-1.5">
+            <Field label={t("invoices.dueDate")} htmlFor="inv-due">
+              <Input
+                id="inv-due"
+                name="dueDate"
+                type="date"
+                defaultValue={initial.dueDate}
+                disabled={pending || noDueDate}
+                className="text-start"
+              />
+            </Field>
+            <label className="inline-flex items-center gap-2 text-xs text-muted-foreground select-none cursor-pointer">
+              <input
+                type="checkbox"
+                checked={noDueDate}
+                onChange={(e) => setNoDueDate(e.target.checked)}
+                disabled={pending}
+                className="rounded border-border text-primary focus:ring-primary"
+              />
+              <span>{t("invoices.noDueDate")}</span>
+            </label>
+          </div>
           <Field label={t("invoices.notesAr")} htmlFor="inv-notes-ar">
             <Textarea
               id="inv-notes-ar"

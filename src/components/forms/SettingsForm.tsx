@@ -2,9 +2,27 @@
 
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
-import { Save, type LucideIcon } from "lucide-react";
+import {
+  Activity,
+  BadgePercent,
+  Bell,
+  Building2,
+  FileSignature,
+  FileText,
+  Globe,
+  Hash,
+  Landmark,
+  Mail,
+  Palette,
+  Save,
+  Scale,
+  ScrollText,
+  Shield,
+  Sliders,
+  type LucideIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
@@ -12,6 +30,41 @@ import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { useToast } from "@/components/ui/Toast";
 import type { ActionResult } from "@/lib/result";
+
+export type SettingsIconName =
+  | "building"
+  | "landmark"
+  | "palette"
+  | "globe"
+  | "percent"
+  | "scale"
+  | "hash"
+  | "signature"
+  | "scroll"
+  | "mail"
+  | "activity"
+  | "shield"
+  | "bell"
+  | "sliders"
+  | "fileText";
+
+const SETTINGS_ICONS: Record<SettingsIconName, LucideIcon> = {
+  building: Building2,
+  landmark: Landmark,
+  palette: Palette,
+  globe: Globe,
+  percent: BadgePercent,
+  scale: Scale,
+  hash: Hash,
+  signature: FileSignature,
+  scroll: ScrollText,
+  mail: Mail,
+  activity: Activity,
+  shield: Shield,
+  bell: Bell,
+  sliders: Sliders,
+  fileText: FileText,
+};
 
 export type SettingsFieldDef =
   | {
@@ -50,7 +103,7 @@ export type SettingsFieldDef =
 export type SettingsSectionDef = {
   title?: string;
   description?: string;
-  icon?: LucideIcon;
+  icon?: SettingsIconName;
   fields: SettingsFieldDef[];
 };
 
@@ -277,7 +330,7 @@ export function SettingsForm({
     <form onSubmit={onSubmit} className="flex flex-col gap-6">
       {sections ? (
         sections.map((section, idx) => {
-          const Icon = section.icon;
+          const Icon = section.icon ? SETTINGS_ICONS[section.icon] : null;
           return (
             <Card key={section.title ?? idx}>
               {section.title ? (
@@ -292,9 +345,6 @@ export function SettingsForm({
                     ) : null}
                     <span>{section.title}</span>
                   </CardTitle>
-                  {section.description ? (
-                    <CardDescription>{section.description}</CardDescription>
-                  ) : null}
                 </CardHeader>
               ) : null}
               <CardContent>

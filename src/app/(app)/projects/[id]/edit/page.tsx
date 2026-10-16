@@ -55,7 +55,6 @@ export default async function EditProjectPage({
             "en",
           ),
     currency: project.currency,
-    taskboardRef: project.taskboardRef ?? "",
     notes: project.notes ?? "",
   };
 

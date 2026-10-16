@@ -18,7 +18,7 @@ import {
   paymentMilestones,
   projects,
 } from "@/db/schema";
-import { addDays, nowMs, todayInTz } from "@/lib/dates";
+import { nowMs, todayInTz } from "@/lib/dates";
 import { AppError } from "@/lib/errors";
 import { generateCode, newId } from "@/lib/ids";
 import { formatMoney } from "@/lib/money";
@@ -327,7 +327,9 @@ export function createInvoice(
         status: "draft",
         languageMode:
           input.languageMode ?? (contract?.languageMode === "en" ? "en" : "ar"),
-        currency: project.currency,
+        currency: input.currency ?? project.currency,
+        issueDate: input.issueDate ?? null,
+        dueDate: input.dueDate ?? null,
         taxRateBp: contract?.taxRateBp ?? defaults.taxRateBp,
         discountType: "none",
         notesAr: input.notesAr,
@@ -456,15 +458,19 @@ export function updateInvoiceDraft(
   const now = nowMs();
   withTx((tx) => {
     assertDraft(tx, id);
+    const updateValues: Record<string, unknown> = {
+      languageMode: input.languageMode,
+      issueDate: input.issueDate,
+      dueDate: input.dueDate,
+      notesAr: input.notesAr,
+      notesEn: input.notesEn,
+      updatedAt: now,
+    };
+    if (input.currency) {
+      updateValues.currency = input.currency;
+    }
     tx.update(invoices)
-      .set({
-        languageMode: input.languageMode,
-        issueDate: input.issueDate,
-        dueDate: input.dueDate,
-        notesAr: input.notesAr,
-        notesEn: input.notesEn,
-        updatedAt: now,
-      })
+      .set(updateValues)
       .where(eq(invoices.id, id))
       .run();
     audit(tx, {
@@ -621,19 +627,9 @@ export function issueInvoice(
       }
     }
 
-    let paymentTermsDays = defaults.paymentTermsDays;
-    if (invoice.contractId) {
-      const contract = tx
-        .select()
-        .from(contracts)
-        .where(eq(contracts.id, invoice.contractId))
-        .get();
-      if (contract) paymentTermsDays = contract.paymentTermsDays;
-    }
-
     const issueDate = invoice.issueDate ?? today;
-    const dueDate = invoice.dueDate ?? addDays(issueDate, paymentTermsDays);
-    if (dueDate < issueDate) {
+    const dueDate = invoice.dueDate ?? null;
+    if (dueDate !== null && dueDate < issueDate) {
       throw new AppError(
         "VALIDATION_FAILED",
         "The due date cannot be before the issue date",

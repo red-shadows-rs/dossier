@@ -7,7 +7,6 @@ import {
   Clock,
   Coins,
   Compass,
-  ExternalLink,
   FileSpreadsheet,
   FileText,
   FolderKanban,
@@ -21,6 +20,7 @@ import {
 import { CreateInvoiceFromMilestoneButton } from "@/components/forms/CreateInvoiceFromMilestoneButton";
 import { ProjectActions } from "@/components/forms/ProjectActions";
 import { ProjectFiles } from "@/components/forms/ProjectFiles";
+import { ActionLink } from "@/components/ui/ActionLink";
 import {
   Badge,
   contractStatusTone,
@@ -41,11 +41,9 @@ import {
 import { cn } from "@/components/ui/cn";
 import type { CurrencyCode } from "@/lib/constants";
 import { formatInstant } from "@/lib/dates";
-import { env } from "@/lib/env";
 import { AppError } from "@/lib/errors";
 import { isLocale } from "@/lib/i18n";
 import { formatMoney } from "@/lib/money";
-import { resolveTaskboardUrl } from "@/lib/taskboard";
 import { can } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
 import { listProjectContracts } from "@/server/services/contracts";
@@ -117,10 +115,6 @@ export default async function ProjectDetailPage({
   const projectInvoices = listInvoices({ projectId: id, page: 1 }).rows;
   const attachments = listProjectAttachments(id);
   const activity = listProjectActivity(id);
-  const taskboardHref = resolveTaskboardUrl(
-    project.taskboardRef,
-    env.TASKBOARD_API_URL,
-  );
 
   const projectName =
     (locale === "ar"
@@ -253,24 +247,6 @@ export default async function ProjectDetailPage({
                 <Field label={t("endDate")} ltr icon={Calendar}>
                   {project.endDate ?? "-"}
                 </Field>
-                {project.taskboardRef ? (
-                  <Field label={t("taskboardRef")} ltr icon={ExternalLink}>
-                    {taskboardHref ? (
-                      <a
-                        href={taskboardHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title={t("taskboardOpen")}
-                        className="text-primary hover:text-primary/80 no-underline inline-flex items-center gap-1"
-                      >
-                        <span>{project.taskboardRef}</span>
-                        <ExternalLink size={12} aria-hidden />
-                      </a>
-                    ) : (
-                      project.taskboardRef
-                    )}
-                  </Field>
-                ) : null}
                 {project.description ? (
                   <Field
                     label={t("description")}
@@ -278,6 +254,16 @@ export default async function ProjectDetailPage({
                   >
                     <span className="whitespace-pre-wrap leading-relaxed text-muted-foreground">
                       {project.description}
+                    </span>
+                  </Field>
+                ) : null}
+                {project.notes ? (
+                  <Field
+                    label={t("notes")}
+                    className="sm:col-span-2 lg:col-span-3"
+                  >
+                    <span className="whitespace-pre-wrap leading-relaxed text-muted-foreground">
+                      {project.notes}
                     </span>
                   </Field>
                 ) : null}
@@ -587,12 +573,13 @@ export default async function ProjectDetailPage({
                         {contract.number ?? "-"}
                       </TableCell>
                       <TableCell className="text-end">
-                        <Link
-                          href={`/contracts/${contract.id}`}
-                          className="text-sm text-muted-foreground hover:text-foreground"
-                        >
-                          {tc("preview")}
-                        </Link>
+                        <div className="flex justify-end">
+                          <ActionLink
+                            href={`/contracts/${contract.id}`}
+                            action="preview"
+                            label={tc("preview")}
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -649,12 +636,13 @@ export default async function ProjectDetailPage({
                         {invoice.dueDate ?? "-"}
                       </TableCell>
                       <TableCell className="text-end">
-                        <Link
-                          href={`/invoices/${invoice.id}`}
-                          className="text-sm text-muted-foreground hover:text-foreground"
-                        >
-                          {tc("preview")}
-                        </Link>
+                        <div className="flex justify-end">
+                          <ActionLink
+                            href={`/invoices/${invoice.id}`}
+                            action="preview"
+                            label={tc("preview")}
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

@@ -44,7 +44,10 @@ export const createInvoiceSchema = z.object({
     .string({ required_error: "errors.required" })
     .min(1, "errors.required"),
   contractId: z.string().min(1).nullable().optional(),
+  currency: currencyEnum.optional(),
   languageMode: z.enum(INVOICE_LANG_MODES).default("ar"),
+  issueDate: nullableOptDate.optional(),
+  dueDate: nullableOptDate.optional(),
   notesAr: nullableOptText(),
   notesEn: nullableOptText(),
 });
@@ -52,6 +55,7 @@ export type CreateInvoiceInput = z.infer<typeof createInvoiceSchema>;
 
 export const updateInvoiceDraftSchema = z.object({
   languageMode: z.enum(INVOICE_LANG_MODES),
+  currency: currencyEnum.optional(),
   issueDate: nullableOptDate,
   dueDate: nullableOptDate,
   notesAr: nullableOptText(),

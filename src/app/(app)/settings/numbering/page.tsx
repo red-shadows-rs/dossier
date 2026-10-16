@@ -1,12 +1,12 @@
 import { getTranslations } from "next-intl/server";
-import { FileText, Hash, Receipt } from "lucide-react";
+import { FileText, Receipt } from "lucide-react";
 import {
   SettingsForm,
   type SettingsFieldDef,
   type SettingsSectionDef,
   type SettingsValues,
 } from "@/components/forms/SettingsForm";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { can } from "@/lib/permissions";
 import { updateNumberingAction } from "@/server/actions/settings";
 import { requireUserPage } from "@/server/auth/require-user";
@@ -34,7 +34,7 @@ export default async function NumberingSettingsPage() {
     {
       title: t("numbering"),
       description: t("numberingDesc"),
-      icon: Hash,
+      icon: "hash",
       fields,
     },
   ];
@@ -56,9 +56,6 @@ export default async function NumberingSettingsPage() {
             <FileText size={18} className="text-primary shrink-0" aria-hidden="true" />
             <span>{t("numberingPreview")}</span>
           </CardTitle>
-          <CardDescription>
-            صيغة أرقام المستندات التي يتم إنشاؤها تلقائيا في النظام
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

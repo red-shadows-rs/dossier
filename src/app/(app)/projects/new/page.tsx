@@ -31,7 +31,6 @@ export default async function NewProjectPage() {
     endDate: "",
     budget: "",
     currency: defaults.currency,
-    taskboardRef: "",
     notes: "",
   };
 

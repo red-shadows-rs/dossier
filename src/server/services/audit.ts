@@ -101,10 +101,10 @@ export function listAuditEntries(filters: AuditFilters = {}): AuditPage {
       if (lower.includes("دخول")) {
         qConds.push(like(auditLog.action, "%login%"));
       }
-      if (lower.includes("توقيع")) {
-        qConds.push(like(auditLog.action, "%sign%"));
+      const orCond = or(...qConds);
+      if (orCond) {
+        conditions.push(orCond);
       }
-      conditions.push(or(...qConds)!);
     }
   }
 

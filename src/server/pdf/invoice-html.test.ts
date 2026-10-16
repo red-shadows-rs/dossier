@@ -234,3 +234,54 @@ describe("renderInvoiceHtml — escaping and legal", () => {
     expect(without).not.toContain("Verification / التحقق");
   });
 });
+
+describe("renderInvoiceHtml — multi-page pagination and branding", () => {
+  it("renders 1 page for up to 10 items with hero header and footer wrap", () => {
+    const lines = Array.from({ length: 5 }, (_, i) => ({
+      position: i + 1,
+      descriptionAr: `بند ${i + 1}`,
+      descriptionEn: `Item ${i + 1}`,
+      qtyMilli: 1000,
+      unitPriceMinor: 1000,
+      lineTotalMinor: 1000,
+    }));
+    const html = renderInvoiceHtml(input({ lines }));
+    const pages = html.split('class="invoice-page"');
+    // split gives 2 parts for 1 occurrence (before and after)
+    expect(pages.length).toBe(2);
+    expect(html).toContain('class="hero-header"');
+    expect(html).not.toContain('class="subsequent-header"');
+    expect(html).toContain('class="inv-footer-wrap"');
+  });
+
+  it("splits into 2 pages for 13 items with subsequent header and bottom-pinned footer on page 2", () => {
+    const lines = Array.from({ length: 13 }, (_, i) => ({
+      position: i + 1,
+      descriptionAr: `بند ${i + 1}`,
+      descriptionEn: `Item ${i + 1}`,
+      qtyMilli: 1000,
+      unitPriceMinor: 1000,
+      lineTotalMinor: 1000,
+    }));
+    const html = renderInvoiceHtml(input({ lines, lang: "ar" }));
+    const pages = html.split('class="invoice-page"');
+    expect(pages.length).toBe(3); // 2 pages -> 3 parts
+    expect(html).toContain('class="hero-header"');
+    expect(html).toContain('class="subsequent-header"');
+    expect(html).toContain('class="sub-doc-meta"');
+    expect(html).not.toContain('class="sub-doc-title"');
+    expect(html).toContain('class="inv-footer-wrap"');
+  });
+
+  it("renders both seller name and logo in brand-box when logoDataUri is present", () => {
+    const html = renderInvoiceHtml(
+      input({
+        logoDataUri: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+      }),
+    );
+    expect(html).toContain('class="brand-logo-img"');
+    expect(html).toContain('class="brand-name"');
+    expect(html).toContain("RED SHADOWS");
+  });
+});
+

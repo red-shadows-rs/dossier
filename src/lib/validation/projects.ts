@@ -45,7 +45,6 @@ export const projectInputSchema = z
       .nullable()
       .default(null),
     currency: currencyEnum,
-    taskboardRef: optText(200),
     notes: optText(2000),
   })
   .refine((data) => Boolean(data.nameAr || data.nameEn), {

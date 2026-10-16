@@ -1,11 +1,32 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
+import {
+  AlertOctagon,
+  Building2,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  FileSearch,
+  FileText,
+  FileX,
+  Fingerprint,
+  Receipt,
+  ShieldCheck,
+  User,
+  XCircle,
+} from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
+import { Footer } from "@/components/layout/Footer";
+import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
+import { Logo } from "@/components/layout/Logo";
+import { ThemeSwitch } from "@/components/layout/ThemeSwitch";
+import { VerificationPdfChecker } from "@/components/forms/VerificationPdfChecker";
 import type { Locale } from "@/lib/constants";
 import { formatInstant } from "@/lib/dates";
 import { env } from "@/lib/env";
-import { isLocale, LOCALE_COOKIE } from "@/lib/i18n";
+import { isLocale, LOCALE_COOKIE, resolveTheme, THEME_COOKIE } from "@/lib/i18n";
 import { getRequestMeta } from "@/server/services/audit";
 import {
   assertLookupRateLimit,
@@ -36,8 +57,8 @@ export default async function VerifyCodePage({
   const sp = await searchParams;
   const store = await cookies();
   const locale = pickLocale(sp.lang, store.get(LOCALE_COOKIE)?.value);
-  const messages = (await import(`../../../../messages/${locale}.json`))
-    .default;
+  const theme = resolveTheme(store.get(THEME_COOKIE)?.value);
+  const messages = (await import(`../../../../messages/${locale}.json`)).default;
   const t = messages.verification;
   const dir = locale === "ar" ? "rtl" : "ltr";
 
@@ -51,29 +72,133 @@ export default async function VerifyCodePage({
     limited = true;
   }
 
+  const isValid = result !== null && result.state === "valid";
+
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <main
-        dir={dir}
-        className="mx-auto flex min-h-dvh w-full max-w-lg flex-col gap-4 p-6"
-      >
-        <h1 className="text-xl font-semibold text-foreground">
-          {t.title}
-        </h1>
-        <p className="font-mono text-sm text-muted-foreground" dir="ltr">
-          {code}
-        </p>
+      <div className="flex min-h-dvh flex-col bg-background">
+        {/* Navigation Header */}
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border/60 bg-background/80 px-4 py-3 sm:px-8 backdrop-blur">
+          <Logo />
+          <div className="flex items-center gap-2">
+            <ThemeSwitch current={theme} />
+            <LocaleSwitch />
+          </div>
+        </header>
 
-        {limited ? (
-          <Notice tone="error" text={t.rateLimited} />
-        ) : result === null ? (
-          <Notice tone="error" text={t.notFound} />
-        ) : result.kind === "contract" ? (
-          <ContractCard result={result} locale={locale} t={t} />
-        ) : (
-          <InvoiceCard result={result} t={t} />
-        )}
-      </main>
+        {/* Main Content Area */}
+        <main dir={dir} className="flex-1 px-4 py-8 sm:px-6 sm:py-12">
+          <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
+            {/* Hero Verification Status Header */}
+            <div className="flex flex-col items-center text-center gap-2.5">
+              <div
+                className={`flex h-14 w-14 items-center justify-center rounded-2xl ring-8 ${
+                  limited
+                    ? "bg-amber-500/10 text-amber-600 ring-amber-500/5 dark:bg-amber-500/20 dark:text-amber-400"
+                    : result === null
+                      ? "bg-destructive/10 text-destructive ring-destructive/5"
+                      : isValid
+                        ? "bg-emerald-500/10 text-emerald-600 ring-emerald-500/5 dark:bg-emerald-500/20 dark:text-emerald-400"
+                        : "bg-destructive/10 text-destructive ring-destructive/5"
+                }`}
+              >
+                {limited ? (
+                  <AlertOctagon className="h-7 w-7" />
+                ) : result === null ? (
+                  <FileX className="h-7 w-7" />
+                ) : isValid ? (
+                  <ShieldCheck className="h-7 w-7" />
+                ) : (
+                  <XCircle className="h-7 w-7" />
+                )}
+              </div>
+
+              <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                {limited
+                  ? t.rateLimited
+                  : result === null
+                    ? t.notFound
+                    : isValid
+                      ? t.found
+                      : t.states[result.state] ?? t.title}
+              </h1>
+
+              <p className="text-sm text-muted-foreground max-w-md">
+                {limited
+                  ? t.rateLimited
+                  : result === null
+                    ? locale === "ar"
+                      ? "لم يتم العثور على أي مستند مطابق لرمز التحقق في سجلات النظام الرسمية."
+                      : "No document matching this verification code was found in the system."
+                    : isValid
+                      ? locale === "ar"
+                        ? "تم التحقق من صحة المستند ومطابقته الرسمية في سجلات النظام المعتمدة."
+                        : "This document has been verified against official system records."
+                      : locale === "ar"
+                        ? "هذا المستند لم يعد سارياً في سجلات النظام."
+                        : "This document is no longer active in system records."}
+              </p>
+
+              {/* Monospace Code Pill */}
+              <div className="mt-1 flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground">
+                  {t.codeLabel}:
+                </span>
+                <span
+                  className="rounded-lg border border-border bg-muted/60 px-3 py-1 font-mono text-xs font-bold tracking-wider text-foreground select-all"
+                  dir="ltr"
+                >
+                  {code}
+                </span>
+              </div>
+            </div>
+
+            {/* Document Details Card */}
+            {limited ? (
+              <Notice tone="error" text={t.rateLimited} />
+            ) : result === null ? (
+              <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border bg-card/60 p-8 text-center">
+                <p className="text-sm text-muted-foreground">
+                  {t.notFound}
+                </p>
+                <Link
+                  href="/verify"
+                  className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-xs font-medium text-foreground hover:bg-muted/80 no-underline transition-colors"
+                >
+                  <FileSearch className="h-3.5 w-3.5" />
+                  <span>{locale === "ar" ? "البحث برمز آخر" : "Try another code"}</span>
+                </Link>
+              </div>
+            ) : result.kind === "contract" ? (
+              <ContractCard result={result} locale={locale} t={t} />
+            ) : (
+              <InvoiceCard result={result} t={t} />
+            )}
+
+            {/* PDF File Integrity Checker (Only if document found) */}
+            {result !== null ? (
+              <VerificationPdfChecker code={code} />
+            ) : null}
+
+            {/* Bottom Actions */}
+            <div className="flex items-center justify-center pt-2">
+              <Link
+                href="/verify"
+                className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground hover:text-foreground no-underline transition-colors"
+              >
+                <FileSearch className="h-3.5 w-3.5" />
+                <span>
+                  {locale === "ar"
+                    ? "التحقق من مستند آخر يدويًا"
+                    : "Verify another document manually"}
+                </span>
+              </Link>
+            </div>
+          </div>
+        </main>
+
+        <Footer bordered={false} />
+      </div>
     </NextIntlClientProvider>
   );
 }
@@ -84,8 +209,8 @@ function Notice({ tone, text }: { tone: "error" | "success"; text: string }) {
       role="status"
       className={
         tone === "success"
-          ? "rounded-md border border-border bg-surface p-4 text-sm text-foreground"
-          : "rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm text-foreground"
+          ? "rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm font-medium text-emerald-700 dark:text-emerald-300"
+          : "rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm font-medium text-destructive"
       }
     >
       {text}
@@ -97,17 +222,37 @@ type Messages = {
   title: string;
   notFound: string;
   rateLimited: string;
+  found: string;
+  codeLabel: string;
   contract: Record<string, string>;
   invoice: Record<string, string>;
   states: Record<string, string>;
   fields: Record<string, string>;
 };
 
-function Row({ label, value }: { label: string; value: string }) {
+function DetailItem({
+  icon,
+  label,
+  value,
+  dir,
+  mono = false,
+}: {
+  icon?: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+  dir?: "ltr" | "rtl";
+  mono?: boolean;
+}) {
   return (
-    <div className="flex flex-col gap-0.5">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="text-sm text-foreground" dir="ltr">
+    <div className="flex flex-col gap-1 rounded-xl border border-border/50 bg-muted/20 p-3 sm:p-3.5">
+      <dt className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+        {icon ? <span className="text-muted-foreground/70">{icon}</span> : null}
+        <span>{label}</span>
+      </dt>
+      <dd
+        className={`text-sm font-semibold text-foreground ${mono ? "font-mono select-all" : ""}`}
+        dir={dir}
+      >
         {value}
       </dd>
     </div>
@@ -127,28 +272,67 @@ function ContractCard({
     locale === "ar"
       ? result.titleAr ?? result.titleEn
       : result.titleEn ?? result.titleAr;
+  const isValid = result.state === "valid";
+
   return (
-    <div className="flex flex-col gap-4 rounded-md border border-border bg-surface p-4">
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="text-base font-semibold text-foreground">
-          {t.contract.heading}
-        </h2>
+    <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-6 sm:p-7 shadow-sm">
+      {/* Top Header Row */}
+      <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <FileText className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-muted-foreground">
+              {t.contract.heading}
+            </div>
+            <div className="font-mono text-base font-bold text-foreground" dir="ltr">
+              {result.number ?? "-"}
+            </div>
+          </div>
+        </div>
         <StateBadge
           label={t.states[result.state] ?? result.state}
-          valid={result.state === "valid"}
+          valid={isValid}
         />
       </div>
+
+      {/* Contract Title */}
+      <div className="rounded-xl border border-border/70 bg-muted/30 p-4">
+        <div className="text-xs font-medium text-muted-foreground">{t.fields.title}</div>
+        <div className="mt-0.5 text-base font-semibold text-foreground">{title ?? "-"}</div>
+      </div>
+
+      {/* Parties & Dates Grid */}
       <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Row label={t.fields.number} value={result.number ?? "-"} />
-        <Row label={t.fields.title} value={title ?? "-"} />
-        <Row label={t.fields.provider} value={result.providerName ?? "-"} />
-        <Row label={t.fields.client} value={result.clientName ?? "-"} />
-        <Row
+        <DetailItem
+          icon={<Building2 className="h-4 w-4" />}
+          label={t.fields.provider}
+          value={result.providerName ?? "-"}
+        />
+        <DetailItem
+          icon={<User className="h-4 w-4" />}
+          label={t.fields.client}
+          value={result.clientName ?? "-"}
+        />
+        <DetailItem
+          icon={<Clock className="h-4 w-4" />}
           label={t.fields.signedAt}
           value={result.signedAt ? formatInstant(result.signedAt, "UTC", locale) : "-"}
+          dir="ltr"
         />
-        <Row label={t.fields.contentHash} value={result.contentHash ?? "-"} />
       </dl>
+
+      {/* Cryptographic SHA-256 Hash */}
+      <div className="flex flex-col gap-1.5 rounded-xl border border-border/70 bg-muted/40 p-3.5">
+        <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+          <Fingerprint className="h-3.5 w-3.5 text-primary" />
+          <span>{t.fields.contentHash}</span>
+        </div>
+        <code className="break-all font-mono text-[11px] leading-relaxed text-foreground select-all" dir="ltr">
+          {result.contentHash ?? "-"}
+        </code>
+      </div>
     </div>
   );
 }
@@ -160,27 +344,71 @@ function InvoiceCard({
   result: Extract<VerificationResult, { kind: "invoice" }>;
   t: Messages;
 }) {
+  const isValid = result.state === "valid";
+
   return (
-    <div className="flex flex-col gap-4 rounded-md border border-border bg-surface p-4">
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="text-base font-semibold text-foreground">
-          {t.invoice.heading}
-        </h2>
+    <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-6 sm:p-7 shadow-sm">
+      {/* Top Header Row */}
+      <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Receipt className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-muted-foreground">
+              {t.invoice.heading}
+            </div>
+            <div className="font-mono text-base font-bold text-foreground" dir="ltr">
+              {result.number ?? "-"}
+            </div>
+          </div>
+        </div>
         <StateBadge
           label={t.states[result.state] ?? result.state}
-          valid={result.state === "valid"}
+          valid={isValid}
         />
       </div>
+
+      {/* Amount Highlight */}
+      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 sm:p-5">
+        <div className="text-xs font-semibold uppercase tracking-wider text-primary">
+          {t.fields.total}
+        </div>
+        <div className="mt-1 font-mono text-2xl font-extrabold text-foreground sm:text-3xl" dir="ltr">
+          {result.totalFormatted}
+        </div>
+      </div>
+
+      {/* Details Grid */}
       <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Row label={t.fields.number} value={result.number ?? "-"} />
-        <Row label={t.fields.issuer} value={result.issuerName ?? "-"} />
-        <Row label={t.fields.issueDate} value={result.issueDate ?? "-"} />
-        <Row label={t.fields.total} value={result.totalFormatted} />
+        <DetailItem
+          icon={<Building2 className="h-4 w-4" />}
+          label={t.fields.issuer}
+          value={result.issuerName ?? "-"}
+        />
+        <DetailItem
+          icon={<Calendar className="h-4 w-4" />}
+          label={t.fields.issueDate}
+          value={result.issueDate ?? "-"}
+          dir="ltr"
+        />
       </dl>
     </div>
   );
 }
 
 function StateBadge({ label, valid }: { label: string; valid: boolean }) {
-  return <Badge tone={valid ? "green" : "red"}>{label}</Badge>;
+  return (
+    <Badge
+      tone={valid ? "green" : "red"}
+      className="gap-1.5 px-3 py-1 text-xs font-semibold"
+    >
+      {valid ? (
+        <CheckCircle2 className="h-3.5 w-3.5" />
+      ) : (
+        <XCircle className="h-3.5 w-3.5" />
+      )}
+      <span>{label}</span>
+    </Badge>
+  );
 }

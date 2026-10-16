@@ -29,6 +29,21 @@ function isValidTimeZone(timeZone: string): boolean {
   }
 }
 
+export const bankAccountSchema = z.object({
+  id: z.string().default(() => Math.random().toString(36).substring(2, 9)),
+  provider: z.string().default("other"),
+  bankNameAr: text(),
+  bankNameEn: text(),
+  accountHolder: text(),
+  iban: text(120),
+  swift: text(50).default(""),
+  currency: z.string().default("SAR"),
+  isActive: z.boolean().default(true),
+  isPrimary: z.boolean().default(false),
+});
+
+export type BankAccount = z.infer<typeof bankAccountSchema>;
+
 export const companySchema = z.object({
   nameAr: text(),
   nameEn: text(),
@@ -52,6 +67,7 @@ export const companySchema = z.object({
       swift: text(20),
     })
     .default({}),
+  bankAccounts: z.array(bankAccountSchema).default([]),
 });
 
 export const defaultsSchema = z.object({

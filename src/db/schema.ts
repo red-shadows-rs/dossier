@@ -177,7 +177,6 @@ export const projects = sqliteTable(
     endDate: text("end_date"),
     budgetMinor: integer("budget_minor"),
     currency: text("currency").notNull(),
-    taskboardRef: text("taskboard_ref"),
     notes: text("notes"),
     archivedAt: integer("archived_at"),
     createdBy: text("created_by").references(() => users.id, {

@@ -20,7 +20,7 @@ import {
 } from "@/server/pdf/html/invoice";
 import { renderReceiptHtml } from "@/server/pdf/html/receipt";
 import { getFileRow, readFile } from "@/server/services/files";
-import { getSettings } from "@/server/services/settings";
+import { getSettings, buildPaymentInstructions } from "@/server/services/settings";
 import {
   getInvoiceDetail,
   isOverdue,
@@ -82,23 +82,32 @@ function sellerSnapshotFor(invoice: InvoiceRow): SellerSnapshot {
 }
 
 function buyerSnapshotFor(invoice: InvoiceRow): BuyerSnapshot {
+  const client = invoice.clientId
+    ? db
+        .select()
+        .from(clients)
+        .where(eq(clients.id, invoice.clientId))
+        .get()
+    : undefined;
+
+  let snapshot: Partial<BuyerSnapshot> = {};
   if (invoice.buyerSnapshotJson) {
-    return JSON.parse(invoice.buyerSnapshotJson) as BuyerSnapshot;
+    try {
+      snapshot = JSON.parse(invoice.buyerSnapshotJson) as BuyerSnapshot;
+    } catch {
+      snapshot = {};
+    }
   }
-  const client = db
-    .select()
-    .from(clients)
-    .where(eq(clients.id, invoice.clientId))
-    .get();
+
   return {
-    nameAr: client?.nameAr ?? null,
-    nameEn: client?.nameEn ?? null,
-    legalNameAr: client?.legalNameAr ?? null,
-    legalNameEn: client?.legalNameEn ?? null,
-    addressAr: client?.addressAr ?? null,
-    addressEn: client?.addressEn ?? null,
-    taxNumber: client?.taxNumber ?? null,
-    crNumber: client?.crNumber ?? null,
+    nameAr: client?.nameAr ?? snapshot.nameAr ?? null,
+    nameEn: client?.nameEn ?? snapshot.nameEn ?? null,
+    legalNameAr: client?.legalNameAr ?? snapshot.legalNameAr ?? null,
+    legalNameEn: client?.legalNameEn ?? snapshot.legalNameEn ?? null,
+    addressAr: client?.addressAr ?? snapshot.addressAr ?? null,
+    addressEn: client?.addressEn ?? snapshot.addressEn ?? null,
+    taxNumber: client?.taxNumber ?? snapshot.taxNumber ?? null,
+    crNumber: client?.crNumber ?? snapshot.crNumber ?? null,
   };
 }
 
@@ -145,6 +154,10 @@ export async function buildInvoiceHtml(
   }
 
   const seller = sellerSnapshotFor(invoice);
+  const company = getSettings("company");
+  const fallbackInstructionsAr = buildPaymentInstructions(company, "ar");
+  const fallbackInstructionsEn = buildPaymentInstructions(company, "en");
+
   const input: InvoiceHtmlInput = {
     invoice: {
       id: invoice.id,
@@ -175,8 +188,10 @@ export async function buildInvoiceHtml(
       paidMinor: invoice.paidMinor,
       notesAr: invoice.notesAr,
       notesEn: invoice.notesEn,
-      paymentInstructionsAr: invoice.paymentInstructionsAr,
-      paymentInstructionsEn: invoice.paymentInstructionsEn,
+      paymentInstructionsAr:
+        invoice.paymentInstructionsAr?.trim() || fallbackInstructionsAr || null,
+      paymentInstructionsEn:
+        invoice.paymentInstructionsEn?.trim() || fallbackInstructionsEn || null,
     },
     lines: lines.map((line) => ({
       position: line.position,
@@ -270,6 +285,10 @@ export async function buildReceiptHtml(
   }
 
   const seller = sellerSnapshotFor(invoice);
+  const company = getSettings("company");
+  const fallbackInstructionsAr = buildPaymentInstructions(company, "ar");
+  const fallbackInstructionsEn = buildPaymentInstructions(company, "en");
+
   const input: InvoiceHtmlInput = {
     invoice: {
       id: invoice.id,
@@ -300,8 +319,10 @@ export async function buildReceiptHtml(
       paidMinor: invoice.paidMinor,
       notesAr: invoice.notesAr,
       notesEn: invoice.notesEn,
-      paymentInstructionsAr: invoice.paymentInstructionsAr,
-      paymentInstructionsEn: invoice.paymentInstructionsEn,
+      paymentInstructionsAr:
+        invoice.paymentInstructionsAr?.trim() || fallbackInstructionsAr || null,
+      paymentInstructionsEn:
+        invoice.paymentInstructionsEn?.trim() || fallbackInstructionsEn || null,
     },
     lines: lines.map((line) => ({
       position: line.position,

@@ -1,9 +1,11 @@
 "use server";
 
+import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { AppError } from "@/lib/errors";
 import type { ActionResult } from "@/lib/result";
 import { assertCan } from "@/lib/permissions";
+import { bankAccountSchema } from "@/lib/validation/settings";
 import { requireUser } from "@/server/auth/require-user";
 import { audit, getRequestMeta } from "@/server/services/audit";
 import { enqueueEmail } from "@/server/services/email";
@@ -34,12 +36,55 @@ export async function updateCompanyAction(
     assertCan(user, "settings.write");
     const meta = await getRequestMeta();
     const current = getSettings("company");
+    const input = (raw as Record<string, unknown>) ?? {};
     updateSettings(
       "company",
       {
-        ...(raw as Record<string, unknown>),
+        ...input,
         logoFileId: current.logoFileId,
         stampFileId: current.stampFileId,
+        bankAccounts: input.bankAccounts ?? current.bankAccounts,
+        bank: input.bank ?? current.bank,
+      },
+      user,
+      meta,
+    );
+    revalidateSettings();
+    return null;
+  });
+}
+
+export async function updateBankAccountsAction(
+  rawAccounts: unknown,
+): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "settings.write");
+    const meta = await getRequestMeta();
+    const current = getSettings("company");
+    const parsedAccounts = z.array(bankAccountSchema).parse(rawAccounts);
+
+    const primary =
+      parsedAccounts.find((a) => a.isPrimary) ??
+      parsedAccounts.find((a) => a.isActive) ??
+      parsedAccounts[0];
+
+    const legacyBank = primary
+      ? {
+          bankNameAr: primary.bankNameAr,
+          bankNameEn: primary.bankNameEn,
+          accountHolder: primary.accountHolder,
+          iban: primary.iban,
+          swift: primary.swift,
+        }
+      : current.bank;
+
+    updateSettings(
+      "company",
+      {
+        ...current,
+        bank: legacyBank,
+        bankAccounts: parsedAccounts,
       },
       user,
       meta,

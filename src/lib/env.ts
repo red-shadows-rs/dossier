@@ -78,8 +78,6 @@ const envSchema = z
       emptyToUndefined,
       z.coerce.number().int().min(1).default(30),
     ),
-    TASKBOARD_API_URL: optionalString,
-    TASKBOARD_API_TOKEN: optionalString,
     TZ: z.preprocess(emptyToUndefined, z.string().default("UTC")),
   })
   .superRefine((data, ctx) => {

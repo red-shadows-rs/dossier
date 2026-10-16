@@ -95,23 +95,15 @@ export default function GlobalError({
               maxWidth: "32rem",
               backgroundColor: "var(--card)",
               border: "1px solid var(--border)",
-              borderRadius: "0.75rem",
+              borderRadius: "1rem",
               boxShadow:
-                "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                "0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2)",
               overflow: "hidden",
             }}
           >
             <div
               style={{
-                height: "4px",
-                width: "100%",
-                backgroundColor: "var(--dest)",
-              }}
-            />
-
-            <div
-              style={{
-                padding: "2rem",
+                padding: "2.5rem 2rem",
                 textAlign: "center",
                 display: "flex",
                 flexDirection: "column",

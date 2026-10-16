@@ -4,6 +4,7 @@ import { ArrowRight, Pencil } from "lucide-react";
 import { InvoiceLinesEditor } from "@/components/forms/InvoiceLinesEditor";
 import { InvoiceMetaForm } from "@/components/forms/InvoiceMetaForm";
 import { Button } from "@/components/ui/Button";
+import type { CurrencyCode } from "@/lib/constants";
 import { AppError } from "@/lib/errors";
 import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
@@ -65,6 +66,7 @@ export default async function EditInvoicePage({
         id={id}
         initial={{
           languageMode: detail.invoice.languageMode,
+          currency: detail.invoice.currency as CurrencyCode,
           issueDate: detail.invoice.issueDate ?? "",
           dueDate: detail.invoice.dueDate ?? "",
           notesAr: detail.invoice.notesAr ?? "",

@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { Activity, Mail } from "lucide-react";
+import { Activity } from "lucide-react";
 import {
   SettingsForm,
   type SettingsFieldDef,
@@ -8,7 +8,7 @@ import {
 } from "@/components/forms/SettingsForm";
 import { TestEmailButton } from "@/components/forms/TestEmailButton";
 import { Badge } from "@/components/ui/Badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { nowMs } from "@/lib/dates";
 import { can } from "@/lib/permissions";
 import { workerHeartbeatSchema } from "@/lib/validation/settings";
@@ -60,7 +60,7 @@ export default async function EmailSettingsPage() {
     {
       title: t("email"),
       description: t("emailDesc"),
-      icon: Mail,
+      icon: "mail",
       fields,
     },
   ];
@@ -86,7 +86,6 @@ export default async function EmailSettingsPage() {
             <Activity size={18} className="text-primary shrink-0" aria-hidden="true" />
             <span>{t("worker.title")}</span>
           </CardTitle>
-          <CardDescription>{t("worker.hint")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-start gap-4">
