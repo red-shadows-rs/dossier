@@ -30,7 +30,7 @@ export function SettingsNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex gap-1 overflow-x-auto border-b border-border">
+    <nav className="flex items-center gap-1.5 overflow-x-auto border-b border-border/60 pb-2">
       {SECTIONS.map((section) => {
         const active = pathname === section.href;
         const Icon = section.icon;
@@ -41,13 +41,17 @@ export function SettingsNav() {
             prefetch={false}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "inline-flex items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium transition-colors",
+              "inline-flex items-center gap-2 whitespace-nowrap rounded-md px-3.5 py-2 text-sm font-medium transition-all duration-150",
               active
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground",
+                ? "bg-primary/10 text-primary shadow-xs font-semibold"
+                : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
             )}
           >
-            <Icon size={16} aria-hidden="true" />
+            <Icon
+              size={16}
+              className={active ? "text-primary" : "text-muted-foreground"}
+              aria-hidden="true"
+            />
             <span>{t(section.key)}</span>
           </Link>
         );

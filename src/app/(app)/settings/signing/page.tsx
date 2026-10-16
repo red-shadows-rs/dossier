@@ -1,11 +1,11 @@
 import { getTranslations } from "next-intl/server";
-import { FileSignature } from "lucide-react";
+import { FileSignature, ScrollText } from "lucide-react";
 import {
   SettingsForm,
   type SettingsFieldDef,
+  type SettingsSectionDef,
   type SettingsValues,
 } from "@/components/forms/SettingsForm";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { can } from "@/lib/permissions";
 import { updateSigningAction } from "@/server/actions/settings";
 import { requireUserPage } from "@/server/auth/require-user";
@@ -17,18 +17,14 @@ export default async function SigningSettingsPage() {
   const t = await getTranslations("settings");
   const signing = getSettings("signing");
 
-  const fields: SettingsFieldDef[] = [
+  const policyFields: SettingsFieldDef[] = [
     {
       kind: "number",
       name: "linkTtlDays",
       label: t("fields.linkTtlDays"),
       min: 1,
       max: 90,
-    },
-    {
-      kind: "checkbox",
-      name: "requireEmailOtp",
-      label: t("fields.requireEmailOtp"),
+      suffix: "يوم",
     },
     {
       kind: "checkbox",
@@ -36,16 +32,41 @@ export default async function SigningSettingsPage() {
       label: t("fields.requireProviderSignatureBeforeSend"),
     },
     {
-      kind: "textarea",
-      name: "consentTextEn",
-      label: t("fields.consentTextEn"),
-      dir: "ltr",
+      kind: "checkbox",
+      name: "requireEmailOtp",
+      label: t("fields.requireEmailOtp"),
     },
+  ];
+
+  const consentFields: SettingsFieldDef[] = [
     {
       kind: "textarea",
       name: "consentTextAr",
       label: t("fields.consentTextAr"),
       dir: "rtl",
+      rows: 3,
+    },
+    {
+      kind: "textarea",
+      name: "consentTextEn",
+      label: t("fields.consentTextEn"),
+      dir: "ltr",
+      rows: 3,
+    },
+  ];
+
+  const sections: SettingsSectionDef[] = [
+    {
+      title: t("signingSecurity"),
+      description: t("signingSecurityDesc"),
+      icon: FileSignature,
+      fields: policyFields,
+    },
+    {
+      title: t("consentText"),
+      description: t("consentTextDesc"),
+      icon: ScrollText,
+      fields: consentFields,
     },
   ];
 
@@ -59,21 +80,11 @@ export default async function SigningSettingsPage() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="inline-flex items-center gap-2">
-          <FileSignature size={18} className="text-primary" aria-hidden="true" />
-          <span>{t("signing")}</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <SettingsForm
-          fields={fields}
-          values={values}
-          action={updateSigningAction}
-          disabled={!canWrite}
-        />
-      </CardContent>
-    </Card>
+    <SettingsForm
+      sections={sections}
+      values={values}
+      action={updateSigningAction}
+      disabled={!canWrite}
+    />
   );
 }

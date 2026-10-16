@@ -3,11 +3,12 @@ import { Activity, Mail } from "lucide-react";
 import {
   SettingsForm,
   type SettingsFieldDef,
+  type SettingsSectionDef,
   type SettingsValues,
 } from "@/components/forms/SettingsForm";
 import { TestEmailButton } from "@/components/forms/TestEmailButton";
 import { Badge } from "@/components/ui/Badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { nowMs } from "@/lib/dates";
 import { can } from "@/lib/permissions";
 import { workerHeartbeatSchema } from "@/lib/validation/settings";
@@ -55,6 +56,15 @@ export default async function EmailSettingsPage() {
     },
   ];
 
+  const sections: SettingsSectionDef[] = [
+    {
+      title: t("email"),
+      description: t("emailDesc"),
+      icon: Mail,
+      fields,
+    },
+  ];
+
   const values: SettingsValues = {
     fromName: email.fromName,
     overdueRemindersEnabled: email.overdueRemindersEnabled,
@@ -63,38 +73,26 @@ export default async function EmailSettingsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="inline-flex items-center gap-2">
-            <Mail size={18} className="text-primary" aria-hidden="true" />
-            <span>{t("email")}</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <SettingsForm
-            fields={fields}
-            values={values}
-            action={updateEmailAction}
-            disabled={!canWrite}
-          />
-        </CardContent>
-      </Card>
+      <SettingsForm
+        sections={sections}
+        values={values}
+        action={updateEmailAction}
+        disabled={!canWrite}
+      />
 
       <Card>
         <CardHeader>
-          <CardTitle className="inline-flex items-center gap-2">
-            <Activity size={18} className="text-primary" aria-hidden="true" />
+          <CardTitle className="inline-flex items-center gap-2.5">
+            <Activity size={18} className="text-primary shrink-0" aria-hidden="true" />
             <span>{t("worker.title")}</span>
           </CardTitle>
+          <CardDescription>{t("worker.hint")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-start gap-4">
             <Badge tone={workerStatus === "running" ? "green" : "red"}>
               {workerLabel}
             </Badge>
-            <p className="text-sm text-muted-foreground">
-              {t("worker.hint")}
-            </p>
             <TestEmailButton disabled={!canWrite} />
           </div>
         </CardContent>

@@ -15,8 +15,10 @@ import { createInvoiceAction } from "@/server/actions/invoices";
 
 export function NewInvoiceForm({
   projects,
+  defaultLanguageMode = "ar",
 }: {
   projects: { id: string; label: string }[];
+  defaultLanguageMode?: string;
 }) {
   const t = useTranslations();
   const toast = useToast();
@@ -92,7 +94,7 @@ export function NewInvoiceForm({
               <Select
                 id="ni-lang"
                 name="languageMode"
-                defaultValue="ar"
+                defaultValue={defaultLanguageMode}
                 disabled={pending}
               >
                 {INVOICE_LANG_MODES.map((value) => (

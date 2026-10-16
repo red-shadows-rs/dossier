@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { Palette } from "lucide-react";
+import { Building2, Landmark, Palette } from "lucide-react";
 import { ImageUploadField } from "@/components/forms/ImageUploadField";
 import {
   SettingsForm,
@@ -7,7 +7,7 @@ import {
   type SettingsSectionDef,
   type SettingsValues,
 } from "@/components/forms/SettingsForm";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { can } from "@/lib/permissions";
 import {
   deleteLogoAction,
@@ -91,10 +91,14 @@ export default async function CompanySettingsPage() {
   const sections: SettingsSectionDef[] = [
     {
       title: t("companyInfo"),
+      description: t("companyInfoDesc"),
+      icon: Building2,
       fields: companyFields,
     },
     {
       title: t("bankInfo"),
+      description: t("bankInfoDesc"),
+      icon: Landmark,
       fields: bankFields,
     },
   ];
@@ -122,10 +126,11 @@ export default async function CompanySettingsPage() {
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle className="inline-flex items-center gap-2">
+          <CardTitle className="inline-flex items-center gap-2.5">
             <Palette size={18} className="text-primary" aria-hidden="true" />
             <span>{t("branding")}</span>
           </CardTitle>
+          <CardDescription>{t("brandingDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">

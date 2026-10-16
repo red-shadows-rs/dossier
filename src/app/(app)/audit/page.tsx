@@ -38,6 +38,7 @@ export default async function AuditPage({
   const locale = isLocale(rawLocale) ? rawLocale : user.locale;
   const params = await searchParams;
 
+  const q = readParam(params.q);
   const entityType = readParam(params.entityType);
   const entityId = readParam(params.entityId);
   const action = readParam(params.action);
@@ -47,6 +48,7 @@ export default async function AuditPage({
   const requestedPage = pageRaw ? Number(pageRaw) : 1;
 
   const { rows, total, page, pageSize } = listAuditEntries({
+    q,
     entityType,
     entityId,
     action,
@@ -56,6 +58,7 @@ export default async function AuditPage({
   });
 
   const query: Record<string, string> = {};
+  if (q) query.q = q;
   if (entityType) query.entityType = entityType;
   if (entityId) query.entityId = entityId;
   if (action) query.action = action;
@@ -63,10 +66,26 @@ export default async function AuditPage({
   if (to) query.to = to;
 
   const hasActiveFilters = Boolean(
-    entityType || entityId || action || from || to,
+    q || entityType || entityId || action || from || to,
   );
   const activeFilterCount =
-    (action ? 1 : 0) + (from ? 1 : 0) + (to ? 1 : 0);
+    (entityType ? 1 : 0) +
+    (entityId ? 1 : 0) +
+    (action ? 1 : 0) +
+    (from ? 1 : 0) +
+    (to ? 1 : 0);
+
+  const ENTITY_TYPE_OPTIONS = [
+    "invoice",
+    "contract",
+    "client",
+    "project",
+    "user",
+    "setting",
+    "payment",
+    "file",
+    "system",
+  ] as const;
 
   return (
     <div className="flex flex-col gap-5 sm:gap-6">
@@ -93,11 +112,10 @@ export default async function AuditPage({
               <div className="flex flex-1 items-center gap-2 min-w-[280px]">
                 <div className="relative flex-1">
                   <Input
-                    id="entityType"
-                    name="entityType"
-                    dir="ltr"
-                    defaultValue={entityType ?? ""}
-                    placeholder={t("entityTypePlaceholder")}
+                    id="audit-q"
+                    name="q"
+                    defaultValue={q ?? ""}
+                    placeholder={t("searchPlaceholder")}
                     className="text-start"
                     startAdornment={
                       <InputAdornment position="start">
@@ -108,16 +126,6 @@ export default async function AuditPage({
                         />
                       </InputAdornment>
                     }
-                  />
-                </div>
-                <div className="w-48 shrink-0">
-                  <Input
-                    id="entityId"
-                    name="entityId"
-                    dir="ltr"
-                    defaultValue={entityId ?? ""}
-                    placeholder={t("entityIdPlaceholder")}
-                    className="text-start"
                   />
                 </div>
                 <Button
@@ -140,10 +148,27 @@ export default async function AuditPage({
               >
                 <div>
                   <label
+                    htmlFor="entityType"
+                    className="mb-1 block text-xs font-semibold text-muted-foreground cursor-pointer select-none"
+                  >
+                    {t("entityType")}
+                  </label>
+                  <Select id="entityType" name="entityType" defaultValue={entityType ?? ""}>
+                    <option value="">{t("allEntityTypes")}</option>
+                    {ENTITY_TYPE_OPTIONS.map((val) => (
+                      <option key={val} value={val}>
+                        {t(`entityTypes.${val}`)} ({val})
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+
+                <div>
+                  <label
                     htmlFor="action"
                     className="mb-1 block text-xs font-semibold text-muted-foreground cursor-pointer select-none"
                   >
-                    {t("allActions")}
+                    {t("action")}
                   </label>
                   <Select id="action" name="action" defaultValue={action ?? ""}>
                     <option value="">{t("allActions")}</option>
@@ -153,6 +178,23 @@ export default async function AuditPage({
                       </option>
                     ))}
                   </Select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="entityId"
+                    className="mb-1 block text-xs font-semibold text-muted-foreground cursor-pointer select-none"
+                  >
+                    {t("entityId")}
+                  </label>
+                  <Input
+                    id="entityId"
+                    name="entityId"
+                    dir="ltr"
+                    defaultValue={entityId ?? ""}
+                    placeholder="INV-0001, CNT-..., Dxp9..."
+                    className="text-start"
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
@@ -204,18 +246,23 @@ export default async function AuditPage({
                 <span className="font-medium text-foreground ms-0.5">
                   {tc("activeFilters")}:
                 </span>
+                {q ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                    <span>{tc("search")}: {q}</span>
+                  </span>
+                ) : null}
                 {entityType ? (
                   <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
-                    <span>{t("entityType")}: {entityType}</span>
+                    <span>{t("entityType")}: {t(`entityTypes.${entityType}`) ?? entityType}</span>
                   </span>
                 ) : null}
                 {entityId ? (
-                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground font-mono">
                     <span>{t("entityId")}: {entityId}</span>
                   </span>
                 ) : null}
                 {action ? (
-                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground">
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-foreground font-mono">
                     <span>{t("action")}: {action}</span>
                   </span>
                 ) : null}

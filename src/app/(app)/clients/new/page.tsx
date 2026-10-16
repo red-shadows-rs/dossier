@@ -6,6 +6,7 @@ import {
 } from "@/components/forms/ClientForm";
 import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
+import { getSettings } from "@/server/services/settings";
 import { smoothLoading } from "@/lib/smooth-loader";
 
 const EMPTY: ClientFormValues = {
@@ -35,6 +36,13 @@ export default async function NewClientPage() {
   const user = await requireUserPage();
   assertCan(user, "clients.write");
   const t = await getTranslations("clients");
+  const defaults = getSettings("defaults");
+
+  const initial: ClientFormValues = {
+    ...EMPTY,
+    country: defaults.country ?? "SA",
+    preferredLanguage: defaults.languageMode ?? "ar",
+  };
 
   return (
     <div className="flex flex-col gap-5 sm:gap-6">
@@ -48,7 +56,7 @@ export default async function NewClientPage() {
           </div>
         </div>
       </div>
-      <ClientForm mode="create" initial={EMPTY} />
+      <ClientForm mode="create" initial={initial} />
     </div>
   );
 }

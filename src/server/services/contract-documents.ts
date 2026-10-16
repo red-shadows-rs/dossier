@@ -10,7 +10,8 @@ import {
 } from "@/lib/doc-lang";
 import { renderContractHtml } from "@/server/pdf/html/contract";
 import { getFontCss } from "@/server/pdf/fonts";
-import { findFileBySha256, readFile } from "@/server/services/files";
+import { findFileBySha256, getFileRow, readFile } from "@/server/services/files";
+import { getSettings } from "@/server/services/settings";
 import type { ContractSnapshotV1 } from "@/server/templating/variables";
 import { buildContractSnapshot } from "./contract-snapshot";
 import { getContract, type ContractRow } from "./contracts";
@@ -24,6 +25,18 @@ function toDataUri(mime: string, buffer: Buffer): string {
 function imageBySha(sha256: string | null): string | null {
   if (!sha256) return null;
   const row = findFileBySha256(sha256);
+  if (!row) return null;
+  try {
+    const file = readFile(row.id);
+    return toDataUri(file.mime, file.buffer);
+  } catch {
+    return null;
+  }
+}
+
+function imageByFileId(fileId: string | null): string | null {
+  if (!fileId) return null;
+  const row = getFileRow(fileId);
   if (!row) return null;
   try {
     const file = readFile(row.id);
@@ -70,13 +83,21 @@ export async function buildContractHtml(
 ): Promise<string> {
   const contract = getContract(contractId);
   const snapshot = snapshotForRendering(contract);
+  const company = getSettings("company");
+  const logoDataUri =
+    imageBySha(snapshot.provider.logoSha256) ??
+    imageByFileId(company.logoFileId ?? null);
+  const stampDataUri =
+    imageBySha(snapshot.provider.stampSha256) ??
+    imageByFileId(company.stampFileId ?? null);
+
   return renderContractHtml({
     snapshot,
     lang,
     mode,
     fonts: getFontCss(),
-    logoDataUri: imageBySha(snapshot.provider.logoSha256),
-    stampDataUri: imageBySha(snapshot.provider.stampSha256),
+    logoDataUri,
+    stampDataUri,
     signatures: [],
     verification: null,
     certificate: null,

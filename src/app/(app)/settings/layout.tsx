@@ -23,6 +23,7 @@ export default async function SettingsLayout({
           </div>
           <div className="flex flex-col gap-0.5">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">{t("title")}</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t("subtitle")}</p>
           </div>
         </div>
       </div>

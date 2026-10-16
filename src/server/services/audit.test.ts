@@ -102,6 +102,40 @@ describe("listAuditEntries", () => {
     expect(byId.rows[0].entityId).toBe("a");
   });
 
+  it("searches across fields with q and maps Arabic keywords", () => {
+    const probe = "probe-q";
+    insertRow({
+      entityType: "invoice",
+      entityId: "INV-9900",
+      action: "invoice.created",
+      ts: 1000,
+    });
+    insertRow({
+      entityType: "contract",
+      entityId: "CNT-1234",
+      action: "contract.signed",
+      ts: 2000,
+    });
+    insertRow({
+      entityType: probe,
+      entityId: "xyz-777",
+      action: "auth.login",
+      ts: 3000,
+    });
+
+    const searchById = listAuditEntries({ q: "9900" });
+    expect(searchById.rows.some((r) => r.entityId === "INV-9900")).toBe(true);
+
+    const searchByAction = listAuditEntries({ q: "signed" });
+    expect(searchByAction.rows.some((r) => r.action === "contract.signed")).toBe(true);
+
+    const searchArabicInvoice = listAuditEntries({ q: "فاتورة" });
+    expect(searchArabicInvoice.rows.some((r) => r.entityType === "invoice")).toBe(true);
+
+    const searchArabicContract = listAuditEntries({ q: "عقد" });
+    expect(searchArabicContract.rows.some((r) => r.entityType === "contract")).toBe(true);
+  });
+
   it("filters by action and date range", () => {
     const probe = "probe-dates";
     const jan1 = Date.UTC(2026, 0, 1, 12, 0, 0);

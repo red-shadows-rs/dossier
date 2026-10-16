@@ -1,11 +1,12 @@
 import { getTranslations } from "next-intl/server";
+import { BadgePercent, Globe, Scale } from "lucide-react";
 import {
   SettingsForm,
   type SettingsFieldDef,
   type SettingsSectionDef,
   type SettingsValues,
 } from "@/components/forms/SettingsForm";
-import { CURRENCIES, GENERAL_LANG_MODES } from "@/lib/constants";
+import { GENERAL_LANG_MODES } from "@/lib/constants";
 import { can } from "@/lib/permissions";
 import { updateDefaultsAction } from "@/server/actions/settings";
 import { requireUserPage } from "@/server/auth/require-user";
@@ -19,21 +20,53 @@ export default async function DefaultsSettingsPage() {
 
   const regionalFields: SettingsFieldDef[] = [
     {
-      kind: "text",
+      kind: "select",
       name: "country",
       label: t("fields.country"),
-      dir: "ltr",
-      maxLength: 2,
+      options: [
+        { value: "SA", label: "المملكة العربية السعودية (SA)" },
+        { value: "AE", label: "الإمارات العربية المتحدة (AE)" },
+        { value: "QA", label: "قطر (QA)" },
+        { value: "KW", label: "الكويت (KW)" },
+        { value: "BH", label: "البحرين (BH)" },
+        { value: "OM", label: "سلطنة عمان (OM)" },
+        { value: "EG", label: "مصر (EG)" },
+        { value: "JO", label: "الأردن (JO)" },
+        { value: "US", label: "الولايات المتحدة (US)" },
+        { value: "GB", label: "المملكة المتحدة (GB)" },
+      ],
     },
-    { kind: "text", name: "timezone", label: t("fields.timezone"), dir: "ltr" },
+    {
+      kind: "select",
+      name: "timezone",
+      label: t("fields.timezone"),
+      options: [
+        { value: "Asia/Riyadh", label: "توقيت السعودية - الرياض (GMT+3)" },
+        { value: "Asia/Dubai", label: "توقيت الإمارات - دبي (GMT+4)" },
+        { value: "Asia/Kuwait", label: "توقيت الكويت (GMT+3)" },
+        { value: "Asia/Qatar", label: "توقيت قطر (GMT+3)" },
+        { value: "Asia/Bahrain", label: "توقيت البحرين (GMT+3)" },
+        { value: "Africa/Cairo", label: "توقيت مصر - القاهرة (GMT+2)" },
+        { value: "UTC", label: "التوقيت العالمي الموحد (UTC)" },
+      ],
+    },
     {
       kind: "select",
       name: "currency",
       label: t("fields.currency"),
-      options: Object.keys(CURRENCIES).map((code) => ({
-        value: code,
-        label: code,
-      })),
+      options: [
+        { value: "SAR", label: "SAR - ريال سعودي" },
+        { value: "AED", label: "AED - درهم إماراتي" },
+        { value: "USD", label: "USD - دولار أمريكي" },
+        { value: "EUR", label: "EUR - يورو" },
+        { value: "QAR", label: "QAR - ريال قطري" },
+        { value: "KWD", label: "KWD - دينار كويتي" },
+        { value: "BHD", label: "BHD - دينار بحريني" },
+        { value: "OMR", label: "OMR - ريال عماني" },
+        { value: "JOD", label: "JOD - دينار أردني" },
+        { value: "EGP", label: "EGP - جنيه مصري" },
+        { value: "GBP", label: "GBP - جنيه إسترليني" },
+      ],
     },
     {
       kind: "select",
@@ -95,14 +128,20 @@ export default async function DefaultsSettingsPage() {
   const sections: SettingsSectionDef[] = [
     {
       title: t("regionalInfo"),
+      description: t("regionalInfoDesc"),
+      icon: Globe,
       fields: regionalFields,
     },
     {
       title: t("financialTerms"),
+      description: t("financialTermsDesc"),
+      icon: BadgePercent,
       fields: financialFields,
     },
     {
       title: t("legalInfo"),
+      description: t("legalInfoDesc"),
+      icon: Scale,
       fields: legalFields,
     },
   ];

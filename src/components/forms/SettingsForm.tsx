@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
-import { Save } from "lucide-react";
+import { Save, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
@@ -50,6 +50,7 @@ export type SettingsFieldDef =
 export type SettingsSectionDef = {
   title?: string;
   description?: string;
+  icon?: LucideIcon;
   fields: SettingsFieldDef[];
 };
 
@@ -275,25 +276,37 @@ export function SettingsForm({
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-6">
       {sections ? (
-        sections.map((section, idx) => (
-          <Card key={section.title ?? idx}>
-            {section.title ? (
-              <CardHeader>
-                <CardTitle>{section.title}</CardTitle>
-                {section.description ? (
-                  <CardDescription>{section.description}</CardDescription>
-                ) : null}
-              </CardHeader>
-            ) : null}
-            <CardContent>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
-                {section.fields.map((field) =>
-                  renderField(field, values, fieldErrors, t, disabled),
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))
+        sections.map((section, idx) => {
+          const Icon = section.icon;
+          return (
+            <Card key={section.title ?? idx}>
+              {section.title ? (
+                <CardHeader>
+                  <CardTitle className="inline-flex items-center gap-2.5">
+                    {Icon ? (
+                      <Icon
+                        size={18}
+                        className="text-primary shrink-0"
+                        aria-hidden="true"
+                      />
+                    ) : null}
+                    <span>{section.title}</span>
+                  </CardTitle>
+                  {section.description ? (
+                    <CardDescription>{section.description}</CardDescription>
+                  ) : null}
+                </CardHeader>
+              ) : null}
+              <CardContent>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
+                  {section.fields.map((field) =>
+                    renderField(field, values, fieldErrors, t, disabled),
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
           {allFields.map((field) =>

@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte, lte, type SQL } from "drizzle-orm";
+import { and, count, desc, eq, gte, like, lte, or, type SQL } from "drizzle-orm";
 import { headers } from "next/headers";
 import { db, type DbTx } from "@/db";
 import { auditLog } from "@/db/schema";
@@ -45,6 +45,7 @@ export async function getRequestMeta(): Promise<RequestMeta> {
 }
 
 export type AuditFilters = {
+  q?: string;
   entityType?: string;
   entityId?: string;
   action?: string;
@@ -64,14 +65,58 @@ export type AuditPage = {
 
 export function listAuditEntries(filters: AuditFilters = {}): AuditPage {
   const conditions: SQL[] = [];
+
+  if (filters.q) {
+    const term = filters.q.trim();
+    if (term) {
+      const pattern = `%${term}%`;
+      const qConds: SQL[] = [
+        like(auditLog.entityId, pattern),
+        like(auditLog.action, pattern),
+        like(auditLog.entityType, pattern),
+        like(auditLog.ip, pattern),
+        like(auditLog.actorId, pattern),
+        like(auditLog.metaJson, pattern),
+      ];
+
+      const lower = term.toLowerCase();
+      if (lower.includes("فاتورة") || lower.includes("فواتير")) {
+        qConds.push(like(auditLog.entityType, "%invoice%"));
+      }
+      if (lower.includes("عقد") || lower.includes("عقود")) {
+        qConds.push(like(auditLog.entityType, "%contract%"));
+      }
+      if (lower.includes("عميل") || lower.includes("عملاء")) {
+        qConds.push(like(auditLog.entityType, "%client%"));
+      }
+      if (lower.includes("مشروع") || lower.includes("مشاريع")) {
+        qConds.push(like(auditLog.entityType, "%project%"));
+      }
+      if (lower.includes("مستخدم") || lower.includes("مستخدمين")) {
+        qConds.push(like(auditLog.entityType, "%user%"));
+      }
+      if (lower.includes("إعدادات") || lower.includes("اعدادات")) {
+        qConds.push(like(auditLog.entityType, "%setting%"));
+      }
+      if (lower.includes("دخول")) {
+        qConds.push(like(auditLog.action, "%login%"));
+      }
+      if (lower.includes("توقيع")) {
+        qConds.push(like(auditLog.action, "%sign%"));
+      }
+      conditions.push(or(...qConds)!);
+    }
+  }
+
   if (filters.entityType) {
-    conditions.push(eq(auditLog.entityType, filters.entityType));
+    conditions.push(eq(auditLog.entityType, filters.entityType.trim()));
   }
   if (filters.entityId) {
-    conditions.push(eq(auditLog.entityId, filters.entityId));
+    const idTrimmed = filters.entityId.trim();
+    conditions.push(like(auditLog.entityId, `%${idTrimmed}%`));
   }
   if (filters.action) {
-    conditions.push(eq(auditLog.action, filters.action));
+    conditions.push(eq(auditLog.action, filters.action.trim()));
   }
   if (filters.from) {
     conditions.push(gte(auditLog.ts, utcStartOfDayMs(filters.from)));

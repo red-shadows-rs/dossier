@@ -7,6 +7,7 @@ import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
 import { listInvoiceableMilestones } from "@/server/services/invoices";
 import { listProjectOptions } from "@/server/services/projects";
+import { getSettings } from "@/server/services/settings";
 import { smoothLoading } from "@/lib/smooth-loader";
 
 export default async function NewInvoicePage() {
@@ -14,6 +15,7 @@ export default async function NewInvoicePage() {
   const user = await requireUserPage();
   assertCan(user, "invoices.write");
   const t = await getTranslations("invoices");
+  const defaults = getSettings("defaults");
   const rawLocale = await getLocale();
   const locale = rawLocale === "en" ? "en" : "ar";
 
@@ -56,7 +58,10 @@ export default async function NewInvoicePage() {
         </Link>
       </div>
 
-      <NewInvoiceForm projects={projects} />
+      <NewInvoiceForm
+        projects={projects}
+        defaultLanguageMode={defaults.languageMode ?? "ar"}
+      />
     </div>
   );
 }
