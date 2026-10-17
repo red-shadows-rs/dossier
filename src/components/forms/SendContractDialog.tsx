@@ -48,7 +48,7 @@ export function SendContractDialog({
   const router = useRouter();
   const padRef = useRef<SignaturePadHandle>(null);
   const [method, setMethod] = useState<"drawn" | "typed">("drawn");
-  const [points, setPoints] = useState(0);
+  const [, setPoints] = useState(0);
   const [typedName, setTypedName] = useState("");
   const [consent, setConsent] = useState(!requireProviderSignature);
 

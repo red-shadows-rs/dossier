@@ -6,8 +6,6 @@ import { useLocale, useTranslations } from "next-intl";
 import {
   AlertTriangle,
   ArrowDown,
-  ArrowLeft,
-  ArrowRight,
   ArrowUp,
   CheckCircle2,
   ChevronLeft,
@@ -15,8 +13,6 @@ import {
   Coins,
   Copy,
   Eye,
-  FileCode2,
-  Lock,
   Plus,
   Receipt,
   Save,
@@ -380,7 +376,6 @@ export function TemplateForm({
       : t("errors.VALIDATION_FAILED");
   }
 
-  const hasErrors = Object.keys(fieldErrors).length > 0;
   const currentIndex = STEPS.indexOf(step);
 
   function goNext() {

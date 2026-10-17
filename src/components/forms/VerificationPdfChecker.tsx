@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
-import { CheckCircle2, FileSearch, ShieldAlert, Upload } from "lucide-react";
+import { CheckCircle2, FileSearch, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { FileUpload } from "@/components/ui/FileUpload";
 import { checkPdfAction } from "@/server/actions/verification";

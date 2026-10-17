@@ -1,19 +1,15 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useLocale } from "next-intl";
 import {
   Bot,
-  CheckCircle2,
-  Code2,
   Coins,
-  Copy,
   Eye,
   FileCode2,
   FileLock2,
   FilePlus2,
-  FileText,
   Globe,
   Languages,
   LayoutGrid,

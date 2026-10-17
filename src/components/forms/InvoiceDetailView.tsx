@@ -103,7 +103,6 @@ export function InvoiceDetailView({
   locale,
 }: InvoiceDetailViewProps) {
   const t = useTranslations("invoices");
-  const tc = useTranslations("common");
 
   const searchParams = useSearchParams();
   const currentTab = searchParams.get("tab") || "preview";

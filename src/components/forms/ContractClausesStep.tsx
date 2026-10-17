@@ -89,7 +89,7 @@ const VARIABLE_CATEGORIES = [
 export function ContractClausesStep({
   id,
   initial,
-  hasFees,
+  hasFees: _hasFees,
   onSaved,
   onPrev,
   onNext,

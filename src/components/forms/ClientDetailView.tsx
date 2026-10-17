@@ -16,7 +16,6 @@ import {
   Receipt,
   ShieldCheck,
   User,
-  Users,
 } from "lucide-react";
 import { ClientArchiveButton } from "@/components/forms/ClientArchiveButton";
 import { ClientDeleteButton } from "@/components/forms/ClientDeleteButton";

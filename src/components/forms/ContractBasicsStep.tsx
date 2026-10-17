@@ -6,10 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   BookOpen,
-  Building2,
   Calendar,
-  CreditCard,
-  FileText,
   Layers,
   Save,
   Scale,
@@ -22,7 +19,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { useToast } from "@/components/ui/Toast";
-import { CURRENCIES, LANG_MODES, type CurrencyCode } from "@/lib/constants";
+import { CURRENCIES, LANG_MODES } from "@/lib/constants";
 import { updateContractBasicsAction } from "@/server/actions/contracts";
 import type { BuilderBasics } from "./ContractBuilder";
 
