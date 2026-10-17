@@ -116,7 +116,7 @@ function fmtQty(qtyMilli: number): string {
 export const INVOICE_CSS = `
 @page {
   size: A4;
-  margin: 0 0 13mm 0;
+  margin: 0 0 8mm 0;
 }
 * {
   box-sizing: border-box;
@@ -708,8 +708,8 @@ table.inv-items-table tbody tr:last-child td {
   background: #e11d48;
   color: #ffffff;
   padding: 0 8mm;
-  height: 12mm;
-  font-size: 7.8pt;
+  height: 7.5mm;
+  font-size: 7.2pt;
   font-weight: 600;
   display: flex;
   justify-content: space-between;
@@ -728,8 +728,8 @@ table.inv-items-table tbody tr:last-child td {
   }
   .invoice-page {
     width: 210mm !important;
-    height: 284mm !important;
-    max-height: 284mm !important;
+    height: 288mm !important;
+    max-height: 288mm !important;
     page-break-after: always !important;
     break-after: page !important;
     display: flex !important;
@@ -780,6 +780,10 @@ function heroHeader(input: InvoiceHtmlInput): string {
   const contact: string[] = [];
   if (s.phone) contact.push(`<span dir="ltr">${esc(s.phone)}</span>`);
   if (s.email) contact.push(`<span dir="ltr">${esc(s.email)}</span>`);
+  if (s.website) {
+    const cleanWeb = s.website.replace(/^https?:\/\//i, "").replace(/\/$/, "");
+    contact.push(`<span dir="ltr">${esc(cleanWeb)}</span>`);
+  }
   if (contact.length > 0) sellerLines.push(`<div>${contact.join(" · ")}</div>`);
   const crVat: string[] = [];
   if (s.crNumber) crVat.push(lang === "ar" ? `س.ت: ${esc(s.crNumber)}` : `CR: ${esc(s.crNumber)}`);

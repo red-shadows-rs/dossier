@@ -16,6 +16,50 @@ const CHART_COLORS = [
   "#94a3b8", 
 ];
 
+function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
+  const rad = ((angleDeg - 90) * Math.PI) / 180.0;
+  return {
+    x: cx + r * Math.cos(rad),
+    y: cy + r * Math.sin(rad),
+  };
+}
+
+function describeDonutSegment(
+  cx: number,
+  cy: number,
+  rInner: number,
+  rOuter: number,
+  startAngle: number,
+  endAngle: number,
+): string {
+  const span = Math.min(360, Math.max(0, endAngle - startAngle));
+  if (span >= 359.9) {
+    return [
+      `M ${cx} ${cy - rOuter}`,
+      `A ${rOuter} ${rOuter} 0 1 0 ${cx} ${cy + rOuter}`,
+      `A ${rOuter} ${rOuter} 0 1 0 ${cx} ${cy - rOuter}`,
+      `M ${cx} ${cy - rInner}`,
+      `A ${rInner} ${rInner} 0 1 1 ${cx} ${cy + rInner}`,
+      `A ${rInner} ${rInner} 0 1 1 ${cx} ${cy - rInner}`,
+      "Z",
+    ].join(" ");
+  }
+
+  const p1 = polarToCartesian(cx, cy, rOuter, startAngle);
+  const p2 = polarToCartesian(cx, cy, rOuter, endAngle);
+  const p3 = polarToCartesian(cx, cy, rInner, endAngle);
+  const p4 = polarToCartesian(cx, cy, rInner, startAngle);
+  const largeArc = span > 180 ? 1 : 0;
+
+  return [
+    `M ${p1.x.toFixed(3)} ${p1.y.toFixed(3)}`,
+    `A ${rOuter} ${rOuter} 0 ${largeArc} 1 ${p2.x.toFixed(3)} ${p2.y.toFixed(3)}`,
+    `L ${p3.x.toFixed(3)} ${p3.y.toFixed(3)}`,
+    `A ${rInner} ${rInner} 0 ${largeArc} 0 ${p4.x.toFixed(3)} ${p4.y.toFixed(3)}`,
+    "Z",
+  ].join(" ");
+}
+
 export function StatusDonut({
   title,
   kind,
@@ -46,10 +90,25 @@ export function StatusDonut({
 
   const total = data.reduce((sum, entry) => sum + entry.value, 0);
   const size = 160;
-  const stroke = 20;
-  const radius = (size - stroke) / 2;
-  const circumference = 2 * Math.PI * radius;
-  let acc = 0;
+  const cx = size / 2;
+  const cy = size / 2;
+  const rOuter = 72;
+  const rInner = 52;
+
+  let currentAngle = 0;
+  const segments = data.map((entry) => {
+    const fraction = entry.value / total;
+    const angleSpan = fraction * 360;
+    const startAngle = currentAngle;
+    const endAngle = currentAngle + angleSpan;
+    currentAngle = endAngle;
+    return {
+      ...entry,
+      startAngle,
+      endAngle,
+      path: describeDonutSegment(cx, cy, rInner, rOuter, startAngle, endAngle),
+    };
+  });
 
   const activeEntry =
     hoveredIdx !== null ? data.find((d) => d.id === hoveredIdx) : null;
@@ -77,38 +136,34 @@ export function StatusDonut({
           >
             <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
               <circle
-                cx={size / 2}
-                cy={size / 2}
-                r={radius}
+                cx={cx}
+                cy={cy}
+                r={(rOuter + rInner) / 2}
                 fill="none"
                 stroke="var(--border)"
-                strokeWidth={stroke}
+                strokeWidth={rOuter - rInner}
+                opacity={0.25}
               />
-              {data.map((entry) => {
-                const fraction = entry.value / total;
-                const dash = fraction * circumference;
-                const offset = -acc * circumference;
-                acc += fraction;
-                const isHovered = hoveredIdx === entry.id;
-
+              {segments.map((seg) => {
+                const isHovered = hoveredIdx === seg.id;
                 return (
-                  <circle
-                    key={entry.id}
-                    cx={size / 2}
-                    cy={size / 2}
-                    r={radius}
-                    fill="none"
-                    stroke={entry.color}
-                    strokeWidth={stroke}
-                    strokeDasharray={`${dash} ${circumference - dash}`}
-                    strokeDashoffset={offset}
-                    transform={`rotate(-90 ${size / 2} ${size / 2})`}
-                    className="transition-opacity duration-150"
+                  <path
+                    key={seg.id}
+                    d={seg.path}
+                    fill={seg.color}
+                    stroke="var(--card)"
+                    strokeWidth={segments.length > 1 ? 2 : 0}
+                    strokeLinejoin="round"
+                    className="transition-all duration-150 cursor-pointer"
                     style={{
                       opacity: hoveredIdx !== null && !isHovered ? 0.4 : 1,
-                      filter: isHovered ? "brightness(1.15)" : undefined,
+                      filter: isHovered
+                        ? "brightness(1.15) drop-shadow(0 0 6px rgba(0,0,0,0.5))"
+                        : undefined,
+                      transform: isHovered ? "scale(1.03)" : "scale(1)",
+                      transformOrigin: `${cx}px ${cy}px`,
                     }}
-                    onMouseEnter={() => setHoveredIdx(entry.id)}
+                    onMouseEnter={() => setHoveredIdx(seg.id)}
                     onMouseLeave={() => setHoveredIdx(null)}
                   />
                 );

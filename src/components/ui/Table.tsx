@@ -11,6 +11,7 @@ import type { TableCellProps } from "@mui/material/TableCell";
 import MuiTableContainer from "@mui/material/TableContainer";
 import MuiTableHead from "@mui/material/TableHead";
 import MuiTableRow from "@mui/material/TableRow";
+import { cn } from "./cn";
 
 export function Table({
   className,
@@ -71,7 +72,7 @@ export function TableHeaderCell({
     <MuiTableCell
       component="th"
       scope="col"
-      className={className}
+      className={cn("text-start", className)}
       sx={{ fontWeight: 600, px: { xs: 1.25, sm: 2 } }}
       {...(props as unknown as TableCellProps)}
     >
@@ -87,7 +88,7 @@ export function TableCell({
 }: TdHTMLAttributes<HTMLTableCellElement>) {
   return (
     <MuiTableCell
-      className={className}
+      className={cn("text-start", className)}
       sx={{ px: { xs: 1.25, sm: 2 } }}
       {...(props as unknown as TableCellProps)}
     >

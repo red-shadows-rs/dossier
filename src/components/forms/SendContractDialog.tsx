@@ -3,7 +3,7 @@
 import { useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { PenTool, Send, Type, X } from "lucide-react";
+import { Building2, PenTool, Send, Type, User, X, FileCheck2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Dialog } from "@/components/ui/Dialog";
@@ -51,59 +51,86 @@ export function SendContractDialog({
   const [points, setPoints] = useState(0);
   const [typedName, setTypedName] = useState("");
   const [consent, setConsent] = useState(!requireProviderSignature);
-  const [signerId, setSignerId] = useState(
-    signers.find((s) => s.isSelf)?.id ?? signers[0]?.id ?? "",
+
+  const initialSigner = signers.find((s) => s.isSelf) ?? signers[0];
+  const [signerId, setSignerId] = useState(initialSigner?.id ?? "");
+  const [providerName, setProviderName] = useState(initialSigner?.name ?? "");
+  const [providerTitle, setProviderTitle] = useState(
+    (languageMode === "ar" ? initialSigner?.titleAr : initialSigner?.titleEn) ?? "",
   );
+
+  const [clientName, setClientName] = useState(clientDefaults.name ?? "");
+  const [clientTitle, setClientTitle] = useState(clientDefaults.title ?? "");
+  const [clientEmail, setClientEmail] = useState(clientDefaults.email ?? "");
+
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [statusError, setStatusError] = useState<string | null>(null);
 
-  const signer = signers.find((s) => s.id === signerId);
+  const handleSignerChange = (newId: string) => {
+    setSignerId(newId);
+    const s = signers.find((opt) => opt.id === newId);
+    if (s) {
+      setProviderName(s.name);
+      setProviderTitle(
+        (languageMode === "ar" ? s.titleAr : s.titleEn) ?? "",
+      );
+    }
+  };
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
     setStatusError(null);
+
     if (requireProviderSignature) {
       if (!consent) {
         setFieldErrors({ consent: "errors.required" });
         setStatusError(t("auth.requiredFields"));
         return;
       }
-      if (method === "drawn" && points < 20) {
-        setFieldErrors({ signature: "errors.tooShort" });
-        setStatusError(t("errors.tooShort"));
-        return;
+      if (method === "drawn") {
+        const dataUrl = padRef.current?.dataUrl;
+        const pts = padRef.current?.pointCount ?? 0;
+        if (!dataUrl || pts < 5) {
+          const msg = "يرجى رسم التوقيع داخل المربع المخصص";
+          setFieldErrors({ signature: msg });
+          setStatusError(msg);
+          return;
+        }
       }
       if (method === "typed" && typedName.trim() === "") {
-        setFieldErrors({ signature: "errors.required" });
-        setStatusError(t("auth.requiredFields"));
+        const msg = "اسم الموقع مطلوب للاعتماد";
+        setFieldErrors({ signature: msg });
+        setStatusError(msg);
         return;
       }
     }
+
     const signature = requireProviderSignature
       ? method === "drawn"
         ? {
             method: "drawn" as const,
             dataUrl: padRef.current?.dataUrl ?? undefined,
           }
-        : { method: "typed" as const, typedName }
+        : { method: "typed" as const, typedName: typedName.trim() }
       : undefined;
 
     setPending(true);
     setFieldErrors({});
+
     const result = await sendContractAction({
       id: contractId,
       providerSignerUserId: signerId,
-      providerName: String(data.get("providerName") ?? ""),
-      providerTitle: String(data.get("providerTitle") ?? ""),
-      clientSignatoryName: String(data.get("clientName") ?? ""),
-      clientSignatoryEmail: String(data.get("clientEmail") ?? ""),
-      clientSignatoryTitle: String(data.get("clientTitle") ?? ""),
+      providerName: providerName.trim(),
+      providerTitle: providerTitle.trim(),
+      clientSignatoryName: clientName.trim(),
+      clientSignatoryEmail: clientEmail.trim(),
+      clientSignatoryTitle: clientTitle.trim(),
       signature,
       consent,
       consentText,
     });
+
     setPending(false);
     if (result.ok) {
       toast({ title: tContracts("send.sent"), tone: "success" });
@@ -111,6 +138,7 @@ export function SendContractDialog({
       router.refresh();
       return;
     }
+
     if (result.error.fieldErrors) setFieldErrors(result.error.fieldErrors);
     const msg =
       result.error.code === "VALIDATION_FAILED"
@@ -122,7 +150,10 @@ export function SendContractDialog({
 
   const err = (key: string) => {
     const value = fieldErrors[key];
-    return value ? t(value) : null;
+    if (!value) return null;
+    return value.startsWith("errors.") || value.startsWith("contracts.")
+      ? t(value)
+      : value;
   };
 
   return (
@@ -130,139 +161,180 @@ export function SendContractDialog({
       open={open}
       onClose={onClose}
       title={tContracts("send.title")}
-      className="w-[min(44rem,calc(100vw-2rem))]"
+      maxWidth="md"
+      className="max-w-2xl w-full"
     >
-      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
         {statusError ? (
           <p
             role="alert"
-            className="rounded border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm font-medium text-destructive"
+            className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive"
           >
             {statusError}
           </p>
         ) : null}
-        <Field
-          label={tContracts("send.providerSigner")}
-          htmlFor="send-signer"
-          required
-        >
-          <Select
-            id="send-signer"
-            value={signerId}
-            onChange={(event) => setSignerId(event.target.value)}
-            disabled={pending}
-          >
-            {signers.map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.name}
-              </option>
-            ))}
-          </Select>
-        </Field>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <Field
-            label={tContracts("send.providerName")}
-            htmlFor="send-provider-name"
-          >
-            <Input
-              id="send-provider-name"
-              name="providerName"
-              defaultValue={signer?.name ?? ""}
-              disabled={pending}
-            />
-          </Field>
-          <Field
-            label={tContracts("send.providerTitle")}
-            htmlFor="send-provider-title"
-          >
-            <Input
-              id="send-provider-title"
-              name="providerTitle"
-              defaultValue={
-                (languageMode === "ar" ? signer?.titleAr : signer?.titleEn) ??
-                ""
-              }
-              disabled={pending}
-            />
-          </Field>
+        {/* Section 1: Provider Signer */}
+        <div className="flex flex-col gap-3.5">
+          <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+            <Building2 className="h-4 w-4 text-primary" />
+            <span>{tContracts("send.providerSigner")}</span>
+          </div>
+
+          {signers.length > 1 ? (
+            <Field
+              label={tContracts("send.providerSigner")}
+              htmlFor="send-signer"
+              required
+            >
+              <Select
+                id="send-signer"
+                value={signerId}
+                onChange={(event) => handleSignerChange(event.target.value)}
+                disabled={pending}
+              >
+                {signers.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.name}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          ) : null}
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field
+              label={tContracts("send.providerName")}
+              htmlFor="send-provider-name"
+              required
+              error={err("providerName")}
+            >
+              <Input
+                id="send-provider-name"
+                name="providerName"
+                value={providerName}
+                onChange={(e) => setProviderName(e.target.value)}
+                disabled={pending}
+                placeholder="اسم المفوض بالتوقيع"
+              />
+            </Field>
+
+            <Field
+              label={tContracts("send.providerTitle")}
+              htmlFor="send-provider-title"
+              error={err("providerTitle")}
+            >
+              <Input
+                id="send-provider-title"
+                name="providerTitle"
+                value={providerTitle}
+                onChange={(e) => setProviderTitle(e.target.value)}
+                disabled={pending}
+                placeholder="المسمى الوظيفي"
+              />
+            </Field>
+          </div>
         </div>
 
-        <fieldset className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <legend className="mb-1 text-sm font-medium">
-            {tContracts("send.clientSignatory")}
-          </legend>
-          <Field
-            label={tContracts("send.clientName")}
-            htmlFor="send-client-name"
-            required
-          >
-            <Input
-              id="send-client-name"
-              name="clientName"
-              defaultValue={clientDefaults.name}
-              disabled={pending}
-            />
-          </Field>
-          <Field
-            label={tContracts("send.clientTitle")}
-            htmlFor="send-client-title"
-          >
-            <Input
-              id="send-client-title"
-              name="clientTitle"
-              defaultValue={clientDefaults.title}
-              disabled={pending}
-            />
-          </Field>
-          <Field
-            label={tContracts("send.clientEmail")}
-            htmlFor="send-client-email"
-            required
-          >
-            <Input
-              id="send-client-email"
-              name="clientEmail"
-              type="email"
-              dir="ltr"
-              defaultValue={clientDefaults.email}
-              disabled={pending}
-              className="text-start"
-            />
-          </Field>
-        </fieldset>
+        {/* Section 2: Client Signatory */}
+        <div className="flex flex-col gap-3.5 border-t border-border/60 pt-4">
+          <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+            <User className="h-4 w-4 text-primary" />
+            <span>{tContracts("send.clientSignatory")}</span>
+          </div>
 
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <Field
+              label={tContracts("send.clientName")}
+              htmlFor="send-client-name"
+              error={err("clientSignatoryName")}
+            >
+              <Input
+                id="send-client-name"
+                name="clientName"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                disabled={pending}
+                placeholder="اسم ممثل العميل (اختياري)"
+              />
+            </Field>
+
+            <Field
+              label={tContracts("send.clientTitle")}
+              htmlFor="send-client-title"
+              error={err("clientSignatoryTitle")}
+            >
+              <Input
+                id="send-client-title"
+                name="clientTitle"
+                value={clientTitle}
+                onChange={(e) => setClientTitle(e.target.value)}
+                disabled={pending}
+                placeholder="المسمى الوظيفي"
+              />
+            </Field>
+
+            <Field
+              label={tContracts("send.clientEmail")}
+              htmlFor="send-client-email"
+              required
+              error={err("clientSignatoryEmail")}
+            >
+              <Input
+                id="send-client-email"
+                name="clientEmail"
+                type="email"
+                dir="ltr"
+                value={clientEmail}
+                onChange={(e) => setClientEmail(e.target.value)}
+                disabled={pending}
+                className="text-start"
+                placeholder="client@example.com"
+              />
+            </Field>
+          </div>
+        </div>
+
+        {/* Section 3: Signature & Consent */}
         {requireProviderSignature ? (
-          <div className="flex flex-col gap-3 rounded-md border border-border p-3">
-            <div className="flex gap-2">
-              <button
-                type="button"
-                aria-current={method === "drawn" ? "true" : undefined}
-                onClick={() => setMethod("drawn")}
-                className={cn(
-                  "flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm",
-                  method === "drawn"
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border text-muted-foreground",
-                )}
-              >
-                <PenTool className="h-4 w-4" />
-                <span>{tContracts("send.drawn")}</span>
-              </button>
-              <button
-                type="button"
-                aria-current={method === "typed" ? "true" : undefined}
-                onClick={() => setMethod("typed")}
-                className={cn(
-                  "flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm",
-                  method === "typed"
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border text-muted-foreground",
-                )}
-              >
-                <Type className="h-4 w-4" />
-                <span>{tContracts("send.typed")}</span>
-              </button>
+          <div className="flex flex-col gap-3.5 border-t border-border/60 pt-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                <FileCheck2 className="h-4 w-4 text-primary" />
+                <span>اعتماد العقد والتوقيع الإلكتروني</span>
+              </div>
+
+              {/* Segmented Control */}
+              <div className="inline-flex rounded-md border border-border/80 bg-muted/30 p-0.5">
+                <button
+                  type="button"
+                  aria-current={method === "drawn" ? "true" : undefined}
+                  onClick={() => setMethod("drawn")}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors",
+                    method === "drawn"
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <PenTool className="h-3.5 w-3.5" />
+                  <span>{tContracts("send.drawn")}</span>
+                </button>
+                <button
+                  type="button"
+                  aria-current={method === "typed" ? "true" : undefined}
+                  onClick={() => setMethod("typed")}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors",
+                    method === "typed"
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <Type className="h-3.5 w-3.5" />
+                  <span>{tContracts("send.typed")}</span>
+                </button>
+              </div>
             </div>
 
             {method === "drawn" ? (
@@ -274,49 +346,76 @@ export function SendContractDialog({
                 }}
               />
             ) : (
-              <Field
-                label={tContracts("send.typedName")}
-                htmlFor="send-typed"
-                error={err("signature")}
-              >
-                <Input
-                  id="send-typed"
-                  value={typedName}
-                  onChange={(event) => setTypedName(event.target.value)}
-                  disabled={pending}
-                />
-              </Field>
+              <div className="flex flex-col gap-3">
+                <Field
+                  label={tContracts("send.typedName")}
+                  htmlFor="send-typed"
+                  error={err("signature")}
+                  required
+                >
+                  <Input
+                    id="send-typed"
+                    value={typedName}
+                    onChange={(event) => {
+                      setTypedName(event.target.value);
+                      if (event.target.value.trim()) {
+                        setFieldErrors((e) => ({ ...e, signature: "" }));
+                      }
+                    }}
+                    disabled={pending}
+                    placeholder="اكتب اسمك للاعتماد كـ توقيع إلكتروني"
+                  />
+                </Field>
+
+                {/* Calligraphic Preview */}
+                <div className="flex h-20 w-full items-center justify-center rounded-lg border border-border/80 bg-card px-4 text-center select-none shadow-inner">
+                  <span className="font-serif text-2xl italic tracking-wide text-foreground">
+                    {typedName.trim() || "توقيع بالاسم المكتوب"}
+                  </span>
+                </div>
+              </div>
             )}
 
-            <Checkbox
-              checked={consent}
-              onChange={(event) => {
-                setConsent(event.target.checked);
-                setFieldErrors((e) => ({ ...e, consent: "" }));
-              }}
-              disabled={pending}
-              label={<span>{consentText}</span>}
-            />
+            {/* Consent Checkbox */}
+            <div className="pt-1">
+              <Checkbox
+                checked={consent}
+                onChange={(event) => {
+                  setConsent(event.target.checked);
+                  if (event.target.checked) {
+                    setFieldErrors((e) => ({ ...e, consent: "" }));
+                  }
+                }}
+                disabled={pending}
+                label={<span className="text-xs font-medium leading-relaxed">{consentText}</span>}
+              />
+            </div>
+
             {err("consent") || err("signature") ? (
-              <p role="alert" className="text-xs text-destructive">
+              <p role="alert" className="text-xs font-medium text-destructive">
                 {err("consent") ?? err("signature")}
               </p>
             ) : null}
           </div>
         ) : null}
 
-        <div className="flex justify-end gap-2">
+        {/* Action Buttons */}
+        <div className="flex items-center justify-end gap-3 pt-2">
           <Button
             type="button"
             variant="secondary"
             onClick={onClose}
             disabled={pending}
-            className="gap-2"
+            className="gap-2 px-5"
           >
             <X className="h-4 w-4" />
             {t("common.cancel")}
           </Button>
-          <Button type="submit" loading={pending} className="gap-2">
+          <Button
+            type="submit"
+            loading={pending}
+            className="gap-2 px-6 shadow-sm"
+          >
             <Send className="h-4 w-4" />
             {tContracts("send.submit")}
           </Button>

@@ -60,9 +60,11 @@ export function createAppTheme(
             fontSize: "0.75rem",
             color: "var(--muted-foreground)",
             borderColor: "var(--border)",
+            textAlign: "start",
           },
           root: {
             borderColor: "var(--border)",
+            textAlign: "start",
           },
         },
       },

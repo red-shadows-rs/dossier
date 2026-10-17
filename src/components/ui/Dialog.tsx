@@ -6,6 +6,8 @@ import MuiDialogActions from "@mui/material/DialogActions";
 import MuiDialogContent from "@mui/material/DialogContent";
 import MuiDialogContentText from "@mui/material/DialogContentText";
 import MuiDialogTitle from "@mui/material/DialogTitle";
+import { X } from "lucide-react";
+import { cn } from "./cn";
 
 export type DialogProps = {
   open: boolean;
@@ -16,6 +18,7 @@ export type DialogProps = {
   footer?: ReactNode;
   className?: string;
   maxWidth?: "xs" | "sm" | "md" | "lg" | "xl" | false;
+  showCloseButton?: boolean;
 };
 
 export function Dialog({
@@ -27,28 +30,72 @@ export function Dialog({
   footer,
   className,
   maxWidth = "sm",
+  showCloseButton = true,
 }: DialogProps) {
   const descriptionId = useId();
 
   return (
     <MuiDialog
       open={open}
-      onClose={onClose}
+      onClose={(_event, reason) => {
+        if (reason === "backdropClick") {
+          return;
+        }
+        onClose();
+      }}
       fullWidth
       maxWidth={maxWidth}
-      className={className}
       aria-describedby={description ? descriptionId : undefined}
+      slotProps={{
+        backdrop: {
+          className: "bg-black/70 transition-opacity",
+        },
+        paper: {
+          className: cn(
+            "bg-surface text-foreground border border-border shadow-2xl rounded-xl overflow-hidden m-4 max-h-[92vh] flex flex-col",
+            className,
+          ),
+          style: {
+            backgroundImage: "none",
+          },
+        },
+      }}
     >
-      <MuiDialogTitle>{title}</MuiDialogTitle>
-      <MuiDialogContent>
+      <div className="flex items-center justify-between border-b border-border/80 px-6 py-4 shrink-0">
+        <MuiDialogTitle
+          component="h2"
+          className="p-0 text-lg font-bold text-foreground leading-tight"
+        >
+          {title}
+        </MuiDialogTitle>
+        {showCloseButton ? (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="إغلاق"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-card hover:text-foreground focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        ) : null}
+      </div>
+
+      <MuiDialogContent className="p-6 overflow-y-auto">
         {description ? (
-          <MuiDialogContentText id={descriptionId} sx={{ mb: children ? 2 : 0 }}>
+          <MuiDialogContentText
+            id={descriptionId}
+            className="mb-4 text-sm text-muted-foreground"
+          >
             {description}
           </MuiDialogContentText>
         ) : null}
         {children}
       </MuiDialogContent>
-      {footer ? <MuiDialogActions>{footer}</MuiDialogActions> : null}
+      {footer ? (
+        <MuiDialogActions className="border-t border-border/80 bg-surface/40 px-6 py-4 shrink-0">
+          {footer}
+        </MuiDialogActions>
+      ) : null}
     </MuiDialog>
   );
 }

@@ -5,6 +5,7 @@ import {
   contractVersions,
   contracts,
   users,
+  clients,
 } from "@/db/schema";
 import { canonicalize } from "@/lib/canonical-json";
 import { hmacToken, sha256Hex } from "@/lib/crypto";
@@ -190,6 +191,22 @@ export function sendContract(
     const providerSignatoryId = newId();
     const clientSignatoryId = newId();
 
+    const clientRecord = tx
+      .select()
+      .from(clients)
+      .where(eq(clients.id, current.clientId))
+      .get();
+    const fallbackClientName =
+      (current.languageMode === "en"
+        ? clientRecord?.repNameEn || clientRecord?.repNameAr || clientRecord?.nameEn || clientRecord?.nameAr
+        : clientRecord?.repNameAr || clientRecord?.repNameEn || clientRecord?.nameAr || clientRecord?.nameEn) ||
+      "العميل";
+
+    const resolvedClientName =
+      input.clientSignatoryName && input.clientSignatoryName.trim().length > 0
+        ? input.clientSignatoryName.trim()
+        : fallbackClientName;
+
     const snapshot = buildContractSnapshot(contractId, [
       {
         role: "provider",
@@ -199,7 +216,7 @@ export function sendContract(
       },
       {
         role: "client",
-        name: input.clientSignatoryName,
+        name: resolvedClientName,
         title: input.clientSignatoryTitle ?? null,
         email: input.clientSignatoryEmail,
       },
@@ -263,7 +280,7 @@ export function sendContract(
         contractId,
         versionId,
         role: "client",
-        name: input.clientSignatoryName,
+        name: resolvedClientName,
         title: input.clientSignatoryTitle ?? null,
         email: input.clientSignatoryEmail,
         sortOrder: 1,

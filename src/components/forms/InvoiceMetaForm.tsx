@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -115,16 +116,12 @@ export function InvoiceMetaForm({
                 className="text-start"
               />
             </Field>
-            <label className="inline-flex items-center gap-2 text-xs text-muted-foreground select-none cursor-pointer">
-              <input
-                type="checkbox"
-                checked={noDueDate}
-                onChange={(e) => setNoDueDate(e.target.checked)}
-                disabled={pending}
-                className="rounded border-border text-primary focus:ring-primary"
-              />
-              <span>{t("invoices.noDueDate")}</span>
-            </label>
+            <Checkbox
+              checked={noDueDate}
+              onChange={(e) => setNoDueDate(e.target.checked)}
+              disabled={pending}
+              label={<span className="text-xs text-muted-foreground">{t("invoices.noDueDate")}</span>}
+            />
           </div>
           <Field label={t("invoices.notesAr")} htmlFor="inv-notes-ar">
             <Textarea

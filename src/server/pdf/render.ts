@@ -32,7 +32,7 @@ async function renderOnce(html: string, footer: FooterMeta): Promise<Buffer> {
       displayHeaderFooter: true,
       headerTemplate: "<div style=\"font-size:0;height:0;margin:0;padding:0;display:none;\"></div>",
       footerTemplate: buildFooterTemplate(footer),
-      margin: { top: "0mm", bottom: "13mm", left: "0mm", right: "0mm" },
+      margin: { top: "0mm", bottom: "8mm", left: "0mm", right: "0mm" },
     });
     return Buffer.from(pdf);
   } finally {

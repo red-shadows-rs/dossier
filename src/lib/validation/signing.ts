@@ -22,8 +22,8 @@ export const sendContractInputSchema = z.object({
   providerTitle: z.string().max(200, "errors.tooLong").optional(),
   clientSignatoryName: z
     .string()
-    .min(1, "errors.required")
-    .max(200, "errors.tooLong"),
+    .max(200, "errors.tooLong")
+    .optional(),
   clientSignatoryEmail: z
     .string()
     .min(1, "errors.required")

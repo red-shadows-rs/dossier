@@ -41,7 +41,7 @@ export function baseCss(fonts: string): string {
   return `${fonts}
 @page {
   size: A4;
-  margin: 0 0 13mm 0;
+  margin: 0 0 8mm 0;
 }
 * {
   box-sizing: border-box;
@@ -124,11 +124,13 @@ p.note {
   line-height: 1.7;
 }
 ul {
-  margin: 0 0 2.5mm;
+  margin: 1.5mm 0 2.5mm 0;
+  margin-inline-start: 4.5mm;
   padding-inline-start: 4.5mm;
 }
 li {
-  margin-bottom: 1mm;
+  margin-bottom: 1.2mm;
+  line-height: 1.65;
 }
 .num {
   font-variant-numeric: tabular-nums;
@@ -879,9 +881,9 @@ li {
 .bottom-red-bar {
   background: #e11d48;
   color: #ffffff;
-  padding: 0 10mm;
-  height: 12mm;
-  font-size: 7.8pt;
+  padding: 0 8mm;
+  height: 7.5mm;
+  font-size: 7.2pt;
   font-weight: 600;
   display: flex;
   justify-content: space-between;
@@ -993,8 +995,8 @@ li {
   }
   .contract-page, .invoice-page {
     width: 210mm !important;
-    height: 284mm !important;
-    max-height: 284mm !important;
+    height: 288mm !important;
+    max-height: 288mm !important;
     page-break-after: always !important;
     break-after: page !important;
     display: flex !important;
@@ -1050,7 +1052,7 @@ export function buildFooterTemplate(meta: {
     overflow: visible !important;
   }
 </style>
-<div style="position: absolute; bottom: -2mm; left: -5mm; width: calc(100% + 10mm); height: 17mm; margin: 0; padding: 0 calc(8mm + 5mm); background-color: #e11d48; -webkit-print-color-adjust: exact; color: #ffffff; font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 8pt; font-weight: 700; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; direction: ${isRtlDoc ? "rtl" : "ltr"};">
+<div style="position: absolute; bottom: -3mm; left: -5mm; width: calc(100% + 10mm); height: 11mm; margin: 0; padding: 0 calc(8mm + 5mm); padding-bottom: 3mm; background-color: #e11d48; -webkit-print-color-adjust: exact; color: #ffffff; font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 7.2pt; font-weight: 700; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; direction: ${isRtlDoc ? "rtl" : "ltr"};">
   <span dir="ltr">Dossier</span>
   <span dir="ltr"><span class="pageNumber"></span> / <span class="totalPages"></span></span>
 </div>`;
@@ -1082,7 +1084,9 @@ export function renderPartiesBlock(
       email: string;
       phone: string;
       addr: string;
+      web?: string;
     },
+    website?: string | null | undefined,
   ): string {
     const lines: string[] = [];
     if (legalName)
@@ -1101,6 +1105,13 @@ export function renderPartiesBlock(
       lines.push(
         `<span class="party-lbl">${esc(labels.email)}:</span> <span class="party-val" dir="ltr">${esc(email)}</span>`,
       );
+    if (website) {
+      const cleanWeb = website.replace(/^https?:\/\//i, "").replace(/\/$/, "");
+      const webLbl = labels.web || (labels.legal === "الاسم القانوني" ? "الموقع" : "Website");
+      lines.push(
+        `<span class="party-lbl">${esc(webLbl)}:</span> <span class="party-val" dir="ltr">${esc(cleanWeb)}</span>`,
+      );
+    }
     if (phone)
       lines.push(
         `<span class="party-lbl">${esc(labels.phone)}:</span> <span class="party-val" dir="ltr">${esc(phone)}</span>`,
@@ -1143,7 +1154,9 @@ export function renderPartiesBlock(
       email: "Email",
       phone: "Phone",
       addr: "Address",
+      web: "Website",
     },
+    p.website,
   );
   const enClient = partyHtml(
     "Second Party (Client)",
@@ -1186,7 +1199,9 @@ export function renderPartiesBlock(
       email: "البريد",
       phone: "الهاتف",
       addr: "العنوان",
+      web: "الموقع",
     },
+    p.website,
   );
   const arClient = partyHtml(
     "الطرف الثاني (العميل)",

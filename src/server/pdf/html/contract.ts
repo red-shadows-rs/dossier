@@ -184,6 +184,10 @@ function renderHeroHeader(
   const contact: string[] = [];
   if (p.phone) contact.push(`<span dir="ltr">${esc(p.phone)}</span>`);
   if (p.email) contact.push(`<span dir="ltr">${esc(p.email)}</span>`);
+  if (p.website) {
+    const cleanWeb = p.website.replace(/^https?:\/\//i, "").replace(/\/$/, "");
+    contact.push(`<span dir="ltr">${esc(cleanWeb)}</span>`);
+  }
   if (contact.length > 0) providerLines.push(`<div>${contact.join(" · ")}</div>`);
   const crVat: string[] = [];
   if (p.crNumber) crVat.push(lang === "ar" ? `س.ت: ${esc(p.crNumber)}` : `CR: ${esc(p.crNumber)}`);
@@ -238,10 +242,11 @@ function renderHeroHeader(
       : snapshot.project.nameEn || snapshot.project.nameAr || ""
   }`;
 
+  const arrow = isRtlDoc ? "←" : "→";
   const termDisplay =
-    c.startDate || c.endDate
-      ? `${startDateFormatted} → ${endDateFormatted}`
-      : "—";
+    startDateFormatted && endDateFormatted
+      ? `${startDateFormatted} ${arrow} ${endDateFormatted}`
+      : startDateFormatted || endDateFormatted || "—";
 
   return `
   <header class="hero-header">

@@ -113,6 +113,14 @@
   select:disabled {
     cursor: not-allowed;
   }
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--primary);
+  }
+  th,
+  td {
+    text-align: start;
+  }
 }
 
 @media (pointer: coarse) {
