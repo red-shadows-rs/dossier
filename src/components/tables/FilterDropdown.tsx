@@ -23,11 +23,8 @@ export function FilterDropdown({
   applyLabel?: string;
   resetLabel?: string;
 }) {
-  let activeLocale = "ar";
-  try {
-    activeLocale = useLocale();
-  } catch {}
-  const isAr = activeLocale !== "en";
+  const locale = useLocale();
+  const isAr = locale !== "en";
 
   const resolvedLabel = label ?? (isAr ? "تصفية" : "Filter");
   const resolvedTitle = title ?? (isAr ? "خيارات التصفية" : "Filter Options");

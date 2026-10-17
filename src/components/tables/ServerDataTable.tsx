@@ -47,11 +47,8 @@ export function ServerDataTable<R extends { id: string | number }>({
   minWidth?: string;
   renderMobileCard?: (row: R) => ReactNode;
 }) {
-  let activeLocale = "ar";
-  try {
-    activeLocale = useLocale();
-  } catch {}
-  const isAr = activeLocale !== "en";
+  const locale = useLocale();
+  const isAr = locale !== "en";
 
   const [clientPage, setClientPage] = useState(1);
 

@@ -36,11 +36,8 @@ export function Dialog({
   closeLabel,
 }: DialogProps) {
   const descriptionId = useId();
-  let activeLocale = "ar";
-  try {
-    activeLocale = useLocale();
-  } catch {}
-  const isAr = activeLocale !== "en";
+  const locale = useLocale();
+  const isAr = locale !== "en";
 
   return (
     <MuiDialog

@@ -43,12 +43,8 @@ export function FileUpload({
   onClear?: () => void;
   hint?: ReactNode;
 }) {
-  let activeLocale = "ar";
-  try {
-    activeLocale = useLocale();
-  } catch {
-  }
-  const isAr = activeLocale !== "en";
+  const locale = useLocale();
+  const isAr = locale !== "en";
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);

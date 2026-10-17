@@ -723,11 +723,8 @@ export function DocumentSkeleton({
   className?: string;
   label?: string;
 } = {}) {
-  let activeLocale = "ar";
-  try {
-    activeLocale = useLocale();
-  } catch {}
-  const isAr = activeLocale !== "en";
+  const locale = useLocale();
+  const isAr = locale !== "en";
 
   return (
     <div className="relative flex flex-col gap-4">

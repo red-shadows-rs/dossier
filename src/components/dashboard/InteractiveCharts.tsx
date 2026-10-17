@@ -76,11 +76,8 @@ export function StatusDonut({
   labels: Record<string, string>;
   totalLabel?: string;
 }) {
-  let activeLocale = "ar";
-  try {
-    activeLocale = useLocale();
-  } catch {}
-  const isAr = activeLocale !== "en";
+  const locale = useLocale();
+  const isAr = locale !== "en";
   const resolvedTotalLabel = totalLabel ?? (isAr ? "الإجمالي" : "Total");
 
   const Icon = kind === "contracts" ? FileText : Receipt;
