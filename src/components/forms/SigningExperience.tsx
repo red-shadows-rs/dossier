@@ -20,7 +20,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Field } from "@/components/ui/Field";
-import { Input } from "@/components/ui/Input";
+import { Input, InputAdornment } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { cn } from "@/components/ui/cn";
 import {
@@ -80,6 +80,10 @@ export function SigningExperience({
 
   async function verifyOtp(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!code.trim()) {
+      setError(tr("errors.required"));
+      return;
+    }
     setPending(true);
     setError(null);
     const result = await verifySigningOtpAction({ token, code });
@@ -260,12 +264,17 @@ export function SigningExperience({
                 disabled={pending}
                 autoComplete="one-time-code"
                 autoFocus={otpSent}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <KeyRound size={16} className="text-muted-foreground" aria-hidden="true" />
+                  </InputAdornment>
+                }
               />
             </Field>
             <Button
               type="submit"
               loading={pending}
-              disabled={pending || !code.trim()}
+              disabled={pending}
               className="w-full sm:w-auto h-11 px-6 gap-2 shrink-0 font-semibold"
             >
               <Check className="h-4 w-4" />
