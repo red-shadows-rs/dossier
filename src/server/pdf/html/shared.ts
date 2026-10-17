@@ -640,50 +640,43 @@ li {
   font-style: italic;
 }
 
-/* Unsigned Note */
+/* Unsigned Note — styled to match Dossier form & site alert design */
 .unsigned-card {
   margin: 3.5mm 0 2mm;
-  background: #fafafa;
-  border: 0.3mm solid #e4e4e7;
-  border-inline-start: 1mm solid #be123c;
-  border-radius: 2mm;
-  padding: 2.2mm 3.5mm;
+  background: rgba(225, 29, 72, 0.05);
+  border: 0.25mm solid rgba(225, 29, 72, 0.25);
+  border-radius: 1.8mm;
+  padding: 2.2mm 3.2mm;
   display: flex;
   align-items: center;
-  gap: 3mm;
+  gap: 2.5mm;
   box-sizing: border-box;
   break-inside: avoid;
   page-break-inside: avoid;
 }
-.unsigned-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 1.5mm;
-  background: #fff1f2;
-  color: #be123c;
-  border: 0.25mm solid #fecdd3;
-  border-radius: 1mm;
-  padding: 0.6mm 2.2mm;
-  font-size: 7pt;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
+.unsigned-icon {
+  width: 4.2mm;
+  height: 4.2mm;
+  color: #e11d48;
   flex-shrink: 0;
 }
-.unsigned-dot {
-  width: 1.6mm;
-  height: 1.6mm;
-  border-radius: 50%;
-  background: #e11d48;
-  display: inline-block;
-  box-shadow: 0 0 1.5mm rgba(225, 29, 72, 0.4);
+.unsigned-text {
+  flex: 1;
+  font-size: 7.2pt;
+  line-height: 1.45;
+  color: #be123c;
+}
+.unsigned-title {
+  font-weight: 800;
+  color: #be123c;
+  letter-spacing: 0.02em;
+}
+.unsigned-sep {
+  margin: 0 1.2mm;
+  opacity: 0.6;
 }
 .unsigned-desc {
-  margin: 0;
-  font-size: 7.2pt;
-  color: #52525b;
-  line-height: 1.45;
+  color: #9f1239;
   font-weight: 500;
 }
 

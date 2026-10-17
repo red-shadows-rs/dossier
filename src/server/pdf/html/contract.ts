@@ -235,6 +235,7 @@ function renderHeroHeader(
   const lblIssue = lang === "en" ? "Issue Date" : "تاريخ الإصدار";
   const lblTerm = lang === "en" ? "Term" : "مدة العقد";
   const lblProject = lang === "en" ? "Project" : "المشروع";
+  const lblVersion = lang === "en" ? "Version" : "الإصدار";
 
   const projectTitle = `${snapshot.project.code} — ${
     lang === "ar"
@@ -290,7 +291,7 @@ function renderHeroHeader(
             </tr>
             ${
               c.versionNo > 1
-                ? `<tr><td class="lbl">v</td><td class="val-std">v${c.versionNo}</td></tr>`
+                ? `<tr><td class="lbl">${lblVersion}</td><td class="val-std">${num(String(c.versionNo))}</td></tr>`
                 : ""
             }
           </tbody>
@@ -522,13 +523,13 @@ export function renderContractHtml(input: ContractHtmlInput): string {
 
   const unsignedNote =
     mode === "unsigned"
-      ? `<div class="unsigned-card"><span class="unsigned-badge"><span class="unsigned-dot"></span>${
+      ? `<div class="unsigned-card"><svg class="unsigned-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg><div class="unsigned-text"><strong class="unsigned-title">${
           lang === "en" ? "UNSIGNED" : "غير موقع"
-        }</span><span class="unsigned-desc">${
+        }</strong><span class="unsigned-sep">—</span><span class="unsigned-desc">${
           lang === "en"
             ? "This contract document is currently unsigned and has no legal validity until fully executed by all parties."
             : "هذا العقد غير موقع حالياً ولا يعد نافذاً أو معتمداً حتى يتم توقيعه رسمياً من جميع الأطراف."
-        }</span></div>`
+        }</span></div></div>`
       : "";
 
   const footerHtml = renderContractFooter(input);
