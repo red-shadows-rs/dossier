@@ -10,11 +10,13 @@ import {
   ChevronRight,
   ChevronUp,
   ChevronsUpDown,
+  Code2,
   Copy,
   Plus,
   Save,
   ScrollText,
   Search,
+  Sparkles,
   Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -26,6 +28,63 @@ import { useToast } from "@/components/ui/Toast";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { saveClausesAction } from "@/server/actions/contracts";
 import type { BuilderClause } from "./ContractBuilder";
+
+const VARIABLE_CATEGORIES = [
+  {
+    key: "blocks",
+    titleAr: "الكتل الخاصة (تدرج في سطر مستقل)",
+    titleEn: "Special Blocks (standalone lines)",
+    badge: "هياكل تلقائية",
+    items: [
+      { key: "{{block.parties}}", labelAr: "كتلة الأطراف", labelEn: "Parties Box" },
+      { key: "{{block.pricing_table}}", labelAr: "جدول الأسعار", labelEn: "Pricing Table" },
+      { key: "{{block.payment_schedule}}", labelAr: "جدول الدفعات", labelEn: "Payment Schedule" },
+      { key: "{{block.signatures}}", labelAr: "كتلة التوقيعات", labelEn: "Signatures" },
+    ],
+  },
+  {
+    key: "contract",
+    titleAr: "بيانات العقد والماليات",
+    titleEn: "Contract & Financials",
+    badge: "العقد",
+    items: [
+      { key: "{{contract.number}}", labelAr: "رقم العقد", labelEn: "Number" },
+      { key: "{{contract.title}}", labelAr: "عنوان العقد", labelEn: "Title" },
+      { key: "{{contract.date}}", labelAr: "تاريخ الإنشاء", labelEn: "Issue Date" },
+      { key: "{{contract.start_date}}", labelAr: "تاريخ البدء", labelEn: "Start Date" },
+      { key: "{{contract.end_date}}", labelAr: "تاريخ الانتهاء", labelEn: "End Date" },
+      { key: "{{contract.total}}", labelAr: "الإجمالي النهائي", labelEn: "Total Amount" },
+      { key: "{{contract.net}}", labelAr: "المبلغ الصافي", labelEn: "Net Amount" },
+      { key: "{{contract.tax}}", labelAr: "مبلغ الضريبة", labelEn: "Tax Amount" },
+      { key: "{{contract.tax_rate}}", labelAr: "نسبة الضريبة", labelEn: "Tax Rate" },
+      { key: "{{contract.currency}}", labelAr: "العملة", labelEn: "Currency" },
+      { key: "{{contract.payment_terms_days}}", labelAr: "مهلة السداد (أيام)", labelEn: "Payment Terms" },
+      { key: "{{contract.scope}}", labelAr: "نطاق العمل", labelEn: "Scope" },
+      { key: "{{contract.governing_law}}", labelAr: "النظام الحاكم", labelEn: "Governing Law" },
+      { key: "{{contract.jurisdiction}}", labelAr: "الاختصاص القضائي", labelEn: "Jurisdiction" },
+    ],
+  },
+  {
+    key: "parties",
+    titleAr: "بيانات العميل والمزود والمشروع",
+    titleEn: "Client, Provider & Project",
+    badge: "الأطراف",
+    items: [
+      { key: "{{client.name}}", labelAr: "اسم العميل", labelEn: "Client Name" },
+      { key: "{{client.rep_name}}", labelAr: "ممثل العميل", labelEn: "Client Rep Name" },
+      { key: "{{client.email}}", labelAr: "بريد العميل", labelEn: "Client Email" },
+      { key: "{{client.phone}}", labelAr: "هاتف العميل", labelEn: "Client Phone" },
+      { key: "{{client.cr_number}}", labelAr: "سجل العميل", labelEn: "Client CR" },
+      { key: "{{client.tax_number}}", labelAr: "ضريبة العميل", labelEn: "Client VAT" },
+      { key: "{{provider.name}}", labelAr: "اسم المزود", labelEn: "Provider Name" },
+      { key: "{{provider.cr_number}}", labelAr: "سجل المزود", labelEn: "Provider CR" },
+      { key: "{{provider.tax_number}}", labelAr: "ضريبة المزود", labelEn: "Provider VAT" },
+      { key: "{{provider.signatory_name}}", labelAr: "المفوض بالتوقيع", labelEn: "Signatory Name" },
+      { key: "{{project.name}}", labelAr: "اسم المشروع", labelEn: "Project Name" },
+      { key: "{{project.code}}", labelAr: "كود المشروع", labelEn: "Project Code" },
+    ],
+  },
+];
 
 export function ContractClausesStep({
   id,
@@ -63,6 +122,7 @@ export function ContractClausesStep({
   const [collapsedIndices, setCollapsedIndices] = useState<Set<number>>(
     new Set(),
   );
+  const [showVariablesGuide, setShowVariablesGuide] = useState(false);
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
@@ -179,6 +239,17 @@ export function ContractClausesStep({
 
             <Button
               type="button"
+              variant={showVariablesGuide ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowVariablesGuide((prev) => !prev)}
+              className="h-8 gap-1.5 text-xs font-medium"
+            >
+              <Code2 className="h-3.5 w-3.5" />
+              <span>{isAr ? "دليل المتغيرات" : "Variables Guide"}</span>
+            </Button>
+
+            <Button
+              type="button"
               variant="outline"
               size="sm"
               onClick={toggleCollapseAll}
@@ -217,6 +288,58 @@ export function ContractClausesStep({
         </CardHeader>
 
         <CardContent className="flex flex-col gap-4">
+          {/* Variables & Blocks Guide Panel */}
+          {showVariablesGuide && (
+            <div className="rounded border border-primary/20 bg-primary/5 p-4 flex flex-col gap-3.5 text-xs animate-in fade-in duration-200">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-primary/15 pb-2.5">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <span className="font-bold text-foreground">
+                    {isAr ? "دليل المفاتيح التشغيلية والمتغيرات التلقائية" : "Operational Keys & Variables Guide"}
+                  </span>
+                </div>
+                <span className="text-[11px] text-muted-foreground">
+                  {isAr ? "انقر على أي مفتاح لنسخه فوراً واستخدامه في نص المادة" : "Click any variable to copy it to clipboard"}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {VARIABLE_CATEGORIES.map((cat) => (
+                  <div key={cat.key} className="flex flex-col gap-2 rounded border border-border/80 bg-card p-3 shadow-2xs">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-foreground text-xs">{isAr ? cat.titleAr : cat.titleEn}</span>
+                      <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary font-mono">{cat.badge}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {cat.items.map((item) => (
+                        <button
+                          key={item.key}
+                          type="button"
+                          onClick={() => {
+                            if (typeof navigator !== "undefined" && navigator.clipboard) {
+                              navigator.clipboard.writeText(item.key);
+                              toast({
+                                title: isAr ? `تم نسخ ${item.key}` : `Copied ${item.key}`,
+                                tone: "success",
+                              });
+                            }
+                          }}
+                          className="group inline-flex items-center gap-1 rounded border border-border/70 bg-muted/40 hover:bg-primary/10 hover:border-primary/40 px-2 py-1 text-[11px] font-mono text-foreground transition-all cursor-pointer"
+                          title={isAr ? `انقر لنسخ ${item.key}` : `Click to copy ${item.key}`}
+                        >
+                          <span className="font-semibold text-primary/90 group-hover:text-primary">{item.key}</span>
+                          <span className="text-[10px] text-muted-foreground">
+                            ({isAr ? item.labelAr : item.labelEn})
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {generalError ? (
             <p
               role="alert"

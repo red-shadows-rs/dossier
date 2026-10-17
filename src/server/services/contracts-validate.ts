@@ -126,9 +126,13 @@ function buildSignatories(
     .get();
   const clientLang: Locale = contract.languageMode === "en" ? "en" : "ar";
   const defaultClientName =
-    clientLang === "ar"
+    (clientLang === "ar"
       ? client?.repNameAr || client?.repNameEn
-      : client?.repNameEn || client?.repNameAr;
+      : client?.repNameEn || client?.repNameAr) ||
+    (clientLang === "ar"
+      ? client?.nameAr || client?.nameEn || client?.legalNameAr || client?.legalNameEn
+      : client?.nameEn || client?.nameAr || client?.legalNameEn || client?.legalNameAr) ||
+    "";
   const clientName = options.clientSignatoryName ?? defaultClientName ?? "";
   const clientEmail = options.clientSignatoryEmail ?? client?.email ?? null;
 
@@ -303,9 +307,13 @@ export function validateContractForSend(
   const clientRow = snapshot.client;
   const clientName =
     options.clientSignatoryName ??
-    (clientLang === "ar"
+    ((clientLang === "ar"
       ? clientRow.repNameAr || clientRow.repNameEn
-      : clientRow.repNameEn || clientRow.repNameAr);
+      : clientRow.repNameEn || clientRow.repNameAr) ||
+      (clientLang === "ar"
+        ? clientRow.nameAr || clientRow.nameEn || clientRow.legalNameAr || clientRow.legalNameEn
+        : clientRow.nameEn || clientRow.nameAr || clientRow.legalNameEn || clientRow.legalNameAr) ||
+      "");
   const clientEmail = options.clientSignatoryEmail ?? clientRow.email;
   if (!clientName)
     issues.push(error("clientSignatoryRequired", "clientSignatoryName"));

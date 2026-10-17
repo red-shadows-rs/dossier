@@ -160,32 +160,30 @@ export function ContractReviewStep({
     <div className="flex flex-col gap-6 pb-28">
       {/* Issues / Health Validation Card */}
       <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="inline-flex items-center gap-2">
-              <CheckCircle2 size={18} className="text-primary" aria-hidden="true" />
-              <span>{t("review.issuesTitle")}</span>
-            </CardTitle>
-            {errors.length === 0 && warnings.length === 0 ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                <span>{isAr ? "جاهز للإرسال" : "Ready to send"}</span>
-              </span>
-            ) : (
-              <span
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold font-mono",
-                  errors.length > 0
-                    ? "border border-destructive/30 bg-destructive/10 text-destructive"
-                    : "border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400",
-                )}
-              >
-                {isAr
-                  ? `${errors.length} أخطاء / ${warnings.length} تنبيهات`
-                  : `${errors.length} errors / ${warnings.length} warnings`}
-              </span>
-            )}
-          </div>
+        <CardHeader className="flex flex-row items-center justify-between gap-3 pb-3">
+          <CardTitle className="inline-flex items-center gap-2">
+            <CheckCircle2 size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("review.issuesTitle")}</span>
+          </CardTitle>
+          {errors.length === 0 && warnings.length === 0 ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary shrink-0">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              <span>{isAr ? "جاهز للإرسال" : "Ready to send"}</span>
+            </span>
+          ) : (
+            <span
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold font-mono shrink-0",
+                errors.length > 0
+                  ? "border border-destructive/30 bg-destructive/10 text-destructive"
+                  : "border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400",
+              )}
+            >
+              {isAr
+                ? `${errors.length} أخطاء / ${warnings.length} تنبيهات`
+                : `${errors.length} errors / ${warnings.length} warnings`}
+            </span>
+          )}
         </CardHeader>
 
         <CardContent className="flex flex-col gap-4">
