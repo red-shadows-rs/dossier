@@ -241,7 +241,13 @@ export function requestSigningOtp(
         toName: signatory.name,
         locale: localeForContract(contract.id, contract.languageMode),
         templateKey: "contract_otp",
-        payload: { otp: code, recipientName: signatory.name },
+        payload: {
+          otp: code,
+          recipientName: signatory.name,
+          number: contract.number,
+          titleAr: contract.titleAr,
+          titleEn: contract.titleEn,
+        },
         entityType: "contract",
         entityId: contract.id,
       });

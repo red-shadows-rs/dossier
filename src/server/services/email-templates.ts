@@ -289,6 +289,8 @@ function renderOtp(
   const ar = locale === "ar";
   const otp = readText(payload, "otp");
   const name = readText(payload, "recipientName");
+  const title = pickTitle(payload, locale);
+  const number = readText(payload, "number");
 
   const subject = ar
     ? `رمز التحقق: ${otp}`
@@ -303,19 +305,40 @@ function renderOtp(
     ? "لا تشارك هذا الرمز مع أي شخص."
     : "Do not share this code with anyone.";
 
+  const docCard =
+    title || number
+      ? `<div style="background:#fcfcfc;border:1px solid #e4e4e7;border-radius:10px;padding:16px 20px;margin-bottom:20px;">
+  <div style="font-size:15px;font-weight:700;color:#18181b;margin-bottom:4px;">${escapeHtml(title)} ${number ? `<span style="display:inline-block;background:#18181b;color:#ffffff;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:3px 8px;border-radius:4px;letter-spacing:0.5px;margin-right:6px;margin-left:6px;">${escapeHtml(number)}</span>` : ""}</div>
+  <div style="font-size:13px;color:#71717a;">${ar ? "رمز التحقق المطلوب لاعتماد وتوقيع العقد إلكترونياً." : "The verification code required to review and sign the contract."}</div>
+</div>`
+      : "";
+
   const html = shell(
     locale,
     [
       `<div style="font-size:16px;font-weight:600;color:#18181b;margin-bottom:12px;">${escapeHtml(greetingRaw)}</div>`,
+      docCard,
       `<div style="font-size:14px;color:#52525b;margin-bottom:12px;">${escapeHtml(leadRaw)}</div>`,
       codeBlock(otp),
       `<div style="margin:16px 0 6px;color:#71717a;font-size:13px;">⏱ ${escapeHtml(expiresRaw)}</div>`,
       `<div style="margin:0;color:#e11d48;font-size:13px;font-weight:500;">🔒 ${escapeHtml(shareRaw)}</div>`,
-    ].join("\n"),
+    ]
+      .filter(Boolean)
+      .join("\n"),
     companyName,
   );
 
-  const text = [greetingRaw, "", leadRaw, otp, expiresRaw, shareRaw].join("\n");
+  const text = [
+    greetingRaw,
+    "",
+    title ? `${title} (${number})` : "",
+    leadRaw,
+    otp,
+    expiresRaw,
+    shareRaw,
+  ]
+    .filter((line) => line !== "")
+    .join("\n");
 
   return { subject, html, text };
 }

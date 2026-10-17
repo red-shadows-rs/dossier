@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { contractVersions } from "@/db/schema";
+import { contractSignatories, contractVersions, users } from "@/db/schema";
 import { AppError } from "@/lib/errors";
 import {
   allowedDocLangs,
@@ -11,6 +11,7 @@ import {
 import { env } from "@/lib/env";
 import { makeQrDataUri, verificationUrl } from "@/server/pdf/qr";
 import { renderContractHtml } from "@/server/pdf/html/contract";
+import type { SignatureRender } from "@/server/pdf/html/shared";
 import { getFontCss } from "@/server/pdf/fonts";
 import { findFileBySha256, getFileRow, readFile } from "@/server/services/files";
 import { getSettings } from "@/server/services/settings";
@@ -107,6 +108,99 @@ export async function buildContractHtml(
     };
   }
 
+  const signatoryRows = db
+    .select()
+    .from(contractSignatories)
+    .where(eq(contractSignatories.contractId, contractId))
+    .orderBy(asc(contractSignatories.sortOrder))
+    .all();
+
+  const isArabic = lang === "ar";
+  const defaultProviderName =
+    (isArabic ? snapshot.provider.nameAr : snapshot.provider.nameEn) ||
+    (isArabic ? "المفوض بالتوقيع" : "Authorized Signatory");
+  const defaultClientName =
+    (isArabic
+      ? snapshot.client.repNameAr || snapshot.client.nameAr
+      : snapshot.client.repNameEn || snapshot.client.nameEn) ||
+    (isArabic ? "ممثل العميل" : "Client Representative");
+
+  const signatures: SignatureRender[] =
+    signatoryRows.length > 0
+      ? signatoryRows.map((s) => {
+          let resolvedTitle = s.title?.trim() || null;
+          if (!resolvedTitle && s.signerUserId) {
+            const u = db
+              .select({
+                titleAr: users.signerTitleAr,
+                titleEn: users.signerTitleEn,
+              })
+              .from(users)
+              .where(eq(users.id, s.signerUserId))
+              .get();
+            resolvedTitle = (isArabic ? u?.titleAr : u?.titleEn) || null;
+          }
+          if (!resolvedTitle) {
+            resolvedTitle =
+              s.role === "provider"
+                ? isArabic
+                  ? "المفوض بالتوقيع"
+                  : "Authorized Signatory"
+                : isArabic
+                  ? "ممثل العميل"
+                  : "Client Representative";
+          }
+          return {
+            role: s.role,
+            name:
+              s.name ||
+              (s.role === "provider" ? defaultProviderName : defaultClientName),
+            title: resolvedTitle,
+            signedAtMs: s.signedAt,
+            method: s.signatureMethod,
+            imageDataUri: imageByFileId(s.signatureFileId),
+            typedName: s.typedName,
+          };
+        })
+      : snapshot.signatories && snapshot.signatories.length > 0
+        ? snapshot.signatories.map((s) => ({
+            role: s.role,
+            name: s.name,
+            title:
+              s.title?.trim() ||
+              (s.role === "provider"
+                ? isArabic
+                  ? "المفوض بالتوقيع"
+                  : "Authorized Signatory"
+                : isArabic
+                  ? "ممثل العميل"
+                  : "Client Representative"),
+            signedAtMs: null,
+            method: null,
+            imageDataUri: null,
+            typedName: null,
+          }))
+        : [
+            {
+              role: "provider" as const,
+              name: defaultProviderName,
+              title: isArabic ? "المفوض بالتوقيع" : "Authorized Signatory",
+              signedAtMs: null,
+              method: null,
+              imageDataUri: null,
+              typedName: null,
+            },
+            {
+              role: "client" as const,
+              name: defaultClientName,
+              title: isArabic ? "ممثل العميل" : "Client Representative",
+              signedAtMs: null,
+              method: null,
+              imageDataUri: null,
+              typedName: null,
+            },
+          ];
+
   return renderContractHtml({
     snapshot,
     lang,
@@ -114,7 +208,7 @@ export async function buildContractHtml(
     fonts: getFontCss(),
     logoDataUri,
     stampDataUri,
-    signatures: [],
+    signatures,
     verification,
     certificate: null,
   });

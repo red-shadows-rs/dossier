@@ -130,40 +130,48 @@ export function SigningExperience({
 
   if (done === "signed") {
     return (
-      <div className="rounded-md border border-border bg-surface p-6 text-center">
-        <h2 className="text-lg font-semibold text-foreground">
+      <div className="flex flex-col items-center justify-center gap-3 py-6 text-center">
+        <div className="rounded-full bg-emerald-500/10 p-3 text-emerald-500">
+          <CheckCheck className="h-8 w-8" />
+        </div>
+        <h2 className="text-lg font-bold text-foreground">
           {t("signedTitle")}
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">{t("signedBody")}</p>
+        <p className="max-w-md text-sm text-muted-foreground">{t("signedBody")}</p>
       </div>
     );
   }
 
   if (done === "declined") {
     return (
-      <div className="rounded-md border border-border bg-surface p-6 text-center">
-        <h2 className="text-lg font-semibold text-foreground">
+      <div className="flex flex-col items-center justify-center gap-3 py-6 text-center">
+        <div className="rounded-full bg-destructive/10 p-3 text-destructive">
+          <XCircle className="h-8 w-8" />
+        </div>
+        <h2 className="text-lg font-bold text-foreground">
           {t("declinedTitle")}
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">{t("declinedBody")}</p>
+        <p className="max-w-md text-sm text-muted-foreground">{t("declinedBody")}</p>
       </div>
     );
   }
 
   if (requiresOtp && !otpVerified) {
     return (
-      <div className="flex flex-col gap-4 rounded-md border border-border p-4">
-        <h2 className="text-base font-semibold text-foreground">
-          {t("otpTitle")}
-        </h2>
-        <p className="text-sm text-muted-foreground">{t("otpHint")}</p>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-base font-semibold text-foreground">
+            {t("otpTitle")}
+          </h2>
+          <p className="text-sm text-muted-foreground">{t("otpHint")}</p>
+        </div>
         <div className="flex flex-wrap gap-2">
           <Button type="button" variant="secondary" onClick={requestOtp} loading={pending} className="gap-2">
             <Send className="h-4 w-4" />
             {otpSent ? t("resendCode") : t("sendCode")}
           </Button>
           {otpSent ? (
-            <span className="self-center text-sm text-muted-foreground">
+            <span className="self-center text-sm font-medium text-emerald-600 dark:text-emerald-400">
               {t("codeSent")}
             </span>
           ) : null}
@@ -177,7 +185,7 @@ export function SigningExperience({
               inputMode="numeric"
               dir="ltr"
               maxLength={6}
-              className="text-start tracking-widest"
+              className="text-start tracking-widest font-mono text-base"
               disabled={pending}
             />
           </Field>
@@ -199,11 +207,13 @@ export function SigningExperience({
     <form
       onSubmit={submit}
       noValidate
-      className="flex flex-col gap-4 rounded-md border border-border p-4"
+      className="flex flex-col gap-5"
     >
-      <h2 className="text-base font-semibold text-foreground">
-        {t("signTitle")}
-      </h2>
+      <div className="flex flex-col gap-1">
+        <h2 className="text-base font-semibold text-foreground">
+          {t("signTitle")}
+        </h2>
+      </div>
 
       <Field label={t("fullName")} htmlFor="sign-name" required>
         <Input
@@ -214,33 +224,31 @@ export function SigningExperience({
         />
       </Field>
 
-      <div className="flex gap-2">
+      <div className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-muted/40 p-1 self-start">
         <button
           type="button"
-          aria-current={method === "drawn" ? "true" : undefined}
           onClick={() => setMethod("drawn")}
           className={cn(
-            "flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm",
+            "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer",
             method === "drawn"
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-border text-muted-foreground",
+              ? "bg-primary text-primary-foreground shadow-xs"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
           )}
         >
-          <PenTool className="h-4 w-4" />
+          <PenTool className="h-3.5 w-3.5" />
           <span>{t("drawn")}</span>
         </button>
         <button
           type="button"
-          aria-current={method === "typed" ? "true" : undefined}
           onClick={() => setMethod("typed")}
           className={cn(
-            "flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm",
+            "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer",
             method === "typed"
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-border text-muted-foreground",
+              ? "bg-primary text-primary-foreground shadow-xs"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
           )}
         >
-          <Type className="h-4 w-4" />
+          <Type className="h-3.5 w-3.5" />
           <span>{t("typed")}</span>
         </button>
       </div>
