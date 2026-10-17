@@ -1,3 +1,4 @@
+import { env } from "@/lib/env";
 import type { Locale } from "@/lib/constants";
 import { formatInstant } from "@/lib/dates";
 import { AppError } from "@/lib/errors";
@@ -82,7 +83,7 @@ function shell(
             <table role="presentation" cellpadding="0" cellspacing="0" style="display:inline-table;">
               <tr>
                 <td style="vertical-align:middle;padding:0;line-height:0;">
-                  <img src="https://dossier.red-shadows-rs.com/apple-touch-icon.png" width="28" height="28" alt="Dossier" style="display:block;width:28px;height:28px;border-radius:6px;border:0;outline:0;text-decoration:none;" />
+                  <img src="${env.APP_URL}/apple-touch-icon.png" width="28" height="28" alt="Dossier" style="display:block;width:28px;height:28px;border-radius:6px;border:0;outline:0;text-decoration:none;" />
                 </td>
                 <td style="vertical-align:middle;padding-${locale === "ar" ? "right" : "left"}:10px;">
                   <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:16px;font-weight:700;color:#ffffff;letter-spacing:0.3px;line-height:1;">Dossier</span>
@@ -96,7 +97,7 @@ function shell(
             <table role="presentation" cellpadding="0" cellspacing="0" style="display:inline-table;direction:ltr;">
               <tr>
                 <td style="vertical-align:middle;padding:0;line-height:0;">
-                  <img src="https://dossier.red-shadows-rs.com/red-shadows-logo.png" width="35" height="24" alt="RED SHADOWS" style="display:block;width:35px;height:24px;border:0;outline:0;text-decoration:none;" />
+                  <img src="${env.APP_URL}/red-shadows-logo.png" width="35" height="24" alt="RED SHADOWS" style="display:block;width:35px;height:24px;border:0;outline:0;text-decoration:none;" />
                 </td>
                 <td style="vertical-align:middle;padding-left:10px;">
                   <span style="font-family:${fontStack};font-size:14px;font-weight:700;color:#ffffff;letter-spacing:0.5px;line-height:1;">${escapeHtml(companyName)}</span>
