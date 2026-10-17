@@ -60,11 +60,22 @@ export function finalizeContractTx(
     .get();
   if (!contract || contract.status !== "sent") return false;
 
-  const signatories = tx
-    .select()
-    .from(contractSignatories)
-    .where(eq(contractSignatories.contractId, contractId))
-    .all();
+  const signatories = contract.currentVersionId
+    ? tx
+        .select()
+        .from(contractSignatories)
+        .where(
+          and(
+            eq(contractSignatories.contractId, contractId),
+            eq(contractSignatories.versionId, contract.currentVersionId),
+          ),
+        )
+        .all()
+    : tx
+        .select()
+        .from(contractSignatories)
+        .where(eq(contractSignatories.contractId, contractId))
+        .all();
   if (signatories.length === 0) return false;
   if (!signatories.every((row) => row.status === "signed")) return false;
 
@@ -239,6 +250,9 @@ function enqueueSignedCopyEmails(
       and(
         eq(contractSignatories.contractId, contract.id),
         eq(contractSignatories.role, "client"),
+        contract.currentVersionId
+          ? eq(contractSignatories.versionId, contract.currentVersionId)
+          : undefined,
       ),
     )
     .get();
@@ -249,6 +263,9 @@ function enqueueSignedCopyEmails(
       and(
         eq(contractSignatories.contractId, contract.id),
         eq(contractSignatories.role, "provider"),
+        contract.currentVersionId
+          ? eq(contractSignatories.versionId, contract.currentVersionId)
+          : undefined,
       ),
     )
     .get();
@@ -358,7 +375,12 @@ export async function generateSealedPdf(
     const signatories = db
       .select()
       .from(contractSignatories)
-      .where(eq(contractSignatories.contractId, contractId))
+      .where(
+        and(
+          eq(contractSignatories.contractId, contractId),
+          eq(contractSignatories.versionId, contract.currentVersionId),
+        ),
+      )
       .all();
 
     const { html, code } = await buildSealedHtml(

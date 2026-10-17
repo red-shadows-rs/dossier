@@ -18,6 +18,26 @@ export type ContractSignatoryRow = typeof contractSignatories.$inferSelect;
 export function listContractSignatories(
   contractId: string,
 ): ContractSignatoryRow[] {
+  const contract = db
+    .select({ currentVersionId: contracts.currentVersionId })
+    .from(contracts)
+    .where(eq(contracts.id, contractId))
+    .get();
+
+  if (contract?.currentVersionId) {
+    return db
+      .select()
+      .from(contractSignatories)
+      .where(
+        and(
+          eq(contractSignatories.contractId, contractId),
+          eq(contractSignatories.versionId, contract.currentVersionId),
+        ),
+      )
+      .orderBy(asc(contractSignatories.sortOrder))
+      .all();
+  }
+
   return db
     .select()
     .from(contractSignatories)

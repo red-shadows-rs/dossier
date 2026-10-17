@@ -252,6 +252,12 @@ describe("reviseContract (recall)", () => {
       .all();
     expect(versions).toHaveLength(2);
     expect(versions[0].contentHash).not.toBe(versions[1].contentHash);
+
+    const activeSignatories = listContractSignatories(id);
+    expect(activeSignatories).toHaveLength(2);
+    expect(
+      activeSignatories.every((s) => s.versionId === resent.currentVersionId),
+    ).toBe(true);
     void clientToken;
   });
 

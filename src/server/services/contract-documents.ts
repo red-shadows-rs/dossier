@@ -1,4 +1,4 @@
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { contractSignatories, contractVersions, users } from "@/db/schema";
 import { AppError } from "@/lib/errors";
@@ -108,12 +108,24 @@ export async function buildContractHtml(
     };
   }
 
-  const signatoryRows = db
-    .select()
-    .from(contractSignatories)
-    .where(eq(contractSignatories.contractId, contractId))
-    .orderBy(asc(contractSignatories.sortOrder))
-    .all();
+  const signatoryRows = contract.currentVersionId
+    ? db
+        .select()
+        .from(contractSignatories)
+        .where(
+          and(
+            eq(contractSignatories.contractId, contractId),
+            eq(contractSignatories.versionId, contract.currentVersionId),
+          ),
+        )
+        .orderBy(asc(contractSignatories.sortOrder))
+        .all()
+    : db
+        .select()
+        .from(contractSignatories)
+        .where(eq(contractSignatories.contractId, contractId))
+        .orderBy(asc(contractSignatories.sortOrder))
+        .all();
 
   const isArabic = lang === "ar";
   const defaultProviderName =
