@@ -1,0 +1,38 @@
+# ─────────────────────────────────────────────
+# Dossier - Docker Ignore
+# ─────────────────────────────────────────────
+
+# ── Dependencies & Build ──
+node_modules
+.next
+.git
+.gitignore
+data
+tmp
+.env
+.env.*
+npm-debug.log*
+
+# ── Configuration & Metadata ──
+Dockerfile
+docker-compose.yml
+.dockerignore
+.kilo
+.vscode
+.idea
+.github
+*.md
+
+# ── Testing & Reporting ──
+playwright-report
+test-results
+coverage
+tests
+playwright.config.ts
+vitest.config.ts
+nginx
+
+# ── Database Artifacts ──
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm

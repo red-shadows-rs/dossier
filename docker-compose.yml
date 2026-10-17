@@ -1,0 +1,42 @@
+# ─────────────────────────────────────────────
+# Dossier - Docker Multi-Container Orchestration
+# https://github.com/red-shadows-rs/dossier
+# ─────────────────────────────────────────────
+
+# ── Application Services ──
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+    volumes:
+      - ./data:/app/data
+    ipc: host
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    ports:
+      - "127.0.0.1:${HOST_PORT:-6002}:3000"
+
+  worker:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    command: ["npx", "tsx", "scripts/worker.ts"]
+    volumes:
+      - ./data:/app/data
+    ipc: host
+    depends_on:
+      - app
