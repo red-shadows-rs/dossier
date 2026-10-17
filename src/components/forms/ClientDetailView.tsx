@@ -97,7 +97,6 @@ export function ClientDetailView({
         ? "ltr"
         : "rtl";
 
-  // Calculations for overview stats
   const activeProjectsCount = projects.filter(
     (p) => p.status === "active" || p.status === "lead",
   ).length;
@@ -136,7 +135,6 @@ export function ClientDetailView({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* 1. Standardized Header with Breadcrumbs */}
       <div className="flex flex-col gap-2">
         <nav
           aria-label="Breadcrumb"
@@ -203,7 +201,6 @@ export function ClientDetailView({
         </div>
       </div>
 
-      {/* 2. Overview Stat Cards Row */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <div className="flex items-center justify-between">
@@ -269,14 +266,10 @@ export function ClientDetailView({
         </div>
       </div>
 
-      {/* 3. URL-synced Tabs Header */}
       <UrlTabs tabs={tabs} defaultTab="overview" onChange={setActiveTab} />
 
-      {/* 4. Tab Content Sections */}
-      {/* TAB 1: OVERVIEW */}
       <div className={currentTab === "overview" ? "block space-y-6" : "hidden"}>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Identity Info */}
           <Card>
             <CardHeader>
               <CardTitle className="inline-flex items-center gap-2">
@@ -322,7 +315,6 @@ export function ClientDetailView({
             </CardContent>
           </Card>
 
-          {/* Contact & Location Info */}
           <Card>
             <CardHeader>
               <CardTitle className="inline-flex items-center gap-2">
@@ -354,7 +346,6 @@ export function ClientDetailView({
             </CardContent>
           </Card>
 
-          {/* Legal Identifiers */}
           <Card>
             <CardHeader>
               <CardTitle className="inline-flex items-center gap-2">
@@ -398,7 +389,6 @@ export function ClientDetailView({
             </CardContent>
           </Card>
 
-          {/* Notes */}
           <Card>
             <CardHeader>
               <CardTitle className="inline-flex items-center gap-2">
@@ -421,13 +411,11 @@ export function ClientDetailView({
         </div>
       </div>
 
-      {/* TAB 2: PROJECTS & CONTRACTS */}
       <div
         className={
           currentTab === "projectsAndContracts" ? "block space-y-6" : "hidden"
         }
       >
-        {/* Projects Section */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <CardTitle className="inline-flex items-center gap-2">
@@ -496,7 +484,6 @@ export function ClientDetailView({
           </CardContent>
         </Card>
 
-        {/* Contracts Section */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <CardTitle className="inline-flex items-center gap-2">
@@ -567,7 +554,6 @@ export function ClientDetailView({
         </Card>
       </div>
 
-      {/* TAB 3: INVOICES */}
       <div className={currentTab === "invoices" ? "block space-y-6" : "hidden"}>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-3">

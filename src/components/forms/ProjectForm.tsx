@@ -129,7 +129,6 @@ export function ProjectForm({
 
     if (result.error.fieldErrors) {
       setFieldErrors(result.error.fieldErrors);
-      // Auto switch to step with errors
       if (
         result.error.fieldErrors.clientId ||
         result.error.fieldErrors.nameAr ||
@@ -162,7 +161,6 @@ export function ProjectForm({
 
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6 pb-28">
-      {/* 1. Top Stepped Workflow Navigation */}
       <div className="rounded border border-border bg-card p-1 shadow-xs">
         <nav
           aria-label="Form Steps"
@@ -217,7 +215,6 @@ export function ProjectForm({
         </div>
       )}
 
-      {/* STEP 1: BASICS & BUDGET */}
       {step === "basics" && (
         <div className="flex flex-col gap-5 animate-in fade-in-50 duration-200">
           <Card>
@@ -323,7 +320,6 @@ export function ProjectForm({
         </div>
       )}
 
-      {/* STEP 2: TIMELINE & STATUS */}
       {step === "timeline" && (
         <div className="flex flex-col gap-5 animate-in fade-in-50 duration-200">
           <Card>
@@ -392,7 +388,6 @@ export function ProjectForm({
         </div>
       )}
 
-      {/* STEP 3: NOTES & DESCRIPTION */}
       {step === "notes" && (
         <div className="flex flex-col gap-5 animate-in fade-in-50 duration-200">
           <Card>
@@ -437,7 +432,6 @@ export function ProjectForm({
         </div>
       )}
 
-      {/* Persistent Bottom Action Bar */}
       <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
         <div className="flex items-center gap-2">
           {currentIndex > 0 && (

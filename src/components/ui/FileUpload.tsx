@@ -155,7 +155,6 @@ export function FileUpload({
 
         {isImage && hasCurrent && imageSource ? (
           <div className="relative flex flex-col items-center justify-center w-full h-full p-3">
-            {/* Status indicator */}
             <div className="absolute top-2.5 end-2.5 z-10 flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400 backdrop-blur-xs">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
               <span>
@@ -165,7 +164,6 @@ export function FileUpload({
               </span>
             </div>
 
-            {/* Centered Image Preview */}
             <div className="flex h-full w-full items-center justify-center py-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -175,7 +173,6 @@ export function FileUpload({
               />
             </div>
 
-            {/* Action Buttons */}
             <div className="absolute bottom-2.5 inset-x-2.5 z-10 flex items-center justify-between gap-2">
               <button
                 type="button"

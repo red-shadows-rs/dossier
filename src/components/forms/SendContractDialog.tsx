@@ -174,7 +174,6 @@ export function SendContractDialog({
           </p>
         ) : null}
 
-        {/* Section 1: Provider Signer */}
         <div className="flex flex-col gap-3.5">
           <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
             <Building2 className="h-4 w-4 text-primary" />
@@ -236,7 +235,6 @@ export function SendContractDialog({
           </div>
         </div>
 
-        {/* Section 2: Client Signatory */}
         <div className="flex flex-col gap-3.5 border-t border-border/60 pt-4">
           <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
             <User className="h-4 w-4 text-primary" />
@@ -295,7 +293,6 @@ export function SendContractDialog({
           </div>
         </div>
 
-        {/* Section 3: Signature & Consent */}
         {requireProviderSignature ? (
           <div className="flex flex-col gap-3.5 border-t border-border/60 pt-4">
             <div className="flex items-center justify-between">
@@ -304,7 +301,6 @@ export function SendContractDialog({
                 <span>اعتماد العقد والتوقيع الإلكتروني</span>
               </div>
 
-              {/* Segmented Control */}
               <div className="inline-flex rounded-md border border-border/80 bg-muted/30 p-0.5">
                 <button
                   type="button"
@@ -367,7 +363,6 @@ export function SendContractDialog({
                   />
                 </Field>
 
-                {/* Calligraphic Preview */}
                 <div className="flex h-20 w-full items-center justify-center rounded-lg border border-border/80 bg-card px-4 text-center select-none shadow-inner">
                   <span className="font-serif text-2xl italic tracking-wide text-foreground">
                     {typedName.trim() || "توقيع بالاسم المكتوب"}
@@ -376,7 +371,6 @@ export function SendContractDialog({
               </div>
             )}
 
-            {/* Consent Checkbox */}
             <div className="pt-1">
               <Checkbox
                 checked={consent}
@@ -399,7 +393,6 @@ export function SendContractDialog({
           </div>
         ) : null}
 
-        {/* Action Buttons */}
         <div className="flex items-center justify-end gap-3 pt-2">
           <Button
             type="button"

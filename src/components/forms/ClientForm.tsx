@@ -112,7 +112,6 @@ export function ClientForm({
     setStatusError(msg);
     toast({ title: msg, tone: "error" });
 
-    // Jump to the step containing errors
     if (result.error.fieldErrors) {
       const keys = Object.keys(result.error.fieldErrors);
       if (keys.some((k) => k.startsWith("name") || k.startsWith("legalName") || k === "type" || k.startsWith("rep"))) {
@@ -148,7 +147,6 @@ export function ClientForm({
 
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6 pb-28">
-      {/* Sleek Step Navigation Header */}
       <div className="relative sm:sticky sm:top-14 z-20 rounded border border-border bg-card p-1 shadow-xs">
         <nav
           aria-label={t("clients.formSteps.basics")}
@@ -210,7 +208,6 @@ export function ClientForm({
         </p>
       ) : null}
 
-      {/* STEP 1: BASICS & IDENTITY & REPRESENTATIVE */}
       {step === "basics" && (
         <div className="flex flex-col gap-5 animate-in fade-in-50 duration-200">
           <Card>
@@ -397,7 +394,6 @@ export function ClientForm({
         </div>
       )}
 
-      {/* STEP 2: CONTACT & ADDRESS & NOTES */}
       {step === "contact" && (
         <div className="flex flex-col gap-5 animate-in fade-in-50 duration-200">
           <Card>
@@ -536,7 +532,6 @@ export function ClientForm({
         </div>
       )}
 
-      {/* STEP 3: LEGAL & TAX */}
       {step === "legal" && (
         <div className="flex flex-col gap-5 animate-in fade-in-50 duration-200">
           <Card>
@@ -581,7 +576,6 @@ export function ClientForm({
         </div>
       )}
 
-      {/* Persistent Bottom Action Bar */}
       <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
         <div className="flex items-center gap-2">
           {currentIndex > 0 && (

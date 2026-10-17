@@ -146,7 +146,6 @@ export function InvoiceDetailView({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* 1. Standardized Header with Breadcrumbs */}
       <div className="flex flex-col gap-2">
         <nav
           aria-label="Breadcrumb"
@@ -228,7 +227,6 @@ export function InvoiceDetailView({
         </div>
       </div>
 
-      {/* 2. Overview Stat Cards Row */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <span className="text-xs font-medium text-muted-foreground">
@@ -271,11 +269,8 @@ export function InvoiceDetailView({
         </div>
       </div>
 
-      {/* 3. URL-synced Tabs Header */}
       <UrlTabs tabs={tabs} defaultTab="preview" onChange={setActiveTab} />
 
-      {/* 4. Tab Content Sections */}
-      {/* TAB 1: PREVIEW (Document Viewer) */}
       <div className={currentTab === "preview" ? "block space-y-6" : "hidden"}>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-3">
@@ -295,10 +290,8 @@ export function InvoiceDetailView({
         </Card>
       </div>
 
-      {/* TAB 2: DETAILS (Lines & Meta) */}
       <div className={currentTab === "details" ? "block space-y-6" : "hidden"}>
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-          {/* Main Content (8 cols) */}
           <div className="flex flex-col gap-6 lg:col-span-8">
             <Card>
               <CardHeader>
@@ -432,7 +425,6 @@ export function InvoiceDetailView({
             )}
           </div>
 
-          {/* Sidebar (4 cols) */}
           <div className="flex flex-col gap-6 lg:col-span-4">
             <Card>
               <CardHeader>
@@ -612,7 +604,6 @@ export function InvoiceDetailView({
         </div>
       </div>
 
-      {/* TAB 3: PAYMENTS */}
       <div className={currentTab === "payments" ? "block space-y-6" : "hidden"}>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-3">

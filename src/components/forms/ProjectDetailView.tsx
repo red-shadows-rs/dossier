@@ -168,7 +168,6 @@ export function ProjectDetailView({
 
   const primaryCurrency = (project.currency || "SAR") as CurrencyCode;
 
-  // Aggregate financials from summary
   const totalContractedMinor = summary.reduce(
     (acc, row) => acc + row.contractedMinor,
     0,
@@ -218,7 +217,6 @@ export function ProjectDetailView({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* 1. Standardized Header with Breadcrumbs */}
       <div className="flex flex-col gap-2">
         <nav
           aria-label="Breadcrumb"
@@ -295,7 +293,6 @@ export function ProjectDetailView({
         </div>
       </div>
 
-      {/* 2. Overview Stat Cards Row */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <div className="flex items-center justify-between">
@@ -354,13 +351,9 @@ export function ProjectDetailView({
         </div>
       </div>
 
-      {/* 3. URL-synced Tabs Header */}
       <UrlTabs tabs={tabs} defaultTab="overview" onChange={setActiveTab} />
 
-      {/* 4. Tab Content Sections */}
-      {/* TAB 1: OVERVIEW & FINANCIALS */}
       <div className={currentTab === "overview" ? "block space-y-6" : "hidden"}>
-        {/* Project Details Card */}
         <Card>
           <CardHeader className="border-b border-border/40 pb-3">
             <CardTitle className="inline-flex items-center gap-2 text-base">
@@ -417,7 +410,6 @@ export function ProjectDetailView({
           </CardContent>
         </Card>
 
-        {/* Financial Summary Card */}
         <Card>
           <CardHeader className="border-b border-border/40 pb-3">
             <CardTitle className="inline-flex items-center gap-2 text-base">
@@ -627,7 +619,6 @@ export function ProjectDetailView({
         </Card>
       </div>
 
-      {/* TAB 2: CONTRACTS & MILESTONES */}
       <div
         className={currentTab === "contracts" ? "block space-y-6" : "hidden"}
       >
@@ -700,7 +691,6 @@ export function ProjectDetailView({
           </CardContent>
         </Card>
 
-        {/* Invoiceable Milestones */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <CardTitle className="inline-flex items-center gap-2">
@@ -757,7 +747,6 @@ export function ProjectDetailView({
 
       </div>
 
-      {/* TAB 3: INVOICES */}
       <div className={currentTab === "invoices" ? "block space-y-6" : "hidden"}>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-3">
@@ -826,7 +815,6 @@ export function ProjectDetailView({
         </Card>
       </div>
 
-      {/* TAB 4: FILES */}
       <div className={currentTab === "files" ? "block space-y-6" : "hidden"}>
         <Card>
           <CardHeader>
@@ -848,7 +836,6 @@ export function ProjectDetailView({
         </Card>
       </div>
 
-      {/* TAB 5: ACTIVITY */}
       <div className={currentTab === "activity" ? "block space-y-6" : "hidden"}>
         <Card>
           <CardHeader>

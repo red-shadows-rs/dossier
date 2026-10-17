@@ -185,7 +185,6 @@ export function UserForm({
         </CardContent>
       </Card>
 
-      {/* Persistent Bottom Action Bar */}
       <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
         <Button
           type="button"

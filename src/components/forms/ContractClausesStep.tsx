@@ -215,7 +215,6 @@ export function ContractClausesStep({
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-6 pb-28">
       <Card>
-        {/* Card Header & Controls Toolbar */}
         <CardHeader className="flex flex-col gap-3 pb-3 sm:flex-row sm:items-center sm:justify-between">
           <CardTitle className="inline-flex items-center gap-2">
             <ScrollText size={18} className="text-primary" aria-hidden="true" />
@@ -288,7 +287,6 @@ export function ContractClausesStep({
         </CardHeader>
 
         <CardContent className="flex flex-col gap-4">
-          {/* Variables & Blocks Guide Panel */}
           {showVariablesGuide && (
             <div className="rounded border border-primary/20 bg-primary/5 p-4 flex flex-col gap-3.5 text-xs animate-in fade-in duration-200">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-primary/15 pb-2.5">
@@ -364,7 +362,6 @@ export function ContractClausesStep({
                   key={index}
                   className="group flex flex-col rounded border border-border bg-card shadow-2xs transition-all hover:border-border hover:shadow-xs"
                 >
-                  {/* Clause Header Bar */}
                   <div className="flex items-center justify-between border-b border-border/50 bg-muted/20 px-4 py-2.5 rounded-t">
                     <div
                       className="flex flex-1 items-center gap-3 cursor-pointer select-none overflow-hidden pe-2"
@@ -382,7 +379,6 @@ export function ContractClausesStep({
                       </span>
                     </div>
 
-                    {/* Action buttons */}
                     <div className="flex items-center gap-1 shrink-0">
                       <Tooltip content={t("contracts.clause.up")}>
                         <button
@@ -453,7 +449,6 @@ export function ContractClausesStep({
                     </div>
                   </div>
 
-                  {/* Clause Body (Collapsible) */}
                   {!isCollapsed ? (
                     <div className="flex flex-col gap-3.5 p-4">
                       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -545,8 +540,6 @@ export function ContractClausesStep({
         </CardContent>
       </Card>
 
-      {/* Unified Action Footer */}
-      {/* Unified Action Footer */}
       <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
         <div className="flex items-center gap-2">
           {onPrev && (

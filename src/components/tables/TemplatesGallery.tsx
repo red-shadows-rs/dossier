@@ -105,7 +105,6 @@ export function TemplatesGallery({
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Search and View Controls Bar */}
       <div className="rounded border border-border bg-card p-3 sm:p-4 shadow-xs">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="flex flex-1 items-center gap-2">
@@ -136,7 +135,6 @@ export function TemplatesGallery({
           </div>
 
           <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-            {/* Filter buttons */}
             <div className="flex items-center rounded border border-border/70 bg-muted/30 p-0.5 text-xs font-medium">
               <button
                 type="button"
@@ -173,7 +171,6 @@ export function TemplatesGallery({
               </button>
             </div>
 
-            {/* View Mode Toggle */}
             <div className="flex items-center rounded border border-border/70 bg-muted/30 p-0.5">
               <button
                 type="button"
@@ -206,7 +203,6 @@ export function TemplatesGallery({
         </div>
       </div>
 
-      {/* Content Area */}
       {filtered.length === 0 ? (
         <EmptyState
           icon={<FileCode2 size={40} className="text-muted-foreground" aria-hidden="true" />}
@@ -255,7 +251,6 @@ export function TemplatesGallery({
                 className="group relative flex flex-col justify-between rounded border border-border bg-card p-4 sm:p-5 transition-colors hover:border-border/80"
               >
                 <div className="flex flex-col gap-3">
-                  {/* Card Header: Icon + Badges */}
                   <div className="flex items-center justify-between gap-3">
                     <div
                       className={`flex h-10 w-10 shrink-0 items-center justify-center rounded border ${iconBg}`}
@@ -279,7 +274,6 @@ export function TemplatesGallery({
                     </div>
                   </div>
 
-                  {/* Title & Subtitle */}
                   <div className="flex flex-col gap-0.5 pt-1">
                     <Link
                       href={`/templates/${row.id}`}
@@ -297,7 +291,6 @@ export function TemplatesGallery({
                     ) : null}
                   </div>
 
-                  {/* Description */}
                   {description ? (
                     <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 min-h-[34px]">
                       {description}
@@ -306,7 +299,6 @@ export function TemplatesGallery({
                     <div className="min-h-[34px]" />
                   )}
 
-                  {/* Metadata Chips */}
                   <div className="flex flex-wrap items-center gap-2 pt-2 text-xs">
                     <span className="inline-flex items-center gap-1 rounded border border-border/60 bg-muted/20 px-2 py-1 font-medium text-muted-foreground">
                       <ListOrdered size={13} className="text-muted-foreground shrink-0" />
@@ -333,7 +325,6 @@ export function TemplatesGallery({
                     </span>
                   </div>
 
-                  {/* Milestone Preset Roadmap snippet */}
                   {milestones && milestones.length > 0 ? (
                     <div className="flex flex-col gap-1 rounded border border-border bg-muted/20 p-2.5 text-xs">
                       <div className="flex items-center justify-between text-muted-foreground font-medium">
@@ -355,7 +346,6 @@ export function TemplatesGallery({
                   ) : null}
                 </div>
 
-                {/* Card Actions Footer */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-4 mt-3 border-t border-border/50">
                   {canWrite ? (
                     <Link

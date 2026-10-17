@@ -97,7 +97,6 @@ export function ContractBasicsStep({
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-6 pb-28">
-      {/* 1. General Info & Regional Settings */}
       <Card>
         <CardHeader>
           <CardTitle className="inline-flex items-center gap-2">
@@ -165,7 +164,6 @@ export function ContractBasicsStep({
             </Select>
           </Field>
 
-          {/* Fees & Milestones Toggle Box */}
           <div className="md:col-span-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded border border-border bg-card/60 p-3">
             <div className="flex items-center gap-3">
               <Checkbox
@@ -207,7 +205,6 @@ export function ContractBasicsStep({
         </CardContent>
       </Card>
 
-      {/* 2. Contract Title & Scope */}
       <Card>
         <CardHeader>
           <CardTitle className="inline-flex items-center gap-2">
@@ -281,7 +278,6 @@ export function ContractBasicsStep({
         </CardContent>
       </Card>
 
-      {/* 3. Dates & Timeline */}
       <Card>
         <CardHeader>
           <CardTitle className="inline-flex items-center gap-2">
@@ -352,7 +348,6 @@ export function ContractBasicsStep({
         </CardContent>
       </Card>
 
-      {/* 4. Legal Jurisdiction & Internal Notes */}
       <Card>
         <CardHeader>
           <CardTitle className="inline-flex items-center gap-2">
@@ -438,7 +433,6 @@ export function ContractBasicsStep({
         </CardContent>
       </Card>
 
-      {/* Unified Action Footer */}
       <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
         <div className="flex items-center gap-2">
           {onNext ? (

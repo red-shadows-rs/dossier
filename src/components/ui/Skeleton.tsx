@@ -337,7 +337,6 @@ export function AuditTableSkeleton() {
 export function DetailViewSkeleton({ tabsCount = 3 }: { tabsCount?: number }) {
   return (
     <div className="flex flex-col gap-5 sm:gap-6">
-      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
         <div className="flex items-center gap-3.5">
           <Skeleton className="h-10 w-10 rounded shrink-0" />
@@ -355,7 +354,6 @@ export function DetailViewSkeleton({ tabsCount = 3 }: { tabsCount?: number }) {
         </div>
       </div>
 
-      {/* 4-KPI Metric Strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {Array.from({ length: 4 }).map((_, i) => (
           <div
@@ -368,10 +366,8 @@ export function DetailViewSkeleton({ tabsCount = 3 }: { tabsCount?: number }) {
         ))}
       </div>
 
-      {/* Tabs */}
       <TabsSkeleton count={tabsCount} />
 
-      {/* Main Tab Content Card */}
       <div className="rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -592,7 +588,6 @@ export function FormSkeleton({ fieldsCount = 6 }: { fieldsCount?: number }) {
 export function DashboardSkeleton() {
   return (
     <div className="flex flex-col gap-6">
-      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
         <div className="flex items-center gap-3.5">
           <Skeleton className="h-10 w-10 rounded shrink-0" />
@@ -603,7 +598,6 @@ export function DashboardSkeleton() {
         </div>
       </div>
 
-      {/* Finance Section */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2 pt-2">
           <Skeleton className="h-4 w-4 rounded" />
@@ -628,7 +622,6 @@ export function DashboardSkeleton() {
         </div>
       </div>
 
-      {/* Operations Section */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2 pt-2">
           <Skeleton className="h-4 w-4 rounded" />
@@ -653,7 +646,6 @@ export function DashboardSkeleton() {
         </div>
       </div>
 
-      {/* Monthly Activity Chart */}
       <div className="rounded border border-border/80 bg-card p-4 sm:p-5 flex flex-col gap-4">
         <div className="flex items-center gap-2 pb-3 border-b border-border/40">
           <Skeleton className="h-7 w-7 rounded" />
@@ -670,7 +662,6 @@ export function DashboardSkeleton() {
         </div>
       </div>
 
-      {/* Donut Charts */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {Array.from({ length: 2 }).map((_, i) => (
           <div
@@ -688,7 +679,6 @@ export function DashboardSkeleton() {
         ))}
       </div>
 
-      {/* Attention Section */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2 pt-2">
           <Skeleton className="h-4 w-4 rounded" />

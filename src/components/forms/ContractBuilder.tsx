@@ -131,7 +131,6 @@ export function ContractBuilder({
   const stepDisabled = (value: Step): boolean =>
     !detail.hasFees && (value === "pricing" || value === "schedule");
 
-  // Navigation handlers
   function goNextFromBasics() {
     setStep(detail.hasFees ? "pricing" : "clauses");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -176,7 +175,6 @@ export function ContractBuilder({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Sleek Dossier Step Navigation */}
       <div className="relative sm:sticky sm:top-14 z-20 rounded border border-border bg-card p-1 shadow-xs">
         <nav
           aria-label={t("builder.steps")}
@@ -237,7 +235,6 @@ export function ContractBuilder({
         </nav>
       </div>
 
-      {/* Step Content */}
       {step === "basics" ? (
         <ContractBasicsStep
           id={detail.id}

@@ -30,7 +30,6 @@ export function PublicContractViewer({
         }
       }
     } catch {
-      // Fallback if sandboxed without allow-same-origin
     }
   };
 

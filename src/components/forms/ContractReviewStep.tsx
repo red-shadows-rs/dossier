@@ -158,7 +158,6 @@ export function ContractReviewStep({
 
   return (
     <div className="flex flex-col gap-6 pb-28">
-      {/* Issues / Health Validation Card */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3 pb-3">
           <CardTitle className="inline-flex items-center gap-2">
@@ -216,7 +215,6 @@ export function ContractReviewStep({
         </CardContent>
       </Card>
 
-      {/* Document Live Preview Card */}
       <Card>
         <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-3">
           <CardTitle className="inline-flex items-center gap-2">
@@ -313,7 +311,6 @@ export function ContractReviewStep({
         </CardContent>
       </Card>
 
-      {/* Unified Action Footer */}
       <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
         <div className="flex items-center gap-2">
           {onPrev && (

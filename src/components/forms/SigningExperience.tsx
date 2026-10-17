@@ -178,7 +178,6 @@ export function SigningExperience({
   if (requiresOtp && !otpVerified) {
     return (
       <div className="flex flex-col gap-5">
-        {/* Card Header with Icon and Badge */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/40 pb-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0">
@@ -202,7 +201,6 @@ export function SigningExperience({
           </Badge>
         </div>
 
-        {/* State Banner */}
         {!otpSent ? (
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-border/80 bg-muted/30 p-3.5">
             <div className="flex items-center gap-2.5 text-xs text-muted-foreground">
@@ -248,7 +246,6 @@ export function SigningExperience({
           </div>
         )}
 
-        {/* Verification Form */}
         <form onSubmit={verifyOtp} noValidate className="flex flex-col gap-4 max-w-md">
           <div className="flex flex-col sm:flex-row items-end gap-3">
             <Field label={t("code")} htmlFor="otp-code" className="flex-1 w-full" required>

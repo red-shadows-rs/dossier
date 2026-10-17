@@ -164,13 +164,11 @@ export const SignaturePad = forwardRef<
           className="absolute inset-0 h-full w-full touch-none cursor-crosshair"
         />
 
-        {/* Signature Baseline Guide */}
         <div className="pointer-events-none absolute bottom-8 inset-x-6 flex items-center gap-2 text-slate-400/80">
           <span className="font-serif text-sm font-bold text-slate-500">✕</span>
           <div className="h-px flex-1 border-b border-dashed border-slate-300 dark:border-slate-400" />
         </div>
 
-        {/* Subtle Watermark Prompt */}
         {!hasStartedDrawing && points === 0 ? (
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-slate-400">
             <PenLine className="h-6 w-6 stroke-[1.5] text-slate-400/80" />
@@ -182,7 +180,6 @@ export const SignaturePad = forwardRef<
       </div>
 
       <div className="flex items-center justify-between px-1 text-xs">
-        {/* Real Human-Readable Status Badge */}
         <div className="flex items-center gap-1.5">
           {points >= MIN_POINTS ? (
             <span className="inline-flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">

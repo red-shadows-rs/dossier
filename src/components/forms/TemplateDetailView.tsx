@@ -117,7 +117,6 @@ export function TemplateDetailView({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* 1. Standardized Header Bar with Breadcrumbs */}
       <div className="flex flex-col gap-2">
         <nav
           aria-label="Breadcrumb"
@@ -205,7 +204,6 @@ export function TemplateDetailView({
         </div>
       </div>
 
-      {/* System Template Notice */}
       {template.isSystem ? (
         <div className="flex items-start gap-2.5 rounded border border-border bg-muted/20 px-4 py-3 text-xs leading-relaxed text-muted-foreground">
           <Info size={16} className="text-primary mt-0.5 shrink-0" aria-hidden="true" />
@@ -213,7 +211,6 @@ export function TemplateDetailView({
         </div>
       ) : null}
 
-      {/* 2. Top Metric KPI Row (4 Cards) */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <span className="text-xs font-medium text-muted-foreground">{t("clauses")}</span>
@@ -241,11 +238,8 @@ export function TemplateDetailView({
         </div>
       </div>
 
-      {/* 3. URL-synced Unified Tabs */}
       <UrlTabs tabs={tabs} defaultTab="preview" onChange={setActiveTab} />
 
-      {/* 4. Tab Content Sections */}
-      {/* TAB 1: PREVIEW */}
       <div className={currentTab === "preview" ? "block space-y-6" : "hidden"}>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-3">
@@ -275,10 +269,8 @@ export function TemplateDetailView({
         </Card>
       </div>
 
-      {/* TAB 2: DETAILS */}
       <div className={currentTab === "details" ? "block space-y-6" : "hidden"}>
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-          {/* Main Info (8 cols) */}
           <div className="flex flex-col gap-6 lg:col-span-8">
             <Card>
               <CardHeader>
@@ -289,7 +281,6 @@ export function TemplateDetailView({
               </CardHeader>
               <CardContent className="flex flex-col gap-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Arabic */}
                   <div className="flex flex-col gap-1.5 rounded border border-border bg-muted/20 p-4" dir="rtl">
                     <span className="text-xs font-semibold text-primary">{t("arabicTitle")}</span>
                     <h3 className="text-base font-bold text-foreground">
@@ -302,7 +293,6 @@ export function TemplateDetailView({
                     ) : null}
                   </div>
 
-                  {/* English */}
                   <div className="flex flex-col gap-1.5 rounded border border-border bg-muted/20 p-4 font-sans" dir="ltr">
                     <span className="text-xs font-semibold text-primary">{t("englishTitle")}</span>
                     <h3 className="text-base font-bold text-foreground font-sans">
@@ -316,7 +306,6 @@ export function TemplateDetailView({
                   </div>
                 </div>
 
-                {/* Milestone Preset Roadmap */}
                 {milestones && milestones.length > 0 ? (
                   <div className="flex flex-col gap-2 rounded border border-border bg-muted/20 p-3.5 mt-2">
                     <div className="flex items-center justify-between text-xs font-semibold text-foreground">
@@ -344,7 +333,6 @@ export function TemplateDetailView({
             </Card>
           </div>
 
-          {/* Sidebar Specifications (4 cols) */}
           <div className="flex flex-col gap-6 lg:col-span-4">
             <Card>
               <CardHeader>
@@ -390,7 +378,6 @@ export function TemplateDetailView({
         </div>
       </div>
 
-      {/* TAB 3: CLAUSES */}
       <div className={currentTab === "clauses" ? "block space-y-6" : "hidden"}>
         <Card>
           <CardHeader>

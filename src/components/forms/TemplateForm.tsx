@@ -355,7 +355,6 @@ export function TemplateForm({
     setStatusError(msg);
     toast({ title: msg, tone: "error" });
 
-    // Jump to the tab containing error if possible
     if (result.error.fieldErrors) {
       const keys = Object.keys(result.error.fieldErrors);
       if (keys.some((k) => k.startsWith("name") || k.startsWith("description") || k === "type")) {
@@ -394,7 +393,6 @@ export function TemplateForm({
 
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6 pb-28">
-      {/* Sleek Step Navigation Header */}
       <div className="relative sm:sticky sm:top-14 z-20 rounded border border-border bg-card p-1 shadow-xs">
         <nav
           aria-label={t("templates.builder.steps")}
@@ -475,7 +473,6 @@ export function TemplateForm({
         </div>
       ) : null}
 
-      {/* STEP 1: BASICS */}
       {step === "basics" && (
         <Card className="animate-in fade-in-50 duration-200">
           <CardHeader>
@@ -600,10 +597,8 @@ export function TemplateForm({
         </Card>
       )}
 
-      {/* STEP 2: CLAUSES */}
       {step === "clauses" && (
         <div className="flex flex-col gap-4 animate-in fade-in-50 duration-200">
-          {/* Live Validation Bar */}
           <div
             className={cn(
               "flex flex-col gap-2 rounded-lg border p-3.5 transition-colors sm:flex-row sm:items-center sm:justify-between",
@@ -652,7 +647,6 @@ export function TemplateForm({
             </Button>
           </div>
 
-          {/* Clauses Cards List */}
           <div className="flex flex-col gap-4">
             {form.clauses.map((clause, index) => {
               const blocks = getClauseBlocks(clause.bodyAr + " " + clause.bodyEn);
@@ -682,7 +676,6 @@ export function TemplateForm({
                       </div>
 
                       <div className="flex items-center gap-2">
-                        {/* Detected Block Badges */}
                         <div className="flex flex-wrap items-center gap-1.5">
                           {blocks.map((b) => (
                             <span
@@ -697,7 +690,6 @@ export function TemplateForm({
                           ))}
                         </div>
 
-                        {/* Actions */}
                         <div className="flex items-center gap-0.5 border-s border-border/60 ps-2">
                           <Button
                             type="button"
@@ -749,7 +741,6 @@ export function TemplateForm({
                   </CardHeader>
 
                   <CardContent className="p-4 flex flex-col gap-4">
-                    {/* Titles */}
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                       <Field
                         label={t("contracts.clause.titleAr")}
@@ -790,14 +781,12 @@ export function TemplateForm({
                       </Field>
                     </div>
 
-                    {/* Quick Insert Toolbar */}
                     <div className="flex flex-wrap items-center gap-1.5 rounded-md border border-border/60 bg-muted/20 p-2 text-xs">
                       <span className="text-[11px] font-medium text-muted-foreground me-1 flex items-center gap-1">
                         <Sparkles className="h-3 w-3 text-primary" />
                         <span>{isAr ? "إدراج سريع:" : "Quick insert:"}</span>
                       </span>
 
-                      {/* Block Buttons */}
                       <button
                         type="button"
                         onClick={() => insertSnippet(index, "{{block.parties}}")}
@@ -827,7 +816,6 @@ export function TemplateForm({
                         + signatures
                       </button>
 
-                      {/* Variables */}
                       <button
                         type="button"
                         onClick={() => insertSnippet(index, "{{contract.startDate}}")}
@@ -851,7 +839,6 @@ export function TemplateForm({
                       </button>
                     </div>
 
-                    {/* Bodies */}
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                       <Field
                         label={t("contracts.clause.bodyAr")}
@@ -912,7 +899,6 @@ export function TemplateForm({
         </div>
       )}
 
-      {/* STEP 3: DEFAULTS & MILESTONES */}
       {step === "defaults" && (
         <div className="flex flex-col gap-5 animate-in fade-in-50 duration-200">
           <Card>
@@ -983,7 +969,6 @@ export function TemplateForm({
             </CardContent>
           </Card>
 
-          {/* Milestone Presets */}
           <Card>
             <CardHeader>
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -1165,7 +1150,6 @@ export function TemplateForm({
         </div>
       )}
 
-      {/* STEP 4: PREVIEW */}
       {step === "preview" && (
         <Card className="animate-in fade-in-50 duration-200">
           <CardHeader>
@@ -1195,7 +1179,6 @@ export function TemplateForm({
         </Card>
       )}
 
-      {/* Persistent Bottom Action Bar */}
       <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
         <div className="flex items-center gap-2">
           {currentIndex > 0 && (

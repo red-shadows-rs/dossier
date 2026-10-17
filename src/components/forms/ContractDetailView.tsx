@@ -158,7 +158,6 @@ export function ContractDetailView({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* 1. Standardized Header Bar with Breadcrumbs */}
       <div className="flex flex-col gap-2">
         <nav
           aria-label="Breadcrumb"
@@ -218,7 +217,6 @@ export function ContractDetailView({
             </div>
           </div>
 
-          {/* Header Action Buttons */}
           {contract.status === "draft" && canWrite ? (
             <div className="flex flex-wrap items-center gap-2">
               <Link href={`/contracts/${contract.id}/edit`}>
@@ -247,7 +245,6 @@ export function ContractDetailView({
         </div>
       </div>
 
-      {/* 2. Top Metric KPI Row (4 Cards) */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <span className="text-xs font-medium text-muted-foreground">{tc("total")}</span>
@@ -283,11 +280,8 @@ export function ContractDetailView({
         />
       ) : null}
 
-      {/* 3. URL-synced Unified Tabs */}
       <UrlTabs tabs={tabs} defaultTab="preview" onChange={setActiveTab} />
 
-      {/* 4. Tab Content Sections */}
-      {/* TAB 1: PREVIEW */}
       <div className={currentTab === "preview" ? "block space-y-6" : "hidden"}>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-3">
@@ -306,12 +300,9 @@ export function ContractDetailView({
         </Card>
       </div>
 
-      {/* TAB 2: DETAILS */}
       <div className={currentTab === "details" ? "block space-y-6" : "hidden"}>
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-          {/* Main Column (8 cols): Items, Milestones, Clauses, Scope */}
           <div className="flex flex-col gap-6 lg:col-span-8">
-            {/* Deliverables Table (if contract.hasFees and items exist) */}
             {contract.hasFees && items.length > 0 ? (
               <Card>
                 <CardHeader>
@@ -372,7 +363,6 @@ export function ContractDetailView({
               </Card>
             ) : null}
 
-            {/* Payment Milestones Table */}
             {milestones.length > 0 ? (
               <Card>
                 <CardHeader>
@@ -442,7 +432,6 @@ export function ContractDetailView({
               </Card>
             ) : null}
 
-            {/* Clauses List */}
             {clauses.length > 0 ? (
               <Card>
                 <CardHeader>
@@ -478,7 +467,6 @@ export function ContractDetailView({
               </Card>
             ) : null}
 
-            {/* Scope & Notes */}
             {contract.internalNotes || contract.scopeAr || contract.scopeEn ? (
               <Card>
                 <CardHeader>
@@ -517,9 +505,7 @@ export function ContractDetailView({
             ) : null}
           </div>
 
-          {/* Sidebar Column (4 cols): Financial Breakdown & Project/Client Info */}
           <div className="flex flex-col gap-6 lg:col-span-4">
-            {/* Financial Breakdown Card */}
             {contract.hasFees ? (
               <Card>
                 <CardHeader>
@@ -559,7 +545,6 @@ export function ContractDetailView({
               </Card>
             ) : null}
 
-            {/* Project & Client Card */}
             <Card>
               <CardHeader>
                 <CardTitle className="inline-flex items-center gap-2">
@@ -645,10 +630,8 @@ export function ContractDetailView({
         </div>
       </div>
 
-      {/* TAB 3: ACTIVITY */}
       <div className={currentTab === "activity" ? "block space-y-6" : "hidden"}>
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-          {/* Signatories Panel (6 cols) */}
           <div className="lg:col-span-6">
             <Card>
               <CardHeader>
@@ -701,9 +684,7 @@ export function ContractDetailView({
             </Card>
           </div>
 
-          {/* Audit Activity & Version History (6 cols) */}
           <div className="flex flex-col gap-6 lg:col-span-6">
-            {/* Version History Card */}
             {versions.length > 0 ? (
               <Card>
                 <CardHeader>
@@ -740,7 +721,6 @@ export function ContractDetailView({
               </Card>
             ) : null}
 
-            {/* Audit Trail Card */}
             <Card>
               <CardHeader>
                 <CardTitle className="inline-flex items-center gap-2">

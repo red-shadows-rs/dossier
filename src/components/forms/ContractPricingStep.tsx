@@ -186,7 +186,6 @@ export function ContractPricingStep({
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-6 pb-28">
-      {/* Items Section */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-3">
           <CardTitle className="inline-flex items-center gap-2">
@@ -332,7 +331,6 @@ export function ContractPricingStep({
         </CardContent>
       </Card>
 
-      {/* Totals & Tax Calculation Card */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="inline-flex items-center gap-2">
@@ -342,7 +340,6 @@ export function ContractPricingStep({
         </CardHeader>
 
         <CardContent className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          {/* Controls Column */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:col-span-7">
             <Field label={t("contracts.discountType")} htmlFor="cb-disc-type">
               <Select
@@ -388,7 +385,6 @@ export function ContractPricingStep({
             </Field>
           </div>
 
-          {/* Breakdown Card Column */}
           <div className="rounded border border-border bg-card/60 p-4 lg:col-span-5">
             {totals ? (
               <div className="flex flex-col gap-2.5">
@@ -440,7 +436,6 @@ export function ContractPricingStep({
         </CardContent>
       </Card>
 
-      {/* Unified Action Footer */}
       <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
         <div className="flex items-center gap-2">
           {onPrev && (

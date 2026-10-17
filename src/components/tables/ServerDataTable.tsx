@@ -117,7 +117,6 @@ export function ServerDataTable<R extends { id: string | number }>({
         </div>
       ) : null}
 
-      {/* Mobile Responsive Cards (< md) */}
       <div className="md:hidden flex flex-col divide-y divide-border/60">
         {displayRows.map((row) => (
           <div key={row.id} className="p-3.5 hover:bg-muted/15 transition-colors">
@@ -156,7 +155,6 @@ export function ServerDataTable<R extends { id: string | number }>({
         ))}
       </div>
 
-      {/* Desktop Table View (>= md) */}
       <div className="hidden md:block relative w-full">
         {canScrollLeft ? (
           <div className="pointer-events-none absolute inset-y-0 start-0 z-10 w-6 bg-gradient-to-r from-card to-transparent rtl:bg-gradient-to-l opacity-80" />

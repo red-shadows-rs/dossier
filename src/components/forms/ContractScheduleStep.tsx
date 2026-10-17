@@ -213,7 +213,6 @@ export function ContractScheduleStep({
         </CardHeader>
 
         <CardContent className="flex flex-col gap-5">
-          {/* Progress / Status banner */}
           <div className="rounded border border-border bg-card/60 p-3.5">
             {mode === "percent" ? (
               <div className="flex flex-col gap-2">
@@ -279,7 +278,6 @@ export function ContractScheduleStep({
             )}
           </div>
 
-          {/* Error Alert */}
           {error ? (
             <p
               role="alert"
@@ -289,14 +287,12 @@ export function ContractScheduleStep({
             </p>
           ) : null}
 
-          {/* Milestones list */}
           <div className="flex flex-col gap-3.5">
             {rows.map((row, index) => (
               <div
                 key={index}
                 className="group flex flex-col gap-3 rounded border border-border bg-card p-4 shadow-2xs transition-all hover:border-border hover:shadow-xs"
               >
-                {/* Milestone Card Header */}
                 <div className="flex items-center justify-between border-b border-border/60 pb-2.5">
                   <span className="inline-flex items-center gap-1.5 rounded bg-muted px-2 py-0.5 text-xs font-semibold text-foreground font-mono">
                     #{index + 1}
@@ -320,7 +316,6 @@ export function ContractScheduleStep({
                   </Tooltip>
                 </div>
 
-                {/* Row 1: Titles (AR / EN) */}
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   <Field
                     label={t("contracts.milestone.titleAr")}
@@ -354,7 +349,6 @@ export function ContractScheduleStep({
                   </Field>
                 </div>
 
-                {/* Row 2: Percentage/Amount, Due Date, Trigger AR, Trigger EN */}
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12">
                   {mode === "percent" ? (
                     <Field
@@ -470,7 +464,6 @@ export function ContractScheduleStep({
         </CardContent>
       </Card>
 
-      {/* Unified Action Footer */}
       <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
         <div className="flex items-center gap-2">
           {onPrev && (

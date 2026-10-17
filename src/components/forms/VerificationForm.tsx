@@ -75,7 +75,6 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Search Input Card */}
       <div className="rounded-lg border border-border bg-card p-5 sm:p-6 shadow-sm">
         <form onSubmit={onLookup} noValidate className="flex flex-col sm:flex-row items-end gap-3">
           <Field label={t("codeLabel")} htmlFor="verify-code" className="w-full flex-1">
@@ -115,7 +114,6 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
         ) : null}
       </div>
 
-      {/* Results Section */}
       {checked ? (
         result === null ? (
           <div
@@ -134,7 +132,6 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
           </div>
         ) : (
           <div className="flex flex-col gap-6">
-            {/* Quick Summary Card */}
             <div className="relative overflow-hidden flex flex-col gap-5 rounded-lg border border-border bg-card p-6 shadow-sm">
               <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/80 via-primary to-rose-400" />
               <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-4">
@@ -171,7 +168,6 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
                 </Badge>
               </div>
 
-              {/* Document Overview Data */}
               {result.kind === "contract" ? (
                 <div className="flex flex-col gap-3">
                   <div className="rounded-md border border-border/70 bg-muted/30 p-3.5">
@@ -236,7 +232,6 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
                 </div>
               )}
 
-              {/* View Full Verification Page Button */}
               <div className="pt-2">
                 <Link
                   href={`/v/${checkedCode ?? code}?lang=${locale}`}
@@ -248,7 +243,6 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
               </div>
             </div>
 
-            {/* Embedded PDF File Integrity Checker */}
             {checkedCode ? (
               <VerificationPdfChecker code={checkedCode} />
             ) : null}
