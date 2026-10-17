@@ -42,6 +42,7 @@ next-env.d.ts
 
 # ── Runtime Data ──
 data/
+*.db
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
