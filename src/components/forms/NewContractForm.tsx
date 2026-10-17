@@ -14,9 +14,13 @@ import { createContractAction } from "@/server/actions/contracts";
 export function NewContractForm({
   projects,
   templates,
+  defaultTemplateId,
+  defaultProjectId,
 }: {
   projects: { id: string; label: string }[];
   templates: { id: string; label: string }[];
+  defaultTemplateId?: string;
+  defaultProjectId?: string;
 }) {
   const t = useTranslations();
   const toast = useToast();
@@ -82,7 +86,12 @@ export function NewContractForm({
               error={err("projectId")}
               required
             >
-              <Select id="nc-project" name="projectId" disabled={pending}>
+              <Select
+                id="nc-project"
+                name="projectId"
+                disabled={pending}
+                defaultValue={defaultProjectId ?? ""}
+              >
                 <option value="">{t("contracts.selectProject")}</option>
                 {projects.map((project) => (
                   <option key={project.id} value={project.id}>
@@ -98,7 +107,12 @@ export function NewContractForm({
               error={err("templateId")}
               required
             >
-              <Select id="nc-template" name="templateId" disabled={pending}>
+              <Select
+                id="nc-template"
+                name="templateId"
+                disabled={pending}
+                defaultValue={defaultTemplateId ?? ""}
+              >
                 <option value="">{t("contracts.selectTemplate")}</option>
                 {templates.map((template) => (
                   <option key={template.id} value={template.id}>

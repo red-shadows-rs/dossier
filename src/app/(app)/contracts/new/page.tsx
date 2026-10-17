@@ -7,13 +7,18 @@ import { listProjectOptions } from "@/server/services/projects";
 import { listTemplates } from "@/server/services/templates";
 import { smoothLoading } from "@/lib/smooth-loader";
 
-export default async function NewContractPage() {
+export default async function NewContractPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ templateId?: string; projectId?: string }>;
+}) {
   await smoothLoading();
   const user = await requireUserPage();
   assertCan(user, "contracts.write");
   const t = await getTranslations("contracts");
   const rawLocale = await getLocale();
   const locale = rawLocale === "en" ? "en" : "ar";
+  const params = await searchParams;
 
   const projects = listProjectOptions().map((project) => ({
     id: project.id,
@@ -36,7 +41,12 @@ export default async function NewContractPage() {
           </div>
         </div>
       </div>
-      <NewContractForm projects={projects} templates={templates} />
+      <NewContractForm
+        projects={projects}
+        templates={templates}
+        defaultTemplateId={params?.templateId}
+        defaultProjectId={params?.projectId}
+      />
     </div>
   );
 }

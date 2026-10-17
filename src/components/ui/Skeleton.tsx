@@ -54,13 +54,10 @@ export function ClientsTableSkeleton() {
     <div className="flex flex-col gap-4">
       <PageHeaderSkeleton actionWidth="w-32" />
       <div className="rounded border border-border bg-card p-3 sm:p-4">
-        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-          <div className="flex flex-1 items-center gap-2 min-w-[240px]">
-            <Skeleton className="h-10 flex-1 rounded" />
-            <Skeleton className="h-10 w-20 rounded" />
-          </div>
-          <Skeleton className="h-10 w-28 rounded" />
-          <Skeleton className="h-10 w-36 rounded" />
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-10 flex-1 min-w-[200px] rounded" />
+          <Skeleton className="h-10 w-20 rounded shrink-0 hidden sm:block" />
+          <Skeleton className="h-10 w-24 rounded shrink-0" />
         </div>
       </div>
       <div className="rounded border border-border bg-card overflow-hidden">
@@ -105,12 +102,10 @@ export function ProjectsTableSkeleton() {
     <div className="flex flex-col gap-4">
       <PageHeaderSkeleton actionWidth="w-36" />
       <div className="rounded border border-border bg-card p-3 sm:p-4">
-        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-          <div className="flex flex-1 items-center gap-2 min-w-[240px]">
-            <Skeleton className="h-10 flex-1 rounded" />
-            <Skeleton className="h-10 w-20 rounded" />
-          </div>
-          <Skeleton className="h-10 w-28 rounded" />
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-10 flex-1 min-w-[200px] rounded" />
+          <Skeleton className="h-10 w-20 rounded shrink-0 hidden sm:block" />
+          <Skeleton className="h-10 w-24 rounded shrink-0" />
         </div>
       </div>
       <div className="rounded border border-border bg-card overflow-hidden">
@@ -150,12 +145,10 @@ export function ContractsTableSkeleton() {
     <div className="flex flex-col gap-4">
       <PageHeaderSkeleton actionWidth="w-32" />
       <div className="rounded border border-border bg-card p-3 sm:p-4">
-        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-          <div className="flex flex-1 items-center gap-2 min-w-[240px]">
-            <Skeleton className="h-10 flex-1 rounded" />
-            <Skeleton className="h-10 w-20 rounded" />
-          </div>
-          <Skeleton className="h-10 w-28 rounded" />
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-10 flex-1 min-w-[200px] rounded" />
+          <Skeleton className="h-10 w-20 rounded shrink-0 hidden sm:block" />
+          <Skeleton className="h-10 w-24 rounded shrink-0" />
         </div>
       </div>
       <div className="rounded border border-border bg-card overflow-hidden">
@@ -197,12 +190,10 @@ export function InvoicesTableSkeleton() {
     <div className="flex flex-col gap-4">
       <PageHeaderSkeleton actionWidth="w-36" />
       <div className="rounded border border-border bg-card p-3 sm:p-4">
-        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-          <div className="flex flex-1 items-center gap-2 min-w-[240px]">
-            <Skeleton className="h-10 flex-1 rounded" />
-            <Skeleton className="h-10 w-20 rounded" />
-          </div>
-          <Skeleton className="h-10 w-28 rounded" />
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-10 flex-1 min-w-[200px] rounded" />
+          <Skeleton className="h-10 w-20 rounded shrink-0 hidden sm:block" />
+          <Skeleton className="h-10 w-24 rounded shrink-0" />
         </div>
       </div>
       <div className="rounded border border-border bg-card overflow-hidden">

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { FileCode2, Plus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/Button";
-import { TemplatesTable } from "@/components/tables/TemplatesTable";
+import { TemplatesGallery } from "@/components/tables/TemplatesGallery";
 import { archiveTemplateAction } from "@/server/actions/templates";
 import { LANG_MODES, TEMPLATE_TYPES } from "@/lib/constants";
 import { can } from "@/lib/permissions";
@@ -31,6 +31,11 @@ export default async function TemplatesPage() {
     archiveConfirm: t("archiveConfirm"),
     archivedToast: t("archivedToast"),
     empty: t("empty"),
+    useTemplate: t("useTemplate"),
+    viewDetails: t("viewDetails"),
+    searchPlaceholder: t("searchPlaceholder"),
+    viewCards: t("viewCards"),
+    viewTable: t("viewTable"),
     typeValues: Object.fromEntries(
       TEMPLATE_TYPES.map((value) => [value, t(`type.${value}`)]),
     ),
@@ -38,6 +43,8 @@ export default async function TemplatesPage() {
       LANG_MODES.map((value) => [value, t(`languageModes.${value}`)]),
     ),
   };
+
+  const canWrite = can(user, "templates.write");
 
   return (
     <div className="flex flex-col gap-5 sm:gap-6">
@@ -55,7 +62,7 @@ export default async function TemplatesPage() {
             </div>
           </div>
         </div>
-        {can(user, "templates.write") ? (
+        {canWrite ? (
           <div className="flex flex-wrap items-center gap-2">
             <Link href="/templates/new">
               <Button type="button" className="gap-1.5 font-medium shadow-xs">
@@ -67,13 +74,12 @@ export default async function TemplatesPage() {
         ) : null}
       </div>
 
-      <div className="overflow-hidden rounded border border-border bg-card">
-        <TemplatesTable
-          rows={rows}
-          labels={labels}
-          archiveAction={archiveTemplateAction}
-        />
-      </div>
+      <TemplatesGallery
+        rows={rows}
+        labels={labels}
+        archiveAction={archiveTemplateAction}
+        canWrite={canWrite}
+      />
     </div>
   );
 }
