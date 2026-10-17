@@ -128,7 +128,7 @@ export function TemplateDocumentViewer({
       {loading ? (
         <DocumentSkeleton />
       ) : html ? (
-        <div className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin] rounded-lg border border-border bg-white shadow-2xs overflow-hidden">
+        <div className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin] rounded-lg border border-border bg-white shadow-2xs">
           <iframe
             title={tTemplates("previewTitle")}
             sandbox="allow-same-origin"

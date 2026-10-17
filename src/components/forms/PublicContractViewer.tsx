@@ -38,7 +38,7 @@ export function PublicContractViewer({
   }, [html]);
 
   return (
-    <div className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin] rounded-xl border border-border/80 bg-white shadow-2xs overflow-hidden">
+    <div className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin] rounded-xl border border-border/80 bg-white shadow-2xs">
       <iframe
         ref={iframeRef}
         title={title}
