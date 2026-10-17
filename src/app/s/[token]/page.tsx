@@ -85,24 +85,9 @@ export default async function SigningPage({
             <div className="flex items-center gap-2 sm:gap-3">
               <Logo />
             </div>
-            <div className="flex items-center gap-2 sm:gap-4">
-              <div className="flex items-center gap-1.5 sm:gap-2 border-s border-border/60 ps-2.5 sm:ps-4">
-                <img
-                  src="/red-shadows-logo.png"
-                  alt="RED SHADOWS"
-                  className="h-5 sm:h-6 w-auto shrink-0"
-                />
-                <span
-                  className="text-xs sm:text-sm font-bold tracking-tight text-foreground font-mono whitespace-nowrap"
-                  dir="ltr"
-                >
-                  RED SHADOWS
-                </span>
-              </div>
-              <div className="flex items-center gap-1 sm:gap-1.5 border-s border-border/60 ps-2 sm:ps-3">
-                <ThemeSwitch current={theme} />
-                <LocaleSwitch />
-              </div>
+            <div className="flex items-center gap-1 sm:gap-1.5">
+              <ThemeSwitch current={theme} />
+              <LocaleSwitch />
             </div>
           </header>
 
@@ -146,24 +131,9 @@ export default async function SigningPage({
           <div className="flex items-center gap-2 sm:gap-3">
             <Logo />
           </div>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <div className="flex items-center gap-1.5 sm:gap-2 border-s border-border/60 ps-2.5 sm:ps-4">
-              <img
-                src="/red-shadows-logo.png"
-                alt="RED SHADOWS"
-                className="h-5 sm:h-6 w-auto shrink-0"
-              />
-              <span
-                className="text-xs sm:text-sm font-bold tracking-tight text-foreground font-mono whitespace-nowrap"
-                dir="ltr"
-              >
-                RED SHADOWS
-              </span>
-            </div>
-            <div className="flex items-center gap-1 sm:gap-1.5 border-s border-border/60 ps-2 sm:ps-3">
-              <ThemeSwitch current={theme} />
-              <LocaleSwitch />
-            </div>
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            <ThemeSwitch current={theme} />
+            <LocaleSwitch />
           </div>
         </header>
 
