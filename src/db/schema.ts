@@ -215,7 +215,7 @@ export const templates = sqliteTable(
     descriptionEn: text("description_en"),
     defaultLanguageMode: text("default_language_mode", { enum: C.LANG_MODES })
       .notNull()
-      .default("bilingual"),
+      .default("ar"),
     defaultsJson: text("defaults_json").notNull().default("{}"),
     isSystem: bool("is_system"),
     archivedAt: integer("archived_at"),
@@ -271,7 +271,7 @@ export const contracts = sqliteTable(
       .default("draft"),
     languageMode: text("language_mode", { enum: C.LANG_MODES })
       .notNull()
-      .default("bilingual"),
+      .default("ar"),
     hasFees: integer("has_fees", { mode: "boolean" }).notNull().default(true),
     titleAr: text("title_ar"),
     titleEn: text("title_en"),

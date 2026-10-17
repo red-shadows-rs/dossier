@@ -50,21 +50,25 @@ export function ContractDocumentViewer({
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         {langs.length > 1 ? (
-          <div className="flex gap-1">
+          <div
+            role="tablist"
+            className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-muted/40 p-1"
+          >
             {langs.map((value) => (
               <button
                 key={value}
                 type="button"
-                aria-current={value === lang ? "true" : undefined}
+                role="tab"
+                aria-selected={value === lang}
                 onClick={() => setLang(value)}
                 className={cn(
-                  "rounded-md border px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer",
+                  "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer",
                   value === lang
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border text-muted-foreground hover:text-foreground",
+                    ? "bg-primary text-primary-foreground shadow-xs"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
                 )}
               >
-                {t(`languageModes.${value}`)}
+                <span>{t(`languageModes.${value}`)}</span>
               </button>
             ))}
           </div>
@@ -103,24 +107,18 @@ export function ContractDocumentViewer({
               const frame = e.currentTarget;
               const updateHeight = () => {
                 try {
-                  if (frame.contentDocument) {
+                  if (frame.contentDocument?.documentElement) {
                     const doc = frame.contentDocument;
                     if (doc.body) {
                       doc.body.style.overflow = "hidden";
                     }
-                    const redBar = doc.querySelector(".bottom-red-bar") as HTMLElement | null;
-                    let h = 0;
-                    if (redBar) {
-                      h = redBar.offsetTop + redBar.offsetHeight;
-                    } else {
-                      const container =
-                        doc.querySelector(".contract-document") ||
-                        doc.querySelector(".invoice-page") ||
-                        doc.body;
-                      h = Math.ceil(container?.getBoundingClientRect().height || doc.body?.scrollHeight || 500);
-                    }
-                    if (h > 0) {
-                      setIframeHeight(Math.max(h, 300));
+                    const h = Math.max(
+                      doc.documentElement.scrollHeight,
+                      doc.body?.scrollHeight ?? 0,
+                      doc.documentElement.offsetHeight,
+                    );
+                    if (h > 400) {
+                      setIframeHeight(h);
                     }
                   }
                 } catch {

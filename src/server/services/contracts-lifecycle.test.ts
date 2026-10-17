@@ -71,7 +71,7 @@ function createValidDraft(signingDeadline: string | null = null): string {
     user,
     id,
     {
-      languageMode: "bilingual",
+      languageMode: "ar",
       titleAr: "عقد تطوير",
       titleEn: "Development Agreement",
       scopeAr: "نطاق العمل",

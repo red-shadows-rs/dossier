@@ -142,6 +142,8 @@ function missingMarker(name: string): string {
   return `<span style="color:#ef4444">⟦missing: ${escapeHtml(name)}⟧</span>`;
 }
 
+import { OPTIONAL_VARIABLES } from "./variables";
+
 export function renderInline(
   raw: string,
   vars: Record<string, string>,
@@ -162,8 +164,12 @@ export function renderInline(
     const name = match[1];
     const value = name.startsWith("block.") ? undefined : vars[name];
     if (value === undefined || value === "") {
-      onMissing(name);
-      out += slot(missingMarker(name));
+      if (OPTIONAL_VARIABLES.has(name)) {
+        out += slot(renderValue("—"));
+      } else {
+        onMissing(name);
+        out += slot(missingMarker(name));
+      }
     } else {
       out += slot(renderValue(value));
     }

@@ -135,7 +135,7 @@ async function loadAttachments(
   if (typeof invoiceId === "string" && invoiceId) {
     const docLang: DocLang = isDocLang(payload.docLang)
       ? payload.docLang
-      : "bilingual";
+      : "ar";
     const render =
       deps.renderInvoiceAttachment ?? defaultRenderInvoiceAttachment;
     attachments.push(await render(invoiceId, docLang));

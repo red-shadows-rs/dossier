@@ -167,53 +167,6 @@ export function renderCertificateSection(
     `
     : "";
 
-  if (lang === "bilingual") {
-    return `
-      <section class="cert">
-        <table class="bilingual-clause" style="margin: 0; border: none;">
-          <tbody>
-            <tr>
-              <td class="col-en divider" dir="ltr" style="width: 50%; vertical-align: top; border-bottom: none;">
-                <div class="doc-badge">AUTHENTICATION CERTIFICATE</div>
-                <h1 style="font-size: 13pt; margin: 1mm 0 2mm;">Certificate of Completion</h1>
-                ${infoTable("en")}
-              </td>
-              <td class="col-ar" dir="rtl" style="width: 50%; vertical-align: top; border-bottom: none;">
-                <div class="doc-badge">شهادة إثبات التوثيق</div>
-                <h1 style="font-size: 13pt; margin: 1mm 0 2mm;">شهادة إتمام التوقيع</h1>
-                ${infoTable("ar")}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        ${verificationBlock}
-
-        <div style="margin: 3mm 0;">
-          <table class="bilingual-clause" style="margin: 0; border: none;">
-            <tbody>
-              <tr>
-                <td class="col-en divider" dir="ltr" style="width: 50%; vertical-align: top; border-bottom: none;">
-                  <div class="section-badge">SIGNATORIES & EVIDENCE</div>
-                  ${signatoriesTable("en")}
-                  <p class="muted" style="margin-top: 2mm;">${esc(statementEn)}</p>
-                </td>
-                <td class="col-ar" dir="rtl" style="width: 50%; vertical-align: top; border-bottom: none;">
-                  <div class="section-badge">سجل الموقعين والأدلة</div>
-                  ${signatoriesTable("ar")}
-                  <p class="muted" style="margin-top: 2mm;">${esc(statementAr)}</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <p class="muted" style="text-align: center; margin-top: 3mm;">Generated at ${esc(
-          utcStamp(cert.generatedAtMs),
-        )} UTC</p>
-      </section>
-    `;
-  }
 
   const isArabic = lang === "ar";
   const title = isArabic ? "شهادة إتمام التوقيع" : "Certificate of Completion";

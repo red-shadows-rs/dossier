@@ -99,7 +99,7 @@ beforeEach(async () => {
       clientId,
       projectId,
       status: "draft",
-      languageMode: "bilingual",
+      languageMode: "ar",
       currency: "SAR",
       taxRateBp: 1500,
       paymentTermsDays: 14,
@@ -131,14 +131,10 @@ beforeEach(async () => {
 });
 
 describe("resolveInvoiceDocLang", () => {
-  it("rejects an incompatible language with VALIDATION_FAILED", () => {
+  it("rejects an invalid language with VALIDATION_FAILED", () => {
     issueInvoice(user, invoiceId, META);
-    db.update(invoices)
-      .set({ languageMode: "ar" })
-      .where(eq(invoices.id, invoiceId))
-      .run();
     const invoice = getInvoice(invoiceId);
-    expect(() => resolveInvoiceDocLang(invoice, "en")).toThrow(AppError);
+    expect(() => resolveInvoiceDocLang(invoice, "invalid-lang")).toThrow(AppError);
   });
 
   it("defaults to the invoice mode", () => {

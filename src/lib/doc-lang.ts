@@ -1,16 +1,14 @@
-export const DOC_LANGS = ["ar", "en", "bilingual"] as const;
+export const DOC_LANGS = ["ar", "en"] as const;
 export type DocLang = (typeof DOC_LANGS)[number];
 
-export type LanguageMode = "ar" | "en" | "bilingual";
+export type LanguageMode = "ar" | "en";
 
-export function allowedDocLangs(mode: LanguageMode): DocLang[] {
-  if (mode === "ar") return ["ar"];
-  if (mode === "en") return ["en"];
-  return ["ar", "en", "bilingual"];
+export function allowedDocLangs(_mode?: LanguageMode | string): DocLang[] {
+  return ["ar", "en"];
 }
 
-export function defaultDocLang(mode: LanguageMode): DocLang {
-  return mode;
+export function defaultDocLang(mode?: LanguageMode | string): DocLang {
+  return mode === "en" ? "en" : "ar";
 }
 
 export function isDocLang(value: unknown): value is DocLang {

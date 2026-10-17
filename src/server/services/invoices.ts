@@ -280,10 +280,8 @@ function sellerSnapshot() {
   };
 }
 
-function requiredLanguages(mode: "ar" | "en" | "bilingual"): Locale[] {
-  if (mode === "ar") return ["ar"];
-  if (mode === "en") return ["en"];
-  return ["ar", "en"];
+function requiredLanguages(mode: "ar" | "en"): Locale[] {
+  return mode === "en" ? ["en"] : ["ar"];
 }
 
 export function createInvoice(
@@ -715,12 +713,10 @@ export function voidInvoice(
 }
 
 export function localeForInvoice(
-  mode: "ar" | "en" | "bilingual",
+  mode: "ar" | "en",
   preferredLanguage: Locale,
 ): Locale {
-  if (mode === "ar") return "ar";
-  if (mode === "en") return "en";
-  return preferredLanguage;
+  return mode === "en" ? "en" : "ar";
 }
 
 export type SendInvoiceEmailOptions = { toEmail?: string };

@@ -69,7 +69,7 @@ export const templateInputSchema = z.object({
   nameEn: z.string().trim().min(1, "errors.required").max(200, "errors.tooLong"),
   descriptionAr: optText(),
   descriptionEn: optText(),
-  defaultLanguageMode: z.enum(LANG_MODES).default("bilingual"),
+  defaultLanguageMode: z.enum(LANG_MODES).default("ar"),
   defaults: templateDefaultsSchema,
   clauses: z
     .array(templateClauseInputSchema)

@@ -81,7 +81,7 @@ beforeEach(async () => {
       clientId,
       projectId,
       status: "draft",
-      languageMode: "bilingual",
+      languageMode: "ar",
       currency: "SAR",
       taxRateBp: 1500,
       subtotalMinor: 1900000,

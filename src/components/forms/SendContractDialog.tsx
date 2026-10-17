@@ -37,7 +37,7 @@ export function SendContractDialog({
   onClose: () => void;
   contractId: string;
   signers: SignerOption[];
-  languageMode: "ar" | "en" | "bilingual";
+  languageMode: "ar" | "en";
   clientDefaults: { name: string; title: string; email: string };
   consentText: string;
   requireProviderSignature: boolean;

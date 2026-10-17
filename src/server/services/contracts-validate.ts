@@ -18,7 +18,7 @@ import {
   parseBody,
   specialBlockSequence,
 } from "@/server/templating/render-body";
-import { buildVariableMap } from "@/server/templating/variables";
+import { buildVariableMap, OPTIONAL_VARIABLES } from "@/server/templating/variables";
 
 export type SendValidationOptions = Partial<SendContractInput>;
 
@@ -60,10 +60,9 @@ type IssueCode = (typeof CONTRACT_ISSUE_CODES)[number];
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function requiredLanguages(mode: "ar" | "en" | "bilingual"): Locale[] {
-  if (mode === "ar") return ["ar"];
+function requiredLanguages(mode: "ar" | "en" | string): Locale[] {
   if (mode === "en") return ["en"];
-  return ["ar", "en"];
+  return ["ar"];
 }
 
 function error(
@@ -286,6 +285,7 @@ export function validateContractForSend(
         if (seen.has(variable)) continue;
         seen.add(variable);
         if (variable === "contract.number") continue;
+        if (OPTIONAL_VARIABLES.has(variable)) continue;
         if (!map[variable]) {
           issues.push(
             error("missingVariable", `clause.${clause.position}.${variable}`, {
@@ -328,12 +328,14 @@ export function validateContractForSend(
     paymentScheduleCount += arSequence.filter(
       (n) => n === "payment_schedule",
     ).length;
-    if (arSequence.join(",") !== enSequence.join(",")) {
-      issues.push(
-        error("blockSequenceMismatch", `clause.${clause.position}.blocks`, {
-          position: clause.position,
-        }),
-      );
+    if (clause.bodyAr.trim() && clause.bodyEn.trim()) {
+      if (arSequence.join(",") !== enSequence.join(",")) {
+        issues.push(
+          error("blockSequenceMismatch", `clause.${clause.position}.blocks`, {
+            position: clause.position,
+          }),
+        );
+      }
     }
   }
   if (signaturesCount !== 1) {
@@ -343,12 +345,7 @@ export function validateContractForSend(
     issues.push(error("paymentScheduleBlock", "blocks"));
   }
 
-  if (contract.taxRateBp > 0 && !company.taxNumber) {
-    issues.push(warning("companyTaxNumberMissing", "company.taxNumber"));
-  }
-  if (contract.taxRateBp > 0 && !clientRow.taxNumber) {
-    issues.push(warning("clientTaxNumberMissing", "client.taxNumber"));
-  }
+  // Tax numbers are explicitly optional for both parties per user requirements
   if (contract.endDate && milestones.length > 0) {
     const lastDue = milestones
       .map((m) => m.dueDate)
@@ -360,20 +357,22 @@ export function validateContractForSend(
     }
   }
   for (const clause of clauses) {
-    const arCount = numberedParagraphLabels(
-      clause.position,
-      parseBody(clause.bodyAr),
-    ).length;
-    const enCount = numberedParagraphLabels(
-      clause.position,
-      parseBody(clause.bodyEn),
-    ).length;
-    if (arCount !== enCount) {
-      issues.push(
-        warning("paragraphCountMismatch", `clause.${clause.position}`, {
-          position: clause.position,
-        }),
-      );
+    if (clause.bodyAr.trim() && clause.bodyEn.trim()) {
+      const arCount = numberedParagraphLabels(
+        clause.position,
+        parseBody(clause.bodyAr),
+      ).length;
+      const enCount = numberedParagraphLabels(
+        clause.position,
+        parseBody(clause.bodyEn),
+      ).length;
+      if (arCount !== enCount) {
+        issues.push(
+          warning("paragraphCountMismatch", `clause.${clause.position}`, {
+            position: clause.position,
+          }),
+        );
+      }
     }
   }
   const bank = company.bank;

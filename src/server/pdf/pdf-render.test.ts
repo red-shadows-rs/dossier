@@ -71,7 +71,7 @@ afterAll(async () => {
 });
 
 describe("renderPdf smoke", () => {
-  for (const lang of ["ar", "en", "bilingual"] as const) {
+  for (const lang of ["ar", "en"] as const) {
     it(`generates a ${lang} PDF`, { timeout: 60000 }, async () => {
       const html = renderContractHtml({
         snapshot: SNAPSHOT,
@@ -105,7 +105,7 @@ describe("renderPdf smoke", () => {
           ...SNAPSHOT,
           contract: { ...SNAPSHOT.contract, number: "DOS-C-2026-0001" },
         },
-        lang: "bilingual",
+        lang: "ar",
         mode: "sealed",
         fonts: getFontCss(),
         logoDataUri: null,
@@ -145,14 +145,14 @@ describe("renderPdf smoke", () => {
     },
   );
 
-  for (const lang of ["ar", "en", "bilingual"] as const) {
+  for (const lang of ["ar", "en"] as const) {
     it(`generates a ${lang} invoice PDF`, { timeout: 60000 }, async () => {
       const html = renderInvoiceHtml({
         invoice: {
           id: "inv-1",
           number: "DOS-I-2026-0001",
           currency: "SAR",
-          languageMode: "bilingual",
+          languageMode: "ar",
           status: "issued",
           issueDate: "2026-10-20",
           dueDate: "2026-11-03",

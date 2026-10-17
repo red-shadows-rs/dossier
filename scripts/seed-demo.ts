@@ -183,7 +183,7 @@ async function main(): Promise<void> {
       user,
       createInvoiceSchema.parse({
         projectId: projectIds[index % projectIds.length],
-        languageMode: "bilingual",
+        languageMode: "ar",
         notesAr: null,
         notesEn: null,
       }),
@@ -210,7 +210,7 @@ async function main(): Promise<void> {
       user,
       id,
       updateInvoiceDraftSchema.parse({
-        languageMode: "bilingual",
+        languageMode: "ar",
         issueDate: invoice.issue ? today : null,
         dueDate: invoice.issue ? addDays(today, 14) : null,
         notesAr: null,

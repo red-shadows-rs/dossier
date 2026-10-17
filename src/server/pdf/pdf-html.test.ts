@@ -150,26 +150,29 @@ describe("renderContractHtml — modes", () => {
     const snapshot = fixture({
       contract: { ...SAMPLE_SNAPSHOT.contract, number: null },
     });
-    const draft = renderContractHtml(input({ snapshot, mode: "draft" }));
-    expect(draft).toContain("DRAFT / مسودة");
+    const draft = renderContractHtml(input({ snapshot, mode: "draft", lang: "ar" }));
+    expect(draft).toContain("مسودة");
     expect(draft).toContain('class="watermark"');
 
-    const preview = renderContractHtml(input({ snapshot, mode: "preview" }));
-    expect(preview).toContain("DRAFT / مسودة");
+    const preview = renderContractHtml(input({ snapshot, mode: "preview", lang: "ar" }));
+    expect(preview).toContain("مسودة");
   });
 
   it("unsigned has no watermark but shows the unsigned note", () => {
-    const html = renderContractHtml(input({ mode: "unsigned" }));
-    expect(html).not.toContain('class="watermark"');
-    expect(html).toContain("UNSIGNED");
-    expect(html).toContain("غير موقع");
+    const htmlEn = renderContractHtml(input({ mode: "unsigned", lang: "en" }));
+    expect(htmlEn).not.toContain('class="watermark"');
+    expect(htmlEn).toContain("UNSIGNED");
+
+    const htmlAr = renderContractHtml(input({ mode: "unsigned", lang: "ar" }));
+    expect(htmlAr).not.toContain('class="watermark"');
+    expect(htmlAr).toContain("غير موقع");
   });
 
   it("sealed includes the verification block, hash and certificate", () => {
     const html = renderContractHtml(
       input({
         mode: "sealed",
-        lang: "bilingual",
+        lang: "ar",
         verification: {
           code: "ABCDEF001111",
           url: "https://dossier.example.com/v/ABCDEF001111",
@@ -195,7 +198,6 @@ describe("renderContractHtml — modes", () => {
         },
       }),
     );
-    expect(html).toContain("Certificate of Completion");
     expect(html).toContain("شهادة إتمام التوقيع");
     expect(html).toContain("SHA-256");
     expect(html).toContain("deadbeef");
@@ -225,13 +227,22 @@ describe("renderContractHtml — language modes", () => {
     expect(html).toContain("Article 1 —");
   });
 
-  it("bilingual mode renders two-cell clause rows with both languages", () => {
-    const html = renderContractHtml(input({ lang: "bilingual" }));
-    expect(html).toContain('class="bilingual-clause"');
-    expect(html).toContain("Article 2 —");
-    expect(html).toContain("المادة 2 —");
-    expect(html).toContain("Description");
-    expect(html).toContain("الوصف");
+  it("falls back to Arabic title if English title is missing in en mode", () => {
+    const snapshot = fixture({
+      clauses: [
+        {
+          position: 1,
+          key: "custom",
+          titleAr: "البند الإضافي",
+          titleEn: "",
+          bodyAr: "محتوى عربي",
+          bodyEn: "",
+        },
+      ],
+    });
+    const html = renderContractHtml(input({ snapshot, lang: "en" }));
+    expect(html).toContain("البند الإضافي");
+    expect(html).toContain("محتوى عربي");
   });
 });
 
@@ -255,4 +266,27 @@ describe("renderContractHtml — tables and money", () => {
     const html = renderContractHtml(input({ lang: "en" }));
     expect((html.match(/<thead>/g) ?? []).length).toBeGreaterThanOrEqual(2);
   });
+
+  it("splits multi-clause contracts into pages with subsequent headers on page 2+", () => {
+    const manyClauses = Array.from({ length: 16 }, (_, i) => ({
+      position: i + 1,
+      key: `clause_${i + 1}`,
+      titleAr: `البند رقم ${i + 1}`,
+      titleEn: `Clause ${i + 1}`,
+      bodyAr: "نص تفصيلي للبند التعاقدي يحدد الالتزامات والشروط والأحكام الخاصة بالمشروع والتسليم والضمان وغيرها من التفاصيل التي تستغرق سطورا متعددة.",
+      bodyEn: "Detailed clause text defining obligations, terms, conditions, project delivery, warranty and other details spanning multiple lines.",
+    }));
+    const snapshot = fixture({ clauses: manyClauses });
+    const htmlAr = renderContractHtml(input({ snapshot, lang: "ar", mode: "draft" }));
+    expect(htmlAr).toContain('class="contract-page"');
+    expect(htmlAr).toContain('class="subsequent-header"');
+    expect(htmlAr).not.toContain("عقد (تابع)");
+    expect(htmlAr).toContain("رقم العقد:");
+
+    const htmlEn = renderContractHtml(input({ snapshot, lang: "en", mode: "draft" }));
+    expect(htmlEn).toContain('class="subsequent-header"');
+    expect(htmlEn).not.toContain("Contract (Cont.)");
+    expect(htmlEn).toContain("Contract No:");
+  });
 });
+

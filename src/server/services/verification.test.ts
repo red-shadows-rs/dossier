@@ -146,7 +146,7 @@ async function sealedContract(): Promise<{ id: string; code: string; pdf: Buffer
     user,
     id,
     {
-      languageMode: "bilingual",
+      languageMode: "ar",
       titleAr: "عقد تطوير",
       titleEn: "Development Agreement",
       scopeAr: "نطاق العمل",
@@ -293,7 +293,7 @@ describe("lookupVerification", () => {
         clientId,
         projectId,
         status: "signed",
-        languageMode: "bilingual",
+        languageMode: "ar",
         currency: "SAR",
         number: "DOS-C-2026-9999",
         verificationCode: "ABCDEFGH0123",

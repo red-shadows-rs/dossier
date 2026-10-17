@@ -66,7 +66,7 @@ export type TemplateFormValues = {
   nameEn: string;
   descriptionAr: string;
   descriptionEn: string;
-  defaultLanguageMode: "ar" | "en" | "bilingual";
+  defaultLanguageMode: "ar" | "en";
   hasFees: boolean;
   titleAr: string;
   titleEn: string;
@@ -1186,7 +1186,7 @@ export function TemplateForm({
 
             <TemplateDocumentViewer
               clauses={previewClauses}
-              defaultLang={form.defaultLanguageMode === "en" ? "en" : form.defaultLanguageMode === "bilingual" ? "bilingual" : "ar"}
+              defaultLang={form.defaultLanguageMode === "en" ? "en" : "ar"}
               templateTitleAr={form.titleAr.trim() || form.nameAr}
               templateTitleEn={form.titleEn.trim() || form.nameEn}
               hasFees={form.hasFees}

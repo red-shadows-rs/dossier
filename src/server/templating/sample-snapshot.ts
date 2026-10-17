@@ -6,7 +6,7 @@ export const SAMPLE_SNAPSHOT: ContractSnapshotV1 = {
     id: "c-sample",
     number: "DOS-C-2026-0001",
     versionNo: 1,
-    languageMode: "bilingual",
+    languageMode: "ar",
     hasFees: true,
     issueDate: "2026-10-20",
     titleAr: "عقد تطوير موقع أو تطبيق ويب",

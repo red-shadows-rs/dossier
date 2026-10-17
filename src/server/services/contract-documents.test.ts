@@ -110,44 +110,38 @@ function createContract(key: string): string {
 }
 
 describe("allowedDocLangs", () => {
-  it("restricts single-language contracts", () => {
-    expect(allowedDocLangs("ar")).toEqual(["ar"]);
-    expect(allowedDocLangs("en")).toEqual(["en"]);
-    expect(allowedDocLangs("bilingual")).toEqual(["ar", "en", "bilingual"]);
+  it("allows both ar and en for all contracts", () => {
+    expect(allowedDocLangs("ar")).toEqual(["ar", "en"]);
+    expect(allowedDocLangs("en")).toEqual(["ar", "en"]);
   });
 });
 
 describe("resolveDocLang", () => {
-  it("rejects an incompatible language with VALIDATION_FAILED", () => {
+  it("rejects an invalid language with VALIDATION_FAILED", () => {
     const id = createContract("web-development");
-    db.update(contracts)
-      .set({ languageMode: "ar" })
-      .where(eq(contracts.id, id))
-      .run();
     const contract = getContract(id);
-    expect(() => resolveDocLang(contract, "en")).toThrow(AppError);
+    expect(() => resolveDocLang(contract, "invalid-lang")).toThrow(AppError);
     try {
-      resolveDocLang(contract, "en");
+      resolveDocLang(contract, "invalid-lang");
     } catch (error) {
       expect((error as AppError).code).toBe("VALIDATION_FAILED");
     }
   });
 
-  it("defaults to the contract mode and allows the compatible ones", () => {
+  it("defaults to the contract mode and allows both ar and en", () => {
     const id = createContract("web-development");
     const contract = getContract(id);
-    expect(resolveDocLang(contract, undefined)).toBe("bilingual");
+    expect(resolveDocLang(contract, undefined)).toBe("ar");
     expect(resolveDocLang(contract, "ar")).toBe("ar");
     expect(resolveDocLang(contract, "en")).toBe("en");
-    expect(resolveDocLang(contract, "bilingual")).toBe("bilingual");
   });
 });
 
 describe("safePdfFilename", () => {
   it("uses the number or 'draft' plus the lang, restricted to [A-Za-z0-9._-]", () => {
     expect(safePdfFilename({ number: null }, "ar")).toBe("draft-ar.pdf");
-    expect(safePdfFilename({ number: "DOS-C-2026-0001" }, "bilingual")).toBe(
-      "DOS-C-2026-0001-bilingual.pdf",
+    expect(safePdfFilename({ number: "DOS-C-2026-0001" }, "ar")).toBe(
+      "DOS-C-2026-0001-ar.pdf",
     );
     expect(safePdfFilename({ number: 'bad/../x y"' }, "en")).toBe(
       "bad..xy-en.pdf",
@@ -158,9 +152,8 @@ describe("safePdfFilename", () => {
 describe("buildContractHtml", () => {
   it("renders a draft preview with a watermark", async () => {
     const id = createContract("web-development");
-    const html = await buildContractHtml(id, "bilingual", "preview");
-    expect(html).toContain("DRAFT / مسودة");
-    expect(html).toContain("Article 1");
+    const html = await buildContractHtml(id, "ar", "preview");
+    expect(html).toContain("مسودة");
     expect(html).toContain("المادة 1 —");
   });
 
@@ -205,7 +198,7 @@ describe("buildContractHtml", () => {
       { projectId: pid, templateId: templateId("web-development") },
       META,
     );
-    const html = await buildContractHtml(cid, "bilingual", "preview");
+    const html = await buildContractHtml(cid, "ar", "preview");
     expect(html).toContain("client.test@example.com");
     expect(html).toContain("+966555123456");
   });
@@ -219,12 +212,8 @@ describe("resolveContractPdf", () => {
     expect(source.filename).toBe("draft-en.pdf");
   });
 
-  it("throws VALIDATION_FAILED for an incompatible language", async () => {
+  it("throws VALIDATION_FAILED for an invalid language", async () => {
     const id = createContract("web-development");
-    db.update(contracts)
-      .set({ languageMode: "en" })
-      .where(eq(contracts.id, id))
-      .run();
-    await expect(resolveContractPdf(id, "ar")).rejects.toThrow(AppError);
+    await expect(resolveContractPdf(id, "invalid" as any)).rejects.toThrow(AppError);
   });
 });

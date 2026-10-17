@@ -119,7 +119,7 @@ function templateIdByKey(key: string): string {
 }
 
 const BASICS = {
-  languageMode: "bilingual" as const,
+  languageMode: "ar" as const,
   titleAr: "عقد تطوير موقع أو تطبيق ويب",
   titleEn: "Website / Web Application Development Agreement",
   scopeAr: "تصميم وتطوير متجر إلكتروني كامل.",
@@ -234,7 +234,7 @@ describe("createContractFromTemplate", () => {
       const detail = getContractDetail(id);
       expect(detail.clauses, key).toHaveLength(expected.clauses);
       expect(detail.contract.hasFees, key).toBe(expected.hasFees);
-      expect(detail.contract.languageMode, key).toBe("bilingual");
+      expect(detail.contract.languageMode, key).toBe("ar");
       expect(detail.contract.status, key).toBe("draft");
       expect(detail.contract.number, key).toBeNull();
       expect(detail.contract.currency, key).toBe("SAR");
@@ -560,7 +560,7 @@ describe("validateContractForSend (7.5)", () => {
   it("rule 1: flags a missing language field", () => {
     const id = createValidContract();
     db.update(contracts)
-      .set({ titleEn: null })
+      .set({ titleAr: null })
       .where(eq(contracts.id, id))
       .run();
     const codes = validateContractForSend(id, sendOptions()).map((i) => i.code);
@@ -731,7 +731,7 @@ describe("validateContractForSend (7.5)", () => {
 
   it("rule 9: flags a missing company name", () => {
     const id = createValidContract();
-    updateSettings("company", { ...getCompany(), nameEn: "" }, user, META);
+    updateSettings("company", { ...getCompany(), nameAr: "" }, user, META);
     expect(
       validateContractForSend(id, sendOptions()).some(
         (i) => i.code === "companyNameRequired",
@@ -777,12 +777,12 @@ describe("validateContractForSend (7.5)", () => {
     ).toBe(true);
   });
 
-  it("warns (not errors) about a missing company tax number", () => {
+  it("does not warn about a missing company tax number (tax numbers are optional)", () => {
     const id = createValidContract();
     updateSettings("company", { ...getCompany(), taxNumber: "" }, user, META);
     const issues = validateContractForSend(id, sendOptions());
     expect(issues.filter((i) => i.severity === "error")).toEqual([]);
-    expect(issues.some((i) => i.code === "companyTaxNumberMissing")).toBe(true);
+    expect(issues.some((i) => i.code === "companyTaxNumberMissing")).toBe(false);
   });
 });
 

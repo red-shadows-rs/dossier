@@ -63,7 +63,7 @@ export type InvoiceHtmlInput = {
     id: string;
     number: string | null;
     currency: string;
-    languageMode: "ar" | "en" | "bilingual";
+    languageMode: "ar" | "en";
     status: InvoiceStatus;
     issueDate: string | null;
     dueDate: string | null;
@@ -98,14 +98,8 @@ function pick(
   en: string | null | undefined,
   lang: DocLang,
 ): string {
-  if (lang === "ar") return esc(ar ?? "");
-  if (lang === "en") return esc(en ?? "");
-  const enText = en ?? "";
-  const arText = ar ?? "";
-  if (enText && arText && enText !== arText) {
-    return `${esc(enText)}<br><span class="ar" dir="rtl">${esc(arText)}</span>`;
-  }
-  return esc(enText || arText);
+  if (lang === "en") return esc(en || ar || "");
+  return esc(ar || en || "");
 }
 
 function uiLang(lang: DocLang): Locale {
@@ -773,8 +767,7 @@ function heroHeader(input: InvoiceHtmlInput): string {
   const isRtlDoc = isRtl(lang);
 
   const title = lang === "ar" ? "فاتورة" : "INVOICE";
-  const subtitle =
-    lang === "bilingual" ? `<div class="sub-title">فاتورة</div>` : "";
+  const subtitle = "";
 
   const sellerName = pick(s.nameAr, s.nameEn, lang);
   const address = pick(s.addressAr ?? null, s.addressEn ?? null, lang);
@@ -795,13 +788,7 @@ function heroHeader(input: InvoiceHtmlInput): string {
     : "—";
 
   const overdueTag = input.isOverdue
-    ? ` <span class="overdue-tag">${
-        lang === "ar"
-          ? "متأخرة"
-          : lang === "en"
-            ? "OVERDUE"
-            : "OVERDUE / متأخرة"
-      }</span>`
+    ? ` <span class="overdue-tag">${lang === "en" ? "OVERDUE" : "متأخرة"}</span>`
     : "";
 
   const dueDateFormatted = inv.dueDate
@@ -842,49 +829,23 @@ function heroHeader(input: InvoiceHtmlInput): string {
       </div>
     `;
 
-
   const svgTransform = isRtlDoc
     ? 'transform="scale(-1, 1) translate(-1000, 0)"'
     : "";
 
-  const lblNo =
-    lang === "ar"
-      ? "رقم الفاتورة"
-      : lang === "bilingual"
-        ? '<span dir="ltr">Invoice No</span> / <span dir="rtl">رقم الفاتورة</span>'
-        : "Invoice No";
-  const lblIssue =
-    lang === "ar"
-      ? "تاريخ الإصدار"
-      : lang === "bilingual"
-        ? '<span dir="ltr">Issue date</span> / <span dir="rtl">تاريخ الإصدار</span>'
-        : "Issue Date";
-  const lblDue =
-    lang === "ar"
-      ? "تاريخ الاستحقاق"
-      : lang === "bilingual"
-        ? '<span dir="ltr">Due date</span> / <span dir="rtl">تاريخ الاستحقاق</span>'
-        : "Due Date";
-  const lblProject =
-    lang === "ar"
-      ? "المشروع"
-      : lang === "bilingual"
-        ? '<span dir="ltr">Project</span> / <span dir="rtl">المشروع</span>'
-        : "Project";
-  const lblContract =
-    lang === "ar"
-      ? "العقد"
-      : lang === "bilingual"
-        ? '<span dir="ltr">Contract</span> / <span dir="rtl">العقد</span>'
-        : "Contract";
+  const lblNo = lang === "en" ? "Invoice No" : "رقم الفاتورة";
+  const lblIssue = lang === "en" ? "Issue Date" : "تاريخ الإصدار";
+  const lblDue = lang === "en" ? "Due Date" : "تاريخ الاستحقاق";
+  const lblProject = lang === "en" ? "Project" : "المشروع";
+  const lblContract = lang === "en" ? "Contract" : "العقد";
 
   return `
   <header class="hero-header">
-    <svg class="hero-svg-bg" viewBox="0 0 1000 240" preserveAspectRatio="none" style="overflow: visible;">
+    <svg class="hero-svg-bg" viewBox="0 0 1000 240" preserveAspectRatio="none" style="overflow: hidden;">
       <g ${svgTransform}>
-        <polygon points="415,-30 1050,-30 1050,195 370,195" fill="#14141a" />
-        <polygon points="370,195 470,195 370,260" fill="#9f1239" />
-        <polygon points="-50,-30 425,-30 370,195 370,260 -50,260" fill="#e11d48" />
+        <polygon points="-50,-20 440,-20 370,240 -50,240" fill="#e11d48" />
+        <polygon points="440,-20 1050,-20 1050,240 370,240" fill="#14141a" />
+        <line x1="0" y1="239" x2="1000" y2="239" stroke="#e11d48" stroke-width="2" />
       </g>
     </svg>
 
@@ -959,12 +920,7 @@ function billToSection(input: InvoiceHtmlInput): string {
   if (b.crNumber) buyerDetails.push(lang === "ar" ? `س.ت: ${esc(b.crNumber)}` : `CR: ${esc(b.crNumber)}`);
   if (b.taxNumber) buyerDetails.push(lang === "ar" ? `ض.ر: ${esc(b.taxNumber)}` : `VAT: ${esc(b.taxNumber)}`);
 
-  const billToLabel =
-    lang === "ar"
-      ? "الفاتورة إلى:"
-      : lang === "bilingual"
-        ? '<span dir="ltr">Invoice to:</span> / <span dir="rtl">الفاتورة إلى:</span>'
-        : "Invoice to:";
+  const billToLabel = lang === "en" ? "Invoice to:" : "الفاتورة إلى:";
 
   return `
   <section class="bill-to-strip">
@@ -1045,19 +1001,11 @@ function linesTable(
 ): string {
   const currency = input.invoice.currency as CurrencyCode;
   const lang = uiLang(input.lang);
-  const isBilingual = input.lang === "bilingual";
   const linesToRender = linesOverride ?? input.lines;
   const rows = linesToRender
     .map((line) => {
-      let descHtml = "";
-      if (isBilingual) {
-        const en = line.descriptionEn ? `<div class="item-title">${esc(line.descriptionEn)}</div>` : "";
-        const ar = line.descriptionAr ? `<div class="item-sub ar" dir="rtl">${esc(line.descriptionAr)}</div>` : "";
-        descHtml = `${en}${ar}`;
-      } else {
-        const primary = pick(line.descriptionAr, line.descriptionEn, input.lang);
-        descHtml = `<div class="item-title">${primary}</div>`;
-      }
+      const primary = pick(line.descriptionAr, line.descriptionEn, input.lang);
+      const descHtml = `<div class="item-title">${primary}</div>`;
       return `<tr>
         <td class="col-num">${num(String(line.position))}</td>
         <td class="col-desc">${descHtml}</td>
@@ -1068,30 +1016,10 @@ function linesTable(
     })
     .join("");
 
-  const thDesc =
-    input.lang === "ar"
-      ? "الوصف"
-      : isBilingual
-        ? 'Item Description / <span class="ar">الوصف</span>'
-        : "Item Description";
-  const thPrice =
-    input.lang === "ar"
-      ? "سعر الوحدة"
-      : isBilingual
-        ? 'Unit price / <span class="ar">سعر الوحدة</span>'
-        : "Unit Price";
-  const thQty =
-    input.lang === "ar"
-      ? "الكمية"
-      : isBilingual
-        ? 'Qty / <span class="ar">الكمية</span>'
-        : "Qty";
-  const thTotal =
-    input.lang === "ar"
-      ? "الإجمالي"
-      : isBilingual
-        ? 'Total / <span class="ar">الإجمالي</span>'
-        : "Total";
+  const thDesc = input.lang === "ar" ? "الوصف" : "Item Description";
+  const thPrice = input.lang === "ar" ? "سعر الوحدة" : "Unit Price";
+  const thQty = input.lang === "ar" ? "الكمية" : "Qty";
+  const thTotal = input.lang === "ar" ? "الإجمالي" : "Total";
 
   return `
   <table class="inv-items-table">

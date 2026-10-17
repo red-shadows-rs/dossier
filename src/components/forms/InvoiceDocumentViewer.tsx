@@ -116,7 +116,7 @@ export function InvoiceDocumentViewer({
                   aria-current={value === lang ? "true" : undefined}
                   onClick={() => setLang(value)}
                   className={cn(
-                    "rounded-md border px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer",
+                    "rounded border px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer",
                     value === lang
                       ? "border-primary bg-primary text-primary-foreground"
                       : "border-border text-muted-foreground hover:text-foreground",

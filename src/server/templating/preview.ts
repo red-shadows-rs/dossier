@@ -122,8 +122,7 @@ export async function renderTemplatePreviewHtml(
   snapshot: ContractSnapshotV1 = SAMPLE_SNAPSHOT,
   options?: TemplatePreviewOptions,
 ): Promise<string> {
-  const docLang: DocLang =
-    lang === "en" ? "en" : lang === "bilingual" ? "bilingual" : "ar";
+  const docLang: DocLang = lang === "en" ? "en" : "ar";
 
   let company: any = null;
   try {

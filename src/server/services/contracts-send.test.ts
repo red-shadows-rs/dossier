@@ -140,7 +140,7 @@ function createValidDraft(): string {
     user,
     id,
     {
-      languageMode: "bilingual",
+      languageMode: "ar",
       titleAr: "عقد تطوير",
       titleEn: "Development Agreement",
       scopeAr: "نطاق العمل",
@@ -283,7 +283,7 @@ describe("sendContract (16.1 Send success)", () => {
   it("blocks sending a contract with validation errors", () => {
     const id = createValidDraft();
     db.update(contracts)
-      .set({ titleEn: null })
+      .set({ titleAr: null })
       .where(eq(contracts.id, id))
       .run();
     expect(() => sendContract(user, id, sendInput(), META)).toThrow(AppError);
@@ -308,7 +308,7 @@ describe("sendContract (16.1 Send success)", () => {
       user,
       id,
       {
-        languageMode: "bilingual",
+        languageMode: "ar",
         titleAr: "عقد تطوير",
         titleEn: "Development Agreement (v2)",
         scopeAr: "نطاق العمل",

@@ -103,8 +103,8 @@ function renderClauseSingle(
   stampDataUri: string | null,
 ): string {
   const vars = buildVariableMap(snapshot, lang);
-  const title = lang === "ar" ? clause.titleAr : clause.titleEn;
-  const body = lang === "ar" ? clause.bodyAr : clause.bodyEn;
+  const title = lang === "ar" ? (clause.titleAr || clause.titleEn) : (clause.titleEn || clause.titleAr);
+  const body = lang === "ar" ? (clause.bodyAr || clause.bodyEn) : (clause.bodyEn || clause.bodyAr);
   const badgeLabel =
     lang === "ar"
       ? `المادة ${clause.position} —`
@@ -130,110 +130,6 @@ function renderClauseSingle(
   return `<section class="contract-single-clause" dir="${docDir(lang)}"><div class="article-header"><span class="article-badge">${esc(badgeLabel)}</span> <span class="article-title">${esc(title)}</span></div><div class="clause-body-single">${inner}</div></section>`;
 }
 
-type Segment =
-  | { kind: "text"; blocks: Block[] }
-  | { kind: "special"; name: SpecialBlockName };
-
-function segmentBlocks(blocks: Block[]): Segment[] {
-  const segments: Segment[] = [];
-  let current: Block[] = [];
-  const flush = () => {
-    if (current.length > 0) {
-      segments.push({ kind: "text", blocks: current });
-      current = [];
-    }
-  };
-  for (const block of blocks) {
-    if (block.type === "special") {
-      flush();
-      segments.push({ kind: "special", name: block.name });
-    } else {
-      current.push(block);
-    }
-  }
-  flush();
-  return segments;
-}
-
-function renderTextBlocks(
-  blocks: Block[],
-  vars: Record<string, string>,
-  clausePosition: number,
-): string {
-  const labels = numberedParagraphLabels(clausePosition, blocks);
-  const labelIndex = { value: 0 };
-  return blocks
-    .map((block) => {
-      if (block.type === "special") return "";
-      if (block.type === "paragraph") {
-        const inner = renderInline(block.text, vars, () => {});
-        if (!block.numbered) return `<p class="note">${inner}</p>`;
-        const label = labels[labelIndex.value] ?? "";
-        labelIndex.value += 1;
-        return `<p><span class="clause-num">${esc(label)}</span> ${inner}</p>`;
-      }
-      const items = block.items
-        .map((item) => `<li>${renderInline(item, vars, () => {})}</li>`)
-        .join("");
-      return `<ul>${items}</ul>`;
-    })
-    .join("");
-}
-
-function renderClauseBilingual(
-  clause: ContractSnapshotV1["clauses"][number],
-  snapshot: ContractSnapshotV1,
-  signatures: SignatureRender[],
-  stampDataUri: string | null,
-): string {
-  const enVars = buildVariableMap(snapshot, "en");
-  const arVars = buildVariableMap(snapshot, "ar");
-  const enBlocks = parseBody(clause.bodyEn);
-  const arBlocks = parseBody(clause.bodyAr);
-  const enSegments = segmentBlocks(enBlocks);
-  const arSegments = segmentBlocks(arBlocks);
-
-  const rows: string[] = [];
-  rows.push(
-    `<tr class="clause-heading-row"><th class="col-en divider" dir="ltr" style="width: 50%;"><div class="article-header"><span class="article-badge">Article ${clause.position} —</span> <span class="article-title">${esc(clause.titleEn)}</span></div></th><th class="col-ar" dir="rtl" style="width: 50%;"><div class="article-header"><span class="article-badge">المادة ${clause.position} —</span> <span class="article-title">${esc(clause.titleAr)}</span></div></th></tr>`,
-  );
-
-  const count = Math.max(enSegments.length, arSegments.length);
-  for (let i = 0; i < count; i += 1) {
-    const enSeg = enSegments[i];
-    const arSeg = arSegments[i];
-    if (enSeg?.kind === "special" || arSeg?.kind === "special") {
-      const name =
-        enSeg?.kind === "special"
-          ? enSeg.name
-          : arSeg?.kind === "special"
-            ? arSeg.name
-            : "parties";
-      rows.push(
-        `<tr class="block-row"><td colspan="2" style="padding: 2mm 0; border: none;">${renderSpecial(
-          name,
-          snapshot,
-          "bilingual",
-          signatures,
-          stampDataUri,
-        )}</td></tr>`,
-      );
-      continue;
-    }
-    const enHtml = enSeg
-      ? renderTextBlocks(enSeg.blocks, enVars, clause.position)
-      : "";
-    const arHtml = arSeg
-      ? renderTextBlocks(arSeg.blocks, arVars, clause.position)
-      : "";
-    rows.push(
-      `<tr class="clause-body-row"><td class="col-en divider" dir="ltr" style="width: 50%; vertical-align: top;">${enHtml}</td><td class="col-ar" dir="rtl" style="width: 50%; vertical-align: top;">${arHtml}</td></tr>`,
-    );
-  }
-
-  const clauseClass = clause.key ? ` clause-${clause.key}` : "";
-  return `<table class="bilingual-clause${clauseClass}"><tbody>${rows.join("")}</tbody></table>`;
-}
 
 function renderHeroHeader(
   snapshot: ContractSnapshotV1,
@@ -258,22 +154,8 @@ function renderHeroHeader(
   const contractTitleAr = c.titleAr || c.titleEn || "عقد اتفاق";
   const contractTitleEn = c.titleEn || c.titleAr || "CONTRACT AGREEMENT";
 
-  let titleHtml = "";
-  let subtitleHtml = "";
-  if (lang === "ar") {
-    titleHtml = esc(contractTitleAr);
-    subtitleHtml = "";
-  } else if (lang === "en") {
-    titleHtml = esc(contractTitleEn);
-    subtitleHtml = "";
-  } else {
-    // Bilingual: secondary language title if different from primary title
-    titleHtml = esc(contractTitleAr);
-    subtitleHtml =
-      contractTitleEn && contractTitleEn !== contractTitleAr
-        ? `<div class="sub-title">${esc(contractTitleEn)}</div>`
-        : "";
-  }
+  const titleHtml = esc(lang === "en" ? contractTitleEn : contractTitleAr);
+  const subtitleHtml = "";
 
   const providerName =
     lang === "ar"
@@ -336,30 +218,10 @@ function renderHeroHeader(
     ? 'transform="scale(-1, 1) translate(-1000, 0)"'
     : "";
 
-  const lblNo =
-    lang === "ar"
-      ? "رقم العقد"
-      : lang === "bilingual"
-        ? '<span dir="ltr">Contract No</span> / <span dir="rtl">رقم العقد</span>'
-        : "Contract No";
-  const lblIssue =
-    lang === "ar"
-      ? "تاريخ الإصدار"
-      : lang === "bilingual"
-        ? '<span dir="ltr">Issue date</span> / <span dir="rtl">تاريخ الإصدار</span>'
-        : "Issue Date";
-  const lblTerm =
-    lang === "ar"
-      ? "مدة العقد"
-      : lang === "bilingual"
-        ? '<span dir="ltr">Term</span> / <span dir="rtl">مدة العقد</span>'
-        : "Term";
-  const lblProject =
-    lang === "ar"
-      ? "المشروع"
-      : lang === "bilingual"
-        ? '<span dir="ltr">Project</span> / <span dir="rtl">المشروع</span>'
-        : "Project";
+  const lblNo = lang === "en" ? "Contract No" : "رقم العقد";
+  const lblIssue = lang === "en" ? "Issue Date" : "تاريخ الإصدار";
+  const lblTerm = lang === "en" ? "Term" : "مدة العقد";
+  const lblProject = lang === "en" ? "Project" : "المشروع";
 
   const projectTitle = `${snapshot.project.code} — ${
     lang === "ar"
@@ -374,11 +236,11 @@ function renderHeroHeader(
 
   return `
   <header class="hero-header">
-    <svg class="hero-svg-bg" viewBox="0 0 1000 240" preserveAspectRatio="none" style="overflow: visible;">
+    <svg class="hero-svg-bg" viewBox="0 0 1000 240" preserveAspectRatio="none" style="overflow: hidden;">
       <g ${svgTransform}>
-        <polygon points="415,-30 1050,-30 1050,195 370,195" fill="#14141a" />
-        <polygon points="370,195 470,195 370,260" fill="#9f1239" />
-        <polygon points="-50,-30 425,-30 370,195 370,260 -50,260" fill="#e11d48" />
+        <polygon points="-50,-20 440,-20 370,240 -50,240" fill="#e11d48" />
+        <polygon points="440,-20 1050,-20 1050,240 370,240" fill="#14141a" />
+        <line x1="0" y1="239" x2="1000" y2="239" stroke="#e11d48" stroke-width="2" />
       </g>
     </svg>
 
@@ -427,59 +289,167 @@ function renderHeroHeader(
   `;
 }
 
+export function renderSubsequentHeader(
+  snapshot: ContractSnapshotV1,
+  lang: DocLang,
+  logoDataUri: string | null,
+): string {
+  const isArabic = lang === "ar";
+  const p = snapshot.provider;
+  const c = snapshot.contract;
+  const providerName = esc(
+    isArabic
+      ? p.nameAr || p.nameEn || ""
+      : p.nameEn || p.nameAr || "",
+  );
+  const docNoLabel = isArabic ? "رقم العقد:" : "Contract No:";
+  const docNumber = c.number ?? (isArabic ? "قيد الإصدار" : "Draft");
+
+  const projectTitle = `${snapshot.project.code} — ${
+    isArabic
+      ? snapshot.project.nameAr || snapshot.project.nameEn || ""
+      : snapshot.project.nameEn || snapshot.project.nameAr || ""
+  }`;
+
+  const logoHtml = logoDataUri
+    ? `<img class="sub-brand-logo" src="${esc(logoDataUri)}" alt="${providerName}" />`
+    : "";
+
+  return `
+  <header class="subsequent-header">
+    <div class="sub-header-left">
+      <div class="sub-doc-meta">
+        <span class="sub-meta-lbl">${docNoLabel}</span>
+        <span class="sub-meta-val" dir="ltr">${esc(docNumber)}</span>
+        <span class="sub-meta-sep">·</span>
+        <span class="sub-meta-project">${esc(projectTitle)}</span>
+      </div>
+    </div>
+    <div class="sub-header-right">
+      <div class="sub-brand-name">${providerName}</div>
+      ${logoHtml}
+    </div>
+  </header>
+  `;
+}
+
+type ContractClause = ContractSnapshotV1["clauses"][number];
+
+export function paginateContractClauses(
+  snapshot: ContractSnapshotV1,
+): { pages: ContractClause[][]; separateFooterPage: boolean } {
+  const clauses = snapshot.clauses;
+  if (!clauses || clauses.length === 0) {
+    return { pages: [[]], separateFooterPage: false };
+  }
+
+  const P1_BUDGET = 185;
+  const PSUB_BUDGET = 235;
+  const FOOTER_MM = 48;
+
+  function estimateClauseMm(clause: ContractClause): number {
+    let mm = 10;
+    const body = clause.bodyAr || clause.bodyEn || "";
+    if (body.includes("{{block.parties}}")) {
+      mm += 36;
+    }
+    if (body.includes("{{block.pricing_table}}")) {
+      const itemsCount = snapshot.items?.length ?? 2;
+      mm += 22 + itemsCount * 6.5;
+    }
+    if (body.includes("{{block.payment_schedule}}")) {
+      const mCount = snapshot.milestones?.length ?? 2;
+      mm += 22 + mCount * 6.5;
+    }
+    if (body.includes("{{block.signatures}}")) {
+      mm += 30;
+    }
+    const textOnly = body.replace(/\{\{block\.[^}]+\}\}/g, "").trim();
+    const approxLines = Math.ceil(textOnly.length / 95);
+    mm += approxLines * 4.4;
+    return Math.max(mm, 14);
+  }
+
+  const heights = clauses.map(estimateClauseMm);
+  const totalMm = heights.reduce((a, b) => a + b, 0);
+
+  if (totalMm + FOOTER_MM <= P1_BUDGET) {
+    return { pages: [clauses], separateFooterPage: false };
+  }
+
+  const pages: ContractClause[][] = [];
+  let currentPage: ContractClause[] = [];
+  let currentMm = 0;
+  let isFirst = true;
+
+  for (let i = 0; i < clauses.length; i++) {
+    const clause = clauses[i];
+    const clMm = heights[i];
+    const budget = isFirst ? P1_BUDGET : PSUB_BUDGET;
+
+    if (currentPage.length > 0 && currentMm + clMm > budget) {
+      pages.push(currentPage);
+      currentPage = [clause];
+      currentMm = clMm;
+      isFirst = false;
+    } else {
+      currentPage.push(clause);
+      currentMm += clMm;
+    }
+  }
+
+  if (currentPage.length > 0) {
+    pages.push(currentPage);
+  }
+
+  // Prevent empty footer page: if last page has no room for footer,
+  // redistribute so that the last page has content as well.
+  const lastPageBudget = pages.length === 1 ? P1_BUDGET : PSUB_BUDGET;
+  const lastPageClauseMm = pages[pages.length - 1].reduce(
+    (acc, cl) => acc + estimateClauseMm(cl),
+    0,
+  );
+
+  if (lastPageClauseMm + FOOTER_MM > lastPageBudget && pages[pages.length - 1].length > 1) {
+    const popped = pages[pages.length - 1].pop()!;
+    pages.push([popped]);
+  }
+
+  return { pages, separateFooterPage: false };
+}
+
 function renderContractFooter(input: ContractHtmlInput): string {
   const { snapshot, lang, stampDataUri, verification } = input;
   const c = snapshot.contract;
 
   const thankYouText =
-    lang === "ar"
-      ? "شكرا لتعاملكم معنا."
-      : lang === "en"
-        ? "Thank you for your business."
-        : '<span dir="ltr">Thank you for your business.</span> / <span dir="rtl">شكرا لتعاملكم معنا.</span>';
+    lang === "en"
+      ? "Thank you for your business."
+      : "شكرا لتعاملكم معنا.";
 
   const notesLines: string[] = [];
   if (c.governingLawAr || c.governingLawEn) {
-    const govTitle =
-      lang === "ar"
-        ? "القانون الحاكم"
-        : lang === "en"
-          ? "Governing Law"
-          : "Governing Law / القانون الحاكم";
+    const govTitle = lang === "en" ? "Governing Law" : "القانون الحاكم";
     const govVal =
-      lang === "ar"
-        ? c.governingLawAr || c.governingLawEn
-        : lang === "en"
-          ? c.governingLawEn || c.governingLawAr
-          : `${c.governingLawEn || "—"} / ${c.governingLawAr || "—"}`;
+      lang === "en"
+        ? c.governingLawEn || c.governingLawAr
+        : c.governingLawAr || c.governingLawEn;
     notesLines.push(
       `<div class="info-block"><h4>${govTitle}</h4><p>${esc(govVal ?? "")}</p></div>`,
     );
   }
   if (c.jurisdictionAr || c.jurisdictionEn) {
-    const jurTitle =
-      lang === "ar"
-        ? "الاختصاص القضائي"
-        : lang === "en"
-          ? "Jurisdiction"
-          : "Jurisdiction / الاختصاص القضائي";
+    const jurTitle = lang === "en" ? "Jurisdiction" : "الاختصاص القضائي";
     const jurVal =
-      lang === "ar"
-        ? c.jurisdictionAr || c.jurisdictionEn
-        : lang === "en"
-          ? c.jurisdictionEn || c.jurisdictionAr
-          : `${c.jurisdictionEn || "—"} / ${c.jurisdictionAr || "—"}`;
+      lang === "en"
+        ? c.jurisdictionEn || c.jurisdictionAr
+        : c.jurisdictionAr || c.jurisdictionEn;
     notesLines.push(
       `<div class="info-block"><h4>${jurTitle}</h4><p>${esc(jurVal ?? "")}</p></div>`,
     );
   }
 
-  const stampTitle =
-    lang === "ar"
-      ? "الختم الرسمي"
-      : lang === "en"
-        ? "Official Stamp"
-        : "Official Stamp / الختم الرسمي";
+  const stampTitle = lang === "en" ? "Official Stamp" : "الختم الرسمي";
   const stampImg = stampDataUri
     ? `<div class="sig-box"><img class="stamp-img" src="${esc(
         stampDataUri,
@@ -490,18 +460,11 @@ function renderContractFooter(input: ContractHtmlInput): string {
   if (verification) {
     const docNumber = c.number ?? (c.id ? c.id.slice(0, 8) : "DRAFT");
     const barcodeSvg = renderCode39Svg(docNumber);
-    const title =
-      lang === "ar"
-        ? "التحقق · باركود"
-        : lang === "en"
-          ? "Verification · Barcode"
-          : "Verification / التحقق · Barcode";
+    const title = lang === "en" ? "Verification · Barcode" : "التحقق · باركود";
     const genNote =
-      lang === "ar"
-        ? "تم إنشاء العقد عبر Dossier"
-        : lang === "en"
-          ? "Contract generated by Dossier"
-          : '<span dir="ltr">Contract generated by Dossier</span> / <span dir="rtl">تم إنشاء العقد عبر Dossier</span>';
+      lang === "en"
+        ? "Contract generated by Dossier"
+        : "تم إنشاء العقد عبر Dossier";
 
     verifyCardHtml = `
       <div class="verify-card">
@@ -518,8 +481,6 @@ function renderContractFooter(input: ContractHtmlInput): string {
     `;
   }
 
-  const footerSystemName = "Dossier";
-
   return `
     <div class="inv-footer-wrap">
       <div class="inv-footer">
@@ -533,10 +494,6 @@ function renderContractFooter(input: ContractHtmlInput): string {
         </div>
       </div>
     </div>
-    <div class="bottom-red-bar">
-      <span dir="ltr">${esc(footerSystemName)}</span>
-      <span class="page-num-display" dir="ltr">1 / 1</span>
-    </div>
   `;
 }
 
@@ -545,35 +502,63 @@ export function renderContractHtml(input: ContractHtmlInput): string {
   const c = snapshot.contract;
 
   const watermark =
-    mode === "draft" || mode === "preview" ? "DRAFT / مسودة" : null;
-
-  const header = renderHeroHeader(snapshot, lang, input.logoDataUri);
-
-  const clausesHtml = snapshot.clauses
-    .map((clause) =>
-      lang === "bilingual"
-        ? renderClauseBilingual(
-            clause,
-            snapshot,
-            input.signatures,
-            input.stampDataUri,
-          )
-        : renderClauseSingle(
-            clause,
-            snapshot,
-            lang,
-            input.signatures,
-            input.stampDataUri,
-          ),
-    )
-    .join("");
+    mode === "draft" || mode === "preview"
+      ? (lang === "en" ? "DRAFT" : "مسودة")
+      : null;
 
   const unsignedNote =
     mode === "unsigned"
-      ? `<div class="unsigned-card"><span class="unsigned-badge">UNSIGNED</span> <span class="unsigned-badge ar" dir="rtl">غير موقع</span><p class="unsigned-desc">This contract document is currently unsigned and has no legal validity until fully executed by all parties.</p></div>`
+      ? `<div class="unsigned-card"><span class="unsigned-badge">${
+          lang === "en" ? "UNSIGNED" : "غير موقع"
+        }</span><p class="unsigned-desc">${
+          lang === "en"
+            ? "This contract document is currently unsigned and has no legal validity until fully executed by all parties."
+            : "هذا العقد غير موقع حالياً ولا يعد نافذاً أو معتمداً حتى يتم توقيعه رسمياً من جميع الأطراف."
+        }</p></div>`
       : "";
 
   const footerHtml = renderContractFooter(input);
+
+  // When previewed on screen (dashboard / editor / review), render as a single continuous page
+  if (mode === "preview") {
+    const headerHtml = renderHeroHeader(snapshot, lang, input.logoDataUri);
+    const clausesHtml = snapshot.clauses
+      .map((clause) =>
+        renderClauseSingle(
+          clause,
+          snapshot,
+          lang === "en" ? "en" : "ar",
+          input.signatures,
+          input.stampDataUri,
+        ),
+      )
+      .join("");
+
+    const pageContent = `
+      <div class="contract-page contract-preview-single-page">
+        <div class="contract-page-main">
+          ${headerHtml}
+          <div class="contract-body">
+            ${clausesHtml}
+            ${unsignedNote}
+          </div>
+        </div>
+        ${footerHtml}
+        <div class="bottom-red-bar">
+          <span dir="ltr">Dossier</span>
+        </div>
+      </div>
+    `;
+
+    const title = (lang === "ar" ? c.titleAr : c.titleEn) ?? "Contract";
+    return documentShell({
+      lang,
+      title,
+      fonts: input.fonts,
+      watermark,
+      body: `<div class="contract-document contract-document-continuous">${pageContent}</div>`,
+    });
+  }
 
   const certificateHtml =
     mode === "sealed" && input.certificate
@@ -591,13 +576,99 @@ export function renderContractHtml(input: ContractHtmlInput): string {
         )
       : "";
 
+  const { pages: clausePages, separateFooterPage } = paginateContractClauses(snapshot);
+  const hasCertPage = !!certificateHtml;
+  const totalPages =
+    clausePages.length +
+    (separateFooterPage ? 1 : 0) +
+    (hasCertPage ? 1 : 0);
+
+  const renderedPages: string[] = [];
+
+  clausePages.forEach((chunk, pageIndex) => {
+    const isFirstPage = pageIndex === 0;
+    const isLastClausePage = pageIndex === clausePages.length - 1;
+    const headerHtml = isFirstPage
+      ? renderHeroHeader(snapshot, lang, input.logoDataUri)
+      : renderSubsequentHeader(snapshot, lang, input.logoDataUri);
+
+    const clausesHtml = chunk
+      .map((clause) =>
+        renderClauseSingle(
+          clause,
+          snapshot,
+          lang === "en" ? "en" : "ar",
+          input.signatures,
+          input.stampDataUri,
+        ),
+      )
+      .join("");
+
+    const pageFooter = isLastClausePage && !separateFooterPage ? footerHtml : "";
+    const noteHtml = isLastClausePage ? unsignedNote : "";
+
+    renderedPages.push(`
+      <div class="contract-page">
+        <div class="contract-page-main">
+          ${headerHtml}
+          <div class="contract-body">
+            ${clausesHtml}
+            ${noteHtml}
+          </div>
+        </div>
+        ${pageFooter}
+        <div class="bottom-red-bar">
+          <span dir="ltr">Dossier</span>
+          <span class="page-num-display" dir="ltr">${pageIndex + 1} / ${totalPages}</span>
+        </div>
+      </div>
+    `);
+  });
+
+  if (separateFooterPage) {
+    const footerPageIndex = clausePages.length;
+    const headerHtml = renderSubsequentHeader(snapshot, lang, input.logoDataUri);
+    renderedPages.push(`
+      <div class="contract-page">
+        <div class="contract-page-main">
+          ${headerHtml}
+          <div class="contract-body"></div>
+        </div>
+        ${footerHtml}
+        <div class="bottom-red-bar">
+          <span dir="ltr">Dossier</span>
+          <span class="page-num-display" dir="ltr">${footerPageIndex + 1} / ${totalPages}</span>
+        </div>
+      </div>
+    `);
+  }
+
+  if (hasCertPage) {
+    const certPageIndex = totalPages - 1;
+    const headerHtml = renderSubsequentHeader(snapshot, lang, input.logoDataUri);
+    renderedPages.push(`
+      <div class="contract-page cert-page">
+        <div class="contract-page-main">
+          ${headerHtml}
+          <div class="contract-body">
+            ${certificateHtml}
+          </div>
+        </div>
+        <div class="bottom-red-bar">
+          <span dir="ltr">Dossier</span>
+          <span class="page-num-display" dir="ltr">${certPageIndex + 1} / ${totalPages}</span>
+        </div>
+      </div>
+    `);
+  }
+
   const title = (lang === "ar" ? c.titleAr : c.titleEn) ?? "Contract";
   return documentShell({
     lang,
     title,
     fonts: input.fonts,
     watermark,
-    body: `<div class="contract-document">${header}<div class="contract-body">${clausesHtml}${unsignedNote}</div>${footerHtml}${certificateHtml}</div>`,
+    body: `<div class="contract-document">${renderedPages.join("")}</div>`,
   });
 }
 

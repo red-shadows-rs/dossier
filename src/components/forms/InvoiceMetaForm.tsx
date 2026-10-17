@@ -20,7 +20,7 @@ export function InvoiceMetaForm({
 }: {
   id: string;
   initial: {
-    languageMode: "ar" | "en" | "bilingual";
+    languageMode: "ar" | "en";
     currency: CurrencyCode;
     issueDate: string;
     dueDate: string;
@@ -40,7 +40,7 @@ export function InvoiceMetaForm({
     setPending(true);
     const result = await updateInvoiceDraftAction({
       id,
-      languageMode: String(data.get("languageMode") ?? "bilingual"),
+      languageMode: String(data.get("languageMode") ?? "ar"),
       currency: String(data.get("currency") ?? initial.currency),
       issueDate: String(data.get("issueDate") ?? "") || null,
       dueDate: noDueDate ? null : String(data.get("dueDate") ?? "") || null,

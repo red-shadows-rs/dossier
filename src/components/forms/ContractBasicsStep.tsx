@@ -138,7 +138,7 @@ export function ContractBasicsStep({
             <Select
               id="cb-lang"
               name="languageMode"
-              defaultValue={initial.languageMode}
+              defaultValue={initial.languageMode === "en" ? "en" : "ar"}
               disabled={pending}
             >
               {LANG_MODES.map((mode) => (
@@ -169,7 +169,7 @@ export function ContractBasicsStep({
           </Field>
 
           {/* Fees & Milestones Toggle Box */}
-          <div className="md:col-span-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-lg border border-border/80 bg-muted/20 p-3.5">
+          <div className="md:col-span-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded border border-border bg-card/60 p-3">
             <div className="flex items-center gap-3">
               <Checkbox
                 id="cb-has-fees"
@@ -183,23 +183,23 @@ export function ContractBasicsStep({
                 </span>
                 <span className="text-xs text-muted-foreground">
                   {isAr
-                    ? "جدول الدفعات والبنود المالية"
-                    : "Financial items and milestones schedule"}
+                    ? "يتضمن العقد بنوداً مالية وجدول دفعات"
+                    : "Contract includes financial items and milestones schedule"}
                 </span>
               </label>
             </div>
 
             {hasFees ? (
-              <div className="flex items-center gap-2 self-stretch sm:self-auto">
-                <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
+              <div className="flex items-center gap-2 self-stretch sm:self-auto shrink-0">
+                <label htmlFor="cb-mode" className="text-xs font-medium text-muted-foreground whitespace-nowrap">
                   {t("contracts.milestoneMode")}:
-                </span>
+                </label>
                 <Select
                   id="cb-mode"
                   name="milestoneMode"
                   defaultValue={initial.milestoneMode}
                   disabled={pending}
-                  className="w-full sm:w-36 h-9 text-xs"
+                  className="w-full sm:w-36 h-9 text-xs font-medium"
                 >
                   <option value="percent">{t("contracts.mode.percent")}</option>
                   <option value="fixed">{t("contracts.mode.fixed")}</option>

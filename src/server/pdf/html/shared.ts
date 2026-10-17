@@ -41,10 +41,7 @@ export function baseCss(fonts: string): string {
   return `${fonts}
 @page {
   size: A4;
-  margin: 14mm 0mm 15mm 0mm;
-}
-@page :first {
-  margin: 0mm 0mm 15mm 0mm;
+  margin: 0 0 13mm 0;
 }
 * {
   box-sizing: border-box;
@@ -54,12 +51,42 @@ html {
   font-size: 8.5pt;
   color: #18181b;
   background: #ffffff;
+  margin: 0;
+  padding: 0;
 }
 body {
   margin: 0;
   padding: 0;
   line-height: 1.55;
   background: #ffffff;
+}
+.contract-page, .invoice-page {
+  width: 100%;
+  max-width: 100%;
+  height: 284mm;
+  max-height: 284mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  background: #ffffff;
+  box-sizing: border-box;
+  page-break-after: always;
+  break-after: page;
+  overflow: hidden;
+}
+.contract-page:last-child, .invoice-page:last-child {
+  page-break-after: auto;
+  break-after: auto;
+}
+.contract-page-main, .invoice-page-main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.contract-body {
+  padding: 0 10mm;
+  flex: 1;
 }
 @media screen {
   html, body {
@@ -106,6 +133,7 @@ li {
   font-family: monospace;
   direction: ltr;
   unicode-bidi: isolate;
+  display: inline-block;
 }
 .watermark {
   position: fixed;
@@ -175,8 +203,8 @@ li {
 }
 .hero-dark-box {
   width: 56%;
-  min-height: 44mm;
-  padding: 5mm 8mm;
+  min-height: 48mm;
+  padding: 6mm 8mm;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -338,10 +366,10 @@ li {
 }
 .article-badge {
   display: inline-block;
-  background: #fff1f2;
-  color: #e11d48;
-  border: 0.25mm solid #fecdd3;
-  border-radius: 1.2mm;
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 0.25mm solid #cbd5e1;
+  border-radius: 1mm;
   padding: 0.6mm 2mm;
   font-size: 7.2pt;
   font-weight: 800;
@@ -384,7 +412,6 @@ li {
 }
 
 /* Cards & Tables */
-/* Cards & Tables */
 .contract-card {
   background: #f8fafc;
   border: 0.35mm solid #e2e8f0;
@@ -395,10 +422,10 @@ li {
 }
 .section-badge {
   display: inline-block;
-  background: #fff1f2;
-  color: #e11d48;
-  border: 0.25mm solid #fecdd3;
-  border-radius: 1.2mm;
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 0.25mm solid #cbd5e1;
+  border-radius: 1mm;
   padding: 0.6mm 2.2mm;
   font-size: 7pt;
   font-weight: 800;
@@ -463,17 +490,17 @@ li {
 .contract-table th {
   background: #e11d48;
   color: #ffffff;
-  font-size: 6.8pt;
+  font-size: 7.2pt;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  padding: 1.8mm 1.5mm;
+  padding: 2.2mm 2.5mm;
   border: none;
   vertical-align: middle;
   line-height: 1.25;
 }
 .contract-table td {
-  padding: 2mm 1.5mm;
+  padding: 2.2mm 2.5mm;
   border: none;
   border-bottom: 0.25mm solid #f1f5f9;
   vertical-align: middle;
@@ -483,10 +510,40 @@ li {
   word-break: break-word;
   overflow-wrap: anywhere;
 }
-.contract-table td.num {
+.contract-table td.num,
+.contract-table .num-val {
   white-space: nowrap;
   font-family: monospace;
   font-weight: 700;
+}
+
+/* Pricing Table Columns */
+.contract-table .col-num { width: 7%; text-align: center; }
+.contract-table .col-desc { width: 39%; text-align: start; }
+.contract-table .col-price { width: 20%; text-align: end; }
+.contract-table .col-qty { width: 14%; text-align: center; }
+.contract-table .col-total { width: 20%; text-align: end; }
+
+/* Payment Schedule Columns */
+.contract-table .c-num { width: 6%; text-align: center; }
+.contract-table .c-title { width: 26%; text-align: start; }
+.contract-table .c-pct { width: 10%; text-align: end; }
+.contract-table .c-net { width: 15%; text-align: end; }
+.contract-table .c-tax { width: 14%; text-align: end; }
+.contract-table .c-total { width: 15%; text-align: end; }
+.contract-table .c-due { width: 14%; text-align: center; }
+
+/* Single-page continuous web preview */
+.contract-preview-single-page {
+  height: auto !important;
+  max-height: none !important;
+  min-height: 100% !important;
+  overflow: visible !important;
+  page-break-after: auto !important;
+  break-after: auto !important;
+}
+.contract-preview-single-page .contract-body {
+  padding-bottom: 6mm;
 }
 .bilingual-clause .contract-table th {
   padding: 1.5mm 1mm;
@@ -832,12 +889,112 @@ li {
   break-inside: avoid;
   flex-shrink: 0;
 }
+/* Subsequent Page Header (Page 2+) */
+.subsequent-header {
+  height: 12mm;
+  padding: 2.5mm 10mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 0.45mm solid #e11d48;
+  margin-bottom: 3.5mm;
+  background: #ffffff;
+  flex-shrink: 0;
+}
+.sub-header-left {
+  display: flex;
+  align-items: center;
+}
+.sub-doc-title-badge {
+  display: inline-block;
+  background: #fff1f2;
+  color: #e11d48;
+  font-weight: 800;
+  font-size: 7.2pt;
+  padding: 0.4mm 2.2mm;
+  border-radius: 2px;
+  border: 0.25mm solid #fecdd3;
+  text-transform: uppercase;
+  margin-inline-end: 2.5mm;
+}
+.sub-doc-meta {
+  font-size: 8pt;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 1.5mm;
+}
+.sub-meta-lbl {
+  color: #94a3b8;
+}
+.sub-meta-val {
+  font-family: monospace;
+  font-weight: 700;
+  color: #14141a;
+}
+.sub-meta-sep {
+  color: #cbd5e1;
+}
+.sub-meta-project {
+  color: #475569;
+  font-weight: 600;
+}
+.sub-header-right {
+  display: flex;
+  align-items: center;
+  gap: 2.5mm;
+}
+.sub-brand-name {
+  font-size: 8.5pt;
+  font-weight: 800;
+  color: #14141a;
+}
+.sub-brand-logo {
+  max-height: 10mm;
+  max-width: 18mm;
+  object-fit: contain;
+}
+
+@media screen {
+  body {
+    background: #f1f5f9;
+    padding: 8mm 0;
+  }
+  .contract-page, .invoice-page {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    margin: 0 auto 10mm auto;
+    background: #ffffff;
+    max-width: 210mm;
+  }
+}
+
 @media print {
+  html, body {
+    height: 100% !important;
+    min-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .contract-page, .invoice-page {
+    width: 210mm !important;
+    height: 284mm !important;
+    max-height: 284mm !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    overflow: hidden !important;
+    background: #ffffff !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+  .contract-page:last-child, .invoice-page:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
   .bottom-red-bar {
-    background: #e11d48 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    color: #ffffff !important;
+    display: none !important;
   }
 }
 `;
@@ -852,7 +1009,7 @@ export function documentShell(input: {
   extraCss?: string;
 }): string {
   const dir = docDir(input.lang);
-  const htmlLang = input.lang === "bilingual" ? "en" : input.lang;
+  const htmlLang = input.lang === "en" ? "en" : "ar";
   return `<!doctype html><html lang="${htmlLang}" dir="${dir}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(input.title)}</title><style>${baseCss(input.fonts)}${input.extraCss ?? ""}</style></head><body>${
     input.watermark
       ? `<div class="watermark">${esc(input.watermark)}</div>`
@@ -1037,31 +1194,6 @@ export function renderPartiesBlock(
     },
   );
 
-  if (lang === "bilingual") {
-    return `
-      <table class="bilingual-clause" style="margin: 0;">
-        <tbody>
-          <tr>
-            <td class="col-en divider" dir="ltr" style="width: 50%; vertical-align: top;">
-              <div class="contract-card">
-                <div class="section-badge">PARTIES TO THE AGREEMENT</div>
-                ${enProvider}
-                ${enClient}
-              </div>
-            </td>
-            <td class="col-ar" dir="rtl" style="width: 50%; vertical-align: top;">
-              <div class="contract-card">
-                <div class="section-badge">أطراف العقد</div>
-                ${arProvider}
-                ${arClient}
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    `;
-  }
-
   if (lang === "ar") {
     return `
       <div class="contract-card" dir="rtl">
@@ -1089,14 +1221,17 @@ export function renderPricingTableBlock(
   snapshot: ContractSnapshotV1,
   lang: DocLang,
 ): string {
+  if (!snapshot.items || snapshot.items.length === 0) {
+    return "";
+  }
   const currency = snapshot.contract.currency;
 
   function tableHtml(tableLang: Locale): string {
     const isArabic = tableLang === "ar";
     const thNum = "#";
     const thDesc = isArabic ? "الوصف" : "Description";
-    const thQty = isArabic ? "الكمية" : "Qty";
     const thPrice = isArabic ? "سعر الوحدة" : "Unit price";
+    const thQty = isArabic ? "الكمية" : "Qty";
     const thTotal = isArabic ? "الإجمالي" : "Total";
 
     const rows = snapshot.items
@@ -1105,11 +1240,11 @@ export function renderPricingTableBlock(
           ? esc(item.descriptionAr ?? item.descriptionEn ?? "")
           : esc(item.descriptionEn ?? item.descriptionAr ?? "");
         return `<tr>
-          <td class="num" style="width: 8%; text-align: center;">${esc(String(item.position))}</td>
-          <td style="width: 30%;">${desc}</td>
-          <td class="num" style="width: 14%; text-align: end;">${num(fmtQty(item.qtyMilli))}</td>
-          <td class="num" style="width: 24%; text-align: end;">${money(item.unitPriceMinor, currency, tableLang)}</td>
-          <td class="num" style="width: 24%; text-align: end;">${money(item.lineTotalMinor, currency, tableLang)}</td>
+          <td class="col-num">${esc(String(item.position))}</td>
+          <td class="col-desc">${desc}</td>
+          <td class="col-price">${money(item.unitPriceMinor, currency, tableLang)}</td>
+          <td class="col-qty">${num(fmtQty(item.qtyMilli))}</td>
+          <td class="col-total">${money(item.lineTotalMinor, currency, tableLang)}</td>
         </tr>`;
       })
       .join("");
@@ -1118,33 +1253,14 @@ export function renderPricingTableBlock(
       <table class="contract-table">
         <thead>
           <tr>
-            <th style="width: 8%; text-align: center;">${thNum}</th>
-            <th style="width: 30%;">${thDesc}</th>
-            <th style="width: 14%; text-align: end;">${thQty}</th>
-            <th style="width: 24%; text-align: end;">${thPrice}</th>
-            <th style="width: 24%; text-align: end;">${thTotal}</th>
+            <th class="col-num">${thNum}</th>
+            <th class="col-desc">${thDesc}</th>
+            <th class="col-price">${thPrice}</th>
+            <th class="col-qty">${thQty}</th>
+            <th class="col-total">${thTotal}</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
-      </table>
-    `;
-  }
-
-  if (lang === "bilingual") {
-    return `
-      <table class="bilingual-clause" style="margin: 0;">
-        <tbody>
-          <tr>
-            <td class="col-en divider" dir="ltr" style="width: 50%; vertical-align: top;">
-              <div class="section-badge">PRICING SPECIFICATION</div>
-              ${tableHtml("en")}
-            </td>
-            <td class="col-ar" dir="rtl" style="width: 50%; vertical-align: top;">
-              <div class="section-badge">تفاصيل الأتعاب والأسعار</div>
-              ${tableHtml("ar")}
-            </td>
-          </tr>
-        </tbody>
       </table>
     `;
   }
@@ -1164,8 +1280,10 @@ export function renderPaymentScheduleBlock(
   snapshot: ContractSnapshotV1,
   lang: DocLang,
 ): string {
+  if (!snapshot.milestones || snapshot.milestones.length === 0) {
+    return "";
+  }
   const currency = snapshot.contract.currency;
-  const isBilingual = lang === "bilingual";
 
   function tableHtml(tableLang: Locale): string {
     const isArabic = tableLang === "ar";
@@ -1176,56 +1294,6 @@ export function renderPaymentScheduleBlock(
     const thTax = isArabic ? "الضريبة" : "Tax";
     const thTotal = isArabic ? "الإجمالي" : "Total";
     const thDue = isArabic ? "الاستحقاق" : "Due";
-
-    if (isBilingual) {
-      const rows = snapshot.milestones
-        .map((m) => {
-          const title = isArabic
-            ? esc(m.titleAr || m.titleEn)
-            : esc(m.titleEn || m.titleAr);
-          const trigger = isArabic
-            ? esc(m.triggerNoteAr || m.triggerNoteEn || "")
-            : esc(m.triggerNoteEn || m.triggerNoteAr || "");
-          const percent =
-            m.percentBp !== null
-              ? num(`${(m.percentBp / 100).toFixed(2)}%`)
-              : "—";
-          const dueDate = m.dueDate ? esc(m.dueDate) : "—";
-
-          const financialDetails =
-            m.taxMinor > 0
-              ? `<div class="muted" style="font-size: 6.2pt; margin-top: 0.5mm; color: #64748b; white-space: nowrap;">${isArabic ? "الصافي:" : "Net:"} ${money(m.amountMinor, currency, tableLang)} · ${isArabic ? "الضريبة:" : "VAT:"} ${money(m.taxMinor, currency, tableLang)}</div>`
-              : "";
-
-          return `<tr>
-          <td class="num" style="width: 6%; text-align: center;">${esc(String(m.position))}</td>
-          <td style="width: 44%;">
-            <strong>${title}</strong>
-            ${trigger ? `<br><span class="muted" style="font-size: 6.5pt;">${trigger}</span>` : ""}
-            ${financialDetails}
-          </td>
-          <td class="num" style="width: 10%; text-align: end;">${percent}</td>
-          <td class="num" style="width: 22%; text-align: end;">${money(m.totalMinor, currency, tableLang)}</td>
-          <td style="width: 18%; font-size: 7pt; text-align: center;">${dueDate}</td>
-        </tr>`;
-        })
-        .join("");
-
-      return `
-      <table class="contract-table">
-        <thead>
-          <tr>
-            <th style="width: 6%; text-align: center;">${thNum}</th>
-            <th style="width: 44%;">${thMilestone}</th>
-            <th style="width: 10%; text-align: end;">${thPercent}</th>
-            <th style="width: 22%; text-align: end;">${thTotal}</th>
-            <th style="width: 18%; text-align: center;">${thDue}</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    `;
-    }
 
     const rows = snapshot.milestones
       .map((m) => {
@@ -1240,16 +1308,16 @@ export function renderPaymentScheduleBlock(
         const dueDate = m.dueDate ? esc(m.dueDate) : "—";
 
         return `<tr>
-          <td class="num" style="width: 6%; text-align: center;">${esc(String(m.position))}</td>
-          <td style="width: 24%;">
+          <td class="c-num">${esc(String(m.position))}</td>
+          <td class="c-title">
             <strong>${title}</strong>
             ${trigger ? `<br><span class="muted" style="font-size: 6.8pt;">${trigger}</span>` : ""}
           </td>
-          <td class="num" style="width: 10%; text-align: end;">${percent}</td>
-          <td class="num" style="width: 16%; text-align: end;">${money(m.amountMinor, currency, tableLang)}</td>
-          <td class="num" style="width: 14%; text-align: end;">${money(m.taxMinor, currency, tableLang)}</td>
-          <td class="num" style="width: 16%; text-align: end;">${money(m.totalMinor, currency, tableLang)}</td>
-          <td style="width: 14%; font-size: 7.2pt; text-align: center;">${dueDate}</td>
+          <td class="c-pct">${percent}</td>
+          <td class="c-net">${money(m.amountMinor, currency, tableLang)}</td>
+          <td class="c-tax">${money(m.taxMinor, currency, tableLang)}</td>
+          <td class="c-total">${money(m.totalMinor, currency, tableLang)}</td>
+          <td class="c-due">${dueDate}</td>
         </tr>`;
       })
       .join("");
@@ -1258,35 +1326,16 @@ export function renderPaymentScheduleBlock(
       <table class="contract-table">
         <thead>
           <tr>
-            <th style="width: 6%; text-align: center;">${thNum}</th>
-            <th style="width: 24%;">${thMilestone}</th>
-            <th style="width: 10%; text-align: end;">${thPercent}</th>
-            <th style="width: 16%; text-align: end;">${thNet}</th>
-            <th style="width: 14%; text-align: end;">${thTax}</th>
-            <th style="width: 16%; text-align: end;">${thTotal}</th>
-            <th style="width: 14%; text-align: center;">${thDue}</th>
+            <th class="c-num">${thNum}</th>
+            <th class="c-title">${thMilestone}</th>
+            <th class="c-pct">${thPercent}</th>
+            <th class="c-net">${thNet}</th>
+            <th class="c-tax">${thTax}</th>
+            <th class="c-total">${thTotal}</th>
+            <th class="c-due">${thDue}</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
-      </table>
-    `;
-  }
-
-  if (lang === "bilingual") {
-    return `
-      <table class="bilingual-clause" style="margin: 0;">
-        <tbody>
-          <tr>
-            <td class="col-en divider" dir="ltr" style="width: 50%; vertical-align: top;">
-              <div class="section-badge">PAYMENT SCHEDULE</div>
-              ${tableHtml("en")}
-            </td>
-            <td class="col-ar" dir="rtl" style="width: 50%; vertical-align: top;">
-              <div class="section-badge">جدول الدفعات والمراحل</div>
-              ${tableHtml("ar")}
-            </td>
-          </tr>
-        </tbody>
       </table>
     `;
   }
@@ -1399,24 +1448,6 @@ export function renderSignaturesBlock(
     </div>
   `;
 
-  if (lang === "bilingual") {
-    return `
-      <table class="bilingual-clause" style="margin: 0;">
-        <tbody>
-          <tr>
-            <td class="col-en divider" dir="ltr" style="width: 50%; vertical-align: top;">
-              <div class="section-badge">EXECUTION & SIGNATURES</div>
-              ${enCards}
-            </td>
-            <td class="col-ar" dir="rtl" style="width: 50%; vertical-align: top;">
-              <div class="section-badge">التوقيع والاعتماد</div>
-              ${arCards}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    `;
-  }
 
   const badge = lang === "ar" ? "التوقيع والاعتماد" : "EXECUTION & SIGNATURES";
   return `

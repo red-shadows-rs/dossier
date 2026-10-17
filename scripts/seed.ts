@@ -87,6 +87,9 @@ async function main(): Promise<void> {
   const settingsInserted = seedDefaultSettings();
   console.log(`Default settings rows inserted: ${settingsInserted}`);
 
+  db.run(sql`UPDATE contracts SET language_mode = 'ar' WHERE language_mode = 'bilingual'`);
+  db.run(sql`UPDATE templates SET default_language_mode = 'ar' WHERE default_language_mode = 'bilingual'`);
+
   const templateResult = seedSystemTemplates();
   console.log(
     `System templates — inserted: ${templateResult.inserted}, updated: ${templateResult.updated}, skipped: ${templateResult.skipped}`,

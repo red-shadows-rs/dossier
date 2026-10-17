@@ -17,14 +17,8 @@ function pick(
   en: string | null | undefined,
   lang: DocLang,
 ): string {
-  if (lang === "ar") return esc(ar ?? "");
-  if (lang === "en") return esc(en ?? "");
-  const enText = en ?? "";
-  const arText = ar ?? "";
-  if (enText && arText && enText !== arText) {
-    return `${esc(enText)}<br><span class="ar" dir="rtl">${esc(arText)}</span>`;
-  }
-  return esc(enText || arText);
+  if (lang === "en") return esc(en || ar || "");
+  return esc(ar || en || "");
 }
 
 function localizePaymentMethod(method: string, lang: DocLang): string {
@@ -36,9 +30,8 @@ function localizePaymentMethod(method: string, lang: DocLang): string {
     other: { ar: "أخرى", en: "Other" },
   };
   const m = methodMap[method] ?? { ar: method, en: method };
-  if (lang === "ar") return esc(m.ar);
   if (lang === "en") return esc(m.en);
-  return `${esc(m.en)} / <span class="ar" dir="rtl">${esc(m.ar)}</span>`;
+  return esc(m.ar);
 }
 
 function heroHeader(input: ReceiptHtmlInput): string {
@@ -48,14 +41,8 @@ function heroHeader(input: ReceiptHtmlInput): string {
   const ui = uiLang(lang);
   const isRtlDoc = isRtl(lang);
 
-  const title =
-    lang === "ar"
-      ? "سند قبض"
-      : lang === "en"
-        ? "RECEIPT"
-        : "RECEIPT";
-  const subtitle =
-    lang === "bilingual" ? `<div class="sub-title">سند قبض</div>` : "";
+  const title = lang === "en" ? "RECEIPT" : "سند قبض";
+  const subtitle = "";
 
   const sellerName = pick(s.nameAr, s.nameEn, lang);
   const address = pick(s.addressAr ?? null, s.addressEn ?? null, lang);
@@ -99,44 +86,19 @@ function heroHeader(input: ReceiptHtmlInput): string {
 
   const receiptNo = inv.number ? `REC-${inv.number}` : "REC-DRAFT";
 
-  const lblNo =
-    lang === "ar"
-      ? "رقم السند"
-      : lang === "bilingual"
-        ? '<span dir="ltr">Receipt No</span> / <span dir="rtl">رقم السند</span>'
-        : "Receipt No";
-  const lblDate =
-    lang === "ar"
-      ? "تاريخ السند"
-      : lang === "bilingual"
-        ? '<span dir="ltr">Receipt Date</span> / <span dir="rtl">تاريخ السند</span>'
-        : "Receipt Date";
-  const lblInvoice =
-    lang === "ar"
-      ? "الفاتورة المرتبطة"
-      : lang === "bilingual"
-        ? '<span dir="ltr">Invoice Ref</span> / <span dir="rtl">الفاتورة المرتبطة</span>'
-        : "Invoice Ref";
-  const lblProject =
-    lang === "ar"
-      ? "المشروع"
-      : lang === "bilingual"
-        ? '<span dir="ltr">Project</span> / <span dir="rtl">المشروع</span>'
-        : "Project";
-  const lblContract =
-    lang === "ar"
-      ? "العقد"
-      : lang === "bilingual"
-        ? '<span dir="ltr">Contract</span> / <span dir="rtl">العقد</span>'
-        : "Contract";
+  const lblNo = lang === "en" ? "Receipt No" : "رقم السند";
+  const lblDate = lang === "en" ? "Receipt Date" : "تاريخ السند";
+  const lblInvoice = lang === "en" ? "Invoice Ref" : "الفاتورة المرتبطة";
+  const lblProject = lang === "en" ? "Project" : "المشروع";
+  const lblContract = lang === "en" ? "Contract" : "العقد";
 
   return `
   <header class="hero-header">
-    <svg class="hero-svg-bg" viewBox="0 0 1000 240" preserveAspectRatio="none" style="overflow: visible;">
+    <svg class="hero-svg-bg" viewBox="0 0 1000 240" preserveAspectRatio="none" style="overflow: hidden;">
       <g ${svgTransform}>
-        <polygon points="415,-20 1040,-20 1040,195 370,195" fill="#14141a" />
-        <polygon points="370,195 470,195 370,260" fill="#9f1239" />
-        <polygon points="-40,-20 425,-20 370,195 370,260 -40,260" fill="#e11d48" />
+        <polygon points="-50,-20 440,-20 370,240 -50,240" fill="#e11d48" />
+        <polygon points="440,-20 1050,-20 1050,240 370,240" fill="#14141a" />
+        <line x1="0" y1="239" x2="1000" y2="239" stroke="#e11d48" stroke-width="2" />
       </g>
     </svg>
 
@@ -210,12 +172,7 @@ function receivedFromSection(input: ReceiptHtmlInput): string {
   if (b.crNumber) buyerDetails.push(lang === "ar" ? `س.ت: ${esc(b.crNumber)}` : `CR: ${esc(b.crNumber)}`);
   if (b.taxNumber) buyerDetails.push(lang === "ar" ? `ض.ر: ${esc(b.taxNumber)}` : `VAT: ${esc(b.taxNumber)}`);
 
-  const billToLabel =
-    lang === "ar"
-      ? "استلمنا من السادة:"
-      : lang === "bilingual"
-        ? '<span dir="ltr">Received from:</span> / <span dir="rtl">استلمنا من السادة:</span>'
-        : "RECEIVED FROM:";
+  const billToLabel = lang === "en" ? "RECEIVED FROM:" : "استلمنا من السادة:";
 
   return `
   <section class="bill-to-strip">
@@ -231,7 +188,6 @@ function receivedFromSection(input: ReceiptHtmlInput): string {
 function paymentsTable(input: ReceiptHtmlInput): string {
   const currency = input.invoice.currency as CurrencyCode;
   const lang = uiLang(input.lang);
-  const isBilingual = input.lang === "bilingual";
   const activePayments = input.payments.filter((p) => !p.voided);
 
   const rows = activePayments
@@ -248,37 +204,11 @@ function paymentsTable(input: ReceiptHtmlInput): string {
     })
     .join("");
 
-  const thDate =
-    input.lang === "ar"
-      ? "تاريخ الاستلام"
-      : isBilingual
-        ? 'Date Received / <span class="ar">تاريخ الاستلام</span>'
-        : "Date Received";
-  const thMethod =
-    input.lang === "ar"
-      ? "طريقة الدفع"
-      : isBilingual
-        ? 'Payment Method / <span class="ar">طريقة الدفع</span>'
-        : "Payment Method";
-  const thRef =
-    input.lang === "ar"
-      ? "المرجع / رقم العملية"
-      : isBilingual
-        ? 'Reference / <span class="ar">المرجع</span>'
-        : "Reference / Txn";
-  const thAmount =
-    input.lang === "ar"
-      ? "المبلغ المقبوض"
-      : isBilingual
-        ? 'Amount Received / <span class="ar">المبلغ المقبوض</span>'
-        : "Amount Received";
-
-  const emptyText =
-    input.lang === "ar"
-      ? "لا توجد دفعات مسجلة"
-      : isBilingual
-        ? 'No recorded payments / <span class="ar">لا توجد دفعات مسجلة</span>'
-        : "No recorded payments";
+  const thDate = input.lang === "ar" ? "تاريخ الاستلام" : "Date Received";
+  const thMethod = input.lang === "ar" ? "طريقة الدفع" : "Payment Method";
+  const thRef = input.lang === "ar" ? "المرجع / رقم العملية" : "Reference / Txn";
+  const thAmount = input.lang === "ar" ? "المبلغ المقبوض" : "Amount Received";
+  const emptyText = input.lang === "ar" ? "لا توجد دفعات مسجلة" : "No recorded payments";
 
   return `
   <table class="inv-items-table">

@@ -74,7 +74,7 @@ function createValidDraft(): string {
     user,
     id,
     {
-      languageMode: "bilingual",
+      languageMode: "ar",
       titleAr: "عقد تطوير",
       titleEn: "Development Agreement",
       scopeAr: "نطاق العمل",
@@ -254,7 +254,7 @@ describe("getSigningContext", () => {
     const context = getSigningContext(clientToken, META);
     expect(context.contractId).toBe(contractId);
     expect(context.signatoryName).toBe("Khalid Al-Noor");
-    expect(context.languageMode).toBe("bilingual");
+    expect(context.languageMode).toBe("ar");
     expect(context.requiresOtp).toBe(true);
     expect(context.otpVerified).toBe(false);
 

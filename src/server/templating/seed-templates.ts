@@ -15,7 +15,7 @@ export type TemplateDef = {
   nameEn: string;
   descriptionAr: string;
   descriptionEn: string;
-  defaultLanguageMode: "bilingual";
+  defaultLanguageMode: "ar";
   defaults: TemplateDefaults;
   clauseKeys: string[];
 };
@@ -332,7 +332,7 @@ export const TEMPLATES: TemplateDef[] = [
       "Fast, scalable, and secure web applications tailored to business needs, from landing pages to dashboards and complex systems.",
     descriptionAr:
       "تطوير تطبيقات ويب سريعة وقابلة للتوسع، مع التركيز على الأداء والأمان وتجربة مستخدم سلسة، من المواقع إلى المنصات ولوحات التحكم.",
-    defaultLanguageMode: "bilingual",
+    defaultLanguageMode: "ar",
     defaults: {
       hasFees: true,
       titleEn: "Web Application Development Agreement",
@@ -388,7 +388,7 @@ export const TEMPLATES: TemplateDef[] = [
       "Cross-platform mobile applications for Android and iOS with high performance, smooth UI, and scalable architecture.",
     descriptionAr:
       "تطبيقات جوال متعددة المنصات لأندرويد وآيفون، بأداء عالٍ وواجهات سلسة وبنية برمجية قابلة للتوسع.",
-    defaultLanguageMode: "bilingual",
+    defaultLanguageMode: "ar",
     defaults: {
       hasFees: true,
       titleEn: "Mobile App Development Agreement",
@@ -444,7 +444,7 @@ export const TEMPLATES: TemplateDef[] = [
       "Custom desktop applications for Windows, Linux, and macOS designed for productivity, automation, and business operations.",
     descriptionAr:
       "برمجيات وتطبيقات سطح مكتب مخصصة لأنظمة ويندوز ولينكس وماك، مصممة للإنتاجية والأتمتة وإدارة الأعمال.",
-    defaultLanguageMode: "bilingual",
+    defaultLanguageMode: "ar",
     defaults: {
       hasFees: true,
       titleEn: "Desktop Application Development Agreement",
@@ -495,7 +495,7 @@ export const TEMPLATES: TemplateDef[] = [
       "Secure and scalable backend systems, APIs, scrapers, and webhooks ensuring reliable data flow and system integrations.",
     descriptionAr:
       "أنظمة خلفية وواجهات برمجية آمنة وقابلة للتوسع، تشغل التطبيقات وتضمن تكاملاً موثوقاً للبيانات والربط بالأنظمة.",
-    defaultLanguageMode: "bilingual",
+    defaultLanguageMode: "ar",
     defaults: {
       hasFees: true,
       titleEn: "APIs & Integrations Agreement",
@@ -546,7 +546,7 @@ export const TEMPLATES: TemplateDef[] = [
       "Intelligent bots and automated workflows that streamline operations and integrate with platforms like Telegram, Discord, and WhatsApp.",
     descriptionAr:
       "تطوير بوتات وأنظمة أتمتة ذكية لتسهيل العمليات وإدارة المهام والتكامل مع منصات مثل تيليجرام وديسكورد وواتساب.",
-    defaultLanguageMode: "bilingual",
+    defaultLanguageMode: "ar",
     defaults: {
       hasFees: true,
       titleEn: "Bots & Automation Agreement",
@@ -597,7 +597,7 @@ export const TEMPLATES: TemplateDef[] = [
       "Stable and secure infrastructure on Linux: Docker, Nginx, CI/CD, and continuous monitoring to keep services available 24/7.",
     descriptionAr:
       "بنية تحتية مستقرة وآمنة على لينكس: حاويات Docker وNginx وCI/CD ومراقبة مستمرة لإبقاء خدماتكم متاحة وموثوقة دائماً.",
-    defaultLanguageMode: "bilingual",
+    defaultLanguageMode: "ar",
     defaults: {
       hasFees: true,
       titleEn: "DevOps & Infrastructure Agreement",
@@ -655,7 +655,7 @@ export const TEMPLATES: TemplateDef[] = [
       "Mutual protection of confidential technical, commercial, and proprietary information between parties.",
     descriptionAr:
       "حماية متبادلة للمعلومات السرية والبيانات الفنية والتجارية لتقييم أو تنفيذ المشاريع.",
-    defaultLanguageMode: "bilingual",
+    defaultLanguageMode: "ar",
     defaults: {
       hasFees: false,
       titleEn: "Mutual Non-Disclosure Agreement",

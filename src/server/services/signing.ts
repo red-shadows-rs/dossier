@@ -56,7 +56,7 @@ export function resetSigningRateLimits(): void {
   rateBuckets.clear();
 }
 
-export type SigningLanguageMode = "ar" | "en" | "bilingual";
+export type SigningLanguageMode = "ar" | "en";
 
 export type SigningContext = {
   contractId: string;

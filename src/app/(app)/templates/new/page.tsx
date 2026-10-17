@@ -14,7 +14,7 @@ const EMPTY: TemplateFormValues = {
   nameEn: "",
   descriptionAr: "",
   descriptionEn: "",
-  defaultLanguageMode: "bilingual",
+  defaultLanguageMode: "ar",
   hasFees: true,
   titleAr: "",
   titleEn: "",

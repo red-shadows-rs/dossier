@@ -78,7 +78,7 @@ describe("seedSystemTemplates", () => {
         key: "web-development",
         nameAr: "مخصص",
         nameEn: "Custom",
-        defaultLanguageMode: "bilingual",
+        defaultLanguageMode: "ar",
         defaultsJson: "{}",
         isSystem: false,
         createdAt: now,

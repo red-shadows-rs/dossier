@@ -134,7 +134,7 @@ describe("sendContract rollback", () => {
       user,
       id,
       {
-        languageMode: "bilingual",
+        languageMode: "ar",
         titleAr: "عقد",
         titleEn: "Contract",
         scopeAr: "نطاق",

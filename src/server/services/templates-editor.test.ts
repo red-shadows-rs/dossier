@@ -54,7 +54,7 @@ function input(overrides: Record<string, unknown> = {}) {
     nameEn: "Custom Template",
     descriptionAr: "",
     descriptionEn: "",
-    defaultLanguageMode: "bilingual",
+    defaultLanguageMode: "ar",
     defaults: { hasFees: false },
     clauses: [clause()],
     ...overrides,

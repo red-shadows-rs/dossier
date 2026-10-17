@@ -9,7 +9,7 @@ export type ContractSnapshotV1 = {
     id: string;
     number: string | null;
     versionNo: number;
-    languageMode: "ar" | "en" | "bilingual";
+    languageMode: "ar" | "en";
     hasFees: boolean;
     issueDate: string; 
     titleAr: string | null;
@@ -166,6 +166,28 @@ export function isAllowedVariable(name: string): name is VariableName {
   return ALLOWED_SET.has(name);
 }
 
+export const OPTIONAL_VARIABLES = new Set<string>([
+  "provider.tax_number",
+  "client.tax_number",
+  "provider.cr_number",
+  "client.cr_number",
+  "provider.website",
+  "provider.phone",
+  "provider.email",
+  "provider.legal_name",
+  "client.legal_name",
+  "client.phone",
+  "client.email",
+  "client.address",
+  "client.country",
+  "client.rep_name",
+  "client.rep_title",
+  "contract.number",
+  "contract.internal_notes",
+  "contract.end_date",
+  "contract.signing_deadline",
+]);
+
 export const FEE_VARIABLES: readonly VariableName[] = [
   "contract.subtotal",
   "contract.discount",
@@ -237,7 +259,7 @@ function buildContract(
   const date = (value: string | null): string =>
     value ? formatDateLong(value, lang) : "";
   return {
-    "contract.number": c.number ?? "",
+    "contract.number": c.number || (lang === "ar" ? "قيد الإصدار" : "Draft"),
     "contract.title": pick(c.titleAr, c.titleEn),
     "contract.scope": pick(c.scopeAr, c.scopeEn),
     "contract.date": date(c.issueDate),

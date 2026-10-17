@@ -156,63 +156,63 @@ export function ContractClausesStep({
     <form onSubmit={onSubmit} className="flex flex-col gap-6 pb-28">
       <Card>
         {/* Card Header & Controls Toolbar */}
-        <CardHeader className="flex flex-col gap-4 pb-3">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <CardTitle className="inline-flex items-center gap-2">
-              <ScrollText size={18} className="text-primary" aria-hidden="true" />
-              <span>{t("contracts.builder.clausesTitle")}</span>
-            </CardTitle>
+        <CardHeader className="flex flex-col gap-3 pb-3 sm:flex-row sm:items-center sm:justify-between">
+          <CardTitle className="inline-flex items-center gap-2">
+            <ScrollText size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("contracts.builder.clausesTitle")}</span>
+            <span className="rounded bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">
+              {clauses.length}
+            </span>
+          </CardTitle>
 
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={toggleCollapseAll}
-                className="gap-1.5 text-xs font-semibold"
-              >
-                <ChevronsUpDown className="h-3.5 w-3.5" />
-                <span>
-                  {collapsedIndices.size === clauses.length
-                    ? "توسيع الكل"
-                    : "طي الكل"}
-                </span>
-              </Button>
-
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                className="gap-1.5 text-xs"
-                onClick={() =>
-                  setClauses((current) => [
-                    ...current,
-                    {
-                      key: null,
-                      titleAr: "",
-                      titleEn: "",
-                      bodyAr: "",
-                      bodyEn: "",
-                    },
-                  ])
-                }
-              >
-                <Plus className="h-3.5 w-3.5" />
-                <span>{t("contracts.clause.add")}</span>
-              </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative w-44 sm:w-56">
+              <Input
+                type="search"
+                placeholder={t("common.search")}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-8 ps-8 text-xs"
+              />
+              <Search className="pointer-events-none absolute inset-y-0 start-2.5 my-auto h-3.5 w-3.5 text-muted-foreground" />
             </div>
-          </div>
 
-          {/* Search Box */}
-          <div className="relative">
-            <Input
-              type="search"
-              placeholder={t("common.search")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="ps-9 text-xs"
-            />
-            <Search className="pointer-events-none absolute inset-y-0 start-3 my-auto h-4 w-4 text-muted-foreground" />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={toggleCollapseAll}
+              className="h-8 gap-1.5 text-xs font-medium"
+            >
+              <ChevronsUpDown className="h-3.5 w-3.5" />
+              <span>
+                {collapsedIndices.size === clauses.length
+                  ? "توسيع الكل"
+                  : "طي الكل"}
+              </span>
+            </Button>
+
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="h-8 gap-1.5 text-xs font-medium"
+              onClick={() =>
+                setClauses((current) => [
+                  ...current,
+                  {
+                    key: null,
+                    titleAr: "",
+                    titleEn: "",
+                    bodyAr: "",
+                    bodyEn: "",
+                  },
+                ])
+              }
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>{t("contracts.clause.add")}</span>
+            </Button>
           </div>
         </CardHeader>
 

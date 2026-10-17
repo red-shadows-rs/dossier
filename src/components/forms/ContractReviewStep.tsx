@@ -277,24 +277,18 @@ export function ContractReviewStep({
                     const frame = e.currentTarget;
                     const updateHeight = () => {
                       try {
-                        if (frame.contentDocument) {
+                        if (frame.contentDocument?.documentElement) {
                           const doc = frame.contentDocument;
                           if (doc.body) {
                             doc.body.style.overflow = "hidden";
                           }
-                          const redBar = doc.querySelector(".bottom-red-bar") as HTMLElement | null;
-                          let h = 0;
-                          if (redBar) {
-                            h = redBar.offsetTop + redBar.offsetHeight;
-                          } else {
-                            const container =
-                              doc.querySelector(".contract-document") ||
-                              doc.querySelector(".invoice-page") ||
-                              doc.body;
-                            h = Math.ceil(container?.getBoundingClientRect().height || doc.body?.scrollHeight || 500);
-                          }
-                          if (h > 0) {
-                            setIframeHeight(Math.max(h, 300));
+                          const h = Math.max(
+                            doc.documentElement.scrollHeight,
+                            doc.body?.scrollHeight ?? 0,
+                            doc.documentElement.offsetHeight,
+                          );
+                          if (h > 400) {
+                            setIframeHeight(h);
                           }
                         }
                       } catch {}

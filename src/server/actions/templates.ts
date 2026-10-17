@@ -88,7 +88,7 @@ const templatePreviewInputSchema = z.object({
       }),
     )
     .default([]),
-  lang: z.enum(["ar", "en", "bilingual"]).default("ar"),
+  lang: z.enum(["ar", "en"]).default("ar"),
   titleAr: z.string().optional(),
   titleEn: z.string().optional(),
   hasFees: z.boolean().optional(),

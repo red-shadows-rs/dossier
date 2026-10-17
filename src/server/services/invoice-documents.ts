@@ -171,13 +171,9 @@ export async function buildInvoiceHtml(
       dueDate: invoice.dueDate,
       projectLabel: project
         ? `${project.code} — ${
-            invoice.languageMode === "ar"
+            lang === "ar"
               ? (project.nameAr ?? project.nameEn ?? "")
-              : invoice.languageMode === "en"
-                ? (project.nameEn ?? project.nameAr ?? "")
-                : (project.nameEn && project.nameAr && project.nameEn !== project.nameAr
-                    ? `${project.nameEn} / ${project.nameAr}`
-                    : (project.nameEn ?? project.nameAr ?? ""))
+              : (project.nameEn ?? project.nameAr ?? "")
           }`
         : "—",
       contractNumber: contract?.number ?? null,
@@ -302,13 +298,9 @@ export async function buildReceiptHtml(
       dueDate: invoice.dueDate,
       projectLabel: project
         ? `${project.code} — ${
-            invoice.languageMode === "ar"
+            lang === "ar"
               ? (project.nameAr ?? project.nameEn ?? "")
-              : invoice.languageMode === "en"
-                ? (project.nameEn ?? project.nameAr ?? "")
-                : (project.nameEn && project.nameAr && project.nameEn !== project.nameAr
-                    ? `${project.nameEn} / ${project.nameAr}`
-                    : (project.nameEn ?? project.nameAr ?? ""))
+              : (project.nameEn ?? project.nameAr ?? "")
           }`
         : "—",
       contractNumber: contract?.number ?? null,
