@@ -748,12 +748,15 @@ table.inv-items-table tbody tr:last-child td {
 }
 @media screen {
   body {
-    background: #f1f5f9;
-    padding: 8mm 0;
+    background: #ffffff;
+    padding: 0;
+    margin: 0;
   }
   .invoice-page {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    margin: 0 auto 10mm auto;
+    box-shadow: none;
+    margin: 0 auto;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 }
 

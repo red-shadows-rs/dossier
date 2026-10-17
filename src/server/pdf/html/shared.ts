@@ -957,14 +957,28 @@ li {
 
 @media screen {
   body {
-    background: #f1f5f9;
-    padding: 8mm 0;
+    background: #ffffff;
+    padding: 0;
+    margin: 0;
   }
   .contract-page, .invoice-page {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    margin: 0 auto 10mm auto;
+    box-shadow: none;
+    margin: 0 auto;
     background: #ffffff;
-    max-width: 210mm;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .contract-preview-single-page {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+    page-break-after: auto !important;
+    break-after: auto !important;
   }
 }
 
