@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FileText, Receipt } from "lucide-react";
+import { useLocale } from "next-intl";
 import type { Locale } from "@/lib/constants";
 import type { MonthlyPoint } from "@/server/services/dashboard";
 import { cn } from "@/components/ui/cn";
@@ -66,7 +67,7 @@ export function StatusDonut({
   statuses,
   counts,
   labels,
-  totalLabel = "الإجمالي",
+  totalLabel,
 }: {
   title: string;
   kind: "contracts" | "invoices";
@@ -75,6 +76,13 @@ export function StatusDonut({
   labels: Record<string, string>;
   totalLabel?: string;
 }) {
+  let activeLocale = "ar";
+  try {
+    activeLocale = useLocale();
+  } catch {}
+  const isAr = activeLocale !== "en";
+  const resolvedTotalLabel = totalLabel ?? (isAr ? "الإجمالي" : "Total");
+
   const Icon = kind === "contracts" ? FileText : Receipt;
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
@@ -189,7 +197,7 @@ export function StatusDonut({
                     {total}
                   </span>
                   <span className="text-[10px] text-muted-foreground">
-                    {totalLabel}
+                    {resolvedTotalLabel}
                   </span>
                 </>
               )}

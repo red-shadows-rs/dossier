@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import type { HTMLAttributes } from "react";
+import { useLocale } from "next-intl";
 
 export function Skeleton({
   className,
@@ -716,10 +717,18 @@ export function DashboardSkeleton() {
 export function DocumentSkeleton({
   withToolbar = false,
   className,
+  label,
 }: {
   withToolbar?: boolean;
   className?: string;
+  label?: string;
 } = {}) {
+  let activeLocale = "ar";
+  try {
+    activeLocale = useLocale();
+  } catch {}
+  const isAr = activeLocale !== "en";
+
   return (
     <div className="relative flex flex-col gap-4">
       {withToolbar ? (
@@ -739,7 +748,9 @@ export function DocumentSkeleton({
       >
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/50 backdrop-blur-[1px] z-10">
           <div className="h-9 w-9 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <span className="text-sm font-medium text-foreground">جار التحميل...</span>
+          <span className="text-sm font-medium text-foreground">
+            {label ?? (isAr ? "جار التحميل..." : "Loading...")}
+          </span>
         </div>
         <div className="flex items-start justify-between">
           <div className="flex flex-col gap-2">

@@ -3,16 +3,17 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { Check, ChevronDown, RotateCcw, SlidersHorizontal, X } from "lucide-react";
+import { useLocale } from "next-intl";
 import { Button } from "@/components/ui/Button";
 
 export function FilterDropdown({
-  label = "تصفية",
+  label,
   activeCount = 0,
   children,
   resetHref,
-  title = "خيارات التصفية",
-  applyLabel = "تطبيق الفلاتر",
-  resetLabel = "إعادة تعيين",
+  title,
+  applyLabel,
+  resetLabel,
 }: {
   label?: string;
   activeCount?: number;
@@ -22,6 +23,17 @@ export function FilterDropdown({
   applyLabel?: string;
   resetLabel?: string;
 }) {
+  let activeLocale = "ar";
+  try {
+    activeLocale = useLocale();
+  } catch {}
+  const isAr = activeLocale !== "en";
+
+  const resolvedLabel = label ?? (isAr ? "تصفية" : "Filter");
+  const resolvedTitle = title ?? (isAr ? "خيارات التصفية" : "Filter Options");
+  const resolvedApplyLabel = applyLabel ?? (isAr ? "تطبيق الفلاتر" : "Apply Filters");
+  const resolvedResetLabel = resetLabel ?? (isAr ? "إعادة تعيين" : "Reset");
+
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -83,7 +95,7 @@ export function FilterDropdown({
         aria-haspopup="dialog"
       >
         <SlidersHorizontal size={15} aria-hidden="true" />
-        <span>{label}</span>
+        <span>{resolvedLabel}</span>
         {activeCount > 0 && (
           <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground px-1.5">
             {activeCount}
@@ -103,14 +115,14 @@ export function FilterDropdown({
           open ? "block animate-in fade-in-50 zoom-in-95" : "hidden"
         }`}
         role="dialog"
-        aria-label={title}
+        aria-label={resolvedTitle}
       >
         <div className="flex items-center justify-between border-b border-border/40 pb-3">
           <div className="flex items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded bg-primary/10 text-primary">
               <SlidersHorizontal size={14} aria-hidden="true" />
             </div>
-            <span className="text-sm font-semibold text-foreground">{title}</span>
+            <span className="text-sm font-semibold text-foreground">{resolvedTitle}</span>
             {activeCount > 0 && (
               <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-bold text-primary">
                 {activeCount}
@@ -121,7 +133,7 @@ export function FilterDropdown({
             type="button"
             onClick={() => setOpen(false)}
             className="cursor-pointer rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-            aria-label="إغلاق"
+            aria-label={isAr ? "إغلاق" : "Close"}
           >
             <X size={16} />
           </button>
@@ -143,7 +155,7 @@ export function FilterDropdown({
                 className="gap-1.5 h-8 px-2.5 text-xs text-muted-foreground hover:text-foreground"
               >
                 <RotateCcw size={13} aria-hidden="true" />
-                <span>{resetLabel}</span>
+                <span>{resolvedResetLabel}</span>
               </Button>
             </Link>
           ) : (
@@ -157,7 +169,7 @@ export function FilterDropdown({
             onClick={() => setOpen(false)}
           >
             <Check size={14} aria-hidden="true" />
-            <span>{applyLabel}</span>
+            <span>{resolvedApplyLabel}</span>
           </Button>
         </div>
       </div>

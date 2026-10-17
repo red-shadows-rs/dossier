@@ -16,6 +16,7 @@ export default async function NumberingSettingsPage() {
   const user = await requireUserPage();
   const canWrite = can(user, "settings.write");
   const t = await getTranslations("settings");
+  const tNav = await getTranslations("nav");
   const numbering = getSettings("numbering");
   const currentYear = new Date().getFullYear();
 
@@ -62,7 +63,7 @@ export default async function NumberingSettingsPage() {
             <div className="flex items-center justify-between rounded-lg border border-border/70 bg-muted/20 p-3.5">
               <div className="flex items-center gap-2.5">
                 <Receipt size={17} className="text-primary" />
-                <span className="text-sm font-medium">فواتير المبيعات</span>
+                <span className="text-sm font-medium">{tNav("invoices")}</span>
               </div>
               <span className="font-mono text-xs font-bold text-foreground bg-card px-2.5 py-1 rounded border border-border/80">
                 {numbering.prefix}-I-{currentYear}-0001
@@ -72,7 +73,7 @@ export default async function NumberingSettingsPage() {
             <div className="flex items-center justify-between rounded-lg border border-border/70 bg-muted/20 p-3.5">
               <div className="flex items-center gap-2.5">
                 <FileText size={17} className="text-primary" />
-                <span className="text-sm font-medium">العقود والاتفاقيات</span>
+                <span className="text-sm font-medium">{tNav("contracts")}</span>
               </div>
               <span className="font-mono text-xs font-bold text-foreground bg-card px-2.5 py-1 rounded border border-border/80">
                 {numbering.prefix}-C-{currentYear}-0001

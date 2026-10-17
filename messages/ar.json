@@ -370,6 +370,7 @@
       "jurisdictionEn": "الاختصاص القضائي (بالإنجليزية)",
       "prefix": "البادئة",
       "linkTtlDays": "صلاحية رابط التوقيع (أيام)",
+      "daysSuffix": "يوم",
       "requireEmailOtp": "رمز تحقق البريد",
       "requireProviderSignatureBeforeSend": "توقيع المزود أولا",
       "consentTextEn": "نص الموافقة (بالإنجليزية)",
@@ -957,6 +958,12 @@
       "drawn": "رسم",
       "typed": "كتابة",
       "typedName": "الاسم المكتوب",
+      "providerNamePlaceholder": "اسم المفوض بالتوقيع",
+      "titlePlaceholder": "المسمى الوظيفي",
+      "typedPlaceholder": "اكتب اسمك للاعتماد كـ توقيع إلكتروني",
+      "typedPreviewFallback": "توقيع بالاسم المكتوب",
+      "drawRequired": "يرجى رسم التوقيع داخل المربع المخصص",
+      "nameRequired": "اسم الموقع مطلوب للاعتماد",
       "submit": "إرسال",
       "sent": "تم إرسال العقد"
     }

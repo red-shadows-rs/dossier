@@ -23,7 +23,7 @@ export default async function SigningSettingsPage() {
       label: t("fields.linkTtlDays"),
       min: 1,
       max: 90,
-      suffix: "يوم",
+      suffix: t("fields.daysSuffix"),
     },
     {
       kind: "checkbox",

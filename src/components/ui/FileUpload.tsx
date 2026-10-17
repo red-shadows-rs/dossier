@@ -15,6 +15,7 @@ import {
   UploadCloud,
 } from "lucide-react";
 import clsx from "clsx";
+import { useLocale } from "next-intl";
 import { formatSize } from "@/lib/files";
 
 export function FileUpload({
@@ -42,6 +43,13 @@ export function FileUpload({
   onClear?: () => void;
   hint?: ReactNode;
 }) {
+  let activeLocale = "ar";
+  try {
+    activeLocale = useLocale();
+  } catch {
+  }
+  const isAr = activeLocale !== "en";
+
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -160,7 +168,7 @@ export function FileUpload({
               <span>
                 {currentFileName
                   ? `${currentFileName}${currentFileSize ? ` (${formatSize(currentFileSize)})` : ""}`
-                  : "تم الرفع"}
+                  : (isAr ? "تم الرفع" : "Uploaded")}
               </span>
             </div>
 
@@ -182,10 +190,10 @@ export function FileUpload({
                   handleReset();
                 }}
                 className="inline-flex items-center gap-1.5 rounded-md border border-border/80 bg-background/90 px-2.5 py-1 text-xs font-medium text-muted-foreground shadow-2xs backdrop-blur-xs transition-colors hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:opacity-50 cursor-pointer"
-                title="حذف الملف"
+                title={isAr ? "حذف الملف" : "Delete file"}
               >
                 <Trash2 size={13} aria-hidden="true" />
-                <span>حذف</span>
+                <span>{isAr ? "حذف" : "Delete"}</span>
               </button>
 
               <button
@@ -196,10 +204,10 @@ export function FileUpload({
                   inputRef.current?.click();
                 }}
                 className="inline-flex items-center gap-1.5 rounded-md border border-border/80 bg-background/90 px-2.5 py-1 text-xs font-medium text-foreground shadow-2xs backdrop-blur-xs transition-colors hover:border-primary/50 hover:bg-primary/10 hover:text-primary disabled:opacity-50 cursor-pointer"
-                title="استبدال الملف"
+                title={isAr ? "استبدال الملف" : "Replace file"}
               >
                 <RotateCcw size={13} aria-hidden="true" />
-                <span>استبدال</span>
+                <span>{isAr ? "استبدال" : "Replace"}</span>
               </button>
             </div>
 
@@ -246,10 +254,10 @@ export function FileUpload({
             </div>
             <div className="flex flex-col gap-0.5">
               <span className="text-xs font-semibold text-foreground">
-                اسحب الملف إلى هنا أو انقر للاختيار
+                {isAr ? "اسحب الملف إلى هنا أو انقر للاختيار" : "Drag and drop file here or click to select"}
               </span>
               <span className="text-[11px] text-muted-foreground">
-                {accept ? accept.split(",").join(" • ") : "جميع صيغ الملفات المدعومة"}
+                {accept ? accept.split(",").join(" • ") : (isAr ? "جميع صيغ الملفات المدعومة" : "All supported file formats")}
               </span>
             </div>
           </div>

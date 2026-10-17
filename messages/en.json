@@ -370,6 +370,7 @@
       "jurisdictionEn": "Jurisdiction (English)",
       "prefix": "Prefix",
       "linkTtlDays": "Link validity (days)",
+      "daysSuffix": "days",
       "requireEmailOtp": "Email OTP verification",
       "requireProviderSignatureBeforeSend": "Provider sign first",
       "consentTextEn": "Consent text (English)",
@@ -957,6 +958,12 @@
       "drawn": "Draw",
       "typed": "Type",
       "typedName": "Typed name",
+      "providerNamePlaceholder": "Signatory full name",
+      "titlePlaceholder": "Job title",
+      "typedPlaceholder": "Type your name to adopt as signature",
+      "typedPreviewFallback": "Typed signature preview",
+      "drawRequired": "Please draw your signature in the designated area",
+      "nameRequired": "Signatory name is required",
       "submit": "Send",
       "sent": "Contract sent"
     }

@@ -92,14 +92,14 @@ export function SendContractDialog({
         const dataUrl = padRef.current?.dataUrl;
         const pts = padRef.current?.pointCount ?? 0;
         if (!dataUrl || pts < 5) {
-          const msg = "يرجى رسم التوقيع داخل المربع المخصص";
+          const msg = tContracts("send.drawRequired");
           setFieldErrors({ signature: msg });
           setStatusError(msg);
           return;
         }
       }
       if (method === "typed" && typedName.trim() === "") {
-        const msg = "اسم الموقع مطلوب للاعتماد";
+        const msg = tContracts("send.nameRequired");
         setFieldErrors({ signature: msg });
         setStatusError(msg);
         return;
@@ -214,7 +214,7 @@ export function SendContractDialog({
                 value={providerName}
                 onChange={(e) => setProviderName(e.target.value)}
                 disabled={pending}
-                placeholder="اسم المفوض بالتوقيع"
+                placeholder={tContracts("send.providerNamePlaceholder")}
               />
             </Field>
 
@@ -229,7 +229,7 @@ export function SendContractDialog({
                 value={providerTitle}
                 onChange={(e) => setProviderTitle(e.target.value)}
                 disabled={pending}
-                placeholder="المسمى الوظيفي"
+                placeholder={tContracts("send.titlePlaceholder")}
               />
             </Field>
           </div>
@@ -268,7 +268,7 @@ export function SendContractDialog({
                 value={clientTitle}
                 onChange={(e) => setClientTitle(e.target.value)}
                 disabled={pending}
-                placeholder="المسمى الوظيفي"
+                placeholder={tContracts("send.titlePlaceholder")}
               />
             </Field>
 
@@ -359,13 +359,13 @@ export function SendContractDialog({
                       }
                     }}
                     disabled={pending}
-                    placeholder="اكتب اسمك للاعتماد كـ توقيع إلكتروني"
+                    placeholder={tContracts("send.typedPlaceholder")}
                   />
                 </Field>
 
                 <div className="flex h-20 w-full items-center justify-center rounded-lg border border-border/80 bg-card px-4 text-center select-none shadow-inner">
                   <span className="font-serif text-2xl italic tracking-wide text-foreground">
-                    {typedName.trim() || "توقيع بالاسم المكتوب"}
+                    {typedName.trim() || tContracts("send.typedPreviewFallback")}
                   </span>
                 </div>
               </div>

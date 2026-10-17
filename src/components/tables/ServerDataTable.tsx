@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import clsx from "clsx";
+import { useLocale } from "next-intl";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Pagination } from "@/components/ui/Pagination";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -46,6 +47,12 @@ export function ServerDataTable<R extends { id: string | number }>({
   minWidth?: string;
   renderMobileCard?: (row: R) => ReactNode;
 }) {
+  let activeLocale = "ar";
+  try {
+    activeLocale = useLocale();
+  } catch {}
+  const isAr = activeLocale !== "en";
+
   const [clientPage, setClientPage] = useState(1);
 
   const isServer = typeof total === "number" && typeof basePath === "string" && typeof page === "number";
@@ -90,7 +97,7 @@ export function ServerDataTable<R extends { id: string | number }>({
     return (
       <EmptyState
         icon={emptyIcon}
-        title={noRowsLabel ?? "لا توجد بيانات"}
+        title={noRowsLabel ?? (isAr ? "لا توجد بيانات" : "No data available")}
         description={emptyDescription}
         action={emptyAction}
         className="border-0 bg-transparent py-14"
@@ -236,7 +243,7 @@ export function ServerDataTable<R extends { id: string | number }>({
                 onClick={() => setClientPage((p) => Math.max(1, p - 1))}
                 className="rounded border border-border px-3 py-1 text-xs font-medium text-foreground disabled:opacity-50 hover:bg-muted/40 transition-colors"
               >
-                السابق
+                {isAr ? "السابق" : "Previous"}
               </button>
               <span className="text-xs text-muted-foreground tabular-nums font-mono" dir="ltr">
                 {clientPage} / {totalPages}
@@ -247,7 +254,7 @@ export function ServerDataTable<R extends { id: string | number }>({
                 onClick={() => setClientPage((p) => Math.min(totalPages, p + 1))}
                 className="rounded border border-border px-3 py-1 text-xs font-medium text-foreground disabled:opacity-50 hover:bg-muted/40 transition-colors"
               >
-                التالي
+                {isAr ? "التالي" : "Next"}
               </button>
             </div>
           )}
