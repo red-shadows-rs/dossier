@@ -54,6 +54,8 @@ export type BuyerSnapshot = {
   addressEn?: string | null;
   taxNumber?: string | null;
   crNumber?: string | null;
+  email?: string | null;
+  phone?: string | null;
 };
 
 export type InvoiceHtmlInput = {
@@ -939,6 +941,20 @@ function billToSection(input: InvoiceHtmlInput): string {
   const buyerName = pick(b.nameAr, b.nameEn, lang);
   const buyerAddress = pick(b.addressAr ?? null, b.addressEn ?? null, lang);
   const buyerDetails: string[] = [];
+  if (b.email) {
+    buyerDetails.push(
+      lang === "ar"
+        ? `البريد: <span dir="ltr">${esc(b.email)}</span>`
+        : `Email: <span dir="ltr">${esc(b.email)}</span>`,
+    );
+  }
+  if (b.phone) {
+    buyerDetails.push(
+      lang === "ar"
+        ? `الهاتف: <span dir="ltr">${esc(b.phone)}</span>`
+        : `Phone: <span dir="ltr">${esc(b.phone)}</span>`,
+    );
+  }
   if (buyerAddress) buyerDetails.push(buyerAddress);
   if (b.crNumber) buyerDetails.push(lang === "ar" ? `س.ت: ${esc(b.crNumber)}` : `CR: ${esc(b.crNumber)}`);
   if (b.taxNumber) buyerDetails.push(lang === "ar" ? `ض.ر: ${esc(b.taxNumber)}` : `VAT: ${esc(b.taxNumber)}`);

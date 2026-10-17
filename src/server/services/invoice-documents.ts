@@ -108,6 +108,8 @@ function buyerSnapshotFor(invoice: InvoiceRow): BuyerSnapshot {
     addressEn: client?.addressEn ?? snapshot.addressEn ?? null,
     taxNumber: client?.taxNumber ?? snapshot.taxNumber ?? null,
     crNumber: client?.crNumber ?? snapshot.crNumber ?? null,
+    email: client?.email ?? snapshot.email ?? null,
+    phone: client?.phone ?? snapshot.phone ?? null,
   };
 }
 

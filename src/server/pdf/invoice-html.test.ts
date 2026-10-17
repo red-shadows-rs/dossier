@@ -283,5 +283,35 @@ describe("renderInvoiceHtml — multi-page pagination and branding", () => {
     expect(html).toContain('class="brand-name"');
     expect(html).toContain("RED SHADOWS");
   });
+
+  it("renders buyer email and phone in the bill-to section when present", () => {
+    const html = renderInvoiceHtml(
+      input({
+        buyer: {
+          nameAr: "شركة النور",
+          nameEn: "Al-Noor Co.",
+          email: "billing@alnoor.example.com",
+          phone: "+966512345678",
+        },
+      }),
+    );
+    expect(html).toContain("billing@alnoor.example.com");
+    expect(html).toContain("+966512345678");
+  });
+
+  it("renders buyer email and phone in the receipt received-from section when present", () => {
+    const html = renderReceiptHtml(
+      input({
+        buyer: {
+          nameAr: "شركة النور",
+          nameEn: "Al-Noor Co.",
+          email: "billing@alnoor.example.com",
+          phone: "+966512345678",
+        },
+      }),
+    );
+    expect(html).toContain("billing@alnoor.example.com");
+    expect(html).toContain("+966512345678");
+  });
 });
 

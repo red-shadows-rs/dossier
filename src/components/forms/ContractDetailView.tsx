@@ -604,6 +604,16 @@ export function ContractDetailView({
                           : client.nameEn || client.nameAr) ?? ""}
                       </span>
                     </Link>
+                    {client.email ? (
+                      <span className="text-xs text-muted-foreground font-mono" dir="ltr">
+                        {client.email}
+                      </span>
+                    ) : null}
+                    {client.phone ? (
+                      <span className="text-xs text-muted-foreground font-mono" dir="ltr">
+                        {client.phone}
+                      </span>
+                    ) : null}
                   </div>
                 ) : null}
 

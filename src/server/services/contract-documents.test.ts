@@ -170,6 +170,45 @@ describe("buildContractHtml", () => {
     expect(html).not.toContain('class="watermark"');
     expect(html).toContain("UNSIGNED");
   });
+
+  it("renders client email and phone in the contract parties block", async () => {
+    const clientId = newId();
+    const now = nowMs();
+    db.insert(clients)
+      .values({
+        id: clientId,
+        type: "company",
+        nameAr: "عميل بريد",
+        nameEn: "Mail Client",
+        email: "client.test@example.com",
+        phone: "+966555123456",
+        preferredLanguage: "ar",
+        createdAt: now,
+        updatedAt: now,
+      })
+      .run();
+    const pid = newId();
+    db.insert(projects)
+      .values({
+        id: pid,
+        code: "P-0002",
+        clientId,
+        nameAr: "مشروع 2",
+        nameEn: "Project 2",
+        currency: "SAR",
+        createdAt: now,
+        updatedAt: now,
+      })
+      .run();
+    const cid = createContractFromTemplate(
+      user,
+      { projectId: pid, templateId: templateId("web-development") },
+      META,
+    );
+    const html = await buildContractHtml(cid, "bilingual", "preview");
+    expect(html).toContain("client.test@example.com");
+    expect(html).toContain("+966555123456");
+  });
 });
 
 describe("resolveContractPdf", () => {

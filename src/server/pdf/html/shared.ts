@@ -889,10 +889,20 @@ export function renderPartiesBlock(
     legalName: string | null | undefined,
     crNumber: string | null | undefined,
     taxNumber: string | null | undefined,
+    email: string | null | undefined,
+    phone: string | null | undefined,
     address: string | null | undefined,
-    extraLabel: string,
-    extraValue: string | null | undefined,
-    labels: { legal: string; cr: string; tax: string; addr: string },
+    repLabel: string,
+    repName: string | null | undefined,
+    repTitle: string | null | undefined,
+    labels: {
+      legal: string;
+      cr: string;
+      tax: string;
+      email: string;
+      phone: string;
+      addr: string;
+    },
   ): string {
     const lines: string[] = [];
     if (legalName)
@@ -907,14 +917,24 @@ export function renderPartiesBlock(
       lines.push(
         `<span class="party-lbl">${esc(labels.tax)}:</span> <span class="party-val">${esc(taxNumber)}</span>`,
       );
+    if (email)
+      lines.push(
+        `<span class="party-lbl">${esc(labels.email)}:</span> <span class="party-val" dir="ltr">${esc(email)}</span>`,
+      );
+    if (phone)
+      lines.push(
+        `<span class="party-lbl">${esc(labels.phone)}:</span> <span class="party-val" dir="ltr">${esc(phone)}</span>`,
+      );
     if (address)
       lines.push(
         `<span class="party-lbl">${esc(labels.addr)}:</span> <span class="party-val">${esc(address)}</span>`,
       );
-    if (extraValue)
+    if (repName) {
+      const fullRep = repTitle ? `${repName} (${repTitle})` : repName;
       lines.push(
-        `<span class="party-lbl">${esc(extraLabel)}:</span> <span class="party-val">${esc(extraValue)}</span>`,
+        `<span class="party-lbl">${esc(repLabel)}:</span> <span class="party-val">${esc(fullRep)}</span>`,
       );
+    }
     return `
       <div class="party-box">
         <div class="party-role">${esc(roleTitle)}</div>
@@ -930,10 +950,20 @@ export function renderPartiesBlock(
     p.legalNameEn,
     p.crNumber,
     p.taxNumber,
-    p.addressEn,
-    "Email",
     p.email,
-    { legal: "Legal Name", cr: "CR", tax: "VAT", addr: "Address" },
+    p.phone,
+    p.addressEn,
+    "Rep",
+    null,
+    null,
+    {
+      legal: "Legal Name",
+      cr: "CR",
+      tax: "VAT",
+      email: "Email",
+      phone: "Phone",
+      addr: "Address",
+    },
   );
   const enClient = partyHtml(
     "Second Party (Client)",
@@ -941,10 +971,20 @@ export function renderPartiesBlock(
     c.legalNameEn,
     c.crNumber,
     c.taxNumber,
+    c.email,
+    c.phone,
     c.addressEn,
     "Rep",
     c.repNameEn,
-    { legal: "Legal Name", cr: "CR", tax: "VAT", addr: "Address" },
+    c.repTitleEn,
+    {
+      legal: "Legal Name",
+      cr: "CR",
+      tax: "VAT",
+      email: "Email",
+      phone: "Phone",
+      addr: "Address",
+    },
   );
 
   const arProvider = partyHtml(
@@ -953,13 +993,18 @@ export function renderPartiesBlock(
     p.legalNameAr,
     p.crNumber,
     p.taxNumber,
-    p.addressAr,
-    "البريد",
     p.email,
+    p.phone,
+    p.addressAr,
+    "الممثل",
+    null,
+    null,
     {
       legal: "الاسم القانوني",
       cr: "س.ت",
       tax: "الرقم الضريبي",
+      email: "البريد",
+      phone: "الهاتف",
       addr: "العنوان",
     },
   );
@@ -969,13 +1014,18 @@ export function renderPartiesBlock(
     c.legalNameAr,
     c.crNumber,
     c.taxNumber,
+    c.email,
+    c.phone,
     c.addressAr,
     "الممثل",
     c.repNameAr,
+    c.repTitleAr,
     {
       legal: "الاسم القانوني",
       cr: "س.ت",
       tax: "الرقم الضريبي",
+      email: "البريد",
+      phone: "الهاتف",
       addr: "العنوان",
     },
   );
