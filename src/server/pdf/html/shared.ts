@@ -642,29 +642,49 @@ li {
 
 /* Unsigned Note */
 .unsigned-card {
-  margin: 4mm 0;
-  background: #fff1f2;
-  border: 0.35mm solid #fecdd3;
+  margin: 3.5mm 0 2mm;
+  background: #fafafa;
+  border: 0.3mm solid #e4e4e7;
+  border-inline-start: 1mm solid #be123c;
   border-radius: 2mm;
-  padding: 2.5mm 3.5mm;
-  text-align: center;
+  padding: 2.2mm 3.5mm;
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+  box-sizing: border-box;
   break-inside: avoid;
+  page-break-inside: avoid;
 }
 .unsigned-badge {
-  display: inline-block;
-  background: #e11d48;
-  color: #ffffff;
-  font-weight: 800;
-  font-size: 7.2pt;
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5mm;
+  background: #fff1f2;
+  color: #be123c;
+  border: 0.25mm solid #fecdd3;
+  border-radius: 1mm;
   padding: 0.6mm 2.2mm;
-  border-radius: 1.5mm;
-  margin: 0 1mm;
+  font-size: 7pt;
+  font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.unsigned-dot {
+  width: 1.6mm;
+  height: 1.6mm;
+  border-radius: 50%;
+  background: #e11d48;
+  display: inline-block;
+  box-shadow: 0 0 1.5mm rgba(225, 29, 72, 0.4);
 }
 .unsigned-desc {
-  margin: 1mm 0 0;
-  font-size: 7pt;
-  color: #9f1239;
+  margin: 0;
+  font-size: 7.2pt;
+  color: #52525b;
+  line-height: 1.45;
+  font-weight: 500;
 }
 
 /* Verification */

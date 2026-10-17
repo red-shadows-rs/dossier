@@ -522,13 +522,13 @@ export function renderContractHtml(input: ContractHtmlInput): string {
 
   const unsignedNote =
     mode === "unsigned"
-      ? `<div class="unsigned-card"><span class="unsigned-badge">${
+      ? `<div class="unsigned-card"><span class="unsigned-badge"><span class="unsigned-dot"></span>${
           lang === "en" ? "UNSIGNED" : "غير موقع"
-        }</span><p class="unsigned-desc">${
+        }</span><span class="unsigned-desc">${
           lang === "en"
             ? "This contract document is currently unsigned and has no legal validity until fully executed by all parties."
             : "هذا العقد غير موقع حالياً ولا يعد نافذاً أو معتمداً حتى يتم توقيعه رسمياً من جميع الأطراف."
-        }</p></div>`
+        }</span></div>`
       : "";
 
   const footerHtml = renderContractFooter(input);

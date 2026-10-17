@@ -255,7 +255,7 @@ export function SendContractDialog({
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
                 disabled={pending}
-                placeholder="اسم ممثل العميل (اختياري)"
+                placeholder={languageMode === "ar" ? "اسم العميل أو ممثله" : "Client or representative name"}
               />
             </Field>
 

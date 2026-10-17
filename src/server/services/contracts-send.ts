@@ -207,6 +207,13 @@ export function sendContract(
         ? input.clientSignatoryName.trim()
         : fallbackClientName;
 
+    const resolvedClientTitle =
+      input.clientSignatoryTitle && input.clientSignatoryTitle.trim().length > 0
+        ? input.clientSignatoryTitle.trim()
+        : clientRecord?.type === "individual"
+          ? (current.languageMode === "en" ? "Client" : "العميل")
+          : (current.languageMode === "en" ? clientRecord?.repTitleEn : clientRecord?.repTitleAr) || null;
+
     const snapshot = buildContractSnapshot(contractId, [
       {
         role: "provider",
@@ -217,7 +224,7 @@ export function sendContract(
       {
         role: "client",
         name: resolvedClientName,
-        title: input.clientSignatoryTitle ?? null,
+        title: resolvedClientTitle,
         email: input.clientSignatoryEmail,
       },
     ]);
@@ -281,7 +288,7 @@ export function sendContract(
         versionId,
         role: "client",
         name: resolvedClientName,
-        title: input.clientSignatoryTitle ?? null,
+        title: resolvedClientTitle,
         email: input.clientSignatoryEmail,
         sortOrder: 1,
         status: "pending",

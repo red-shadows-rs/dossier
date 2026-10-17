@@ -154,7 +154,10 @@ export default async function ContractEditPage({
     clientRow?.nameEn ??
     "";
   const clientTitle =
-    (locale === "ar" ? clientRow?.repTitleAr : clientRow?.repTitleEn) ?? "";
+    (locale === "ar" ? clientRow?.repTitleAr : clientRow?.repTitleEn) ||
+    (clientRow?.type === "individual"
+      ? (locale === "ar" ? "العميل" : "Client")
+      : "");
   const signers = listCompanySigners().map((signer) => ({
     id: signer.id,
     name: signer.name,

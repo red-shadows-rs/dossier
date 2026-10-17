@@ -128,14 +128,26 @@ export async function buildContractHtml(
         .all();
 
   const isArabic = lang === "ar";
+  const isIndividual =
+    snapshot.client.type === "individual" || !snapshot.client.repNameAr;
+
   const defaultProviderName =
     (isArabic ? snapshot.provider.nameAr : snapshot.provider.nameEn) ||
     (isArabic ? "المفوض بالتوقيع" : "Authorized Signatory");
+
   const defaultClientName =
     (isArabic
       ? snapshot.client.repNameAr || snapshot.client.nameAr
       : snapshot.client.repNameEn || snapshot.client.nameEn) ||
-    (isArabic ? "ممثل العميل" : "Client Representative");
+    (isArabic
+      ? isIndividual ? "العميل" : "ممثل العميل"
+      : isIndividual ? "Client" : "Client Representative");
+
+  const defaultClientTitle =
+    (isArabic ? snapshot.client.repTitleAr : snapshot.client.repTitleEn) ||
+    (isIndividual
+      ? isArabic ? "العميل" : "Client"
+      : isArabic ? "ممثل العميل" : "Client Representative");
 
   const signatures: SignatureRender[] =
     signatoryRows.length > 0
@@ -158,9 +170,13 @@ export async function buildContractHtml(
                 ? isArabic
                   ? "المفوض بالتوقيع"
                   : "Authorized Signatory"
-                : isArabic
-                  ? "ممثل العميل"
-                  : "Client Representative";
+                : defaultClientTitle;
+          } else if (
+            s.role === "client" &&
+            isIndividual &&
+            (resolvedTitle === "ممثل العميل" || resolvedTitle === "Client Representative")
+          ) {
+            resolvedTitle = isArabic ? "العميل" : "Client";
           }
           return {
             role: s.role,
@@ -184,9 +200,7 @@ export async function buildContractHtml(
                 ? isArabic
                   ? "المفوض بالتوقيع"
                   : "Authorized Signatory"
-                : isArabic
-                  ? "ممثل العميل"
-                  : "Client Representative"),
+                : defaultClientTitle),
             signedAtMs: null,
             method: null,
             imageDataUri: null,
@@ -205,7 +219,7 @@ export async function buildContractHtml(
             {
               role: "client" as const,
               name: defaultClientName,
-              title: isArabic ? "ممثل العميل" : "Client Representative",
+              title: defaultClientTitle,
               signedAtMs: null,
               method: null,
               imageDataUri: null,
