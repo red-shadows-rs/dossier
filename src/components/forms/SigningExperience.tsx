@@ -1,8 +1,22 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
-import { useTranslations } from "next-intl";
-import { Ban, Check, CheckCheck, PenTool, Send, Type, XCircle } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import {
+  AlertCircle,
+  Ban,
+  Check,
+  CheckCheck,
+  CheckCircle2,
+  KeyRound,
+  Mail,
+  PenTool,
+  RotateCcw,
+  Send,
+  Type,
+  XCircle,
+} from "lucide-react";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Field } from "@/components/ui/Field";
@@ -30,6 +44,7 @@ export function SigningExperience({
   otpVerified: boolean;
   consentText: string;
 }) {
+  const locale = useLocale();
   const t = useTranslations("signing");
   const tr = useTranslations();
   const padRef = useRef<SignaturePadHandle>(null);
@@ -158,47 +173,116 @@ export function SigningExperience({
 
   if (requiresOtp && !otpVerified) {
     return (
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-base font-semibold text-foreground">
-            {t("otpTitle")}
-          </h2>
-          <p className="text-sm text-muted-foreground">{t("otpHint")}</p>
+      <div className="flex flex-col gap-5">
+        {/* Card Header with Icon and Badge */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/40 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0">
+              <Mail className="h-5 w-5" />
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <h2 className="text-base font-semibold text-foreground">
+                {t("otpTitle")}
+              </h2>
+              <p className="text-xs text-muted-foreground">{t("otpHint")}</p>
+            </div>
+          </div>
+          <Badge tone={otpSent ? "green" : "blue"}>
+            {otpSent
+              ? locale === "ar"
+                ? "تم إرسال الرمز"
+                : "Code Sent"
+              : locale === "ar"
+                ? "تحقق أمني"
+                : "Security Check"}
+          </Badge>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="secondary" onClick={requestOtp} loading={pending} className="gap-2">
-            <Send className="h-4 w-4" />
-            {otpSent ? t("resendCode") : t("sendCode")}
-          </Button>
-          {otpSent ? (
-            <span className="self-center text-sm font-medium text-emerald-600 dark:text-emerald-400">
-              {t("codeSent")}
-            </span>
+
+        {/* State Banner */}
+        {!otpSent ? (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-border/80 bg-muted/30 p-3.5">
+            <div className="flex items-center gap-2.5 text-xs text-muted-foreground">
+              <KeyRound className="h-4 w-4 text-primary shrink-0" />
+              <span>
+                {locale === "ar"
+                  ? "انقر على زر الإرسال لاستلام رمز تحقق لمرة واحدة على بريدك الإلكتروني المسجل."
+                  : "Click send to receive your one-time 6-digit verification code via email."}
+              </span>
+            </div>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={requestOtp}
+              loading={pending}
+              className="gap-2 shrink-0 font-semibold"
+            >
+              <Send className="h-4 w-4" />
+              <span>{t("sendCode")}</span>
+            </Button>
+          </div>
+        ) : (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+              <span>
+                {locale === "ar"
+                  ? "تم إرسال رمز التحقق إلى بريدك الإلكتروني بنجاح. يرجى إدخال الرمز أدناه."
+                  : "Verification code sent to your email. Please enter it below."}
+              </span>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={requestOtp}
+              loading={pending}
+              className="gap-1.5 shrink-0 text-xs text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 cursor-pointer"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span>{t("resendCode")}</span>
+            </Button>
+          </div>
+        )}
+
+        {/* Verification Form */}
+        <form onSubmit={verifyOtp} noValidate className="flex flex-col gap-4 max-w-md">
+          <div className="flex flex-col sm:flex-row items-end gap-3">
+            <Field label={t("code")} htmlFor="otp-code" className="flex-1 w-full" required>
+              <Input
+                id="otp-code"
+                value={code}
+                onChange={(event) => setCode(event.target.value)}
+                inputMode="numeric"
+                dir="ltr"
+                maxLength={6}
+                placeholder="123456"
+                className="font-mono text-center tracking-widest text-lg h-11"
+                disabled={pending}
+                autoComplete="one-time-code"
+                autoFocus={otpSent}
+              />
+            </Field>
+            <Button
+              type="submit"
+              loading={pending}
+              disabled={pending || !code.trim()}
+              className="w-full sm:w-auto h-11 px-6 gap-2 shrink-0 font-semibold"
+            >
+              <Check className="h-4 w-4" />
+              <span>{t("verify")}</span>
+            </Button>
+          </div>
+
+          {error ? (
+            <div
+              role="alert"
+              className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-xs font-medium text-destructive"
+            >
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <span>{error}</span>
+            </div>
           ) : null}
-        </div>
-        <form onSubmit={verifyOtp} noValidate className="flex items-end gap-2">
-          <Field label={t("code")} htmlFor="otp-code" className="flex-1">
-            <Input
-              id="otp-code"
-              value={code}
-              onChange={(event) => setCode(event.target.value)}
-              inputMode="numeric"
-              dir="ltr"
-              maxLength={6}
-              className="text-start tracking-widest font-mono text-base"
-              disabled={pending}
-            />
-          </Field>
-          <Button type="submit" loading={pending} className="gap-2">
-            <Check className="h-4 w-4" />
-            {t("verify")}
-          </Button>
         </form>
-        {error ? (
-          <p role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
-        ) : null}
       </div>
     );
   }
@@ -283,9 +367,13 @@ export function SigningExperience({
       />
 
       {error ? (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
+        <div
+          role="alert"
+          className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-xs font-medium text-destructive"
+        >
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          <span>{error}</span>
+        </div>
       ) : null}
 
       <div className="flex flex-wrap justify-between gap-2">

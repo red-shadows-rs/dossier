@@ -140,7 +140,7 @@ export default async function SigningPage({
         {/* Main Content Area */}
         <main
           dir={dir}
-          className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8"
+          className="flex w-full flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8"
         >
           {/* Document Header Card */}
           <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5 sm:p-6 shadow-xs">
