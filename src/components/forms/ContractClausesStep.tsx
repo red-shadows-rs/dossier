@@ -153,7 +153,7 @@ export function ContractClausesStep({
   const generalError = Object.values(fieldErrors)[0];
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-6">
+    <form onSubmit={onSubmit} className="flex flex-col gap-6 pb-28">
       <Card>
         {/* Card Header & Controls Toolbar */}
         <CardHeader className="flex flex-col gap-4 pb-3">

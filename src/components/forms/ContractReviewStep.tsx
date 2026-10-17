@@ -157,7 +157,7 @@ export function ContractReviewStep({
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 pb-28">
       {/* Issues / Health Validation Card */}
       <Card>
         <CardHeader className="pb-3">

@@ -172,7 +172,7 @@ export function ContractScheduleStep({
   const isPercentComplete = mode === "percent" && Math.round(sum) === 100;
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-6">
+    <form onSubmit={onSubmit} className="flex flex-col gap-6 pb-28">
       <Card>
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-3">
           <div className="flex items-center gap-2.5">

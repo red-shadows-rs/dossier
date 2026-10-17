@@ -99,7 +99,7 @@ export function ContractBasicsStep({
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-6">
+    <form onSubmit={onSubmit} className="flex flex-col gap-6 pb-28">
       {/* 1. General Info & Regional Settings */}
       <Card>
         <CardHeader>

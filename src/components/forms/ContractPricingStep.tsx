@@ -186,7 +186,7 @@ export function ContractPricingStep({
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-6">
+    <form onSubmit={onSubmit} className="flex flex-col gap-6 pb-28">
       {/* Items Section */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-3">
