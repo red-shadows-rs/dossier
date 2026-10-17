@@ -157,7 +157,7 @@ export const SignaturePad = forwardRef<
     <div className="flex flex-col gap-2.5">
       <div
         ref={containerRef}
-        className="group relative h-44 w-full overflow-hidden rounded-xl border border-border/80 bg-slate-50 dark:bg-slate-100 shadow-inner select-none"
+        className="group relative h-44 w-full overflow-hidden rounded-xl border border-border/90 bg-white dark:bg-slate-50/95 ring-1 ring-border/80 dark:ring-white/10 shadow-2xs select-none"
       >
         <canvas
           ref={canvasRef}
@@ -165,8 +165,8 @@ export const SignaturePad = forwardRef<
         />
 
         <div className="pointer-events-none absolute bottom-8 inset-x-6 flex items-center gap-2 text-slate-400/80">
-          <span className="font-serif text-sm font-bold text-slate-500">✕</span>
-          <div className="h-px flex-1 border-b border-dashed border-slate-300 dark:border-slate-400" />
+          <span className="font-serif text-sm font-bold text-slate-400 select-none">✕</span>
+          <div className="h-px flex-1 border-b border-dashed border-slate-300" />
         </div>
 
         {!hasStartedDrawing && points === 0 ? (
