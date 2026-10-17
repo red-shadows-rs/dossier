@@ -196,7 +196,7 @@
     "tooLong": "Value is too long",
     "tooShort": "Value is too short",
     "discountExceedsSubtotal": "Discount exceeds subtotal",
-    "milestonesSumMismatch": "Milestones do not sum to net total",
+    "milestonesSumMismatch": "Milestones do not sum to contract total",
     "invalidCredentials": "Invalid email or password",
     "emailInUse": "Email is already in use"
   },

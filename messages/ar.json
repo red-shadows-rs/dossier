@@ -196,7 +196,7 @@
     "tooLong": "النص طويل جدا",
     "tooShort": "النص قصير جدا",
     "discountExceedsSubtotal": "الخصم يتجاوز المجموع الفرعي",
-    "milestonesSumMismatch": "مجموع الدفعات لا يطابق الصافي",
+    "milestonesSumMismatch": "مجموع الدفعات لا يطابق إجمالي العقد",
     "invalidCredentials": "بيانات الدخول غير صحيحة",
     "emailInUse": "البريد الإلكتروني مستخدم بالفعل"
   },

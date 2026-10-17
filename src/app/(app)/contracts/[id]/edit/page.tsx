@@ -119,7 +119,10 @@ export default async function ContractEditPage({
       titleAr: m.titleAr,
       titleEn: m.titleEn,
       percentBp: m.percentBp,
-      amountMinor: m.amountMinor,
+      amountMinor:
+        detail.contract.milestoneMode === "fixed" && m.totalMinor !== null
+          ? m.totalMinor
+          : m.amountMinor,
       dueDate: m.dueDate,
       triggerNoteAr: m.triggerNoteAr,
       triggerNoteEn: m.triggerNoteEn,
@@ -136,6 +139,8 @@ export default async function ContractEditPage({
       value: detail.contract.discountValue,
     },
     taxRateBp: detail.contract.taxRateBp,
+    netMinor: detail.contract.netMinor,
+    totalMinor: detail.contract.totalMinor,
     preset: defaults?.milestonePreset ?? null,
   };
 

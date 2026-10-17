@@ -52,6 +52,8 @@ export function ContractScheduleStep({
   mode: initialMode,
   initial,
   preset,
+  netMinor,
+  totalMinor,
   onSaved,
   onPrev,
   onNext,
@@ -61,6 +63,8 @@ export function ContractScheduleStep({
   mode: "percent" | "fixed";
   initial: BuilderMilestone[];
   preset: BuilderPreset;
+  netMinor?: number;
+  totalMinor?: number;
   onSaved: () => void;
   onPrev?: () => void;
   onNext?: () => void;
@@ -180,20 +184,18 @@ export function ContractScheduleStep({
             <span>{t("contracts.builder.scheduleTitle")}</span>
           </CardTitle>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <Field label="" className="mb-0">
-              <Select
-                id="cb-sched-mode"
-                value={mode}
-                onChange={(event) =>
-                  setMode(event.target.value as "percent" | "fixed")
-                }
-                className="w-40 text-xs font-semibold"
-              >
-                <option value="percent">{t("contracts.mode.percent")}</option>
-                <option value="fixed">{t("contracts.mode.fixed")}</option>
-              </Select>
-            </Field>
+          <div className="flex items-center gap-2 shrink-0">
+            <Select
+              id="cb-sched-mode"
+              value={mode}
+              onChange={(event) =>
+                setMode(event.target.value as "percent" | "fixed")
+              }
+              className="h-8 w-36 text-xs font-medium"
+            >
+              <option value="percent">{t("contracts.mode.percent")}</option>
+              <option value="fixed">{t("contracts.mode.fixed")}</option>
+            </Select>
 
             {preset ? (
               <Button
@@ -201,7 +203,7 @@ export function ContractScheduleStep({
                 variant="outline"
                 size="sm"
                 onClick={resetToPreset}
-                className="gap-1.5 text-xs"
+                className="h-8 gap-1.5 text-xs font-medium"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
                 <span>{t("contracts.resetToPreset")}</span>
@@ -241,13 +243,38 @@ export function ContractScheduleStep({
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-between text-xs font-medium">
-                <span className="text-muted-foreground">
-                  {t("contracts.milestone.sum")}:
-                </span>
-                <span className="font-mono font-bold text-foreground">
-                  {formatMoney(sum, currencyCode, "en")}
-                </span>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between text-xs font-medium">
+                  <span className="text-muted-foreground">
+                    {t("contracts.milestone.sum")}:
+                  </span>
+                  <span
+                    className={cn(
+                      "font-mono font-bold",
+                      totalMinor && (sum === totalMinor || (netMinor && sum === netMinor))
+                        ? "text-primary"
+                        : "text-foreground",
+                    )}
+                  >
+                    {formatMoney(sum, currencyCode, "en")}
+                    {totalMinor ? ` / ${formatMoney(totalMinor, currencyCode, "en")}` : ""}
+                  </span>
+                </div>
+                {totalMinor && totalMinor > 0 ? (
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                    <div
+                      className={cn(
+                        "h-full transition-all duration-300",
+                        sum === totalMinor || (netMinor && sum === netMinor)
+                          ? "bg-primary"
+                          : "bg-primary/50",
+                      )}
+                      style={{
+                        width: `${Math.min(100, Math.max(0, Math.round((sum / totalMinor) * 100)))}%`,
+                      }}
+                    />
+                  </div>
+                ) : null}
               </div>
             )}
           </div>

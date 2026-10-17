@@ -74,7 +74,8 @@ export function validateMilestones(input: MilestonePlanInput): string[] {
       }
       sum += row.amountMinor;
     }
-    if (sum !== input.net) issues.push(SUM_MISMATCH);
+    const total = input.net + input.tax;
+    if (sum !== input.net && sum !== total) issues.push(SUM_MISMATCH);
   }
   return issues;
 }
@@ -99,17 +100,34 @@ export function planMilestones(input: MilestonePlanInput): PlannedMilestone[] {
   }
 
   let amounts: number[];
+  let taxes: number[];
+  let totals: number[];
   let percents: (number | null)[];
+
   if (input.mode === "percent") {
     const bps = input.rows.map((row) => row.percentBp as number);
     amounts = allocateByBp(input.net, bps);
+    taxes = allocateProportional(input.tax, amounts);
+    totals = amounts.map((a, i) => a + taxes[i]);
     percents = bps;
   } else {
-    amounts = input.rows.map((row) => row.amountMinor as number);
+    const rawAmounts = input.rows.map((row) => row.amountMinor as number);
+    const sum = rawAmounts.reduce((a, b) => a + b, 0);
+    const total = input.net + input.tax;
+
+    if (input.tax > 0 && sum === total) {
+      // User entered total (gross) milestone amounts matching contract total
+      totals = rawAmounts;
+      amounts = allocateProportional(input.net, totals);
+      taxes = totals.map((tot, i) => tot - amounts[i]);
+    } else {
+      // User entered net milestone amounts
+      amounts = rawAmounts;
+      taxes = allocateProportional(input.tax, amounts);
+      totals = amounts.map((a, i) => a + taxes[i]);
+    }
     percents = input.rows.map(() => null);
   }
-
-  const taxes = allocateProportional(input.tax, amounts);
 
   const plan = input.rows.map((row, index) => ({
     position: index + 1,
@@ -118,7 +136,7 @@ export function planMilestones(input: MilestonePlanInput): PlannedMilestone[] {
     percentBp: percents[index],
     amountMinor: amounts[index],
     taxMinor: taxes[index],
-    totalMinor: amounts[index] + taxes[index],
+    totalMinor: totals[index],
     dueDate: row.dueDate ?? null,
     triggerNoteAr: row.triggerNoteAr ?? null,
     triggerNoteEn: row.triggerNoteEn ?? null,

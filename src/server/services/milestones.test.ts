@@ -102,6 +102,24 @@ describe("planMilestones fixed mode", () => {
     expect(plan.reduce((acc, m) => acc + m.totalMinor, 0)).toBe(1_150_001);
   });
 
+  it("accepts amounts summing to total (gross) and allocates net and tax proportionally", () => {
+    const plan = planMilestones({
+      net: 32609,
+      tax: 4891,
+      mode: "fixed",
+      rows: [
+        row({ amountMinor: 10000 }),
+        row({ amountMinor: 10000 }),
+        row({ amountMinor: 10000 }),
+        row({ amountMinor: 7500 }),
+      ],
+    });
+    expect(plan.map((m) => m.totalMinor)).toEqual([10000, 10000, 10000, 7500]);
+    expect(plan.reduce((acc, m) => acc + m.amountMinor, 0)).toBe(32609);
+    expect(plan.reduce((acc, m) => acc + m.taxMinor, 0)).toBe(4891);
+    expect(plan.reduce((acc, m) => acc + m.totalMinor, 0)).toBe(37500);
+  });
+
   it("throws milestonesSumMismatch when amounts do not sum to net", () => {
     try {
       planMilestones({

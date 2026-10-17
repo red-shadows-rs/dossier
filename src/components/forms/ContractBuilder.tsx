@@ -20,7 +20,7 @@ import { ContractReviewStep, type SendContext } from "./ContractReviewStep";
 import type { Issue } from "@/lib/validation/issues";
 
 export type BuilderBasics = {
-  languageMode: "ar" | "en" | "bilingual";
+  languageMode: "ar" | "en";
   titleAr: string;
   titleEn: string;
   scopeAr: string;
@@ -88,6 +88,8 @@ export type BuilderDetail = {
   clauses: BuilderClause[];
   discount: { type: "none" | "percent" | "fixed"; value: number };
   taxRateBp: number;
+  netMinor?: number;
+  totalMinor?: number;
   preset: BuilderPreset;
 };
 
@@ -266,6 +268,8 @@ export function ContractBuilder({
           mode={detail.basics.milestoneMode}
           initial={detail.milestones}
           preset={detail.preset}
+          netMinor={detail.netMinor}
+          totalMinor={detail.totalMinor}
           onSaved={refresh}
           onPrev={goPrevFromSchedule}
           onNext={goNextFromSchedule}
