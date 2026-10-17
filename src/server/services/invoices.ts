@@ -714,7 +714,7 @@ export function voidInvoice(
 
 export function localeForInvoice(
   mode: "ar" | "en",
-  preferredLanguage: Locale,
+  _preferredLanguage: Locale,
 ): Locale {
   return mode === "en" ? "en" : "ar";
 }

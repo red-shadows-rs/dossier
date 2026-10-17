@@ -214,6 +214,6 @@ describe("resolveContractPdf", () => {
 
   it("throws VALIDATION_FAILED for an invalid language", async () => {
     const id = createContract("web-development");
-    await expect(resolveContractPdf(id, "invalid" as any)).rejects.toThrow(AppError);
+    await expect(resolveContractPdf(id, "invalid" as unknown as "ar")).rejects.toThrow(AppError);
   });
 });

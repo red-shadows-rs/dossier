@@ -4,7 +4,6 @@ import { db } from "@/db";
 import {
   clients,
   contracts,
-  invoices,
   paymentMilestones,
   projects,
 } from "@/db/schema";

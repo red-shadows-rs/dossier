@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
@@ -85,9 +86,11 @@ export default async function VerifyCodePage({
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="flex items-center gap-1.5 sm:gap-2 border-s border-border/60 ps-2.5 sm:ps-4">
-              <img
+              <Image
                 src="/red-shadows-logo.png"
                 alt="RED SHADOWS"
+                width={24}
+                height={24}
                 className="h-5 sm:h-6 w-auto shrink-0"
               />
               <span className="text-xs sm:text-sm font-bold tracking-tight text-foreground font-mono whitespace-nowrap" dir="ltr">

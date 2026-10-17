@@ -426,8 +426,11 @@ export function paginateContractClauses(
   );
 
   if (lastPageClauseMm + FOOTER_MM > lastPageBudget && pages[pages.length - 1].length > 1) {
-    const popped = pages[pages.length - 1].pop()!;
-    pages.push([popped]);
+    const lastPage = pages[pages.length - 1];
+    const popped = lastPage.pop();
+    if (popped) {
+      pages.push([popped]);
+    }
   }
 
   return { pages, separateFooterPage: false };

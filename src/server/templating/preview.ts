@@ -17,7 +17,7 @@ import {
   renderScopeBlock,
   type Block,
 } from "./render-body";
-import { buildVariableMap, type ContractSnapshotV1 } from "./variables";
+import { type ContractSnapshotV1 } from "./variables";
 
 const SPECIAL_LABELS: Record<string, string> = {
   parties: "{{block.parties}}",
@@ -133,7 +133,7 @@ export async function renderTemplatePreviewHtml(
 ): Promise<string> {
   const docLang: DocLang = lang === "en" ? "en" : "ar";
 
-  let company: any = null;
+  let company: ReturnType<typeof getSettings<"company">> | null = null;
   try {
     company = getSettings("company");
   } catch {
