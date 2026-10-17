@@ -60,25 +60,18 @@ export function NewContractForm({
       {statusError ? (
         <p
           role="alert"
-          className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-xs font-semibold text-destructive"
+          className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-xs font-semibold text-destructive"
         >
           {statusError}
         </p>
       ) : null}
 
       <Card>
-        <CardHeader className="flex flex-row items-center gap-2.5 pb-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <FileSignature className="h-4 w-4" />
-          </div>
-          <div>
-            <CardTitle className="text-base font-semibold">
-              {t("contracts.newTitle")}
-            </CardTitle>
-            <p className="text-xs text-muted-foreground">
-              اختر المشروع والقالب القانوني لتهيئة مسودة العقد
-            </p>
-          </div>
+        <CardHeader>
+          <CardTitle className="inline-flex items-center gap-2">
+            <FileSignature size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("contracts.newTitle")}</span>
+          </CardTitle>
         </CardHeader>
 
         <CardContent className="flex flex-col gap-6">

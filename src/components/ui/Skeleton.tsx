@@ -769,68 +769,132 @@ export function FormSkeleton({ fieldsCount = 6 }: { fieldsCount?: number }) {
 export function DashboardSkeleton() {
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+        <div className="flex items-center gap-3.5">
           <Skeleton className="h-10 w-10 rounded shrink-0" />
-          <div className="flex flex-col gap-1.5">
-            <Skeleton className="h-7 w-44" />
-            <Skeleton className="h-3.5 w-60" />
+          <div className="flex flex-col gap-1">
+            <Skeleton className="h-7 w-36 sm:w-48 rounded" />
+            <Skeleton className="h-3.5 w-56 sm:w-72 rounded" />
           </div>
         </div>
-        <Skeleton className="h-9 w-32 rounded" />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 md:gap-4">
-        {Array.from({ length: 6 }).map((_, i) => (
+      {/* Finance Section */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2 pt-2">
+          <Skeleton className="h-4 w-4 rounded" />
+          <Skeleton className="h-3.5 w-20 rounded" />
+        </div>
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex flex-col justify-between rounded border border-border/80 bg-card p-3 sm:p-4 h-24 sm:h-28"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <Skeleton className="h-3 w-16 sm:w-20 rounded" />
+                <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded shrink-0" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <Skeleton className="h-6 w-24 sm:w-28 rounded" />
+                <Skeleton className="h-3 w-28 sm:w-36 rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Operations Section */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2 pt-2">
+          <Skeleton className="h-4 w-4 rounded" />
+          <Skeleton className="h-3.5 w-24 rounded" />
+        </div>
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex flex-col justify-between rounded border border-border/80 bg-card p-3 sm:p-4 h-24 sm:h-28"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <Skeleton className="h-3 w-16 sm:w-20 rounded" />
+                <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded shrink-0" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <Skeleton className="h-6 w-16 sm:w-20 rounded" />
+                <Skeleton className="h-3 w-28 sm:w-32 rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Monthly Activity Chart */}
+      <div className="rounded border border-border/80 bg-card p-4 sm:p-5 flex flex-col gap-4">
+        <div className="flex items-center gap-2 pb-3 border-b border-border/40">
+          <Skeleton className="h-7 w-7 rounded" />
+          <Skeleton className="h-4 w-32 rounded" />
+        </div>
+        <div className="h-56 flex items-end gap-3 pt-4">
+          {Array.from({ length: 12 }).map((_, idx) => (
+            <Skeleton
+              key={idx}
+              className="flex-1 rounded-t-sm"
+              style={{ height: `${20 + ((idx * 13) % 70)}%` }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Donut Charts */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {Array.from({ length: 2 }).map((_, i) => (
           <div
             key={i}
-            className="h-32 rounded border border-border bg-card p-4 flex flex-col justify-between"
+            className="rounded border border-border/80 bg-card p-4 sm:p-5 flex flex-col gap-4"
           >
-            <div className="flex items-center justify-between">
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-7 w-7 rounded" />
+            <div className="flex items-center justify-between pb-3 border-b border-border/40">
+              <Skeleton className="h-4 w-32 rounded" />
+              <Skeleton className="h-4 w-16 rounded" />
             </div>
-            <div className="flex flex-col gap-1.5">
-              <Skeleton className="h-7 w-24" />
-              <Skeleton className="h-3 w-28" />
+            <div className="flex items-center justify-center py-6">
+              <Skeleton className="h-36 w-36 rounded-full" />
             </div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="h-64 rounded border border-border bg-card p-4 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-5 w-32" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-          <div className="flex-1 flex items-end gap-3 pt-4">
-            {Array.from({ length: 8 }).map((_, idx) => (
-              <Skeleton
-                key={idx}
-                className="flex-1 rounded-t-md"
-                style={{ height: `${25 + ((idx * 17) % 65)}%` }}
-              />
-            ))}
-          </div>
+      {/* Attention Section */}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-2 pt-2">
+          <Skeleton className="h-4 w-4 rounded" />
+          <Skeleton className="h-3.5 w-20 rounded" />
         </div>
-        <div className="h-64 rounded border border-border bg-card p-4 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-5 w-36" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-          <div className="flex flex-col gap-3 flex-1 justify-center">
-            {Array.from({ length: 4 }).map((_, idx) => (
-              <div key={idx} className="flex flex-col gap-1">
-                <div className="flex justify-between">
-                  <Skeleton className="h-3 w-20" />
-                  <Skeleton className="h-3 w-12" />
-                </div>
-                <Skeleton className="h-2.5 w-full rounded-full" />
+
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className="overflow-hidden rounded border border-border/80 bg-card shadow-xs"
+          >
+            <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-4 rounded" />
+                <Skeleton className="h-4 w-36 rounded" />
               </div>
-            ))}
+              <Skeleton className="h-5 w-12 rounded" />
+            </div>
+            <div className="divide-y divide-border/60 px-4">
+              {Array.from({ length: 3 }).map((_, j) => (
+                <div key={j} className="flex items-center justify-between py-3 gap-4">
+                  <Skeleton className="h-4 w-28 rounded" />
+                  <Skeleton className="h-4 w-36 rounded hidden sm:block" />
+                  <Skeleton className="h-4 w-20 rounded" />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );

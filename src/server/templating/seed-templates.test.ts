@@ -5,10 +5,13 @@ import { validateTemplateClauses } from "./validate";
 import { ALLOWED_VARIABLES } from "./variables";
 
 describe("seed templates", () => {
-  it("defines the four system templates", () => {
+  it("defines the seven system templates", () => {
     expect(TEMPLATES.map((t) => t.key).sort()).toEqual([
+      "api-integrations",
       "automation-bot-development",
-      "maintenance-support",
+      "desktop-development",
+      "devops-infrastructure",
+      "mobile-development",
       "nda",
       "web-development",
     ]);

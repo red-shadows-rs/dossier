@@ -211,7 +211,7 @@ export function ContractPricingStep({
             {rows.map((row, index) => (
               <div
                 key={index}
-                className="group relative grid grid-cols-1 gap-3 rounded-xl border border-border/80 bg-card p-3.5 shadow-2xs transition-all hover:border-border hover:shadow-xs md:grid-cols-12 md:items-start"
+                className="group relative grid grid-cols-1 gap-3 rounded-md border border-border/80 bg-card p-3.5 shadow-2xs transition-all hover:border-border hover:shadow-xs md:grid-cols-12 md:items-start"
               >
                 <div className="flex items-center justify-between md:hidden pb-1">
                   <span className="text-xs font-bold text-muted-foreground font-mono">
@@ -410,7 +410,7 @@ export function ContractPricingStep({
           </div>
 
           {/* Breakdown Card Column */}
-          <div className="rounded-xl border border-border/80 bg-muted/30 p-4 lg:col-span-5">
+          <div className="rounded-md border border-border/80 bg-muted/30 p-4 lg:col-span-5">
             {totals ? (
               <div className="flex flex-col gap-2.5">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">

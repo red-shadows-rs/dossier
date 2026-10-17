@@ -40,11 +40,25 @@ export default async function VerifyPage({
     <NextIntlClientProvider locale={locale} messages={messages}>
       <div className="flex min-h-dvh flex-col bg-background">
         {/* Navigation Header */}
-        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border/60 bg-background/80 px-4 py-3 sm:px-8 backdrop-blur">
-          <Logo />
-          <div className="flex items-center gap-2">
-            <ThemeSwitch current={theme} />
-            <LocaleSwitch />
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-2 sm:gap-3 border-b border-border/60 bg-background/80 px-3 py-2.5 sm:px-8 sm:py-3 backdrop-blur">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Logo />
+          </div>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-1.5 sm:gap-2 border-s border-border/60 ps-2.5 sm:ps-4">
+              <img
+                src="/red-shadows-logo.png"
+                alt="RED SHADOWS"
+                className="h-5 sm:h-6 w-auto shrink-0"
+              />
+              <span className="text-xs sm:text-sm font-bold tracking-tight text-foreground font-mono whitespace-nowrap" dir="ltr">
+                RED SHADOWS
+              </span>
+            </div>
+            <div className="flex items-center gap-1 sm:gap-1.5 border-s border-border/60 ps-2 sm:ps-3">
+              <ThemeSwitch current={theme} />
+              <LocaleSwitch />
+            </div>
           </div>
         </header>
 
@@ -53,7 +67,7 @@ export default async function VerifyPage({
           <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
             {/* Hero Header */}
             <div className="flex flex-col items-center text-center gap-2.5">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-8 ring-primary/5">
+              <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-primary/10 text-primary ring-4 ring-primary/5">
                 <ShieldCheck className="h-7 w-7" />
               </div>
               <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -61,8 +75,8 @@ export default async function VerifyPage({
               </h1>
               <p className="text-sm text-muted-foreground max-w-md">
                 {locale === "ar"
-                  ? "تحقق من صحة الفواتير والعقود الصادرة ومطابقتها للسجلات الرسمية المشفرة."
-                  : "Verify the authenticity and integrity of issued invoices and contracts against cryptographic records."}
+                  ? "التحقق من صحة وموثوقية العقود والفواتير الصادرة."
+                  : "Verify the authenticity of issued invoices and contracts."}
               </p>
             </div>
 

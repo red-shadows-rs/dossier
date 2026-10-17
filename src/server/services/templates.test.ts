@@ -8,12 +8,12 @@ import { AppError } from "@/lib/errors";
 import { getTemplate, listTemplates, seedSystemTemplates } from "./templates";
 
 describe("seedSystemTemplates", () => {
-  it("seeds all four system templates with their clauses", () => {
+  it("seeds all seven system templates with their clauses", () => {
     const result = seedSystemTemplates();
-    expect(result).toEqual({ inserted: 4, updated: 0, skipped: 0 });
+    expect(result).toEqual({ inserted: 7, updated: 0, skipped: 0 });
 
     const { rows } = listTemplates();
-    expect(rows).toHaveLength(4);
+    expect(rows).toHaveLength(7);
     for (const row of rows) {
       expect(row.isSystem).toBe(true);
       expect(row.clauseCount).toBeGreaterThan(0);
@@ -31,7 +31,7 @@ describe("seedSystemTemplates", () => {
     const firstClauseCount = db.select().from(templateClauses).all().length;
 
     const second = seedSystemTemplates();
-    expect(second).toEqual({ inserted: 0, updated: 4, skipped: 0 });
+    expect(second).toEqual({ inserted: 0, updated: 7, skipped: 0 });
 
     const after = db
       .select()
@@ -56,12 +56,12 @@ describe("seedSystemTemplates", () => {
     if (!web) return;
     const { template, clauses } = getTemplate(web.id);
     expect(template.key).toBe("web-development");
-    expect(clauses.length).toBe(21);
+    expect(clauses.length).toBe(15);
     expect(clauses.map((c) => c.position)).toEqual(
-      Array.from({ length: 21 }, (_, i) => i + 1),
+      Array.from({ length: 15 }, (_, i) => i + 1),
     );
     expect(clauses[0].key).toBe("parties");
-    expect(clauses[20].key).toBe("signatures");
+    expect(clauses[14].key).toBe("signatures");
   });
 
   it("throws NOT_FOUND for a missing template", () => {
@@ -88,7 +88,7 @@ describe("seedSystemTemplates", () => {
 
     const result = seedSystemTemplates();
     expect(result.skipped).toBe(1);
-    expect(result.inserted).toBe(3);
+    expect(result.inserted).toBe(6);
 
     const kept = db
       .select()

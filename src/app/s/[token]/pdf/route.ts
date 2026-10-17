@@ -29,6 +29,8 @@ export async function GET(
         : await renderPdf(source.html, {
             docNumber: source.docNumber,
             code: null,
+            kind: "contract",
+            lang: source.lang,
           });
 
     const headers = new Headers({

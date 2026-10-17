@@ -161,9 +161,9 @@ export default async function InvoicesPage({
       <Card className="overflow-visible">
         <CardContent className="p-3 sm:p-4 overflow-visible">
           <form method="get" className="flex flex-col gap-2.5">
-            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-              <div className="flex flex-1 items-center gap-2 min-w-[240px]">
-                <div className="relative flex-1">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <div className="flex flex-1 items-center gap-1.5 sm:gap-2">
+                <div className="relative flex-1 min-w-0">
                   <Input
                     id="invoices-q"
                     name="q"
@@ -183,12 +183,11 @@ export default async function InvoicesPage({
                 <Button
                   type="submit"
                   variant="secondary"
-                  className="shrink-0 gap-1.5 h-10 px-4 border-border/80 font-medium"
+                  className="shrink-0 gap-1.5 h-10 px-3 sm:px-4 border-border/80 font-medium"
                 >
                   <Search size={15} aria-hidden="true" />
-                  <span>{tc("search")}</span>
+                  <span className="hidden sm:inline">{tc("search")}</span>
                 </Button>
-              </div>
 
               <FilterDropdown
                 label={tc("filter")}
@@ -304,6 +303,7 @@ export default async function InvoicesPage({
                 </Link>
               ) : null}
             </div>
+          </div>
 
             {hasActiveFilters ? (
               <div className="flex flex-wrap items-center gap-1.5 border-t border-border/40 pt-2.5 text-xs text-muted-foreground">

@@ -150,34 +150,36 @@ export function InvoiceDocumentViewer({
       {loading ? (
         <DocumentSkeleton />
       ) : html ? (
-        <iframe
-          title={t("summary")}
-          sandbox="allow-same-origin"
-          srcDoc={html}
-          scrolling="no"
-          onLoad={(e) => {
-            try {
-              const frame = e.currentTarget;
-              if (frame.contentDocument?.documentElement) {
-                const doc = frame.contentDocument;
-                if (doc.body) {
-                  doc.body.style.overflow = "hidden";
+        <div className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin] rounded-md border border-border bg-white shadow-2xs">
+          <iframe
+            title={t("summary")}
+            sandbox="allow-same-origin"
+            srcDoc={html}
+            scrolling="no"
+            onLoad={(e) => {
+              try {
+                const frame = e.currentTarget;
+                if (frame.contentDocument?.documentElement) {
+                  const doc = frame.contentDocument;
+                  if (doc.body) {
+                    doc.body.style.overflow = "hidden";
+                  }
+                  const h = Math.max(
+                    doc.documentElement.scrollHeight,
+                    doc.body?.scrollHeight ?? 0,
+                    doc.documentElement.offsetHeight,
+                  );
+                  if (h > 400) {
+                    setIframeHeight(h);
+                  }
                 }
-                const h = Math.max(
-                  doc.documentElement.scrollHeight,
-                  doc.body?.scrollHeight ?? 0,
-                  doc.documentElement.offsetHeight,
-                );
-                if (h > 400) {
-                  setIframeHeight(h);
-                }
+              } catch {
               }
-            } catch {
-            }
-          }}
-          style={{ height: `${iframeHeight}px` }}
-          className="w-full rounded-md border border-border bg-white transition-all duration-200 overflow-hidden"
-        />
+            }}
+            style={{ height: `${iframeHeight}px` }}
+            className="w-full min-w-[620px] sm:min-w-full border-0 bg-white transition-all duration-200 block"
+          />
+        </div>
       ) : (
         <div className="flex min-h-[44rem] items-center justify-center rounded-md border border-dashed border-border text-sm text-muted-foreground">
           {t("documentUnavailable")}

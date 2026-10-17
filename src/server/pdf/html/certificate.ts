@@ -56,7 +56,7 @@ export function renderCertificateSection(
   const statementEn =
     "This certificate summarizes the evidence recorded by Dossier when this document was signed electronically. The document hash above covers the exact content that was signed.";
   const statementAr =
-    "تلخص هذه الشهادة الأدلة التي سجلتها منصة Dossier عند توقيع هذا المستند إلكترونيا. ويغطي تجزئة المحتوى أعلاه المحتوى الموقع بالضبط.";
+    "توثق هذه الشهادة بيانات التوقيع الإلكتروني المسجلة في منصة Dossier، وتطابق البصمة الرقمية أعلاه محتوى المستند الموقع.";
 
   function infoTable(targetLang: "ar" | "en"): string {
     const isArabic = targetLang === "ar";

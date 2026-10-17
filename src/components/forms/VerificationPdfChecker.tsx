@@ -50,19 +50,7 @@ export function VerificationPdfChecker({ code }: { code: string }) {
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-sm">
-      <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <Upload className="h-4 w-4" />
-        </div>
-        <div>
-          <h3 className="text-sm font-semibold text-foreground">
-            {t("pdfTitle")}
-          </h3>
-          <p className="text-xs text-muted-foreground">{t("pdfHint")}</p>
-        </div>
-      </div>
-
+    <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-5 sm:p-6 shadow-sm">
       <form onSubmit={onCheckPdf} noValidate className="flex flex-col gap-3">
         <FileUpload
           label={t("pdfTitle")}

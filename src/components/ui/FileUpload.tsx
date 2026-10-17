@@ -122,7 +122,7 @@ export function FileUpload({
           }
         }}
         className={clsx(
-          "group relative flex flex-col items-center justify-center rounded-xl transition-all select-none overflow-hidden w-full h-40",
+          "group relative flex flex-col items-center justify-center rounded-lg transition-all select-none overflow-hidden w-full h-40",
           isImage && hasCurrent && imageSource
             ? "border border-border/80 bg-card/50 shadow-2xs cursor-default"
             : clsx(

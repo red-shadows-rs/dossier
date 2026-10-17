@@ -60,9 +60,9 @@ export default function RootError({
           aria-hidden="true"
         />
 
-        <div className="relative w-full max-w-lg rounded-2xl border border-border/70 bg-card/90 p-8 sm:p-10 shadow-2xl backdrop-blur-md">
+        <div className="relative w-full max-w-lg rounded-lg border border-border/70 bg-card/90 p-8 sm:p-10 shadow-2xl backdrop-blur-md">
           <div className="flex flex-col items-center text-center">
-            <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-500 ring-8 ring-rose-500/5 shadow-inner">
+            <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-lg bg-rose-500/10 text-rose-500 ring-4 ring-rose-500/5 shadow-inner">
               <AlertCircle size={32} strokeWidth={2.2} aria-hidden="true" />
             </div>
 
@@ -81,7 +81,7 @@ export default function RootError({
             </p>
 
             {error.digest ? (
-              <div className="mt-5 flex w-full max-w-xs items-center justify-between gap-2 rounded-xl border border-border/80 bg-muted/40 px-3.5 py-2 text-xs font-mono text-muted-foreground">
+              <div className="mt-5 flex w-full max-w-xs items-center justify-between gap-2 rounded-md border border-border/80 bg-muted/40 px-3.5 py-2 text-xs font-mono text-muted-foreground">
                 <span className="truncate">
                   <span className="text-muted-foreground/70">{t("errorReference")}: </span>
                   <span className="select-all font-semibold text-foreground tracking-wide">

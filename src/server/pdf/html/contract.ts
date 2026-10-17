@@ -12,10 +12,12 @@ import {
   type ContractSnapshotV1,
 } from "@/server/templating/variables";
 import { renderCertificateSection, type CertificateData } from "./certificate";
+import { renderCode39Svg } from "@/server/pdf/qr";
 import {
   docDir,
   documentShell,
   esc,
+  isRtl,
   num,
   renderPartiesBlock,
   renderPaymentScheduleBlock,
@@ -233,97 +235,308 @@ function renderClauseBilingual(
   return `<table class="bilingual-clause${clauseClass}"><tbody>${rows.join("")}</tbody></table>`;
 }
 
-function renderHeader(
+function renderHeroHeader(
   snapshot: ContractSnapshotV1,
   lang: DocLang,
   logoDataUri: string | null,
 ): string {
   const c = snapshot.contract;
   const p = snapshot.provider;
-  const isBilingual = lang === "bilingual";
-  const isArabic = lang === "ar";
+  const isRtlDoc = isRtl(lang);
   const docNumber = c.number ?? "DRAFT";
-  const issueDateFormatted = formatDateLong(c.issueDate, "en");
+  const uiLocale = lang === "ar" ? "ar" : "en";
+  const issueDateFormatted = c.issueDate
+    ? esc(formatDateLong(c.issueDate, uiLocale))
+    : "—";
+  const startDateFormatted = c.startDate
+    ? esc(formatDateLong(c.startDate, uiLocale))
+    : "—";
+  const endDateFormatted = c.endDate
+    ? esc(formatDateLong(c.endDate, uiLocale))
+    : "—";
 
-  const logoMarkup = logoDataUri
-    ? `<img class="header-logo" src="${esc(logoDataUri)}" alt="Logo" />`
+  const contractTitleAr = c.titleAr || c.titleEn || "عقد اتفاق";
+  const contractTitleEn = c.titleEn || c.titleAr || "CONTRACT AGREEMENT";
+
+  let titleHtml = "";
+  let subtitleHtml = "";
+  if (lang === "ar") {
+    titleHtml = esc(contractTitleAr);
+    subtitleHtml = "";
+  } else if (lang === "en") {
+    titleHtml = esc(contractTitleEn);
+    subtitleHtml = "";
+  } else {
+    // Bilingual: secondary language title if different from primary title
+    titleHtml = esc(contractTitleAr);
+    subtitleHtml =
+      contractTitleEn && contractTitleEn !== contractTitleAr
+        ? `<div class="sub-title">${esc(contractTitleEn)}</div>`
+        : "";
+  }
+
+  const providerName =
+    lang === "ar"
+      ? (p.nameAr || p.nameEn || "")
+      : (p.nameEn || p.nameAr || "");
+  const providerLegal =
+    lang === "ar"
+      ? (p.legalNameAr || p.legalNameEn || "")
+      : (p.legalNameEn || p.legalNameAr || "");
+  const address =
+    lang === "ar"
+      ? (p.addressAr || p.addressEn || "")
+      : (p.addressEn || p.addressAr || "");
+
+  const providerLines: string[] = [];
+  if (address) providerLines.push(`<div>${esc(address)}</div>`);
+  const contact: string[] = [];
+  if (p.phone) contact.push(`<span dir="ltr">${esc(p.phone)}</span>`);
+  if (p.email) contact.push(`<span dir="ltr">${esc(p.email)}</span>`);
+  if (contact.length > 0) providerLines.push(`<div>${contact.join(" · ")}</div>`);
+  const crVat: string[] = [];
+  if (p.crNumber) crVat.push(lang === "ar" ? `س.ت: ${esc(p.crNumber)}` : `CR: ${esc(p.crNumber)}`);
+  if (p.taxNumber) crVat.push(lang === "ar" ? `ض.ر: ${esc(p.taxNumber)}` : `VAT: ${esc(p.taxNumber)}`);
+  if (crVat.length > 0) providerLines.push(`<div>${crVat.join(" · ")}</div>`);
+
+  const brandSubHtml =
+    providerLegal && providerLegal !== providerName
+      ? `<div class="brand-sub">${esc(providerLegal)}</div>`
+      : "";
+
+  const brandMarkSvg = logoDataUri
+    ? `
+      <div class="brand-box">
+        <div class="brand-text-col">
+          <div class="brand-name">${esc(providerName)}</div>
+          ${brandSubHtml}
+        </div>
+        <div class="brand-logo-frame">
+          <img class="brand-logo-img" src="${esc(logoDataUri)}" alt="${esc(providerName)}" />
+        </div>
+      </div>
+    `
     : `
-      <div class="brand-logo-fallback">
-        <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
-          <polygon points="16,2 30,10 16,18 2,10" fill="#e11d48" />
-          <polygon points="2,10 16,18 16,30 2,22" fill="#9f1239" />
-          <polygon points="30,10 16,18 16,30 30,22" fill="#fb7185" />
-        </svg>
-        <span class="brand-title">${esc(p.nameEn || p.nameAr || "DOSSIER")}</span>
+      <div class="brand-box">
+        <div class="brand-text-col">
+          <div class="brand-name">${esc(providerName)}</div>
+          ${brandSubHtml}
+        </div>
+        <div class="brand-logo-frame">
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+            <polygon points="16,2 30,10 16,18 2,10" fill="#e11d48" />
+            <polygon points="2,10 16,18 16,30 2,22" fill="#9f1239" />
+            <polygon points="30,10 16,18 16,30 30,22" fill="#fb7185" />
+          </svg>
+        </div>
       </div>
     `;
 
-  if (isBilingual) {
-    return `
-      <header class="contract-hero-header">
-        <div class="header-top-bar">
-          <div class="header-logo-container">${logoMarkup}</div>
-          <div class="header-pills-container">
-            <span class="header-pill doc-number-pill"><span class="pill-lbl">NO:</span> ${esc(docNumber)}</span>
-            <span class="header-pill"><span class="pill-lbl">DATE:</span> ${esc(issueDateFormatted)}</span>
-            ${c.versionNo > 1 ? `<span class="header-pill"><span class="pill-lbl">VER:</span> v${c.versionNo}</span>` : ""}
-          </div>
-        </div>
+  const svgTransform = isRtlDoc
+    ? 'transform="scale(-1, 1) translate(-1000, 0)"'
+    : "";
 
-        <table class="bilingual-clause" style="margin: 0; border: none;">
+  const lblNo =
+    lang === "ar"
+      ? "رقم العقد"
+      : lang === "bilingual"
+        ? '<span dir="ltr">Contract No</span> / <span dir="rtl">رقم العقد</span>'
+        : "Contract No";
+  const lblIssue =
+    lang === "ar"
+      ? "تاريخ الإصدار"
+      : lang === "bilingual"
+        ? '<span dir="ltr">Issue date</span> / <span dir="rtl">تاريخ الإصدار</span>'
+        : "Issue Date";
+  const lblTerm =
+    lang === "ar"
+      ? "مدة العقد"
+      : lang === "bilingual"
+        ? '<span dir="ltr">Term</span> / <span dir="rtl">مدة العقد</span>'
+        : "Term";
+  const lblProject =
+    lang === "ar"
+      ? "المشروع"
+      : lang === "bilingual"
+        ? '<span dir="ltr">Project</span> / <span dir="rtl">المشروع</span>'
+        : "Project";
+
+  const projectTitle = `${snapshot.project.code} — ${
+    lang === "ar"
+      ? snapshot.project.nameAr || snapshot.project.nameEn || ""
+      : snapshot.project.nameEn || snapshot.project.nameAr || ""
+  }`;
+
+  const termDisplay =
+    c.startDate || c.endDate
+      ? `${startDateFormatted} → ${endDateFormatted}`
+      : "—";
+
+  return `
+  <header class="hero-header">
+    <svg class="hero-svg-bg" viewBox="0 0 1000 240" preserveAspectRatio="none" style="overflow: visible;">
+      <g ${svgTransform}>
+        <polygon points="415,-30 1050,-30 1050,195 370,195" fill="#14141a" />
+        <polygon points="370,195 470,195 370,260" fill="#9f1239" />
+        <polygon points="-50,-30 425,-30 370,195 370,260 -50,260" fill="#e11d48" />
+      </g>
+    </svg>
+
+    <div class="hero-content">
+      <div class="hero-red-box">
+        <div>
+          <div class="inv-main-title">${titleHtml}</div>
+          ${subtitleHtml}
+        </div>
+        <div class="seller-meta">
+          ${providerLines.join("")}
+        </div>
+      </div>
+
+      <div class="hero-dark-box">
+        <table class="meta-table">
           <tbody>
             <tr>
-              <td class="col-en divider" dir="ltr" style="width: 50%; vertical-align: top; border-bottom: none;">
-                <div class="doc-badge">LEGAL AGREEMENT</div>
-                <h1 class="contract-main-title">${esc(c.titleEn || c.titleAr || "Contract Agreement")}</h1>
-                <div class="contract-meta-sub">
-                  <span>Project: <strong>${esc(snapshot.project.code)}</strong> — ${esc(snapshot.project.nameEn || snapshot.project.nameAr || "")}</span>
-                </div>
-              </td>
-              <td class="col-ar" dir="rtl" style="width: 50%; vertical-align: top; border-bottom: none;">
-                <div class="doc-badge">عقد اتفاق قانوني</div>
-                <h1 class="contract-main-title">${esc(c.titleAr || c.titleEn || "عقد اتفاق")}</h1>
-                <div class="contract-meta-sub">
-                  <span>المشروع: <strong>${esc(snapshot.project.code)}</strong> — ${esc(snapshot.project.nameAr || snapshot.project.nameEn || "")}</span>
-                </div>
-              </td>
+              <td class="lbl">${lblNo}</td>
+              <td class="val"><span class="doc-number" dir="ltr">${esc(docNumber)}</span></td>
             </tr>
+            <tr>
+              <td class="lbl">${lblIssue}</td>
+              <td class="val-std">${issueDateFormatted}</td>
+            </tr>
+            <tr>
+              <td class="lbl">${lblTerm}</td>
+              <td class="val-std">${termDisplay}</td>
+            </tr>
+            <tr>
+              <td class="lbl">${lblProject}</td>
+              <td class="val-std">${esc(projectTitle)}</td>
+            </tr>
+            ${
+              c.versionNo > 1
+                ? `<tr><td class="lbl">v</td><td class="val-std">v${c.versionNo}</td></tr>`
+                : ""
+            }
           </tbody>
         </table>
-      </header>
+
+        ${brandMarkSvg}
+      </div>
+    </div>
+  </header>
+  `;
+}
+
+function renderContractFooter(input: ContractHtmlInput): string {
+  const { snapshot, lang, stampDataUri, verification } = input;
+  const c = snapshot.contract;
+
+  const thankYouText =
+    lang === "ar"
+      ? "شكرا لتعاملكم معنا."
+      : lang === "en"
+        ? "Thank you for your business."
+        : '<span dir="ltr">Thank you for your business.</span> / <span dir="rtl">شكرا لتعاملكم معنا.</span>';
+
+  const notesLines: string[] = [];
+  if (c.governingLawAr || c.governingLawEn) {
+    const govTitle =
+      lang === "ar"
+        ? "القانون الحاكم"
+        : lang === "en"
+          ? "Governing Law"
+          : "Governing Law / القانون الحاكم";
+    const govVal =
+      lang === "ar"
+        ? c.governingLawAr || c.governingLawEn
+        : lang === "en"
+          ? c.governingLawEn || c.governingLawAr
+          : `${c.governingLawEn || "—"} / ${c.governingLawAr || "—"}`;
+    notesLines.push(
+      `<div class="info-block"><h4>${govTitle}</h4><p>${esc(govVal ?? "")}</p></div>`,
+    );
+  }
+  if (c.jurisdictionAr || c.jurisdictionEn) {
+    const jurTitle =
+      lang === "ar"
+        ? "الاختصاص القضائي"
+        : lang === "en"
+          ? "Jurisdiction"
+          : "Jurisdiction / الاختصاص القضائي";
+    const jurVal =
+      lang === "ar"
+        ? c.jurisdictionAr || c.jurisdictionEn
+        : lang === "en"
+          ? c.jurisdictionEn || c.jurisdictionAr
+          : `${c.jurisdictionEn || "—"} / ${c.jurisdictionAr || "—"}`;
+    notesLines.push(
+      `<div class="info-block"><h4>${jurTitle}</h4><p>${esc(jurVal ?? "")}</p></div>`,
+    );
+  }
+
+  const stampTitle =
+    lang === "ar"
+      ? "الختم الرسمي"
+      : lang === "en"
+        ? "Official Stamp"
+        : "Official Stamp / الختم الرسمي";
+  const stampImg = stampDataUri
+    ? `<div class="sig-box"><img class="stamp-img" src="${esc(
+        stampDataUri,
+      )}" alt="Stamp" /><div class="sig-title">${stampTitle}</div></div>`
+    : "";
+
+  let verifyCardHtml = "";
+  if (verification) {
+    const docNumber = c.number ?? (c.id ? c.id.slice(0, 8) : "DRAFT");
+    const barcodeSvg = renderCode39Svg(docNumber);
+    const title =
+      lang === "ar"
+        ? "التحقق · باركود"
+        : lang === "en"
+          ? "Verification · Barcode"
+          : "Verification / التحقق · Barcode";
+    const genNote =
+      lang === "ar"
+        ? "تم إنشاء العقد عبر Dossier"
+        : lang === "en"
+          ? "Contract generated by Dossier"
+          : '<span dir="ltr">Contract generated by Dossier</span> / <span dir="rtl">تم إنشاء العقد عبر Dossier</span>';
+
+    verifyCardHtml = `
+      <div class="verify-card">
+        <div class="qr-frame">
+          <img class="qr" src="${esc(verification.qrDataUri)}" alt="QR Code" />
+        </div>
+        <div class="barcode-details">
+          <div class="verify-badge-title">${title}</div>
+          <div class="barcode-svg-container">${barcodeSvg}</div>
+          <div class="verify-code-str">${num(verification.code)}</div>
+          <div class="muted note-dossier" style="font-size: 6.8pt; color: #64748b;">${genNote}</div>
+        </div>
+      </div>
     `;
   }
 
-  const docBadgeText = isArabic ? "عقد اتفاق قانوني" : "LEGAL AGREEMENT";
-  const mainTitle = isArabic
-    ? esc(c.titleAr || c.titleEn || "عقد اتفاق")
-    : esc(c.titleEn || c.titleAr || "Contract Agreement");
-  const projectLabel = isArabic ? "المشروع" : "Project";
-  const projectName = isArabic
-    ? esc(snapshot.project.nameAr || snapshot.project.nameEn || "")
-    : esc(snapshot.project.nameEn || snapshot.project.nameAr || "");
-  const numLabel = isArabic ? "رقم العقد" : "NO";
-  const dateLabel = isArabic ? "التاريخ" : "DATE";
+  const footerSystemName = "Dossier";
 
   return `
-    <header class="contract-hero-header" dir="${docDir(lang)}">
-      <div class="header-top-bar">
-        <div class="header-logo-container">${logoMarkup}</div>
-        <div class="header-pills-container">
-          <span class="header-pill doc-number-pill"><span class="pill-lbl">${numLabel}:</span> ${esc(docNumber)}</span>
-          <span class="header-pill"><span class="pill-lbl">${dateLabel}:</span> ${esc(issueDateFormatted)}</span>
-          ${c.versionNo > 1 ? `<span class="header-pill"><span class="pill-lbl">v:</span> ${c.versionNo}</span>` : ""}
+    <div class="inv-footer-wrap">
+      <div class="inv-footer">
+        <div class="footer-info">
+          ${notesLines.join("")}
+          <div class="thank-you">${thankYouText}</div>
+        </div>
+        <div class="footer-verification">
+          ${verifyCardHtml}
+          ${stampImg}
         </div>
       </div>
-
-      <div class="contract-title-wrap">
-        <div class="doc-badge">${docBadgeText}</div>
-        <h1 class="contract-main-title">${mainTitle}</h1>
-        <div class="contract-meta-sub">
-          <span>${projectLabel}: <strong>${esc(snapshot.project.code)}</strong> — ${projectName}</span>
-        </div>
-      </div>
-    </header>
+    </div>
+    <div class="bottom-red-bar">
+      <span dir="ltr">${esc(footerSystemName)}</span>
+      <span class="page-num-display" dir="ltr">1 / 1</span>
+    </div>
   `;
 }
 
@@ -334,7 +547,7 @@ export function renderContractHtml(input: ContractHtmlInput): string {
   const watermark =
     mode === "draft" || mode === "preview" ? "DRAFT / مسودة" : null;
 
-  const header = renderHeader(snapshot, lang, input.logoDataUri);
+  const header = renderHeroHeader(snapshot, lang, input.logoDataUri);
 
   const clausesHtml = snapshot.clauses
     .map((clause) =>
@@ -360,32 +573,7 @@ export function renderContractHtml(input: ContractHtmlInput): string {
       ? `<div class="unsigned-card"><span class="unsigned-badge">UNSIGNED</span> <span class="unsigned-badge ar" dir="rtl">غير موقع</span><p class="unsigned-desc">This contract document is currently unsigned and has no legal validity until fully executed by all parties.</p></div>`
       : "";
 
-  const verificationBlock =
-    mode === "sealed" && input.verification
-      ? `<div class="verify">
-          <table style="width: 100%; border: none;">
-            <tbody>
-              <tr>
-                <td style="width: 30mm; vertical-align: middle; border: none; padding-inline-end: 4mm;">
-                  <img class="qr" src="${esc(input.verification.qrDataUri)}" alt="QR" />
-                </td>
-                <td style="vertical-align: middle; border: none;">
-                  <div class="verify-badge">CRYPTOGRAPHIC VERIFICATION</div>
-                  <p style="margin: 0 0 1.5mm;"><strong>Verification code / رمز التحقق:</strong> ${num(
-                    input.verification.code,
-                  )}</p>
-                  <p class="muted" dir="ltr" style="margin: 0 0 1.5mm;">${esc(
-                    input.verification.url,
-                  )}</p>
-                  <p class="hash" style="margin: 0;">SHA-256 (content): ${esc(
-                    input.certificate?.contentHash ?? "",
-                  )}</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>`
-      : "";
+  const footerHtml = renderContractFooter(input);
 
   const certificateHtml =
     mode === "sealed" && input.certificate
@@ -409,7 +597,7 @@ export function renderContractHtml(input: ContractHtmlInput): string {
     title,
     fonts: input.fonts,
     watermark,
-    body: `${header}${clausesHtml}${unsignedNote}${verificationBlock}${certificateHtml}`,
+    body: `<div class="contract-document">${header}<div class="contract-body">${clausesHtml}${unsignedNote}</div>${footerHtml}${certificateHtml}</div>`,
   });
 }
 

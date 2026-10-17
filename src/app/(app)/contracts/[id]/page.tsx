@@ -4,17 +4,17 @@ import { eq } from "drizzle-orm";
 import {
   Building2,
   Calendar,
-  Coins,
+  Clock,
   FileEdit,
   FileSignature,
   FileText,
   FolderKanban,
-  Globe,
   History,
   Layers,
+  ListOrdered,
   Receipt,
   ScrollText,
-  type LucideIcon,
+  Wallet,
 } from "lucide-react";
 import { db } from "@/db";
 import { clients, projects } from "@/db/schema";
@@ -51,35 +51,16 @@ import {
 } from "@/server/services/contracts";
 import { listContractSignatories } from "@/server/services/contracts-lifecycle";
 
-type SearchParams = Record<string, string | string[] | undefined>;
-
-const TABS = ["summary", "document", "signatures", "history"] as const;
-type Tab = (typeof TABS)[number];
-
-const TAB_ICONS = {
-  summary: ScrollText,
-  document: FileText,
-  signatures: FileSignature,
-  history: History,
-} as const;
-
 export default async function ContractDetailPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<SearchParams>;
 }) {
   await smoothLoading();
   const user = await requireUserPage();
   const t = await getTranslations("contracts");
   const tc = await getTranslations("common");
   const { id } = await params;
-  const sp = await searchParams;
-  const tabParam = Array.isArray(sp.tab) ? sp.tab[0] : sp.tab;
-  const tab: Tab = (TABS as readonly string[]).includes(tabParam ?? "")
-    ? (tabParam as Tab)
-    : "summary";
 
   let detail;
   try {
@@ -120,15 +101,11 @@ export default async function ContractDetailPage({
       ? (contract.titleAr ? "rtl" : "ltr")
       : (contract.titleEn ? "ltr" : "rtl");
 
-  const tabCounts: Record<Tab, number | null> = {
-    summary: null,
-    document: null,
-    signatures: signatories.length,
-    history: history.total,
-  };
+  const signedCount = signatories.filter((s) => s.status === "signed").length;
 
   return (
     <div className="flex flex-col gap-5 sm:gap-6">
+      {/* 1. Header Bar matching Invoices */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
         <div className="flex items-center gap-3.5">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
@@ -137,21 +114,41 @@ export default async function ContractDetailPage({
           <div className="flex flex-col gap-0.5">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                <span dir={contractDir}>
-                  {contractTitle}
-                </span>
+                {contract.number ?? (contractTitle !== "-" ? contractTitle : t("new"))}
               </h1>
               <Badge tone={contractStatusTone(contract.status)} className="translate-y-0.5">
                 {t(`status.${contract.status}`)}
               </Badge>
-              {contract.number ? (
-                <span className="inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground translate-y-0.5" dir="ltr">
-                  {contract.number}
+              {contract.number && contractTitle && contractTitle !== "-" ? (
+                <span className="text-sm font-medium text-muted-foreground translate-y-0.5">
+                  · <span dir={contractDir}>{contractTitle}</span>
+                </span>
+              ) : null}
+            </div>
+            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+              {contract.startDate ? (
+                <span className="inline-flex items-center gap-1">
+                  <Calendar className="h-3.5 w-3.5" />
+                  <span>{t("startDate")}:</span>
+                  <span dir="ltr" className="font-mono text-foreground">
+                    {contract.startDate}
+                  </span>
+                </span>
+              ) : null}
+              {contract.endDate ? (
+                <span className="inline-flex items-center gap-1">
+                  <Clock className="h-3.5 w-3.5" />
+                  <span>{t("endDate")}:</span>
+                  <span dir="ltr" className="font-mono text-foreground">
+                    {contract.endDate}
+                  </span>
                 </span>
               ) : null}
             </div>
           </div>
         </div>
+
+        {/* Header Action Buttons */}
         {contract.status === "draft" && canWrite ? (
           <div className="flex flex-wrap items-center gap-2">
             <Link href={`/contracts/${contract.id}/edit`}>
@@ -179,6 +176,7 @@ export default async function ContractDetailPage({
         )}
       </div>
 
+      {/* 2. Top Metric Cards Row matching Invoices */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="flex flex-col gap-1 rounded border border-border/80 bg-card p-3 shadow-xs">
           <span className="text-xs font-medium text-muted-foreground">{tc("total")}</span>
@@ -199,9 +197,9 @@ export default async function ContractDetailPage({
           </span>
         </div>
         <div className="flex flex-col gap-1 rounded border border-border/80 bg-card p-3 shadow-xs">
-          <span className="text-xs font-medium text-muted-foreground">{t("clauses")}</span>
+          <span className="text-xs font-medium text-muted-foreground">{t("signatories")}</span>
           <span className="text-lg font-bold font-mono tabular-nums text-foreground">
-            {clauses.length}
+            {signedCount} / {signatories.length}
           </span>
         </div>
       </div>
@@ -214,354 +212,471 @@ export default async function ContractDetailPage({
         />
       ) : null}
 
-      <nav className="flex gap-1 overflow-x-auto border-b border-border/60">
-        {TABS.map((value) => {
-          const Icon = TAB_ICONS[value];
-          const count = tabCounts[value];
-          return (
-            <Link
-              key={value}
-              href={`/contracts/${contract.id}?tab=${value}`}
-              aria-current={tab === value ? "page" : undefined}
-              className={cn(
-                "inline-flex items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium transition-colors",
-                tab === value
-                  ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground",
-              )}
-            >
-              <Icon size={16} aria-hidden="true" />
-              <span>{t(`tabs.${value}`)}</span>
-              {count !== null && count !== undefined ? (
-                <span
-                  className={cn(
-                    "rounded px-1.5 py-0.5 text-[11px] font-mono font-medium",
-                    tab === value
-                      ? "bg-primary/15 text-primary"
-                      : "bg-muted/60 text-muted-foreground",
-                  )}
-                >
-                  {count}
-                </span>
-              ) : null}
-            </Link>
-          );
-        })}
-      </nav>
-
-      {tab === "summary" ? (
-        <div className="flex flex-col gap-4">
+      {/* 3. Unified 12-Column Grid (8 cols main + 4 cols sidebar) identical to Invoices */}
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+        {/* Left Column (8 cols): Document Viewer & Content Sections */}
+        <div className="flex flex-col gap-6 lg:col-span-8">
+          {/* Document Viewer Card - Live Preview front and center */}
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
               <CardTitle className="inline-flex items-center gap-2">
-                <ScrollText size={18} className="text-primary" aria-hidden="true" />
-                <span>{t("summary")}</span>
+                <FileText size={18} className="text-primary" aria-hidden="true" />
+                <span>{t("document")}</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                <Row
-                  label={t("project")}
-                  icon={FolderKanban}
-                  value={
-                    (locale === "ar"
-                      ? project?.nameAr || project?.nameEn
-                      : project?.nameEn || project?.nameAr) ?? "-"
-                  }
-                />
-                <Row
-                  label={t("client")}
-                  icon={Building2}
-                  value={
-                    (locale === "ar"
-                      ? client?.nameAr || client?.nameEn
-                      : client?.nameEn || client?.nameAr) ?? "-"
-                  }
-                />
-                <Row
-                  label={t("languageMode")}
-                  icon={Globe}
-                  value={t(`languageModes.${contract.languageMode}`)}
-                />
-                <Row label={t("currency")} value={contract.currency} ltr icon={Coins} />
-                <Row
-                  label={t("hasFees")}
-                  icon={Receipt}
-                  value={contract.hasFees ? t("yes") : t("no")}
-                />
-                <Row label={t("items")} value={String(items.length)} ltr icon={FileText} />
-                <Row
-                  label={t("milestones")}
-                  value={String(milestones.length)}
-                  ltr
-                  icon={Layers}
-                />
-                <Row label={t("clauses")} value={String(clauses.length)} ltr icon={FileSignature} />
-                <Row
-                  label={t("startDate")}
-                  value={contract.startDate ?? "-"}
-                  ltr
-                  icon={Calendar}
-                />
-                <Row label={t("endDate")} value={contract.endDate ?? "-"} ltr icon={Calendar} />
-              </dl>
-              {contract.internalNotes ? (
-                <div className="flex flex-col gap-1 border-t border-border/40 pt-3">
-                  <span className="text-xs font-medium text-muted-foreground">{t("internalNotes")}</span>
-                  <p className="rounded border border-border/60 bg-muted/20 p-3 text-sm text-foreground whitespace-pre-wrap leading-relaxed">
-                    {contract.internalNotes}
-                  </p>
-                </div>
-              ) : null}
+              <ContractDocumentViewer
+                id={contract.id}
+                languageMode={contract.languageMode}
+                canDownload={can(user, "contracts.read")}
+              />
             </CardContent>
           </Card>
 
+          {/* Deliverables Table (if contract.hasFees and items exist) */}
+          {contract.hasFees && items.length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="inline-flex items-center gap-2">
+                  <ListOrdered size={18} className="text-primary" aria-hidden="true" />
+                  <span>{t("items")}</span>
+                  <span className="text-xs font-normal text-muted-foreground">
+                    ({items.length})
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto rounded border border-border">
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableHeaderCell>
+                          {locale === "ar" ? "الوصف" : "Description"}
+                        </TableHeaderCell>
+                        <TableHeaderCell className="text-end">
+                          {locale === "ar" ? "الكمية" : "Qty"}
+                        </TableHeaderCell>
+                        <TableHeaderCell className="text-end">
+                          {locale === "ar" ? "سعر الوحدة" : "Unit Price"}
+                        </TableHeaderCell>
+                        <TableHeaderCell className="text-end">
+                          {locale === "ar" ? "الإجمالي" : "Total"}
+                        </TableHeaderCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {items.map((item) => {
+                        const desc =
+                          locale === "ar"
+                            ? (item.descriptionAr ?? item.descriptionEn ?? "-")
+                            : (item.descriptionEn ?? item.descriptionAr ?? "-");
+                        return (
+                          <TableRow key={item.id}>
+                            <TableCell className="font-medium text-foreground">
+                              {desc}
+                            </TableCell>
+                            <TableCell className="text-end font-mono text-xs tabular-nums">
+                              {item.qtyMilli / 1000}
+                            </TableCell>
+                            <TableCell className="text-end font-mono text-xs tabular-nums">
+                              {formatMoney(item.unitPriceMinor, currency, locale)}
+                            </TableCell>
+                            <TableCell className="text-end font-semibold tabular-nums">
+                              {formatMoney(item.lineTotalMinor, currency, locale)}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          ) : null}
+
+          {/* Payment Milestones Table */}
+          {milestones.length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="inline-flex items-center gap-2">
+                  <Layers size={18} className="text-primary" aria-hidden="true" />
+                  <span>{t("milestones")}</span>
+                  <span className="text-xs font-normal text-muted-foreground">
+                    ({milestones.length})
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto rounded border border-border">
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableHeaderCell>
+                          {locale === "ar" ? "الدفعة / المرحلة" : "Milestone"}
+                        </TableHeaderCell>
+                        <TableHeaderCell className="text-end">
+                          {locale === "ar" ? "النسبة" : "%"}
+                        </TableHeaderCell>
+                        <TableHeaderCell className="text-end">
+                          {locale === "ar" ? "المبلغ" : "Amount"}
+                        </TableHeaderCell>
+                        <TableHeaderCell className="text-center">
+                          {locale === "ar" ? "الاستحقاق" : "Due Date"}
+                        </TableHeaderCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {milestones.map((m) => {
+                        const mTitle =
+                          locale === "ar"
+                            ? (m.titleAr || m.titleEn)
+                            : (m.titleEn || m.titleAr);
+                        const mTrigger =
+                          locale === "ar"
+                            ? m.triggerNoteAr || m.triggerNoteEn
+                            : m.triggerNoteEn || m.triggerNoteAr;
+                        return (
+                          <TableRow key={m.id}>
+                            <TableCell className="font-medium text-foreground">
+                              <span>{mTitle}</span>
+                              {mTrigger ? (
+                                <span className="block text-xs text-muted-foreground mt-0.5">
+                                  {mTrigger}
+                                </span>
+                              ) : null}
+                            </TableCell>
+                            <TableCell className="text-end font-mono text-xs tabular-nums">
+                              {m.percentBp !== null ? `${(m.percentBp / 100).toFixed(1)}%` : "—"}
+                            </TableCell>
+                            <TableCell className="text-end font-semibold tabular-nums">
+                              {formatMoney(m.amountMinor, currency, locale)}
+                            </TableCell>
+                            <TableCell className="text-center font-mono text-xs text-muted-foreground">
+                              {m.dueDate ?? "—"}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          ) : null}
+
+          {/* Clauses List */}
+          {clauses.length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="inline-flex items-center gap-2">
+                  <FileSignature size={18} className="text-primary" aria-hidden="true" />
+                  <span>{t("clauses")}</span>
+                  <span className="text-xs font-normal text-muted-foreground">
+                    ({clauses.length})
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {clauses.map((c) => {
+                  const clTitle =
+                    locale === "ar"
+                      ? (c.titleAr || c.titleEn)
+                      : (c.titleEn || c.titleAr);
+                  return (
+                    <div
+                      key={c.id}
+                      className="flex items-center gap-3 rounded-lg border border-border/70 bg-card p-3 transition-colors hover:border-primary/40"
+                    >
+                      <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-bold font-mono text-primary shrink-0">
+                        {locale === "ar" ? `المادة ${c.position}` : `Art. ${c.position}`}
+                      </span>
+                      <span className="text-sm font-semibold text-foreground">
+                        {clTitle}
+                      </span>
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          ) : null}
+
+          {/* Scope & Notes */}
+          {contract.internalNotes || contract.scopeAr || contract.scopeEn ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="inline-flex items-center gap-2">
+                  <ScrollText size={18} className="text-primary" aria-hidden="true" />
+                  <span>{t("internalNotes")}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4">
+                {contract.scopeAr ? (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs font-medium text-muted-foreground">{t("scopeAr")}</span>
+                    <p className="rounded border border-border/60 bg-muted/20 p-3 text-sm text-foreground whitespace-pre-wrap leading-relaxed" dir="rtl">
+                      {contract.scopeAr}
+                    </p>
+                  </div>
+                ) : null}
+                {contract.scopeEn ? (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs font-medium text-muted-foreground">{t("scopeEn")}</span>
+                    <p className="rounded border border-border/60 bg-muted/20 p-3 text-sm text-foreground whitespace-pre-wrap leading-relaxed" dir="ltr">
+                      {contract.scopeEn}
+                    </p>
+                  </div>
+                ) : null}
+                {contract.internalNotes ? (
+                  <div className="flex flex-col gap-1 border-t border-border/40 pt-3">
+                    <span className="text-xs font-medium text-muted-foreground">{t("internalNotes")}</span>
+                    <p className="rounded border border-border/60 bg-muted/20 p-3 text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+                      {contract.internalNotes}
+                    </p>
+                  </div>
+                ) : null}
+              </CardContent>
+            </Card>
+          ) : null}
+        </div>
+
+        {/* Right Column (4 cols): Financial Summary, Meta, Signatories, Audit */}
+        <div className="flex flex-col gap-6 lg:col-span-4">
+          {/* Summary Card identical to Invoices */}
           {contract.hasFees ? (
             <Card>
               <CardHeader>
                 <CardTitle className="inline-flex items-center gap-2">
-                  <Receipt size={18} className="text-primary" aria-hidden="true" />
-                  <span>{t("totalsTitle")}</span>
+                  <Wallet size={18} className="text-primary" aria-hidden="true" />
+                  <span>{t("summary")}</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <dl className="flex flex-col gap-1">
+              <CardContent className="flex flex-col gap-4">
+                {milestones.length > 0 ? (
+                  <div className="flex flex-col gap-2 rounded border border-border bg-surface p-3.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground">{t("milestones")}</span>
+                      <span className="font-semibold text-foreground">
+                        {milestones.length} {t("milestones")}
+                      </span>
+                    </div>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-border">
+                      <div
+                        className="h-full bg-primary transition-all duration-300"
+                        style={{
+                          width: `${Math.min(
+                            100,
+                            Math.max(
+                              0,
+                              Math.round(
+                                milestones.reduce(
+                                  (acc, m) => acc + (m.percentBp ?? 0),
+                                  0,
+                                ) / 100,
+                              ),
+                            ),
+                          )}%`,
+                        }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between border-t border-border/50 pt-2 text-xs">
+                      <span className="text-muted-foreground">{tc("total")}</span>
+                      <span className="font-bold text-foreground tabular-nums">
+                        {formatMoney(contract.totalMinor, currency, locale)}
+                      </span>
+                    </div>
+                  </div>
+                ) : null}
+
+                <dl className="flex flex-col gap-2 text-sm">
                   <Money
                     label={tc("subtotal")}
-                    value={formatMoney(contract.subtotalMinor, currency, user.locale)}
+                    value={formatMoney(contract.subtotalMinor, currency, locale)}
                   />
-                  <Money
-                    label={t("discountLabel")}
-                    value={formatMoney(contract.discountMinor, currency, user.locale)}
-                  />
+                  {contract.discountMinor > 0 ? (
+                    <Money
+                      label={t("discountLabel")}
+                      value={`-${formatMoney(contract.discountMinor, currency, locale)}`}
+                    />
+                  ) : null}
                   <Money
                     label={t("net")}
-                    value={formatMoney(contract.netMinor, currency, user.locale)}
+                    value={formatMoney(contract.netMinor, currency, locale)}
                   />
                   <Money
                     label={t("tax")}
-                    value={formatMoney(contract.taxMinor, currency, user.locale)}
+                    value={formatMoney(contract.taxMinor, currency, locale)}
                   />
+                  <div className="my-1 border-t border-border" />
                   <Money
                     label={tc("total")}
-                    value={formatMoney(contract.totalMinor, currency, user.locale)}
+                    value={formatMoney(contract.totalMinor, currency, locale)}
                     strong
                   />
                 </dl>
               </CardContent>
             </Card>
           ) : null}
-        </div>
-      ) : null}
 
-      {tab === "document" ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="inline-flex items-center gap-2">
-              <FileText size={18} className="text-primary" aria-hidden="true" />
-              <span>{t("document")}</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ContractDocumentViewer
-              id={contract.id}
-              languageMode={contract.languageMode}
-              canDownload={can(user, "contracts.read")}
-            />
-          </CardContent>
-        </Card>
-      ) : null}
+          {/* Project & Client Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="inline-flex items-center gap-2">
+                <FolderKanban size={18} className="text-primary" aria-hidden="true" />
+                <span>{t("contractData")}</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3">
+              {project ? (
+                <div className="flex flex-col gap-1 rounded-lg border border-border/70 bg-card p-3 transition-colors hover:border-primary/40">
+                  <span className="text-xs font-medium text-muted-foreground">{t("project")}</span>
+                  <Link
+                    href={`/projects/${project.id}`}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-foreground transition-colors hover:text-primary"
+                  >
+                    <FolderKanban className="h-4 w-4 text-primary/70 shrink-0" aria-hidden="true" />
+                    <span>
+                      {(locale === "ar"
+                        ? project.nameAr || project.nameEn
+                        : project.nameEn || project.nameAr) ?? project.code}
+                    </span>
+                    {project.code ? (
+                      <span className="font-mono text-xs text-muted-foreground font-normal" dir="ltr">
+                        ({project.code})
+                      </span>
+                    ) : null}
+                  </Link>
+                </div>
+              ) : null}
 
-      {tab === "signatures" ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="inline-flex items-center gap-2">
-              <FileSignature size={18} className="text-primary" aria-hidden="true" />
-              <span>{t("tabs.signatures")}</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {signatories.length === 0 ? (
-              <EmptyState title={t("signatures.empty")} />
-            ) : (
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableHeaderCell>{t("signatures.role")}</TableHeaderCell>
-                    <TableHeaderCell>{t("signatures.name")}</TableHeaderCell>
-                    <TableHeaderCell>{t("signatures.status")}</TableHeaderCell>
-                    <TableHeaderCell>{t("signatures.viewedAt")}</TableHeaderCell>
-                    <TableHeaderCell>{t("signatures.otpAt")}</TableHeaderCell>
-                    <TableHeaderCell>{t("signatures.signedAt")}</TableHeaderCell>
-                    <TableHeaderCell>{t("signatures.method")}</TableHeaderCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
+              {client ? (
+                <div className="flex flex-col gap-1 rounded-lg border border-border/70 bg-card p-3 transition-colors hover:border-primary/40">
+                  <span className="text-xs font-medium text-muted-foreground">{t("client")}</span>
+                  <Link
+                    href={`/clients/${client.id}`}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-foreground transition-colors hover:text-primary"
+                  >
+                    <Building2 className="h-4 w-4 text-primary/70 shrink-0" aria-hidden="true" />
+                    <span>
+                      {(locale === "ar"
+                        ? client.nameAr || client.nameEn
+                        : client.nameEn || client.nameAr) ?? ""}
+                    </span>
+                  </Link>
+                </div>
+              ) : null}
+
+              <div className="flex items-center justify-between px-1 text-xs text-muted-foreground">
+                <span>{t("currency")}</span>
+                <span className="font-mono font-semibold text-foreground">{contract.currency}</span>
+              </div>
+              <div className="flex items-center justify-between px-1 text-xs text-muted-foreground">
+                <span>{t("languageMode")}</span>
+                <span className="font-semibold text-foreground">{t(`languageModes.${contract.languageMode}`)}</span>
+              </div>
+              <div className="flex items-center justify-between px-1 text-xs text-muted-foreground">
+                <span>{t("startDate")}</span>
+                <span className="font-semibold text-foreground">{contract.startDate ?? "—"}</span>
+              </div>
+              <div className="flex items-center justify-between px-1 text-xs text-muted-foreground">
+                <span>{t("endDate")}</span>
+                <span className="font-semibold text-foreground">{contract.endDate ?? "—"}</span>
+              </div>
+              {contract.signingDeadline ? (
+                <div className="flex items-center justify-between px-1 text-xs text-muted-foreground">
+                  <span>{t("signingDeadline")}</span>
+                  <span className="font-semibold text-foreground">{contract.signingDeadline}</span>
+                </div>
+              ) : null}
+            </CardContent>
+          </Card>
+
+          {/* Signatories Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="inline-flex items-center gap-2">
+                <FileSignature size={18} className="text-primary" aria-hidden="true" />
+                <span>{t("signatoriesTitle")}</span>
+                <span className="text-xs font-normal text-muted-foreground">
+                  ({signedCount}/{signatories.length})
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {signatories.length === 0 ? (
+                <EmptyState title={t("signatures.empty")} />
+              ) : (
+                <div className="flex flex-col gap-2.5">
                   {signatories.map((sig) => (
-                    <TableRow key={sig.id}>
-                      <TableCell>{t(`signatures.roles.${sig.role}`)}</TableCell>
-                      <TableCell>
-                        <span className="block">{sig.name}</span>
-                        {sig.title ? (
-                          <span className="block text-xs text-muted-foreground">
-                            {sig.title}
-                          </span>
-                        ) : null}
-                        {sig.status === "declined" && sig.declineReason ? (
-                          <span className="block text-xs text-destructive">
-                            {t("signatures.reason")}: {sig.declineReason}
-                          </span>
-                        ) : null}
-                      </TableCell>
-                      <TableCell>
+                    <div
+                      key={sig.id}
+                      className="flex flex-col gap-1.5 rounded-lg border border-border/70 bg-card p-3 text-xs transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-foreground">{sig.name}</span>
                         <Badge
                           tone={sig.status === "signed" ? "green" : sig.status === "declined" ? "red" : "gray"}
                         >
                           {t(`signatures.statusLabel.${sig.status}`)}
                         </Badge>
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap">
-                        {sig.viewedAt
-                          ? formatInstant(sig.viewedAt, "UTC", locale)
-                          : t("signatures.dash")}
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap">
-                        {sig.otpVerifiedAt
-                          ? formatInstant(sig.otpVerifiedAt, "UTC", locale)
-                          : t("signatures.dash")}
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap">
-                        {sig.signedAt
-                          ? formatInstant(sig.signedAt, "UTC", locale)
-                          : t("signatures.dash")}
-                      </TableCell>
-                      <TableCell>
-                        {sig.signatureMethod
-                          ? t(`signatures.methodLabel.${sig.signatureMethod}`)
-                          : t("signatures.dash")}
-                      </TableCell>
-                    </TableRow>
+                      </div>
+                      <div className="flex items-center justify-between text-muted-foreground">
+                        <span>{t(`signatures.roles.${sig.role}`)}</span>
+                        {sig.title ? <span>{sig.title}</span> : null}
+                      </div>
+                      {sig.signedAt ? (
+                        <div className="flex items-center justify-between text-[11px] text-muted-foreground pt-1 border-t border-border/40">
+                          <span>{t("signatures.signedAt")}</span>
+                          <span className="font-mono">{formatInstant(sig.signedAt, "UTC", locale)}</span>
+                        </div>
+                      ) : null}
+                      {sig.status === "declined" && sig.declineReason ? (
+                        <p className="text-xs text-destructive pt-1 border-t border-border/40">
+                          {t("signatures.reason")}: {sig.declineReason}
+                        </p>
+                      ) : null}
+                    </div>
                   ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
-      ) : null}
-
-      {tab === "history" ? (
-        <div className="flex flex-col gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="inline-flex items-center gap-2">
-                <Layers size={18} className="text-primary" aria-hidden="true" />
-                <span>{t("history.versions")}</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {versions.length === 0 ? (
-                <EmptyState title={t("history.noVersions")} />
-              ) : (
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableHeaderCell>{t("history.version")}</TableHeaderCell>
-                      <TableHeaderCell>{t("history.hash")}</TableHeaderCell>
-                      <TableHeaderCell>
-                        {t("history.createdAt")}
-                      </TableHeaderCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {versions.map((version) => (
-                      <TableRow key={version.id}>
-                        <TableCell className="tabular-nums font-mono">{version.versionNo}</TableCell>
-                        <TableCell className="font-mono text-xs">
-                          {version.contentHash.slice(0, 16)}…
-                        </TableCell>
-                        <TableCell>
-                          {formatInstant(version.createdAt, "UTC", locale)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                </div>
               )}
             </CardContent>
           </Card>
 
+          {/* Audit Trail & Versions */}
           <Card>
             <CardHeader>
               <CardTitle className="inline-flex items-center gap-2">
                 <History size={18} className="text-primary" aria-hidden="true" />
                 <span>{t("history.activity")}</span>
+                <span className="text-xs font-normal text-muted-foreground">
+                  ({history.total})
+                </span>
               </CardTitle>
             </CardHeader>
             <CardContent>
               {history.rows.length === 0 ? (
                 <EmptyState title={t("history.noActivity")} />
               ) : (
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableHeaderCell>{t("history.when")}</TableHeaderCell>
-                      <TableHeaderCell>{t("history.action")}</TableHeaderCell>
-                      <TableHeaderCell>{t("history.actor")}</TableHeaderCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {history.rows.map((row) => (
-                      <TableRow key={row.id}>
-                        <TableCell className="whitespace-nowrap">
+                <div className="flex flex-col gap-2 text-xs">
+                  {history.rows.slice(0, 5).map((row) => (
+                    <div key={row.id} className="flex flex-col gap-0.5 border-b border-border/40 pb-2 last:border-b-0 last:pb-0">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-xs font-semibold text-foreground">{row.action}</span>
+                        <span className="text-[11px] text-muted-foreground whitespace-nowrap">
                           {formatInstant(row.ts, "UTC", locale)}
-                        </TableCell>
-                        <TableCell>
-                          <span className="font-mono text-xs">{row.action}</span>
-                        </TableCell>
-                        <TableCell>
-                          {row.actorType}
-                          {row.actorId ? (
-                            <span
-                              className="ms-1 text-xs text-muted-foreground"
-                              dir="ltr"
-                            >
-                              {row.actorId}
-                            </span>
-                          ) : null}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-muted-foreground">
+                        {row.actorType}
+                        {row.actorId ? <span className="ms-1 font-mono" dir="ltr">({row.actorId.slice(0, 8)})</span> : null}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </CardContent>
           </Card>
         </div>
-      ) : null}
-    </div>
-  );
-}
-
-function Row({
-  label,
-  value,
-  ltr,
-  icon: Icon,
-}: {
-  label: string;
-  value: string;
-  ltr?: boolean;
-  icon?: LucideIcon;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5 rounded border border-border/70 bg-card p-3 shadow-2xs transition-colors hover:border-primary/40">
-      <dt className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-        {Icon ? <Icon size={13} className="text-primary/70 shrink-0" aria-hidden /> : null}
-        <span>{label}</span>
-      </dt>
-      <dd className="text-sm font-semibold tracking-tight text-foreground break-words" dir={ltr ? "ltr" : undefined}>
-        {value}
-      </dd>
+      </div>
     </div>
   );
 }
@@ -576,20 +691,14 @@ function Money({
   strong?: boolean;
 }) {
   return (
-    <div
-      className={cn(
-        "flex items-center justify-between gap-4 py-2 border-b border-border/40 text-sm",
-        strong && "border-t-2 border-t-primary/30 border-b-0 pt-3 text-base font-bold text-foreground",
-      )}
-    >
-      <dt className={strong ? "font-bold text-foreground" : "text-muted-foreground"}>
-        {label}
-      </dt>
+    <div className="flex items-center justify-between gap-4 text-sm">
+      <dt className="text-muted-foreground">{label}</dt>
       <dd
-        className={cn(
-          "font-mono tabular-nums",
-          strong ? "text-lg font-bold text-primary" : "text-foreground font-semibold",
-        )}
+        className={
+          strong
+            ? "font-semibold tabular-nums text-foreground"
+            : "tabular-nums text-foreground"
+        }
       >
         {value}
       </dd>

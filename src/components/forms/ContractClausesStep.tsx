@@ -234,7 +234,7 @@ export function ContractClausesStep({
           ) : null}
 
           {filteredClauses.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border p-8 text-center text-xs text-muted-foreground">
+            <div className="rounded-md border border-dashed border-border p-8 text-center text-xs text-muted-foreground">
               {t("common.noResults")}
             </div>
           ) : null}
@@ -246,10 +246,10 @@ export function ContractClausesStep({
               return (
                 <div
                   key={index}
-                  className="group flex flex-col rounded-xl border border-border/80 bg-card shadow-2xs transition-all hover:border-border hover:shadow-xs"
+                  className="group flex flex-col rounded-md border border-border/80 bg-card shadow-2xs transition-all hover:border-border hover:shadow-xs"
                 >
                   {/* Clause Header Bar */}
-                  <div className="flex items-center justify-between border-b border-border/50 bg-muted/20 px-4 py-2.5 rounded-t-xl">
+                  <div className="flex items-center justify-between border-b border-border/50 bg-muted/20 px-4 py-2.5 rounded-t-md">
                     <div
                       className="flex flex-1 items-center gap-3 cursor-pointer select-none overflow-hidden pe-2"
                       onClick={() => toggleCollapse(index)}
@@ -274,7 +274,7 @@ export function ContractClausesStep({
                           aria-label={t("contracts.clause.up")}
                           onClick={() => move(index, -1)}
                           disabled={index === 0}
-                          className="flex h-7 w-7 items-center justify-center rounded-md border border-border/70 text-muted-foreground transition-all hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
+                          className="hidden sm:flex h-7 w-7 items-center justify-center rounded-md border border-border/70 text-muted-foreground transition-all hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
                         >
                           <ArrowUp className="h-3.5 w-3.5" />
                         </button>
@@ -286,7 +286,7 @@ export function ContractClausesStep({
                           aria-label={t("contracts.clause.down")}
                           onClick={() => move(index, 1)}
                           disabled={index === clauses.length - 1}
-                          className="flex h-7 w-7 items-center justify-center rounded-md border border-border/70 text-muted-foreground transition-all hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
+                          className="hidden sm:flex h-7 w-7 items-center justify-center rounded-md border border-border/70 text-muted-foreground transition-all hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
                         >
                           <ArrowDown className="h-3.5 w-3.5" />
                         </button>

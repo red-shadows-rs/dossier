@@ -219,7 +219,7 @@ export function ContractScheduleStep({
 
         <CardContent className="flex flex-col gap-5">
           {/* Progress / Status banner */}
-          <div className="rounded-xl border border-border/80 bg-muted/30 p-3.5">
+          <div className="rounded-md border border-border/80 bg-muted/30 p-3.5">
             {mode === "percent" ? (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between text-xs font-medium">
@@ -274,7 +274,7 @@ export function ContractScheduleStep({
             {rows.map((row, index) => (
               <div
                 key={index}
-                className="group flex flex-col gap-3 rounded-xl border border-border/80 bg-card p-4 shadow-2xs transition-all hover:border-border hover:shadow-xs"
+                className="group flex flex-col gap-3 rounded-md border border-border/80 bg-card p-4 shadow-2xs transition-all hover:border-border hover:shadow-xs"
               >
                 {/* Milestone Card Header */}
                 <div className="flex items-center justify-between border-b border-border/60 pb-2.5">

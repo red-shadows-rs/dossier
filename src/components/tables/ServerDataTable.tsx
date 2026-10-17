@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import clsx from "clsx";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Pagination } from "@/components/ui/Pagination";
@@ -28,6 +28,7 @@ export function ServerDataTable<R extends { id: string | number }>({
   emptyIcon,
   emptyDescription,
   emptyAction,
+  minWidth = "min-w-[560px]",
 }: {
   rows: R[];
   columns: ColumnDef<R>[];
@@ -41,6 +42,7 @@ export function ServerDataTable<R extends { id: string | number }>({
   emptyIcon?: ReactNode;
   emptyDescription?: ReactNode;
   emptyAction?: ReactNode;
+  minWidth?: string;
 }) {
   const [clientPage, setClientPage] = useState(1);
 
@@ -53,6 +55,34 @@ export function ServerDataTable<R extends { id: string | number }>({
   const displayRows = isServer
     ? rows
     : rows.slice((clientPage - 1) * effectivePageSize, clientPage * effectivePageSize);
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollIndicators = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    const maxScroll = scrollWidth - clientWidth;
+    if (maxScroll <= 2) {
+      setCanScrollLeft(false);
+      setCanScrollRight(false);
+      return;
+    }
+    const absScroll = Math.abs(scrollLeft);
+    setCanScrollLeft(absScroll > 4);
+    setCanScrollRight(absScroll < maxScroll - 4);
+  }, []);
+
+  useEffect(() => {
+    updateScrollIndicators();
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(updateScrollIndicators);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [updateScrollIndicators, displayRows]);
 
   if (effectiveTotal === 0 && !externalLoading) {
     return (
@@ -82,55 +112,68 @@ export function ServerDataTable<R extends { id: string | number }>({
         </div>
       ) : null}
 
-      <div className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin]">
-        <table className="w-full min-w-[640px] text-start text-sm border-collapse">
-          <thead>
-            <tr className="border-b border-border bg-muted/40 text-xs font-semibold text-muted-foreground">
-              {columns.map((col) => (
-                <th
-                  key={col.id}
-                  scope="col"
-                  className={clsx(
-                    "py-3 px-4 select-none whitespace-nowrap",
-                    col.align === "end"
-                      ? "text-end"
-                      : col.align === "center"
-                        ? "text-center"
-                        : "text-start",
-                    col.headerClassName,
-                  )}
-                >
-                  {col.header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border/50">
-            {displayRows.map((row) => (
-              <tr
-                key={row.id}
-                className="hover:bg-muted/30 transition-colors"
-              >
+      <div className="relative w-full">
+        {canScrollLeft ? (
+          <div className="pointer-events-none absolute inset-y-0 start-0 z-10 w-6 bg-gradient-to-r from-card to-transparent rtl:bg-gradient-to-l opacity-80 sm:hidden" />
+        ) : null}
+        {canScrollRight ? (
+          <div className="pointer-events-none absolute inset-y-0 end-0 z-10 w-6 bg-gradient-to-l from-card to-transparent rtl:bg-gradient-to-r opacity-80 sm:hidden" />
+        ) : null}
+
+        <div
+          ref={scrollContainerRef}
+          onScroll={updateScrollIndicators}
+          className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin]"
+        >
+          <table className={clsx("w-full text-start text-sm border-collapse", minWidth)}>
+            <thead>
+              <tr className="border-b border-border bg-muted/40 text-xs font-semibold text-muted-foreground">
                 {columns.map((col) => (
-                  <td
+                  <th
                     key={col.id}
+                    scope="col"
                     className={clsx(
-                      "py-3.5 px-4 text-foreground align-middle",
+                      "py-3 px-3.5 sm:px-4 select-none whitespace-nowrap",
                       col.align === "end"
                         ? "text-end"
                         : col.align === "center"
                           ? "text-center"
                           : "text-start",
-                      col.className,
+                      col.headerClassName,
                     )}
                   >
-                    {col.render(row)}
-                  </td>
+                    {col.header}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-border/50">
+              {displayRows.map((row) => (
+                <tr
+                  key={row.id}
+                  className="hover:bg-muted/30 transition-colors"
+                >
+                  {columns.map((col) => (
+                    <td
+                      key={col.id}
+                      className={clsx(
+                        "py-3 px-3.5 sm:px-4 text-foreground align-middle",
+                        col.align === "end"
+                          ? "text-end"
+                          : col.align === "center"
+                            ? "text-center"
+                            : "text-start",
+                        col.className,
+                      )}
+                    >
+                      {col.render(row)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {totalPages > 1 ? (

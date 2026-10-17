@@ -147,7 +147,7 @@ describe("duplicateTemplate", () => {
     expect(copy.template.isSystem).toBe(false);
     expect(copy.template.key).toBeNull();
     expect(copy.template.nameEn).toBe(source.nameEn);
-    expect(copy.clauses).toHaveLength(21);
+    expect(copy.clauses).toHaveLength(15);
 
     const original = getTemplate(source.id);
     expect(original.template.isSystem).toBe(true);

@@ -18,8 +18,8 @@ export function Table({
   ...props
 }: HTMLAttributes<HTMLTableElement>) {
   return (
-    <MuiTableContainer sx={{ overflowX: "auto", width: "100%", scrollbarWidth: "thin" }}>
-      <MuiTable size="small" className={className} sx={{ minWidth: 520 }} {...props}>
+    <MuiTableContainer sx={{ overflowX: "auto", width: "100%", scrollbarWidth: "thin", touchAction: "pan-x" }}>
+      <MuiTable size="small" className={className} sx={{ minWidth: { xs: "100%", sm: 500 } }} {...props}>
         {children}
       </MuiTable>
     </MuiTableContainer>
@@ -72,7 +72,7 @@ export function TableHeaderCell({
       component="th"
       scope="col"
       className={className}
-      sx={{ fontWeight: 600 }}
+      sx={{ fontWeight: 600, px: { xs: 1.25, sm: 2 } }}
       {...(props as unknown as TableCellProps)}
     >
       {children}
@@ -86,7 +86,11 @@ export function TableCell({
   ...props
 }: TdHTMLAttributes<HTMLTableCellElement>) {
   return (
-    <MuiTableCell className={className} {...(props as unknown as TableCellProps)}>
+    <MuiTableCell
+      className={className}
+      sx={{ px: { xs: 1.25, sm: 2 } }}
+      {...(props as unknown as TableCellProps)}
+    >
       {children}
     </MuiTableCell>
   );

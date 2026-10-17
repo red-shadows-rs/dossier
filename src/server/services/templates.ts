@@ -1,4 +1,4 @@
-import { asc, count, desc, eq, isNull } from "drizzle-orm";
+import { and, asc, count, desc, eq, isNull, notInArray } from "drizzle-orm";
 import { db, withTx, type DbTx } from "@/db";
 import { templateClauses, templates } from "@/db/schema";
 import { nowMs } from "@/lib/dates";
@@ -140,6 +140,22 @@ export function seedSystemTemplates(): {
   let skipped = 0;
 
   withTx((tx) => {
+    const validKeys = TEMPLATES.map((t) => t.key);
+    const legacy = tx
+      .select({ id: templates.id })
+      .from(templates)
+      .where(
+        and(eq(templates.isSystem, true), notInArray(templates.key, validKeys)),
+      )
+      .all();
+
+    for (const leg of legacy) {
+      tx.delete(templateClauses)
+        .where(eq(templateClauses.templateId, leg.id))
+        .run();
+      tx.delete(templates).where(eq(templates.id, leg.id)).run();
+    }
+
     for (const def of TEMPLATES) {
       const existing = tx
         .select()

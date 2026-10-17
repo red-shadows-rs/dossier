@@ -8,6 +8,8 @@ import {
   isDocLang,
   type DocLang,
 } from "@/lib/doc-lang";
+import { env } from "@/lib/env";
+import { makeQrDataUri, verificationUrl } from "@/server/pdf/qr";
 import { renderContractHtml } from "@/server/pdf/html/contract";
 import { getFontCss } from "@/server/pdf/fonts";
 import { findFileBySha256, getFileRow, readFile } from "@/server/services/files";
@@ -91,6 +93,20 @@ export async function buildContractHtml(
     imageBySha(snapshot.provider.stampSha256) ??
     imageByFileId(company.stampFileId ?? null);
 
+  let verification: { code: string; url: string; qrDataUri: string } | null = null;
+  const verificationCode =
+    contract.verificationCode ??
+    contract.number ??
+    (contract.status === "draft" || mode === "preview" || mode === "draft" ? "DRAFT-PREVIEW" : null);
+  if (verificationCode) {
+    const url = verificationUrl(env.APP_URL, verificationCode);
+    verification = {
+      code: verificationCode,
+      url,
+      qrDataUri: await makeQrDataUri(url),
+    };
+  }
+
   return renderContractHtml({
     snapshot,
     lang,
@@ -99,7 +115,7 @@ export async function buildContractHtml(
     logoDataUri,
     stampDataUri,
     signatures: [],
-    verification: null,
+    verification,
     certificate: null,
   });
 }
@@ -118,8 +134,8 @@ export function documentMode(contract: ContractRow): ContractDocMode {
 }
 
 export type ContractPdfSource =
-  | { kind: "sealed"; fileId: string; filename: string }
-  | { kind: "render"; html: string; filename: string; docNumber: string };
+  | { kind: "sealed"; fileId: string; filename: string; lang: DocLang }
+  | { kind: "render"; html: string; filename: string; docNumber: string; lang: DocLang };
 
 export async function resolveContractPdf(
   contractId: string,
@@ -137,6 +153,7 @@ export async function resolveContractPdf(
       kind: "sealed",
       fileId: contract.finalPdfFileId,
       filename: safePdfFilename(contract, lang),
+      lang,
     };
   }
 
@@ -150,5 +167,6 @@ export async function resolveContractPdf(
     html,
     filename: safePdfFilename(contract, lang),
     docNumber: contract.number ?? "DRAFT",
+    lang,
   };
 }

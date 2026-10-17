@@ -106,9 +106,9 @@ export default async function ClientsPage({
       <Card className="overflow-visible">
         <CardContent className="p-3 sm:p-4 overflow-visible">
           <form method="get" className="flex flex-col gap-2.5">
-            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-              <div className="flex flex-1 items-center gap-2 min-w-[240px]">
-                <div className="relative flex-1">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <div className="flex flex-1 items-center gap-1.5 sm:gap-2">
+                <div className="relative flex-1 min-w-0">
                   <Input
                     id="clients-q"
                     name="q"
@@ -128,46 +128,46 @@ export default async function ClientsPage({
                 <Button
                   type="submit"
                   variant="secondary"
-                  className="shrink-0 gap-1.5 h-10 px-4 border-border/80 font-medium"
+                  className="shrink-0 gap-1.5 h-10 px-3 sm:px-4 border-border/80 font-medium"
                 >
                   <Search size={15} aria-hidden="true" />
-                  <span>{tc("search")}</span>
+                  <span className="hidden sm:inline">{tc("search")}</span>
                 </Button>
+
+                <FilterDropdown
+                  label={tc("filter")}
+                  activeCount={activeFilterCount}
+                  title={tc("filterOptions")}
+                  applyLabel={tc("applyFilters")}
+                  resetLabel={tc("reset")}
+                  resetHref="/clients"
+                >
+                  <label className="flex h-10 cursor-pointer items-center justify-between rounded border border-border/70 bg-muted/20 ps-3 pe-1 text-sm text-foreground hover:bg-muted/40 transition-colors select-none">
+                    <span className="font-medium text-foreground">
+                      {t("includeArchived")}
+                    </span>
+                    <Checkbox
+                      name="archived"
+                      value="1"
+                      defaultChecked={archived}
+                      sx={{ p: 0.5 }}
+                    />
+                  </label>
+                </FilterDropdown>
+
+                {hasActiveFilters ? (
+                  <Link href="/clients" className="shrink-0 no-underline">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className="gap-1.5 h-10 px-3"
+                    >
+                      <RotateCcw size={15} aria-hidden="true" />
+                      <span className="hidden sm:inline">{tc("reset")}</span>
+                    </Button>
+                  </Link>
+                ) : null}
               </div>
-
-              <FilterDropdown
-                label={tc("filter")}
-                activeCount={activeFilterCount}
-                title={tc("filterOptions")}
-                applyLabel={tc("applyFilters")}
-                resetLabel={tc("reset")}
-                resetHref="/clients"
-              >
-                <label className="flex h-10 cursor-pointer items-center justify-between rounded border border-border/70 bg-muted/20 ps-3 pe-1 text-sm text-foreground hover:bg-muted/40 transition-colors select-none">
-                  <span className="font-medium text-foreground">
-                    {t("includeArchived")}
-                  </span>
-                  <Checkbox
-                    name="archived"
-                    value="1"
-                    defaultChecked={archived}
-                    sx={{ p: 0.5 }}
-                  />
-                </label>
-              </FilterDropdown>
-
-              {hasActiveFilters ? (
-                <Link href="/clients" className="shrink-0 no-underline">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="gap-1.5 h-10 px-3"
-                  >
-                    <RotateCcw size={15} aria-hidden="true" />
-                    <span>{tc("reset")}</span>
-                  </Button>
-                </Link>
-              ) : null}
             </div>
 
             {hasActiveFilters ? (

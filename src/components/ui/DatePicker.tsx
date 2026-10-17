@@ -445,7 +445,10 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
               "absolute z-50 mt-1.5 w-72 start-0 rounded-lg border border-border bg-popover p-3 text-popover-foreground shadow-2xl transition-all duration-150 animate-in fade-in-50 zoom-in-95",
             )}
           >
-            <div className="flex items-center justify-between pb-2.5 mb-2 border-b border-border/60">
+            <div
+              dir="ltr"
+              className="flex items-center justify-between pb-2.5 mb-2 border-b border-border/60"
+            >
               <div className="flex items-center gap-1">
                 <button
                   type="button"
@@ -453,7 +456,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
                   className="h-7 w-7 rounded p-0 inline-flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                   title={isRtl ? "السنة السابقة" : "Previous year"}
                 >
-                  <ChevronsLeft className="h-4 w-4 rtl:rotate-180" />
+                  <ChevronsLeft className="h-4 w-4" />
                 </button>
                 <button
                   type="button"
@@ -461,11 +464,14 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
                   className="h-7 w-7 rounded p-0 inline-flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                   title={isRtl ? "الشهر السابق" : "Previous month"}
                 >
-                  <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
+                  <ChevronLeft className="h-4 w-4" />
                 </button>
               </div>
 
-              <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+              <div
+                dir={isRtl ? "rtl" : "ltr"}
+                className="flex items-center gap-1.5 text-xs font-bold text-foreground"
+              >
                 <button
                   type="button"
                   onClick={() =>
@@ -493,7 +499,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
                   className="h-7 w-7 rounded p-0 inline-flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                   title={isRtl ? "الشهر القادم" : "Next month"}
                 >
-                  <ChevronRight className="h-4 w-4 rtl:rotate-180" />
+                  <ChevronRight className="h-4 w-4" />
                 </button>
                 <button
                   type="button"
@@ -501,7 +507,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
                   className="h-7 w-7 rounded p-0 inline-flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                   title={isRtl ? "السنة القادمة" : "Next year"}
                 >
-                  <ChevronsRight className="h-4 w-4 rtl:rotate-180" />
+                  <ChevronsRight className="h-4 w-4" />
                 </button>
               </div>
             </div>

@@ -21,257 +21,304 @@ export type TemplateDef = {
 };
 
 export const CLAUSES: Record<string, ClauseDef> = {
+  // --- المشتركة (Shared Core) ---
   parties: {
     titleEn: "Parties",
     titleAr: "الأطراف",
     bodyEn: "{{block.parties}}",
     bodyAr: "{{block.parties}}",
   },
-  purpose: {
-    titleEn: "Purpose of the Agreement",
-    titleAr: "الغرض من العقد",
-    bodyEn:
-      "This Agreement governs the engagement of the Provider by the Client for the project **{{project.name}}** (Ref. {{project.code}}) under Agreement No. {{contract.number}} dated {{contract.date}}.\n\nBy signing this Agreement, each Party confirms that it has the legal capacity and authority to enter into it.",
-    bodyAr:
-      "ينظم هذا العقد تعاقد العميل مع المزود لتنفيذ مشروع **{{project.name}}** (مرجع {{project.code}}) بموجب العقد رقم {{contract.number}} المؤرخ في {{contract.date}}.\n\nبتوقيع هذا العقد يقر كل طرف بأن لديه الأهلية والصلاحية القانونية للتعاقد.",
-  },
-  scope: {
-    titleEn: "Scope of Work",
-    titleAr: "نطاق العمل",
-    bodyEn:
-      "The Provider shall perform the following services (the **Services**):\n\n> {{contract.scope}}\n\nAny work not expressly described above is outside the scope of this Agreement and is subject to the Change Requests clause.",
-    bodyAr:
-      "يلتزم المزود بتنفيذ الخدمات التالية («الخدمات»):\n\n> {{contract.scope}}\n\nيعد أي عمل غير منصوص عليه صراحة أعلاه خارج نطاق هذا العقد، ويخضع لبند طلبات التغيير.",
-  },
   fees: {
-    titleEn: "Fees and Payment",
-    titleAr: "الأتعاب والدفع",
+    titleEn: "Fees & Payment Schedule",
+    titleAr: "الأتعاب وجدول السداد",
     bodyEn:
-      "The total fee for the Services is **{{contract.total}}**, comprising a net amount of {{contract.net}} and tax of {{contract.tax}} ({{contract.tax_rate}}), as detailed below.\n\n{{block.pricing_table}}\n\nThe fee shall be paid according to the following payment schedule.\n\n{{block.payment_schedule}}\n\nEach invoice is payable within **{{contract.payment_terms_days}}** days from its issue date, by bank transfer to the account stated on the invoice.\n\nAmounts already paid for work performed are non-refundable unless otherwise agreed in writing.",
+      "The total fee under this Agreement is **{{contract.total}}** (Net: {{contract.net}}, VAT: {{contract.tax}} at {{contract.tax_rate}}).\n\n{{block.pricing_table}}\n\nFees shall be settled in accordance with the milestone schedule below:\n\n{{block.payment_schedule}}\n\nEach invoice is payable within **{{contract.payment_terms_days}}** days from its issue date by bank transfer to the Provider's designated account. Amounts paid for executed work are non-refundable.",
     bodyAr:
-      "إجمالي أتعاب الخدمات **{{contract.total}}**، ويشمل مبلغا صافيا قدره {{contract.net}} وضريبة قدرها {{contract.tax}} ({{contract.tax_rate}})، وفق التفصيل الآتي.\n\n{{block.pricing_table}}\n\nتسدد الأتعاب وفق جدول الدفعات الآتي.\n\n{{block.payment_schedule}}\n\nتستحق كل فاتورة خلال **{{contract.payment_terms_days}}** يوما من تاريخ إصدارها، ويتم السداد بالتحويل البنكي إلى الحساب المبين في الفاتورة.\n\nلا تسترد المبالغ المدفوعة عن أعمال تم تنفيذها ما لم يتفق كتابة على خلاف ذلك.",
+      "إجمالي أتعاب هذا العقد **{{contract.total}}** (المبلغ الصافي: {{contract.net}}، وضريبة القيمة المضافة: {{contract.tax}} بنسبة {{contract.tax_rate}}).\n\n{{block.pricing_table}}\n\nتسدد الأتعاب وفق جدول الدفعات والمراحل الآتي:\n\n{{block.payment_schedule}}\n\nتستحق كل فاتورة خلال **{{contract.payment_terms_days}}** يوما من تاريخ إصدارها بالتحويل إلى الحساب البنكي المعتمد للمزود، وتعد المبالغ المدفوعة عن أعمال منفذة نهائية وغير قابلة للاسترداد.",
   },
   timeline: {
-    titleEn: "Term and Timeline",
+    titleEn: "Term & Timeline",
     titleAr: "المدة والجدول الزمني",
     bodyEn:
-      "This Agreement takes effect on **{{contract.start_date}}** and, unless terminated earlier in accordance with its terms, remains in force until **{{contract.end_date}}**.\n\nDelivery dates depend on the Client providing content, approvals and access on time. Delays caused by the Client extend the timeline accordingly.",
+      "This Agreement takes effect on **{{contract.start_date}}** and remains in force until **{{contract.end_date}}**.\n\nDelivery milestones depend on the Client providing required materials, credentials, and approvals on time. Delays caused by the Client shall extend the timeline accordingly.",
     bodyAr:
-      "يسري هذا العقد اعتبارا من **{{contract.start_date}}** ويظل نافذا حتى **{{contract.end_date}}** ما لم ينه قبل ذلك وفق أحكامه.\n\nتعتمد مواعيد التسليم على تزويد العميل بالمحتوى والموافقات والصلاحيات في الوقت المناسب، وأي تأخير ناتج عن العميل يمدد الجدول الزمني بمقداره.",
+      "يسري هذا العقد اعتبارا من **{{contract.start_date}}** ويظل نافذا حتى **{{contract.end_date}}**.\n\nيرتبط الالتزام بمواعيد التسليم بتزويد العميل بكافة المتطلبات والموافقات وصلاحيات الوصول في مواعيدها، ويترتب على أي تأخير من العميل تمديد الجدول الزمني بمقداره.",
   },
   client_obligations: {
     titleEn: "Client Obligations",
     titleAr: "التزامات العميل",
     bodyEn:
-      "The Client shall:\n\n- provide all content, materials, credentials and information reasonably required, in a timely manner;\n- appoint a representative authorized to give approvals and feedback;\n- review deliverables and respond within 5 business days of submission;\n- pay all amounts when due.",
+      "The Client shall:\n\n- Provide all necessary content, credentials, and technical information in a timely manner;\n- Appoint an authorized representative for approvals and communications;\n- Review deliverables and submit feedback within 5 business days of receipt;\n- Settle all due milestone payments on schedule.",
     bodyAr:
-      "يلتزم العميل بما يلي:\n\n- تزويد المزود في الوقت المناسب بالمحتوى والمواد وبيانات الدخول والمعلومات اللازمة؛\n- تعيين ممثل مفوض بإبداء الموافقات والملاحظات؛\n- مراجعة المخرجات والرد خلال 5 أيام عمل من تسليمها؛\n- سداد المبالغ المستحقة في مواعيدها.",
+      "يلتزم العميل بما يلي:\n\n- تزويد المزود بكافة البيانات والمحتوى وصلاحيات الوصول اللازمة في الوقت المناسب؛\n- تعيين ممثل مفوض باعتماد المخرجات وإبداء الملاحظات؛\n- مراجعة المخرجات والرد خلال 5 أيام عمل من تاريخ تسليمها؛\n- سداد الدفعات المستحقة في مواعيد استحقاقها المحددة.",
   },
   provider_obligations: {
-    titleEn: "Provider Obligations",
-    titleAr: "التزامات المزود",
+    titleEn: "Provider Commitments",
+    titleAr: "التزامات المزود وجودة العمل",
     bodyEn:
-      "The Provider shall perform the Services with reasonable skill and care in line with generally accepted professional standards, assign suitably qualified personnel, and keep the Client reasonably informed of progress.",
+      "The Provider shall perform the services with professional skill and care following modern software engineering practices, assign qualified team members, and keep the Client informed of progress regularly.",
     bodyAr:
-      "يلتزم المزود بتنفيذ الخدمات بالعناية والمهارة المعقولتين وفق المعايير المهنية المتعارف عليها، وتكليف كوادر مؤهلة، وإطلاع العميل على سير العمل بصورة معقولة.",
+      "يلتزم المزود بتنفيذ الخدمات بالعناية والمهارة المهنية ووفق أفضل الممارسات الهندسية والبرمجية المعمول بها، وتكليف كوادر مؤهلة، وإحاطة العميل بمستجدات سير العمل دوريا.",
   },
   change_requests: {
     titleEn: "Change Requests",
-    titleAr: "طلبات التغيير",
+    titleAr: "طلبات التعديل والأعمال الإضافية",
     bodyEn:
-      "Either Party may request changes to the Services. No change takes effect until agreed in writing (email is sufficient), stating its effect on fees and timeline.\n\nApproved changes are invoiced as additional work.",
+      "Either Party may request modifications to the scope of work. No change takes effect until agreed in writing, detailing its impact on fees and timeline.\n\nApproved additions shall be invoiced as separate work orders.",
     bodyAr:
-      "لأي من الطرفين طلب تعديل الخدمات، ولا يسري أي تعديل إلا بعد الاتفاق عليه كتابة (ويكفي البريد الإلكتروني) مع بيان أثره على الأتعاب والجدول الزمني.\n\nتفوتر التعديلات المعتمدة كأعمال إضافية.",
+      "يحق لأي من الطرفين طلب تعديل نطاق العمل، ولا يسري أي تعديل إلا بعد الاتفاق عليه كتابة مع بيان أثره على الأتعاب والجدول الزمني.\n\nتفوتر الأعمال الإضافية المعتمدة بموجب أوامر عمل مستقلة.",
   },
   acceptance: {
-    titleEn: "Delivery and Acceptance",
-    titleAr: "التسليم والقبول",
+    titleEn: "Inspection & Acceptance",
+    titleAr: "الفحص والتسليم النهائي",
     bodyEn:
-      "Upon delivery of each deliverable the Client shall test it and either accept it or give written, reasonable grounds for rejection within 5 business days.\n\nA deliverable is deemed accepted if the Client does not respond within that period or uses it in production.\n\nThe Provider shall correct, free of charge, material non-conformities with the agreed scope.",
+      "Upon delivery of each milestone or version, the Client shall test it and either accept it or submit written, objective notes within 5 business days.\n\nA deliverable is deemed accepted if no response is received within that period or if deployed to live production.",
     bodyAr:
-      "عند تسليم كل مخرج، يفحصه العميل ويقبله أو يبدي كتابة أسبابا معقولة للرفض خلال 5 أيام عمل.\n\nيعد المخرج مقبولا إذا لم يرد العميل خلال هذه المدة أو استخدمه فعليا في بيئة التشغيل.\n\nيصحح المزود دون مقابل العيوب الجوهرية المخالفة للنطاق المتفق عليه.",
-  },
-  third_party_hosting: {
-    titleEn: "Third-Party Services and Hosting",
-    titleAr: "خدمات الأطراف الثالثة والاستضافة",
-    bodyEn:
-      "Domains, hosting, software subscriptions, API usage and other third-party services are not included in the fees unless stated in the Scope of Work.\n\nWhere the Provider procures them on the Client's behalf, they are billed at cost and the related accounts remain the Client's property.",
-    bodyAr:
-      "لا تشمل الأتعاب النطاقات والاستضافة واشتراكات البرمجيات واستهلاك واجهات البرمجة وسائر خدمات الأطراف الثالثة ما لم يرد ذلك في نطاق العمل.\n\nوإذا اشترى المزود شيئا منها نيابة عن العميل فيفوتر بالتكلفة الفعلية وتظل الحسابات المرتبطة به مملوكة للعميل.",
-  },
-  platform_terms: {
-    titleEn: "Third-Party Platforms",
-    titleAr: "المنصات الخارجية",
-    bodyEn:
-      "The deliverables may interact with third-party platforms and APIs. The Client is responsible for complying with those platforms' terms of use.\n\nThe Provider is not responsible for changes, restrictions or suspensions imposed by third-party platforms that affect operation. Adapting the deliverables to such changes is subject to the Change Requests clause.",
-    bodyAr:
-      "قد تتعامل المخرجات مع منصات وواجهات برمجة تابعة لأطراف ثالثة، ويلتزم العميل بشروط استخدام تلك المنصات.\n\nلا يتحمل المزود مسؤولية التغييرات أو القيود أو الإيقاف الذي تفرضه المنصات الخارجية وتتأثر به عملية التشغيل، ويخضع تكييف المخرجات مع هذه التغييرات لبند طلبات التغيير.",
-  },
-  lawful_use: {
-    titleEn: "Lawful Use",
-    titleAr: "الاستخدام المشروع",
-    bodyEn:
-      "The Client shall use the deliverables only for lawful purposes and shall not use them to infringe the rights of others, to send unsolicited messages in breach of law or platform rules, or to access any system without authorization.",
-    bodyAr:
-      "يلتزم العميل باستخدام المخرجات في أغراض مشروعة فقط، وعدم استخدامها للتعدي على حقوق الغير أو إرسال رسائل غير مرغوب فيها بالمخالفة للقانون أو لقواعد المنصات أو الدخول إلى أي نظام دون تصريح.",
+      "عند تسليم كل مخرج أو مرحلة، يفحص العميل العمل ويعتمده أو يقدم ملاحظات كتابية محددة خلال 5 أيام عمل.\n\nيعد المخرج معتمدا ومقبولا في حال انقضاء المدة دون ملاحظات أو عند استخدامه فعليا في بيئة الإنتاج والتشغيل.",
   },
   ip: {
-    titleEn: "Intellectual Property",
-    titleAr: "الملكية الفكرية",
+    titleEn: "Intellectual Property Rights",
+    titleAr: "حقوق الملكية الفكرية",
     bodyEn:
-      "Upon receipt of full payment, the Provider assigns to the Client ownership of the custom deliverables created specifically for the Client under this Agreement.\n\nThe Provider retains ownership of its pre-existing tools, libraries, know-how and general methodologies, and grants the Client a non-exclusive, perpetual license to use them as embedded in the deliverables.\n\nThird-party and open-source components remain subject to their own licenses.\n\nThe Provider may reference the project in its portfolio unless the Client objects in writing.",
+      "Upon full settlement of all due fees, ownership of the custom code, designs, and deliverables created specifically for the Client shall transfer to the Client.\n\nThe Provider retains ownership of its pre-existing tools, libraries, and frameworks, granting the Client a perpetual license for their embedded use.",
     bodyAr:
-      "بعد سداد كامل الأتعاب، يتنازل المزود للعميل عن ملكية المخرجات المنجزة خصيصا له بموجب هذا العقد.\n\nيحتفظ المزود بملكية أدواته ومكتباته وخبراته ومنهجياته السابقة على العقد، ويمنح العميل ترخيصا غير حصري ودائما باستخدامها بالصورة المضمنة في المخرجات.\n\nتظل المكونات الخاصة بأطراف ثالثة والمفتوحة المصدر خاضعة لتراخيصها.\n\nيجوز للمزود الإشارة إلى المشروع ضمن أعماله ما لم يعترض العميل كتابة.",
+      "تؤول ملكية البرمجيات والأكواد والتصاميم المخصصة المنفذة لصالح العميل إليه فور سداد كامل الأتعاب المستحقة.\n\nيحتفظ المزود بملكية أدواته ومكتباته المسبقة، مع منح العميل ترخيصا دائما غير حصري لاستخدامها بصورتها المضمنة في المخرجات.",
   },
   confidentiality: {
-    titleEn: "Confidentiality",
-    titleAr: "السرية",
+    titleEn: "Confidentiality & Data Protection",
+    titleAr: "السرية وحماية المعلومات",
     bodyEn:
-      "Each Party shall keep confidential all non-public information received from the other Party in connection with this Agreement, use it only to perform this Agreement, and disclose it only to personnel and advisers who need it and are bound by equivalent duties.\n\nThis obligation does not apply to information that is public through no fault of the recipient, was already lawfully known to it, or must be disclosed by law or court order.\n\nIt survives for 3 years after termination or expiry of this Agreement.",
+      "Both Parties agree to maintain strict confidentiality regarding all non-public technical, commercial, and operational information exchanged under this Agreement.\n\nThis obligation survives for 2 years following contract termination or expiry.",
     bodyAr:
-      "يلتزم كل طرف بالمحافظة على سرية المعلومات غير المعلنة التي يتلقاها من الطرف الآخر بشأن هذا العقد، وعدم استخدامها إلا لتنفيذه، وعدم الإفصاح عنها إلا لمن يحتاجها من العاملين والمستشارين الملزمين بواجبات مماثلة.\n\nلا ينطبق هذا الالتزام على المعلومات التي أصبحت عامة دون تقصير من المتلقي، أو كانت معلومة له بصورة مشروعة، أو وجب الإفصاح عنها بموجب القانون أو أمر قضائي.\n\nويستمر هذا الالتزام 3 سنوات بعد انتهاء هذا العقد أو انقضائه.",
+      "يلتزم الطرفان بالمحافظة التامة على سرية كافة المعلومات والبيانات الفنية والتجارية والتشغيلية غير المعلنة المتبادلة بموجب هذا العقد وعدم إفشائها لأي طرف ثالث.\n\nيظل هذا الالتزام ساريا طوال مدة العقد ولمدة سنتين بعد انتهائه.",
   },
-  warranty_support: {
-    titleEn: "Warranty and Support",
-    titleAr: "الضمان والدعم",
+  warranty: {
+    titleEn: "Warranty & Defect Correction",
+    titleAr: "الضمان ومعالجة الأعطال",
     bodyEn:
-      "For 30 days after final acceptance (the **Warranty Period**) the Provider shall fix, free of charge, defects that cause a deliverable to deviate materially from the agreed scope.\n\nThe warranty excludes issues caused by modifications made by third parties, misuse, third-party services, or hosting changes.\n\nSupport beyond the Warranty Period is available under a separate agreement.",
+      "The Provider warrants the deliverables for 30 days following final acceptance to fix any technical bugs or non-conformity with the agreed scope at no extra charge.\n\nThe warranty excludes issues caused by third-party modifications, client misuse, or external hosting changes.",
     bodyAr:
-      "خلال 30 يوما من القبول النهائي («مدة الضمان») يصلح المزود مجانا العيوب التي تجعل المخرج مخالفا بصورة جوهرية للنطاق المتفق عليه.\n\nيستثنى من الضمان ما نتج عن تعديلات أجراها أطراف ثالثة، أو سوء الاستخدام، أو خدمات الأطراف الثالثة، أو تغير الاستضافة.\n\nيتاح الدعم بعد مدة الضمان بموجب اتفاق منفصل.",
-  },
-  liability: {
-    titleEn: "Limitation of Liability",
-    titleAr: "حدود المسؤولية",
-    bodyEn:
-      "To the maximum extent permitted by law, neither Party is liable for indirect or consequential loss, or for loss of profit, revenue or data.\n\nEach Party's total aggregate liability under this Agreement is limited to the fees paid or payable under it.\n\nNothing in this clause limits liability that cannot be limited by law.",
-    bodyAr:
-      "إلى أقصى حد يسمح به القانون، لا يتحمل أي من الطرفين مسؤولية عن الخسائر غير المباشرة أو التبعية، ولا عن فقدان الأرباح أو الإيرادات أو البيانات.\n\nيحد إجمالي مسؤولية كل طرف بموجب هذا العقد بقيمة الأتعاب المدفوعة أو المستحقة بموجبه.\n\nلا يحد هذا البند أي مسؤولية لا يجوز تحديدها قانونا.",
+      "يقدم المزود ضمانا لمدة 30 يوما من تاريخ الاعتماد النهائي لمعالجة أي خلل برمجي أو عيب في النطاق المتفق عليه دون أتعاب إضافية.\n\nيستثنى من الضمان الأعطال الناتجة عن تعديل طرف ثالث، أو سوء الاستخدام، أو تغيير بيئة الاستضافة الخارجية.",
   },
   termination: {
-    titleEn: "Termination",
-    titleAr: "إنهاء العقد",
+    titleEn: "Termination & Settlement",
+    titleAr: "الإنهاء وتسوية المستحقات",
     bodyEn:
-      "Either Party may terminate this Agreement by written notice if the other Party materially breaches it and does not remedy the breach within 14 days of written notice.\n\nThe Client may terminate without cause on 14 days' written notice, paying for all work performed up to the termination date and any non-cancellable costs.\n\nOn termination the Provider shall deliver the work completed to date, subject to payment.",
+      "Either Party may terminate this Agreement upon 14 days' written notice if the other Party commits a material breach and fails to remedy it within that period.\n\nUpon termination, the Client shall pay for all work performed up to the termination date, and the Provider shall deliver completed work accordingly.",
     bodyAr:
-      "يجوز لأي طرف إنهاء هذا العقد بإشعار كتابي إذا أخل الطرف الآخر إخلالا جوهريا ولم يعالج الإخلال خلال 14 يوما من إشعاره كتابة.\n\nيجوز للعميل الإنهاء دون سبب بإشعار كتابي مدته 14 يوما، مع سداد قيمة الأعمال المنفذة حتى تاريخ الإنهاء وأي تكاليف غير قابلة للإلغاء.\n\nعند الإنهاء يسلم المزود الأعمال المنجزة حتى ذلك التاريخ، مقابل سداد المستحقات.",
-  },
-  force_majeure: {
-    titleEn: "Force Majeure",
-    titleAr: "القوة القاهرة",
-    bodyEn:
-      "Neither Party is liable for delay or failure caused by events beyond its reasonable control, such as natural disasters, war, government action, or network and utility outages.\n\nThe affected Party shall notify the other promptly and use reasonable efforts to resume performance. If the event lasts more than 60 days, either Party may terminate by written notice.",
-    bodyAr:
-      "لا يسأل أي طرف عن التأخر أو الإخفاق الناتج عن أحداث خارجة عن إرادته المعقولة، كالكوارث الطبيعية والحروب والقرارات الحكومية وانقطاع الشبكات أو المرافق.\n\nيخطر الطرف المتأثر الآخر فورا ويبذل جهدا معقولا لاستئناف التنفيذ. وإذا استمر الحدث أكثر من 60 يوما جاز لأي طرف الإنهاء بإشعار كتابي.",
+      "يحق لأي من الطرفين إنهاء العقد بإشعار كتابي مدته 14 يوما في حال إخلال الطرف الآخر بالتزام جوهري دون معالجته خلال تلك المدة.\n\nعند الإنهاء، يسدد العميل قيمة الأعمال المنجزة حتى تاريخه، ويسلم المزود المخرجات المكتملة تبعا لذلك.",
   },
   governing_law: {
-    titleEn: "Governing Law and Disputes",
-    titleAr: "القانون الواجب التطبيق وتسوية النزاعات",
+    titleEn: "Governing Law & Jurisdiction",
+    titleAr: "النظام الحاكم وتسوية النزاعات",
     bodyEn:
-      "This Agreement is governed by the laws of **{{contract.governing_law}}**.\n\nThe Parties shall first try to resolve any dispute amicably; failing that, the competent courts of **{{contract.jurisdiction}}** have jurisdiction.",
+      "This Agreement is governed by and construed in accordance with the laws of **{{contract.governing_law}}**.\n\nThe Parties shall endeavor to settle disputes amicably; failing that, the competent courts of **{{contract.jurisdiction}}** hold jurisdiction.",
     bodyAr:
-      "يخضع هذا العقد لأحكام **{{contract.governing_law}}**.\n\nيسعى الطرفان أولا إلى تسوية أي نزاع وديا، وإن تعذر ذلك فيكون الاختصاص للمحاكم المختصة في **{{contract.jurisdiction}}**.",
-  },
-  notices: {
-    titleEn: "Notices",
-    titleAr: "الإشعارات",
-    bodyEn:
-      "Notices under this Agreement must be in writing and sent to the email addresses stated in this Agreement ({{provider.email}} for the Provider and {{client.email}} for the Client), or to any other address notified in writing.\n\nNotices sent by email are deemed received on the next business day.",
-    bodyAr:
-      "تكون الإشعارات المتعلقة بهذا العقد كتابية وترسل إلى البريد الإلكتروني المبين في هذا العقد ({{provider.email}} للمزود و{{client.email}} للعميل) أو إلى أي عنوان آخر يخطر به كتابة.\n\nتعد الإشعارات المرسلة بالبريد الإلكتروني مستلمة في يوم العمل التالي.",
-  },
-  entire_agreement: {
-    titleEn: "Entire Agreement and Amendments",
-    titleAr: "الاتفاق الكامل والتعديل",
-    bodyEn:
-      "This Agreement is the entire agreement between the Parties on its subject and supersedes all prior discussions.\n\nIt may be amended only in writing signed by both Parties.\n\nIf any provision is held invalid, the remaining provisions stay in force. Neither Party may assign this Agreement without the other's written consent.",
-    bodyAr:
-      "يمثل هذا العقد الاتفاق الكامل بين الطرفين بشأن موضوعه ويحل محل كل ما سبقه من مناقشات.\n\nلا يجوز تعديله إلا كتابة بتوقيع الطرفين.\n\nإذا ثبت بطلان أي حكم منه بقيت سائر الأحكام نافذة، ولا يجوز لأي طرف التنازل عن هذا العقد دون موافقة كتابية من الطرف الآخر.",
-  },
-  electronic_signature: {
-    titleEn: "Electronic Signature and Counterparts",
-    titleAr: "التوقيع الإلكتروني وتعدد النسخ",
-    bodyEn:
-      "The Parties agree that this Agreement may be executed electronically, and that electronic signatures together with the signing evidence recorded by the platform (timestamps, IP address and email verification) have the same effect as handwritten signatures to the extent permitted by applicable law.\n\nThis Agreement may be signed in counterparts.",
-    bodyAr:
-      "يتفق الطرفان على جواز إبرام هذا العقد إلكترونيا، وعلى أن التوقيعات الإلكترونية مع أدلة التوقيع التي تسجلها المنصة (الأوقات وعنوان IP والتحقق عبر البريد الإلكتروني) لها ذات أثر التوقيع بخط اليد بالقدر الذي يسمح به القانون المعمول به.\n\nيجوز توقيع هذا العقد على نسخ متعددة.",
+      "يخضع هذا العقد ويفسر وفقا للأنظمة المعمول بها في **{{contract.governing_law}}**.\n\nيسعى الطرفان إلى حل أي خلاف وديا، وفي حال تعذر ذلك تختص المحاكم في **{{contract.jurisdiction}}** بالفصل فيه حصرا.",
   },
   signatures: {
     titleEn: "Signatures",
-    titleAr: "التوقيعات",
+    titleAr: "التوقيع والإقرار",
     bodyEn: "{{block.signatures}}",
     bodyAr: "{{block.signatures}}",
   },
-  maint_services: {
-    titleEn: "Maintenance and Support Services",
-    titleAr: "خدمات الصيانة والدعم",
+
+  // --- 1. تطوير تطبيقات الويب (Web App Development) ---
+  purpose_web: {
+    titleEn: "Purpose & Web Engagement",
+    titleAr: "موضوع العقد وتطوير الويب",
     bodyEn:
-      "The Provider shall provide ongoing maintenance and support for the following systems (the **Systems**):\n\n> {{contract.scope}}\n\nThe Services include bug fixes, security updates, minor adjustments, and technical support through the channels agreed by the Parties.\n\nNew features and major changes are outside the fixed fees and are quoted separately under the Change Requests clause.",
+      "This Agreement governs the engagement of the Provider by the Client to build, develop, and deploy the web application or digital platform for project **{{project.name}}** (Ref: {{project.code}}) under Agreement No. {{contract.number}} dated {{contract.date}}.",
     bodyAr:
-      "يقدم المزود خدمات الصيانة والدعم المستمرة للأنظمة التالية («الأنظمة»):\n\n> {{contract.scope}}\n\nتشمل الخدمات إصلاح الأخطاء والتحديثات الأمنية والتعديلات الطفيفة والدعم الفني عبر القنوات المتفق عليها بين الطرفين.\n\nتعد الميزات الجديدة والتغييرات الكبيرة خارج الأتعاب الثابتة وتسعر منفصلة وفق بند طلبات التغيير.",
+      "ينظم هذا العقد تكليف العميل للمزود بتطوير وبرمجة وتدشين تطبيق الويب أو المنصة الرقمية لمشروع **{{project.name}}** (مرجع: {{project.code}}) بموجب العقد رقم {{contract.number}} المؤرخ في {{contract.date}}.",
   },
-  sla: {
-    titleEn: "Service Levels",
-    titleAr: "مستويات الخدمة",
+  scope_web: {
+    titleEn: "Scope of Web Development",
+    titleAr: "نطاق عمل تطوير الويب",
     bodyEn:
-      "Support requests are acknowledged within 1 business day. For critical issues (a system being unavailable) the target first response time is 4 business hours.\n\nBusiness hours are those notified by the Provider to the Client. Response targets are commitments of effort and do not guarantee resolution times.",
+      "The Provider shall deliver web development services according to the specifications below:\n\n> {{contract.scope}}\n\nThird-party domain names, cloud hosting servers, and external paid service subscriptions are excluded from the fees unless expressly stated otherwise in the scope.",
     bodyAr:
-      "يقر المزود باستلام طلبات الدعم خلال يوم عمل واحد، ويكون زمن الاستجابة الأولى المستهدف للحالات الحرجة (تعطل النظام) 4 ساعات عمل.\n\nساعات العمل هي التي يبلغ بها المزود العميل. وتمثل أهداف الاستجابة التزاما ببذل العناية ولا تضمن مدد الحل.",
+      "يلتزم المزود بتنفيذ خدمات تطوير تطبيق الويب وفق المواصفات المحددة أدناه:\n\n> {{contract.scope}}\n\nلا تشمل الأتعاب تكاليف النطاقات، أو الخوادم السحابية، أو اشتراكات الخدمات الخارجية المدفوعة ما لم ينص نطاق العمل أعلاه على خلاف ذلك صراحة.",
   },
+
+  // --- 2. تطوير تطبيقات الجوال (Mobile App Development) ---
+  purpose_mobile: {
+    titleEn: "Purpose & Mobile Engagement",
+    titleAr: "موضوع العقد وتطوير تطبيقات الجوال",
+    bodyEn:
+      "This Agreement governs the development and delivery of a cross-platform mobile application for Android and iOS for project **{{project.name}}** (Ref: {{project.code}}) under Agreement No. {{contract.number}} dated {{contract.date}}.",
+    bodyAr:
+      "ينظم هذا العقد تطوير وبرمجة وتسليم تطبيق جوال متعدد المنصات (Android و iOS) لمشروع **{{project.name}}** (مرجع: {{project.code}}) بموجب العقد رقم {{contract.number}} المؤرخ في {{contract.date}}.",
+  },
+  scope_mobile: {
+    titleEn: "Scope of Mobile App Development",
+    titleAr: "نطاق عمل تطبيق الجوال",
+    bodyEn:
+      "The Provider shall design, code, and build the mobile application according to the specifications below:\n\n> {{contract.scope}}\n\nWork includes frontend mobile interfaces, API communication, local data caching, and release builds for testing and app stores.",
+    bodyAr:
+      "يلتزم المزود بتنفيذ وتطوير تطبيق الجوال وفق المواصفات المحددة أدناه:\n\n> {{contract.scope}}\n\nيشمل العمل بناء واجهات الجوال، والربط بالواجهات البرمجية، وتجهيز الحزم التشغيلية لبيئة الاختبار والمتاجر.",
+  },
+  store_publishing: {
+    titleEn: "App Store Publishing & Accounts",
+    titleAr: "النشر في المتاجر وحسابات المطورين",
+    bodyEn:
+      "The Client shall maintain active Apple Developer and Google Play developer accounts and is responsible for all associated store fees.\n\nThe Provider shall prepare store assets, build packages, and assist with store submission. Store review times and approval policies are governed solely by Apple and Google.",
+    bodyAr:
+      "يلتزم العميل بتوفير حسابات مطورين نشطة في متجري Apple و Google ويتحمل رسومها بشكل مستقل.\n\nيتولى المزود تجهيز حزم الإطلاق ومساعدة العميل في رفع التطبيق للمراجعة. وتخضع مواعيد وسياسات القبول لسياسات المتجرين المستقلة.",
+  },
+
+  // --- 3. تطوير تطبيقات سطح المكتب (Desktop Software) ---
+  purpose_desktop: {
+    titleEn: "Purpose & Desktop Engagement",
+    titleAr: "موضوع العقد وتطبيقات سطح المكتب",
+    bodyEn:
+      "This Agreement governs the design, engineering, and delivery of a custom desktop software application for project **{{project.name}}** (Ref: {{project.code}}) under Agreement No. {{contract.number}} dated {{contract.date}}.",
+    bodyAr:
+      "ينظم هذا العقد تطوير وهندسة وتسليم برنامج سطح مكتب مخصص لمشروع **{{project.name}}** (مرجع: {{project.code}}) بموجب العقد رقم {{contract.number}} المؤرخ في {{contract.date}}.",
+  },
+  scope_desktop: {
+    titleEn: "Scope of Desktop Application",
+    titleAr: "نطاق عمل برنامج سطح المكتب",
+    bodyEn:
+      "The Provider shall build custom desktop software according to the specifications below:\n\n> {{contract.scope}}\n\nDeliverables include executable installers for the agreed operating systems (Windows, macOS, or Linux) and installation documentation.",
+    bodyAr:
+      "يلتزم المزود بتطوير برنامج سطح المكتب وفق المواصفات المحددة أدناه:\n\n> {{contract.scope}}\n\nتشمل المخرجات حزم التثبيت القابلة للتشغيل للأنظمة المتفق عليها (Windows أو macOS أو Linux) ودليل التشغيل.",
+  },
+  os_compatibility: {
+    titleEn: "Operating System Compatibility",
+    titleAr: "توافق أنظمة التشغيل والبيئة",
+    bodyEn:
+      "The desktop software is developed to run on standard modern operating system versions agreed in the scope. Hardware drivers, specialized peripherals, and code-signing certificates are outside the scope unless explicitly quoted.",
+    bodyAr:
+      "يطور البرنامج ليعمل على إصدارات أنظمة التشغيل الحديثة المتفق عليها في النطاق. وتعد تعريفات العتاد الخاص وشهادات توقيع الأكواد الرقمية (Code Signing) خارج النطاق ما لم يتفق عليها صراحة.",
+  },
+
+  // --- 4. الواجهات والتكاملات (APIs & Integrations) ---
+  purpose_apis: {
+    titleEn: "Purpose & API Integration",
+    titleAr: "موضوع العقد والواجهات البرمجية",
+    bodyEn:
+      "This Agreement governs the backend development, API integrations, and data synchronization services for project **{{project.name}}** (Ref: {{project.code}}) under Agreement No. {{contract.number}} dated {{contract.date}}.",
+    bodyAr:
+      "ينظم هذا العقد تطوير الأنظمة الخلفية والواجهات البرمجية والتكامل التلقائي للبيانات لمشروع **{{project.name}}** (مرجع: {{project.code}}) بموجب العقد رقم {{contract.number}} المؤرخ في {{contract.date}}.",
+  },
+  scope_apis: {
+    titleEn: "Scope of APIs & Integrations",
+    titleAr: "نطاق الواجهات البرمجية والربط",
+    bodyEn:
+      "The Provider shall architect and implement secure APIs and integration pipelines according to the specifications below:\n\n> {{contract.scope}}\n\nWork includes API endpoint development, webhook handlers, automated scrapers or connectors, and technical integration documentation.",
+    bodyAr:
+      "يلتزم المزود ببناء وتطوير الواجهات البرمجية ومسارات تكامل البيانات وفق المواصفات التالية:\n\n> {{contract.scope}}\n\nيشمل العمل تطوير نقاط الاتصال (Endpoints)، ومعالجات Webhooks، وأدوات الربط أو السحب التلقائي، وتوثيق الواجهة الفنية.",
+  },
+  api_security: {
+    titleEn: "Security & API Rate Limits",
+    titleAr: "الأمان ومعدلات الاستهلاك البرمجي",
+    bodyEn:
+      "APIs shall incorporate authentication protocols (such as OAuth 2.0 or secure API keys) and validation controls. The Client is responsible for paying any usage or consumption fees charged by connected third-party APIs.",
+    bodyAr:
+      "تبنى الواجهات البرمجية بضوابط تحقق وأمان موثوقة (مثل OAuth 2.0 ومفاتيح API الآمنة). ويتحمل العميل أي رسوم استهلاك تفرضها الخدمات الخارجية المرتبطة.",
+  },
+
+  // --- 5. البوتات والأتمتة (Bots & Automation) ---
+  purpose_bots: {
+    titleEn: "Purpose & Automation Engagement",
+    titleAr: "موضوع العقد وتطوير البوتات",
+    bodyEn:
+      "This Agreement governs the programming and deployment of intelligent bots and automation workflows for project **{{project.name}}** (Ref: {{project.code}}) under Agreement No. {{contract.number}} dated {{contract.date}}.",
+    bodyAr:
+      "ينظم هذا العقد تطوير وبرمجة وتدشين البوتات الذكية ومسارات الأتمتة لمشروع **{{project.name}}** (مرجع: {{project.code}}) بموجب العقد رقم {{contract.number}} المؤرخ في {{contract.date}}.",
+  },
+  scope_bots: {
+    titleEn: "Scope of Bots & Automation",
+    titleAr: "نطاق البوتات والأتمتة",
+    bodyEn:
+      "The Provider shall create bots and automation routines according to the specifications below:\n\n> {{contract.scope}}\n\nWork covers bot logic, commands, database storage, and integration with target communication platforms (such as Telegram, Discord, or WhatsApp).",
+    bodyAr:
+      "يلتزم المزود بتطوير وتدشين البوتات والأتمتة وفق المواصفات المحددة أدناه:\n\n> {{contract.scope}}\n\nيشمل العمل منطق البوت، والأوامر البرمجية، وتخزين البيانات، والربط بالمنصات المستهدفة (مثل تيليجرام أو ديسكورد أو واتساب).",
+  },
+  platform_rules: {
+    titleEn: "Third-Party Platform Compliance",
+    titleAr: "الامتثال لسياسات المنصات الخارجية",
+    bodyEn:
+      "The Client shall maintain valid platform accounts and ensure bot usage complies with each platform's developer terms. The Provider is not responsible for bans or API restrictions resulting from changes in external platform rules.",
+    bodyAr:
+      "يلتزم العميل بامتلاك حسابات صالحة والتأكد من توافق استخدام البوت مع شروط المنصات، ولا يتحمل المزود مسؤولية أي حظر أو قيود ناتجة عن تعديل سياسات المنصات الخارجية.",
+  },
+
+  // --- 6. البنية التحتية و DevOps (DevOps & Infrastructure) ---
+  purpose_devops: {
+    titleEn: "Purpose & DevOps Services",
+    titleAr: "موضوع العقد والبنية التحتية",
+    bodyEn:
+      "This Agreement governs server setup, Linux administration, Docker containerization, and ongoing DevOps monitoring for project **{{project.name}}** (Ref: {{project.code}}) under Agreement No. {{contract.number}} dated {{contract.date}}.",
+    bodyAr:
+      "ينظم هذا العقد تهيئة وإدارة الخوادم، وحاويات Docker، وإعدادات Nginx ومراقبة البنية التحتية لمشروع **{{project.name}}** (مرجع: {{project.code}}) بموجب العقد رقم {{contract.number}} المؤرخ في {{contract.date}}.",
+  },
+  scope_devops: {
+    titleEn: "Scope of DevOps & Infrastructure",
+    titleAr: "نطاق خدمات البنية التحتية و DevOps",
+    bodyEn:
+      "The Provider shall deliver infrastructure engineering and management services detailed below:\n\n> {{contract.scope}}\n\nServices cover server hardening, reverse proxy configuration (Nginx), SSL lifecycle, CI/CD automation, automated backups, and uptime monitoring.",
+    bodyAr:
+      "يقدم المزود خدمات هندسة وإدارة البنية التحتية المحددة أدناه:\n\n> {{contract.scope}}\n\nتشمل الخدمات حماية الخوادم، وإعداد Nginx، وشهادات SSL، ومسارات النشر التلقائي (CI/CD)، والنسخ الاحتياطي التلقائي ومراقبة التوفر المستمر.",
+  },
+  infrastructure_accounts: {
+    titleEn: "Cloud Accounts & Hosting Costs",
+    titleAr: "حسابات السحابة وتكاليف الاستضافة",
+    bodyEn:
+      "Server hardware and cloud provider costs (e.g., Hetzner, AWS, DigitalOcean) are paid directly by the Client to the respective hosting vendor. The Provider acts as authorized technical administrator.",
+    bodyAr:
+      "تكون تكاليف الخوادم والاشتراكات السحابية (مثل Hetzner أو AWS) مدفوعة مباشرة من العميل لمزود الخدمة، وتقتصر مسؤولية المزود على الإدارة والتشغيل الفني.",
+  },
+
+  // --- 7. اتفاقية السرية وعدم الإفصاح (Mutual NDA) ---
   nda_purpose: {
-    titleEn: "Purpose",
-    titleAr: "الغرض",
+    titleEn: "Purpose of Disclosure",
+    titleAr: "الغرض من الإفصاح",
     bodyEn:
-      "The Parties wish to discuss and evaluate **{{project.name}}** (the **Purpose**) and, for that purpose, may disclose Confidential Information to each other.",
+      "The Parties wish to disclose certain confidential and technical information solely for evaluating or executing project **{{project.name}}** (Ref: {{project.code}}) (the **Purpose**).",
     bodyAr:
-      "يرغب الطرفان في بحث وتقييم **{{project.name}}** («الغرض») وقد يفصح كل منهما للآخر عن معلومات سرية لهذا الغرض.",
+      "يرغب الطرفان في تبادل معلومات فنية وتجارية سرية بهدف دراسة أو تنفيذ مشروع **{{project.name}}** (مرجع: {{project.code}}) («الغرض»)، ويقتصر استخدامها على هذا الغرض حصرا.",
   },
   nda_definition: {
-    titleEn: "Confidential Information",
-    titleAr: "المعلومات السرية",
+    titleEn: "Confidential Information Defined",
+    titleAr: "تعريف ونطاق المعلومات السرية",
     bodyEn:
-      "**Confidential Information** means all non-public information, in any form, disclosed by or on behalf of a Party (the **Disclosing Party**) to the other Party (the **Receiving Party**) in connection with the Purpose, including business plans, source code, designs, data, pricing, customer information and technical know-how, whether or not marked confidential.",
+      "**Confidential Information** means all non-public technical, commercial, financial, and code assets disclosed by either Party, whether written, oral, or electronic, clearly marked or reasonably understood to be confidential.",
     bodyAr:
-      "«المعلومات السرية» هي جميع المعلومات غير المعلنة، بأي شكل، التي يفصح عنها طرف («الطرف المفصح») أو من ينوب عنه للطرف الآخر («الطرف المتلقي») بشأن الغرض، بما في ذلك الخطط التجارية والشيفرة المصدرية والتصاميم والبيانات والأسعار ومعلومات العملاء والخبرات التقنية، سواء وسمت بالسرية أم لا.",
+      "تشمل «المعلومات السرية» كافة البيانات والمعلومات الفنية والبرمجية والمالية والتجارية غير المعلنة المتبادلة بين الطرفين بأي وسيلة كانت، متى كانت تحمل طابع السرية بحكم طبيعتها.",
   },
   nda_obligations: {
-    titleEn: "Obligations of the Receiving Party",
-    titleAr: "التزامات الطرف المتلقي",
+    titleEn: "Protection Obligations",
+    titleAr: "التزامات المحافظة على السرية",
     bodyEn:
-      "The Receiving Party shall:\n\n- use the Confidential Information solely for the Purpose;\n- not disclose it to any third party except to its employees and advisers who need to know it and are bound by equivalent confidentiality duties;\n- protect it with at least the care it uses for its own confidential information, and never less than reasonable care.",
+      "The Receiving Party shall protect disclosed information with reasonable care, restrict access solely to essential personnel under equivalent confidentiality terms, and refrain from copying or unauthorized disclosure.",
     bodyAr:
-      "يلتزم الطرف المتلقي بما يلي:\n\n- استخدام المعلومات السرية للغرض وحده؛\n- عدم الإفصاح عنها لأي طرف ثالث إلا للعاملين والمستشارين الذين يحتاجون إلى معرفتها والملزمين بواجبات سرية مماثلة؛\n- حمايتها بعناية لا تقل عن عنايته بمعلوماته السرية الخاصة، ولا تقل بأي حال عن العناية المعقولة.",
+      "يلتزم الطرف المتلقي بحماية المعلومات السرية بدرجة العناية اللازمة، وقصر الاطلاع عليها على العاملين المعنيين مباشرة، والامتناع عن نسخها أو إفشائها دون موافقة كتابية مسبقة.",
   },
   nda_exclusions: {
-    titleEn: "Exclusions",
-    titleAr: "الاستثناءات",
+    titleEn: "Standard Exclusions",
+    titleAr: "استثناءات السرية النظامية",
     bodyEn:
-      "These obligations do not apply to information that:\n\n- is or becomes public through no breach by the Receiving Party;\n- was lawfully known to the Receiving Party before disclosure;\n- is lawfully received from a third party without restriction;\n- is independently developed without use of the Confidential Information.\n\nThe Receiving Party may disclose Confidential Information if required by law or court order, after giving the Disclosing Party prompt notice where lawful.",
+      "Confidentiality obligations do not apply to information that becomes public without breach, was independently developed without reference to disclosed data, or must be disclosed by lawful judicial order.",
     bodyAr:
-      "لا تنطبق هذه الالتزامات على المعلومات التي:\n\n- أصبحت عامة دون إخلال من الطرف المتلقي؛\n- كانت معلومة للطرف المتلقي بصورة مشروعة قبل الإفصاح؛\n- تلقاها من طرف ثالث بصورة مشروعة ودون قيود؛\n- طورها بصورة مستقلة دون استخدام المعلومات السرية.\n\nيجوز للطرف المتلقي الإفصاح عن المعلومات السرية إذا اقتضى القانون أو أمر قضائي ذلك، بعد إخطار الطرف المفصح فورا متى كان ذلك جائزا قانونا.",
+      "لا تسري التزامات السرية على المعلومات المتاحة للعموم دون خطأ، أو المطورة ذاتيا بصورة مستقلة، أو الواجب الإفصاح عنها بموجب أمر قضائي أو نظامي ملزم.",
   },
   nda_term: {
-    titleEn: "Term",
-    titleAr: "المدة",
+    titleEn: "Term & Survival",
+    titleAr: "مدة الاتفاقية وسريان الالتزام",
     bodyEn:
-      "This Agreement applies to disclosures made from **{{contract.start_date}}** until **{{contract.end_date}}**.\n\nThe confidentiality obligations continue for 3 years after that end date and, for trade secrets, for as long as they remain trade secrets.",
+      "This Agreement covers disclosures made from **{{contract.start_date}}** to **{{contract.end_date}}**. Confidentiality duties survive for 3 years following expiration, and indefinitely for trade secrets.",
     bodyAr:
-      "ينطبق هذا العقد على الإفصاحات التي تتم اعتبارا من **{{contract.start_date}}** حتى **{{contract.end_date}}**.\n\nتستمر التزامات السرية 3 سنوات بعد تاريخ الانتهاء المذكور، وبالنسبة للأسرار التجارية طوال مدة بقائها أسرارا تجارية.",
+      "تسري هذه الاتفاقية على الإفصاحات المتبادلة من **{{contract.start_date}}** حتى **{{contract.end_date}}**، وتظل التزامات السرية ملزمة لمدة 3 سنوات بعد انتهائها، ودائمة بالنسبة للأسرار التجارية.",
   },
   nda_return: {
     titleEn: "Return or Destruction",
-    titleAr: "الإعادة أو الإتلاف",
+    titleAr: "إعادة أو إتلاف المعلومات",
     bodyEn:
-      "On written request, and in any event when the Purpose ends, the Receiving Party shall promptly return or securely destroy all Confidential Information and confirm in writing that it has done so.\n\nCopies that must be kept by law or that sit in routine backups remain subject to this Agreement.",
+      "Upon written request, the Receiving Party shall promptly return or securely delete all confidential materials, retaining only archival records required by statutory law.",
     bodyAr:
-      "بناء على طلب كتابي، وفي جميع الأحوال عند انتهاء الغرض، يعيد الطرف المتلقي جميع المعلومات السرية أو يتلفها بصورة آمنة فورا ويؤكد ذلك كتابة.\n\nتظل النسخ التي يجب الاحتفاظ بها بموجب القانون أو الموجودة في النسخ الاحتياطية الاعتيادية خاضعة لهذا العقد.",
-  },
-  nda_remedies: {
-    titleEn: "Remedies",
-    titleAr: "سبل الانتصاف",
-    bodyEn:
-      "Each Party acknowledges that a breach of this Agreement may cause irreparable harm for which damages alone may be inadequate, and that the Disclosing Party may seek injunctive relief in addition to any other remedy available by law.",
-    bodyAr:
-      "يقر كل طرف بأن الإخلال بهذا العقد قد يسبب ضررا جسيما لا يكفي التعويض وحده لجبره، وبأن للطرف المفصح طلب التدابير التحفظية أو الوقتية إضافة إلى سائر سبل الانتصاف المتاحة قانونا.",
+      "بناء على طلب كتابي، يتلف الطرف المتلقي بصورة آمنة أو يعيد كافة الوثائق والبيانات السرية فورا، باستثناء ما تفرضه القوانين من أرشفة نظامية داخلية.",
   },
 };
 
@@ -279,36 +326,36 @@ export const TEMPLATES: TemplateDef[] = [
   {
     key: "web-development",
     type: "contract",
-    nameEn: "Website / Web Application Development Agreement",
-    nameAr: "عقد تطوير موقع أو تطبيق ويب",
+    nameEn: "Web Application Development Agreement",
+    nameAr: "عقد تطوير تطبيقات الويب",
     descriptionEn:
-      "Design and development of a website or web application, with fees, milestones and delivery terms.",
+      "Fast, scalable, and secure web applications tailored to business needs, from landing pages to dashboards and complex systems.",
     descriptionAr:
-      "تصميم وتطوير موقع أو تطبيق ويب، مع الأتعاب والدفعات وبنود التسليم.",
+      "تطوير تطبيقات ويب سريعة وقابلة للتوسع، مع التركيز على الأداء والأمان وتجربة مستخدم سلسة، من المواقع إلى المنصات ولوحات التحكم.",
     defaultLanguageMode: "bilingual",
     defaults: {
       hasFees: true,
-      titleEn: "Website / Web Application Development Agreement",
-      titleAr: "عقد تطوير موقع أو تطبيق ويب",
+      titleEn: "Web Application Development Agreement",
+      titleAr: "عقد تطوير تطبيقات الويب",
       paymentTermsDays: 14,
       milestonePreset: {
         mode: "percent",
         rows: [
           {
-            titleEn: "Advance upon signing",
-            titleAr: "دفعة مقدمة عند التوقيع",
+            titleEn: "Advance payment upon contract signing",
+            titleAr: "دفعة مقدمة عند توقيع العقد",
             percentBp: 4000,
             triggerNoteEn: "Upon signing",
             triggerNoteAr: "عند التوقيع",
           },
           {
-            titleEn: "On delivery of the staging version",
-            titleAr: "عند تسليم النسخة التجريبية",
+            titleEn: "Upon delivery of staging preview version",
+            titleAr: "عند تسليم النسخة التجريبية للمعاينة",
             percentBp: 3000,
           },
           {
-            titleEn: "On final delivery and acceptance",
-            titleAr: "عند التسليم النهائي والقبول",
+            titleEn: "Upon final launch delivery and acceptance",
+            titleAr: "عند التسليم النهائي والاعتماد للتدشين",
             percentBp: 3000,
           },
         ],
@@ -316,53 +363,208 @@ export const TEMPLATES: TemplateDef[] = [
     },
     clauseKeys: [
       "parties",
-      "purpose",
-      "scope",
+      "purpose_web",
+      "scope_web",
       "fees",
       "timeline",
       "client_obligations",
       "provider_obligations",
       "change_requests",
       "acceptance",
-      "third_party_hosting",
       "ip",
       "confidentiality",
-      "warranty_support",
-      "liability",
+      "warranty",
       "termination",
-      "force_majeure",
       "governing_law",
-      "notices",
-      "entire_agreement",
-      "electronic_signature",
+      "signatures",
+    ],
+  },
+  {
+    key: "mobile-development",
+    type: "contract",
+    nameEn: "Mobile App Development Agreement",
+    nameAr: "عقد تطوير تطبيقات الجوال",
+    descriptionEn:
+      "Cross-platform mobile applications for Android and iOS with high performance, smooth UI, and scalable architecture.",
+    descriptionAr:
+      "تطبيقات جوال متعددة المنصات لأندرويد وآيفون، بأداء عالٍ وواجهات سلسة وبنية برمجية قابلة للتوسع.",
+    defaultLanguageMode: "bilingual",
+    defaults: {
+      hasFees: true,
+      titleEn: "Mobile App Development Agreement",
+      titleAr: "عقد تطوير تطبيقات الجوال",
+      paymentTermsDays: 14,
+      milestonePreset: {
+        mode: "percent",
+        rows: [
+          {
+            titleEn: "Advance payment upon architecture and UI approval",
+            titleAr: "دفعة مقدمة عند اعتماد الهيكلية والواجهات",
+            percentBp: 4000,
+            triggerNoteEn: "Upon kickoff",
+            triggerNoteAr: "عند بدء المشروع",
+          },
+          {
+            titleEn: "Upon test build delivery (TestFlight / APK)",
+            titleAr: "عند تسليم نسخة الاختبار (TestFlight / APK)",
+            percentBp: 3000,
+          },
+          {
+            titleEn: "Upon final app store build submission and handover",
+            titleAr: "عند اكتمال التطبيق والتجهيز لمتاجر التطبيقات",
+            percentBp: 3000,
+          },
+        ],
+      },
+    },
+    clauseKeys: [
+      "parties",
+      "purpose_mobile",
+      "scope_mobile",
+      "fees",
+      "timeline",
+      "store_publishing",
+      "client_obligations",
+      "change_requests",
+      "acceptance",
+      "ip",
+      "confidentiality",
+      "warranty",
+      "termination",
+      "governing_law",
+      "signatures",
+    ],
+  },
+  {
+    key: "desktop-development",
+    type: "contract",
+    nameEn: "Desktop Application Development Agreement",
+    nameAr: "عقد تطوير تطبيقات سطح المكتب",
+    descriptionEn:
+      "Custom desktop applications for Windows, Linux, and macOS designed for productivity, automation, and business operations.",
+    descriptionAr:
+      "برمجيات وتطبيقات سطح مكتب مخصصة لأنظمة ويندوز ولينكس وماك، مصممة للإنتاجية والأتمتة وإدارة الأعمال.",
+    defaultLanguageMode: "bilingual",
+    defaults: {
+      hasFees: true,
+      titleEn: "Desktop Application Development Agreement",
+      titleAr: "عقد تطوير تطبيقات سطح المكتب",
+      paymentTermsDays: 14,
+      milestonePreset: {
+        mode: "percent",
+        rows: [
+          {
+            titleEn: "Advance payment upon project kickoff",
+            titleAr: "دفعة مقدمة لبدء مرحلة التطوير",
+            percentBp: 5000,
+            triggerNoteEn: "Upon kickoff",
+            triggerNoteAr: "عند بدء العمل",
+          },
+          {
+            titleEn: "Upon delivery of installable release package and verification",
+            titleAr: "عند تسليم حزم التثبيت النهائية واختبارها",
+            percentBp: 5000,
+          },
+        ],
+      },
+    },
+    clauseKeys: [
+      "parties",
+      "purpose_desktop",
+      "scope_desktop",
+      "fees",
+      "timeline",
+      "os_compatibility",
+      "client_obligations",
+      "change_requests",
+      "acceptance",
+      "ip",
+      "confidentiality",
+      "warranty",
+      "termination",
+      "governing_law",
+      "signatures",
+    ],
+  },
+  {
+    key: "api-integrations",
+    type: "contract",
+    nameEn: "APIs & Integrations Agreement",
+    nameAr: "عقد الواجهات البرمجية والتكاملات",
+    descriptionEn:
+      "Secure and scalable backend systems, APIs, scrapers, and webhooks ensuring reliable data flow and system integrations.",
+    descriptionAr:
+      "أنظمة خلفية وواجهات برمجية آمنة وقابلة للتوسع، تشغل التطبيقات وتضمن تكاملاً موثوقاً للبيانات والربط بالأنظمة.",
+    defaultLanguageMode: "bilingual",
+    defaults: {
+      hasFees: true,
+      titleEn: "APIs & Integrations Agreement",
+      titleAr: "عقد الواجهات البرمجية والتكاملات",
+      paymentTermsDays: 14,
+      milestonePreset: {
+        mode: "percent",
+        rows: [
+          {
+            titleEn: "Advance payment upon schema and architecture design",
+            titleAr: "دفعة مقدمة عند اعتماد هيكلية ومخطط الواجهات",
+            percentBp: 5000,
+            triggerNoteEn: "Upon kickoff",
+            triggerNoteAr: "عند بدء المشروع",
+          },
+          {
+            titleEn: "Upon integration tests, documentation, and live handover",
+            titleAr: "عند اجتياز الاختبارات وتوثيق الواجهات والتسليم",
+            percentBp: 5000,
+          },
+        ],
+      },
+    },
+    clauseKeys: [
+      "parties",
+      "purpose_apis",
+      "scope_apis",
+      "fees",
+      "timeline",
+      "api_security",
+      "client_obligations",
+      "change_requests",
+      "acceptance",
+      "ip",
+      "confidentiality",
+      "warranty",
+      "termination",
+      "governing_law",
       "signatures",
     ],
   },
   {
     key: "automation-bot-development",
     type: "contract",
-    nameEn: "Bot & Automation Development Agreement",
-    nameAr: "عقد تطوير بوت وأتمتة",
+    nameEn: "Bots & Automation Agreement",
+    nameAr: "عقد البوتات وأنظمة الأتمتة",
     descriptionEn:
-      "Development of bots and automation workflows, with third-party platform terms.",
-    descriptionAr: "تطوير بوتات ومسارات أتمتة، مع بنود المنصات الخارجية.",
+      "Intelligent bots and automated workflows that streamline operations and integrate with platforms like Telegram, Discord, and WhatsApp.",
+    descriptionAr:
+      "تطوير بوتات وأنظمة أتمتة ذكية لتسهيل العمليات وإدارة المهام والتكامل مع منصات مثل تيليجرام وديسكورد وواتساب.",
     defaultLanguageMode: "bilingual",
     defaults: {
       hasFees: true,
-      titleEn: "Bot & Automation Development Agreement",
-      titleAr: "عقد تطوير بوت وأتمتة",
+      titleEn: "Bots & Automation Agreement",
+      titleAr: "عقد البوتات وأنظمة الأتمتة",
       paymentTermsDays: 14,
       milestonePreset: {
         mode: "percent",
         rows: [
           {
-            titleEn: "Advance upon signing",
-            titleAr: "دفعة مقدمة عند التوقيع",
+            titleEn: "Advance payment upon bot kickoff",
+            titleAr: "دفعة مقدمة لبدء تطوير البوت والربط",
             percentBp: 5000,
+            triggerNoteEn: "Upon kickoff",
+            triggerNoteAr: "عند بدء العمل",
           },
           {
-            titleEn: "On delivery and acceptance",
-            titleAr: "عند التسليم والقبول",
+            titleEn: "Upon bot deployment, verification, and handover",
+            titleAr: "عند تدشين البوت واختباره واعتماده النهائي",
             percentBp: 5000,
           },
         ],
@@ -370,64 +572,58 @@ export const TEMPLATES: TemplateDef[] = [
     },
     clauseKeys: [
       "parties",
-      "purpose",
-      "scope",
+      "purpose_bots",
+      "scope_bots",
       "fees",
       "timeline",
+      "platform_rules",
       "client_obligations",
-      "provider_obligations",
       "change_requests",
       "acceptance",
-      "platform_terms",
-      "lawful_use",
       "ip",
       "confidentiality",
-      "warranty_support",
-      "liability",
+      "warranty",
       "termination",
-      "force_majeure",
       "governing_law",
-      "notices",
-      "entire_agreement",
-      "electronic_signature",
       "signatures",
     ],
   },
   {
-    key: "maintenance-support",
+    key: "devops-infrastructure",
     type: "contract",
-    nameEn: "Maintenance & Support Agreement",
-    nameAr: "عقد صيانة ودعم فني",
+    nameEn: "DevOps & Infrastructure Agreement",
+    nameAr: "عقد البنية التحتية و DevOps",
     descriptionEn:
-      "Ongoing maintenance and support with quarterly milestones and service levels.",
-    descriptionAr: "صيانة ودعم مستمران مع دفعات ربع سنوية ومستويات خدمة.",
+      "Stable and secure infrastructure on Linux: Docker, Nginx, CI/CD, and continuous monitoring to keep services available 24/7.",
+    descriptionAr:
+      "بنية تحتية مستقرة وآمنة على لينكس: حاويات Docker وNginx وCI/CD ومراقبة مستمرة لإبقاء خدماتكم متاحة وموثوقة دائماً.",
     defaultLanguageMode: "bilingual",
     defaults: {
       hasFees: true,
-      titleEn: "Maintenance & Support Agreement",
-      titleAr: "عقد صيانة ودعم فني",
+      titleEn: "DevOps & Infrastructure Agreement",
+      titleAr: "عقد البنية التحتية و DevOps",
       paymentTermsDays: 7,
       milestonePreset: {
         mode: "percent",
         rows: [
           {
-            titleEn: "Quarter 1 fee",
-            titleAr: "رسوم الربع الأول",
+            titleEn: "Quarter 1 retainer fee",
+            titleAr: "رسوم الربع الأول للتشغيل والدعم",
             percentBp: 2500,
           },
           {
-            titleEn: "Quarter 2 fee",
-            titleAr: "رسوم الربع الثاني",
+            titleEn: "Quarter 2 retainer fee",
+            titleAr: "رسوم الربع الثاني للتشغيل والدعم",
             percentBp: 2500,
           },
           {
-            titleEn: "Quarter 3 fee",
-            titleAr: "رسوم الربع الثالث",
+            titleEn: "Quarter 3 retainer fee",
+            titleAr: "رسوم الربع الثالث للتشغيل والدعم",
             percentBp: 2500,
           },
           {
-            titleEn: "Quarter 4 fee",
-            titleAr: "رسوم الربع الرابع",
+            titleEn: "Quarter 4 retainer fee",
+            titleAr: "رسوم الربع الرابع للتشغيل والدعم",
             percentBp: 2500,
           },
         ],
@@ -435,23 +631,18 @@ export const TEMPLATES: TemplateDef[] = [
     },
     clauseKeys: [
       "parties",
-      "purpose",
-      "maint_services",
-      "sla",
+      "purpose_devops",
+      "scope_devops",
       "fees",
       "timeline",
+      "infrastructure_accounts",
       "client_obligations",
       "provider_obligations",
       "change_requests",
-      "ip",
       "confidentiality",
-      "liability",
+      "warranty",
       "termination",
-      "force_majeure",
       "governing_law",
-      "notices",
-      "entire_agreement",
-      "electronic_signature",
       "signatures",
     ],
   },
@@ -459,15 +650,16 @@ export const TEMPLATES: TemplateDef[] = [
     key: "nda",
     type: "nda",
     nameEn: "Mutual Non-Disclosure Agreement",
-    nameAr: "اتفاقية عدم إفصاح متبادلة",
+    nameAr: "اتفاقية السرية وعدم الإفصاح المتبادلة",
     descriptionEn:
-      "Mutual non-disclosure agreement for evaluating a project before engagement.",
-    descriptionAr: "اتفاقية عدم إفصاح متبادلة لتقييم مشروع قبل التعاقد.",
+      "Mutual protection of confidential technical, commercial, and proprietary information between parties.",
+    descriptionAr:
+      "حماية متبادلة للمعلومات السرية والبيانات الفنية والتجارية لتقييم أو تنفيذ المشاريع.",
     defaultLanguageMode: "bilingual",
     defaults: {
       hasFees: false,
       titleEn: "Mutual Non-Disclosure Agreement",
-      titleAr: "اتفاقية عدم إفصاح متبادلة",
+      titleAr: "اتفاقية السرية وعدم الإفصاح المتبادلة",
     },
     clauseKeys: [
       "parties",
@@ -477,11 +669,7 @@ export const TEMPLATES: TemplateDef[] = [
       "nda_exclusions",
       "nda_term",
       "nda_return",
-      "nda_remedies",
       "governing_law",
-      "notices",
-      "entire_agreement",
-      "electronic_signature",
       "signatures",
     ],
   },

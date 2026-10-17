@@ -173,8 +173,7 @@ export default function GlobalError({
                   maxWidth: "22rem",
                 }}
               >
-                واجهت المنصة مشكلة مؤقتة على مستوى النظام. يمكنك إعادة المحاولة
-                أو العودة للرئيسية.
+                حدث خطأ غير متوقع في النظام. يمكنك إعادة المحاولة.
               </p>
 
               {error?.digest ? (
@@ -226,7 +225,7 @@ export default function GlobalError({
                   }}
                 >
                   <Gauge size={16} />
-                  العودة للوحة التحكم
+                  الرئيسية
                 </Link>
                 <button
                   type="button"
@@ -261,7 +260,7 @@ export default function GlobalError({
                 backgroundColor: "rgba(148, 163, 184, 0.05)",
               }}
             >
-              إذا استمرت المشكلة، شارك رمز الخطأ مع الدعم الفني.
+              عند استمرار المشكلة، تواصل مع الدعم الفني.
             </div>
           </div>
         </main>

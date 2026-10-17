@@ -28,6 +28,7 @@ import { formatInstant } from "@/lib/dates";
 import { env } from "@/lib/env";
 import { isLocale, LOCALE_COOKIE, resolveTheme, THEME_COOKIE } from "@/lib/i18n";
 import { getRequestMeta } from "@/server/services/audit";
+import { renderCode39Svg } from "@/server/pdf/qr";
 import {
   assertLookupRateLimit,
   lookupVerification,
@@ -78,11 +79,25 @@ export default async function VerifyCodePage({
     <NextIntlClientProvider locale={locale} messages={messages}>
       <div className="flex min-h-dvh flex-col bg-background">
         {/* Navigation Header */}
-        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border/60 bg-background/80 px-4 py-3 sm:px-8 backdrop-blur">
-          <Logo />
-          <div className="flex items-center gap-2">
-            <ThemeSwitch current={theme} />
-            <LocaleSwitch />
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-2 sm:gap-3 border-b border-border/60 bg-background/80 px-3 py-2.5 sm:px-8 sm:py-3 backdrop-blur">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Logo />
+          </div>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-1.5 sm:gap-2 border-s border-border/60 ps-2.5 sm:ps-4">
+              <img
+                src="/red-shadows-logo.png"
+                alt="RED SHADOWS"
+                className="h-5 sm:h-6 w-auto shrink-0"
+              />
+              <span className="text-xs sm:text-sm font-bold tracking-tight text-foreground font-mono whitespace-nowrap" dir="ltr">
+                RED SHADOWS
+              </span>
+            </div>
+            <div className="flex items-center gap-1 sm:gap-1.5 border-s border-border/60 ps-2 sm:ps-3">
+              <ThemeSwitch current={theme} />
+              <LocaleSwitch />
+            </div>
           </div>
         </header>
 
@@ -92,7 +107,7 @@ export default async function VerifyCodePage({
             {/* Hero Verification Status Header */}
             <div className="flex flex-col items-center text-center gap-2.5">
               <div
-                className={`flex h-14 w-14 items-center justify-center rounded-2xl ring-8 ${
+                className={`flex h-14 w-14 items-center justify-center rounded-lg ring-4 ${
                   limited
                     ? "bg-amber-500/10 text-amber-600 ring-amber-500/5 dark:bg-amber-500/20 dark:text-amber-400"
                     : result === null
@@ -128,14 +143,14 @@ export default async function VerifyCodePage({
                   ? t.rateLimited
                   : result === null
                     ? locale === "ar"
-                      ? "لم يتم العثور على أي مستند مطابق لرمز التحقق في سجلات النظام الرسمية."
+                      ? "لم يتم العثور على مستند مطابق لرمز التحقق."
                       : "No document matching this verification code was found in the system."
                     : isValid
                       ? locale === "ar"
-                        ? "تم التحقق من صحة المستند ومطابقته الرسمية في سجلات النظام المعتمدة."
+                        ? "تم التحقق من صحة المستند ومطابقته لسجلات النظام."
                         : "This document has been verified against official system records."
                       : locale === "ar"
-                        ? "هذا المستند لم يعد سارياً في سجلات النظام."
+                        ? "هذا المستند غير سارٍ حالياً في سجلات النظام."
                         : "This document is no longer active in system records."}
               </p>
 
@@ -157,7 +172,7 @@ export default async function VerifyCodePage({
             {limited ? (
               <Notice tone="error" text={t.rateLimited} />
             ) : result === null ? (
-              <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border bg-card/60 p-8 text-center">
+              <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-border bg-card/60 p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   {t.notFound}
                 </p>
@@ -170,9 +185,9 @@ export default async function VerifyCodePage({
                 </Link>
               </div>
             ) : result.kind === "contract" ? (
-              <ContractCard result={result} locale={locale} t={t} />
+              <ContractCard result={result} code={code} locale={locale} t={t} />
             ) : (
-              <InvoiceCard result={result} t={t} />
+              <InvoiceCard result={result} code={code} locale={locale} t={t} />
             )}
 
             {/* PDF File Integrity Checker (Only if document found) */}
@@ -209,8 +224,8 @@ function Notice({ tone, text }: { tone: "error" | "success"; text: string }) {
       role="status"
       className={
         tone === "success"
-          ? "rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm font-medium text-emerald-700 dark:text-emerald-300"
-          : "rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm font-medium text-destructive"
+          ? "rounded-md border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm font-medium text-emerald-700 dark:text-emerald-300"
+          : "rounded-md border border-destructive/30 bg-destructive/10 p-4 text-sm font-medium text-destructive"
       }
     >
       {text}
@@ -244,7 +259,7 @@ function DetailItem({
   mono?: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-1 rounded-xl border border-border/50 bg-muted/20 p-3 sm:p-3.5">
+    <div className="flex flex-col gap-1 rounded-md border border-border/50 bg-muted/20 p-3 sm:p-3.5">
       <dt className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
         {icon ? <span className="text-muted-foreground/70">{icon}</span> : null}
         <span>{label}</span>
@@ -261,10 +276,12 @@ function DetailItem({
 
 function ContractCard({
   result,
+  code,
   locale,
   t,
 }: {
   result: Extract<VerificationResult, { kind: "contract" }>;
+  code: string;
   locale: Locale;
   t: Messages;
 }) {
@@ -275,11 +292,13 @@ function ContractCard({
   const isValid = result.state === "valid";
 
   return (
-    <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-6 sm:p-7 shadow-sm">
+    <div className="relative overflow-hidden flex flex-col gap-5 rounded-lg border border-border bg-card p-5 sm:p-7 shadow-sm">
+      <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/80 via-primary to-rose-400" />
+
       {/* Top Header Row */}
       <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
             <FileText className="h-5 w-5" />
           </div>
           <div>
@@ -297,8 +316,28 @@ function ContractCard({
         />
       </div>
 
+      {isValid && (
+        <div className="flex items-center gap-2 rounded-md border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          <span>{locale === "ar" ? "مستند معتمد ومطابق لسجلات النظام" : "Verified Official Record"}</span>
+        </div>
+      )}
+
+      {/* Code 39 Barcode Box */}
+      <div className="flex flex-col items-center justify-center gap-1.5 rounded-md border border-border/70 bg-muted/20 py-3.5 px-4 text-center">
+        <div
+          className="max-w-[280px] overflow-hidden"
+          dangerouslySetInnerHTML={{ __html: renderCode39Svg(code, 28) }}
+        />
+        <div className="flex items-center gap-2 mt-1">
+          <span className="font-mono text-xs font-bold tracking-widest text-muted-foreground select-all" dir="ltr">
+            {code}
+          </span>
+        </div>
+      </div>
+
       {/* Contract Title */}
-      <div className="rounded-xl border border-border/70 bg-muted/30 p-4">
+      <div className="rounded-md border border-border/70 bg-muted/30 p-4">
         <div className="text-xs font-medium text-muted-foreground">{t.fields.title}</div>
         <div className="mt-0.5 text-base font-semibold text-foreground">{title ?? "-"}</div>
       </div>
@@ -324,7 +363,7 @@ function ContractCard({
       </dl>
 
       {/* Cryptographic SHA-256 Hash */}
-      <div className="flex flex-col gap-1.5 rounded-xl border border-border/70 bg-muted/40 p-3.5">
+      <div className="flex flex-col gap-1.5 rounded-md border border-border/70 bg-muted/40 p-3.5">
         <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
           <Fingerprint className="h-3.5 w-3.5 text-primary" />
           <span>{t.fields.contentHash}</span>
@@ -339,19 +378,25 @@ function ContractCard({
 
 function InvoiceCard({
   result,
+  code,
+  locale,
   t,
 }: {
   result: Extract<VerificationResult, { kind: "invoice" }>;
+  code: string;
+  locale: Locale;
   t: Messages;
 }) {
   const isValid = result.state === "valid";
 
   return (
-    <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-6 sm:p-7 shadow-sm">
+    <div className="relative overflow-hidden flex flex-col gap-5 rounded-lg border border-border bg-card p-5 sm:p-7 shadow-sm">
+      <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/80 via-primary to-rose-400" />
+
       {/* Top Header Row */}
       <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
             <Receipt className="h-5 w-5" />
           </div>
           <div>
@@ -369,8 +414,28 @@ function InvoiceCard({
         />
       </div>
 
+      {isValid && (
+        <div className="flex items-center gap-2 rounded-md border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          <span>{locale === "ar" ? "فاتورة معتمدة ومطابقة لسجلات النظام" : "Verified Official Invoice"}</span>
+        </div>
+      )}
+
+      {/* Code 39 Barcode Box */}
+      <div className="flex flex-col items-center justify-center gap-1.5 rounded-md border border-border/70 bg-muted/20 py-3.5 px-4 text-center">
+        <div
+          className="max-w-[280px] overflow-hidden"
+          dangerouslySetInnerHTML={{ __html: renderCode39Svg(code, 28) }}
+        />
+        <div className="flex items-center gap-2 mt-1">
+          <span className="font-mono text-xs font-bold tracking-widest text-muted-foreground select-all" dir="ltr">
+            {code}
+          </span>
+        </div>
+      </div>
+
       {/* Amount Highlight */}
-      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 sm:p-5">
+      <div className="rounded-md border border-primary/20 bg-primary/5 p-4 sm:p-5">
         <div className="text-xs font-semibold uppercase tracking-wider text-primary">
           {t.fields.total}
         </div>

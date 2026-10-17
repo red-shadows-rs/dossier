@@ -36,7 +36,7 @@ export default async function NotFound() {
               <span className="select-none font-mono text-7xl font-black tracking-widest text-muted-foreground/15 sm:text-8xl">
                 404
               </span>
-              <div className="absolute flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary shadow-sm">
+              <div className="absolute flex h-12 w-12 items-center justify-center rounded-md border border-primary/20 bg-primary/10 text-primary shadow-sm">
                 <FileQuestion size={24} strokeWidth={2} aria-hidden="true" />
               </div>
             </div>

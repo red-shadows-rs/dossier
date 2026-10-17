@@ -221,10 +221,13 @@ describe("createContractFromTemplate", () => {
   it("copies clauses and defaults for every seed template", () => {
     const expectations: Record<string, { clauses: number; hasFees: boolean }> =
       {
-        "web-development": { clauses: 21, hasFees: true },
-        "automation-bot-development": { clauses: 22, hasFees: true },
-        "maintenance-support": { clauses: 19, hasFees: true },
-        nda: { clauses: 13, hasFees: false },
+        "web-development": { clauses: 15, hasFees: true },
+        "mobile-development": { clauses: 15, hasFees: true },
+        "desktop-development": { clauses: 15, hasFees: true },
+        "api-integrations": { clauses: 15, hasFees: true },
+        "automation-bot-development": { clauses: 15, hasFees: true },
+        "devops-infrastructure": { clauses: 14, hasFees: true },
+        nda: { clauses: 9, hasFees: false },
       };
     for (const [key, expected] of Object.entries(expectations)) {
       const id = createFrom(key);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
@@ -115,6 +115,13 @@ export function ContractBuilder({
   const router = useRouter();
   const [step, setStep] = useState<Step>("basics");
 
+  useEffect(() => {
+    const el = document.getElementById(`step-btn-${step}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+  }, [step]);
+
   function refresh() {
     router.refresh();
   }
@@ -167,11 +174,11 @@ export function ContractBuilder({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Redesigned Modern Stepper Navigation */}
-      <div className="sticky top-14 z-30 rounded-2xl border border-border/80 bg-card/95 p-2 shadow-sm backdrop-blur">
+      {/* Sleek Dossier Step Navigation */}
+      <div className="relative sm:sticky sm:top-14 z-20 rounded-lg border border-border bg-card p-1 shadow-xs">
         <nav
           aria-label={t("builder.steps")}
-          className="flex items-center gap-1.5 overflow-x-auto touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:gap-2 snap-x snap-mandatory"
+          className="flex items-center gap-1 overflow-x-auto touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:gap-1.5"
         >
           {STEPS.map((value, index) => {
             const disabled = stepDisabled(value);
@@ -182,6 +189,7 @@ export function ContractBuilder({
             return (
               <button
                 key={value}
+                id={`step-btn-${value}`}
                 type="button"
                 disabled={disabled}
                 aria-current={active ? "step" : undefined}
@@ -190,27 +198,27 @@ export function ContractBuilder({
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 className={cn(
-                  "group flex shrink-0 sm:flex-1 min-w-[115px] sm:min-w-[130px] snap-start items-center gap-2 rounded-xl border px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs font-semibold transition-all select-none",
+                  "group flex shrink-0 sm:flex-1 min-w-[85px] sm:min-w-[110px] items-center gap-1.5 sm:gap-2 rounded-md px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-semibold transition-all select-none cursor-pointer",
                   active
-                    ? "border-primary bg-primary text-primary-foreground shadow-xs ring-2 ring-primary/20"
+                    ? "bg-primary text-primary-foreground shadow-xs"
                     : completed
-                      ? "border-border/60 bg-muted/40 text-foreground hover:bg-muted/70 hover:border-border"
-                      : "border-transparent bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+                      ? "bg-muted/50 text-foreground hover:bg-muted"
+                      : "bg-transparent text-muted-foreground hover:bg-muted/40 hover:text-foreground",
                   disabled && "opacity-40 cursor-not-allowed hover:bg-transparent hover:text-muted-foreground",
                 )}
               >
                 <div
                   className={cn(
-                    "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-colors",
+                    "flex h-6 w-6 shrink-0 items-center justify-center rounded text-xs font-bold transition-colors",
                     active
                       ? "bg-primary-foreground/20 text-primary-foreground"
                       : completed
                         ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-                        : "bg-muted text-muted-foreground group-hover:bg-muted/80",
+                        : "bg-muted text-muted-foreground",
                   )}
                 >
                   {completed ? (
-                    <CheckCircle2 className="h-4 w-4" />
+                    <CheckCircle2 className="h-3.5 w-3.5" />
                   ) : (
                     <Icon className="h-3.5 w-3.5" />
                   )}

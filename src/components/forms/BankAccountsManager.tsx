@@ -235,15 +235,15 @@ export function BankAccountsManager({
 
       <CardContent>
         {accounts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/80 bg-muted/10 p-8 text-center">
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border/80 bg-muted/10 p-8 text-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-3">
               <Landmark size={24} aria-hidden="true" />
             </div>
             <h4 className="text-sm font-semibold text-foreground mb-1">
-              لم تتم إضافة أي حسابات بنكية بعد
+              لا توجد حسابات بنكية مضافة
             </h4>
             <p className="text-xs text-muted-foreground max-w-md mb-4">
-              أضف حساباتك البنكية المعتمدة لتظهر تلقائيا في تعليمات الدفع وفواتير المبيعات.
+              أضف حساباً بنكياً لعرضه في الفواتير والمدفوعات.
             </p>
             <Button
               type="button"
@@ -254,7 +254,7 @@ export function BankAccountsManager({
               className="gap-1.5"
             >
               <Plus size={15} aria-hidden="true" />
-              <span>إضافة حسابك الأول</span>
+              <span>إضافة حساب جديد</span>
             </Button>
           </div>
         ) : (
@@ -267,7 +267,7 @@ export function BankAccountsManager({
                 <div
                   key={acc.id}
                   className={clsx(
-                    "relative flex flex-col justify-between rounded-xl border p-4 transition-all bg-card/60",
+                    "relative flex flex-col justify-between rounded-lg border p-4 transition-all bg-card/60",
                     acc.isPrimary
                       ? "border-primary/50 shadow-xs ring-1 ring-primary/20"
                       : "border-border/80 hover:border-border",
@@ -446,7 +446,7 @@ export function BankAccountsManager({
       <Dialog
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        title={editingAccount ? "تعديل بيانات الحساب" : "إضافة حساب أو وسيلة دفع"}
+        title={editingAccount ? "تعديل الحساب البنكي" : "إضافة حساب بنكي"}
         maxWidth="md"
         footer={null}
       >
@@ -545,12 +545,12 @@ export function BankAccountsManager({
           </div>
 
           {/* Account Holder */}
-          <Field label="اسم صاحب الحساب / المستفيد" htmlFor="acc-holder">
+          <Field label="اسم المستفيد" htmlFor="acc-holder">
             <Input
               id="acc-holder"
               value={accountHolder}
               onChange={(e) => setAccountHolder(e.target.value)}
-              placeholder="اسم المنشأة أو المستفيد كما هو مسجل في البنك"
+              placeholder="اسم المستفيد أو المنشأة لدى البنك"
             />
           </Field>
 
@@ -644,7 +644,7 @@ export function BankAccountsManager({
         onClose={() => setDeleteTargetId(null)}
         onConfirm={handleDeleteConfirm}
         title="حذف الحساب"
-        message="هل أنت متأكد من رغبتك في حذف هذا الحساب؟ لن يظهر مجددا في تعليمات الدفع."
+        message="هل أنت متأكد من حذف هذا الحساب البنكي؟"
         confirmLabel="حذف الحساب"
         cancelLabel="إلغاء"
         pending={pending}

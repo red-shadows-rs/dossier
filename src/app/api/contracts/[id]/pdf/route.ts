@@ -40,6 +40,8 @@ export async function GET(
       pdf = await renderPdf(source.html, {
         docNumber: source.docNumber,
         code: null,
+        kind: "contract",
+        lang: source.lang,
       });
     }
 

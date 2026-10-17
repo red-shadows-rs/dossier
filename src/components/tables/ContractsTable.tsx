@@ -144,6 +144,7 @@ export function ContractsTable({
       query={query}
       noRowsLabel={labels.empty}
       emptyIcon={<FileText size={36} className="text-muted-foreground" aria-hidden="true" />}
+      minWidth="min-w-[420px] sm:min-w-full"
     />
   );
 }

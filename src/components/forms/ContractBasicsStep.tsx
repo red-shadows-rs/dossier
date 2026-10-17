@@ -102,22 +102,13 @@ export function ContractBasicsStep({
     <form onSubmit={onSubmit} className="flex flex-col gap-6">
       {/* 1. General Info & Regional Settings */}
       <Card>
-        <CardHeader className="flex flex-row items-center gap-2.5 pb-4 border-b border-border/50">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <Layers className="h-4 w-4" />
-          </div>
-          <div>
-            <CardTitle className="text-base font-bold text-foreground">
-              {isAr ? "البيانات الأساسية واللغة" : "Basic Information & Language"}
-            </CardTitle>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {isAr
-                ? "ارتباط المشروع والقالب ولغة العقد والعملة المعتمدة"
-                : "Project, template association, document language and contract currency"}
-            </p>
-          </div>
+        <CardHeader>
+          <CardTitle className="inline-flex items-center gap-2">
+            <Layers size={18} className="text-primary" aria-hidden="true" />
+            <span>{isAr ? "البيانات الأساسية واللغة" : "Basic Information & Language"}</span>
+          </CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
+        <CardContent className="grid grid-cols-1 gap-4 pt-2 md:grid-cols-2">
           <Field label={t("contracts.project")} htmlFor="cb-project">
             <div className="relative">
               <Input
@@ -178,7 +169,7 @@ export function ContractBasicsStep({
           </Field>
 
           {/* Fees & Milestones Toggle Box */}
-          <div className="md:col-span-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-xl border border-border/80 bg-muted/20 p-4">
+          <div className="md:col-span-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-lg border border-border/80 bg-muted/20 p-3.5">
             <div className="flex items-center gap-3">
               <Checkbox
                 id="cb-has-fees"
@@ -187,13 +178,13 @@ export function ContractBasicsStep({
                 disabled={pending}
               />
               <label htmlFor="cb-has-fees" className="flex flex-col cursor-pointer select-none">
-                <span className="text-sm font-bold text-foreground">
+                <span className="text-sm font-semibold text-foreground">
                   {t("contracts.hasFees")}
                 </span>
                 <span className="text-xs text-muted-foreground">
                   {isAr
-                    ? "تفعيل جدول الدفعات والبنود المالية وحساب الضريبة والخصم"
-                    : "Enable financial pricing, milestones schedule, tax and discount calculations"}
+                    ? "جدول الدفعات والبنود المالية"
+                    : "Financial items and milestones schedule"}
                 </span>
               </label>
             </div>
@@ -221,22 +212,13 @@ export function ContractBasicsStep({
 
       {/* 2. Contract Title & Scope */}
       <Card>
-        <CardHeader className="flex flex-row items-center gap-2.5 pb-4 border-b border-border/50">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <BookOpen className="h-4 w-4" />
-          </div>
-          <div>
-            <CardTitle className="text-base font-bold text-foreground">
-              {isAr ? "مسمى العقد ونطاق العمل" : "Contract Title & Scope of Work"}
-            </CardTitle>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {isAr
-                ? "عنوان الاتفاقية الرسمي والوصف التفصيلي لنطاق الخدمات المقدمة"
-                : "Official agreement title and detailed description of deliverables"}
-            </p>
-          </div>
+        <CardHeader>
+          <CardTitle className="inline-flex items-center gap-2">
+            <BookOpen size={18} className="text-primary" aria-hidden="true" />
+            <span>{isAr ? "العنوان ونطاق العمل" : "Title & Scope"}</span>
+          </CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
+        <CardContent className="grid grid-cols-1 gap-4 pt-2 md:grid-cols-2">
           <Field
             label={t("contracts.titleAr")}
             htmlFor="cb-title-ar"
@@ -304,22 +286,13 @@ export function ContractBasicsStep({
 
       {/* 3. Dates & Timeline */}
       <Card>
-        <CardHeader className="flex flex-row items-center gap-2.5 pb-4 border-b border-border/50">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <Calendar className="h-4 w-4" />
-          </div>
-          <div>
-            <CardTitle className="text-base font-bold text-foreground">
-              {isAr ? "المدد والتواريخ التعاقدية" : "Contract Timeline & Payment Terms"}
-            </CardTitle>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {isAr
-                ? "تاريخ سريان العقد وانتهائه وموعد التوقيع الأقصى ومهلة السداد"
-                : "Effective dates, signing deadline, and payment terms in days"}
-            </p>
-          </div>
+        <CardHeader>
+          <CardTitle className="inline-flex items-center gap-2">
+            <Calendar size={18} className="text-primary" aria-hidden="true" />
+            <span>{isAr ? "التواريخ والمدد" : "Timeline & Terms"}</span>
+          </CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
+        <CardContent className="grid grid-cols-1 gap-4 pt-2 md:grid-cols-2">
           <Field
             label={t("contracts.startDate")}
             htmlFor="cb-start"
@@ -384,22 +357,13 @@ export function ContractBasicsStep({
 
       {/* 4. Legal Jurisdiction & Internal Notes */}
       <Card>
-        <CardHeader className="flex flex-row items-center gap-2.5 pb-4 border-b border-border/50">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <Scale className="h-4 w-4" />
-          </div>
-          <div>
-            <CardTitle className="text-base font-bold text-foreground">
-              {isAr ? "الإطار النظامي والملاحظات الداخلية" : "Legal Framework & Internal Notes"}
-            </CardTitle>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {isAr
-                ? "القانون الحاكم والاختصاص القضائي وملاحظات سرية للفريق الداخلي"
-                : "Governing law, judicial jurisdiction, and internal notes"}
-            </p>
-          </div>
+        <CardHeader>
+          <CardTitle className="inline-flex items-center gap-2">
+            <Scale size={18} className="text-primary" aria-hidden="true" />
+            <span>{isAr ? "القانون والملاحظات" : "Governing Law & Notes"}</span>
+          </CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
+        <CardContent className="grid grid-cols-1 gap-4 pt-2 md:grid-cols-2">
           <Field
             label={t("contracts.governingLawAr")}
             htmlFor="cb-law-ar"
@@ -478,48 +442,41 @@ export function ContractBasicsStep({
       </Card>
 
       {/* Unified Action Footer */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-        <div className="text-xs text-muted-foreground">
-          {isAr
-            ? "يتم حفظ التعديلات كمسودة ويمكن استكمالها في أي وقت"
-            : "Changes are saved to draft and can be continued anytime"}
-        </div>
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-end gap-2.5 pt-2">
+        <Button
+          type="submit"
+          variant="secondary"
+          loading={pending}
+          className="gap-2 text-xs font-semibold"
+        >
+          <Save className="h-4 w-4" />
+          <span>{t("common.save")}</span>
+        </Button>
+
+        {onNext ? (
           <Button
-            type="submit"
-            variant="secondary"
+            type="button"
+            onClick={(e) => {
+              const form = e.currentTarget.closest("form");
+              if (form) {
+                void performSave(form, true);
+              }
+            }}
             loading={pending}
             className="gap-2 text-xs font-semibold"
           >
-            <Save className="h-4 w-4" />
-            <span>{t("common.save")}</span>
+            <span>
+              {hasFees
+                ? isAr
+                  ? "التالي: التسعير"
+                  : "Next: Pricing"
+                : isAr
+                  ? "التالي: البنود"
+                  : "Next: Clauses"}
+            </span>
+            {isAr ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
           </Button>
-
-          {onNext ? (
-            <Button
-              type="button"
-              onClick={(e) => {
-                const form = e.currentTarget.closest("form");
-                if (form) {
-                  void performSave(form, true);
-                }
-              }}
-              loading={pending}
-              className="gap-2 text-xs font-semibold"
-            >
-              <span>
-                {hasFees
-                  ? isAr
-                    ? "متابعة إلى التسعير"
-                    : "Continue to Pricing"
-                  : isAr
-                    ? "متابعة إلى بنود العقد"
-                    : "Continue to Clauses"}
-              </span>
-              {isAr ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
-            </Button>
-          ) : null}
-        </div>
+        ) : null}
       </div>
     </form>
   );

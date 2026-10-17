@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   AlertCircle,
   AlertTriangle,
@@ -70,11 +70,14 @@ export function ContractReviewStep({
 }) {
   const t = useTranslations("contracts");
   const tRoot = useTranslations();
+  const locale = useLocale();
+  const isAr = locale === "ar";
   const langs = allowedDocLangs(languageMode);
   const [lang, setLang] = useState<DocLang>(defaultDocLang(languageMode));
   const [html, setHtml] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
+  const [iframeHeight, setIframeHeight] = useState<number>(650);
 
   useEffect(() => {
     let active = true;
@@ -116,7 +119,7 @@ export function ContractReviewStep({
       <li
         key={`${issue.code}-${index}`}
         className={cn(
-          "flex flex-col gap-2 rounded-xl border p-3.5 sm:flex-row sm:items-center sm:justify-between transition-all",
+          "flex flex-col gap-2 rounded-md border p-3.5 sm:flex-row sm:items-center sm:justify-between transition-all",
           isError
             ? "border-destructive/30 bg-destructive/5 hover:border-destructive/50"
             : "border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50",
@@ -164,7 +167,7 @@ export function ContractReviewStep({
             {errors.length === 0 && warnings.length === 0 ? (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                 <CheckCircle2 className="h-3.5 w-3.5" />
-                <span>جاهز للإرسال</span>
+                <span>{isAr ? "جاهز للإرسال" : "Ready to send"}</span>
               </span>
             ) : (
               <span
@@ -175,7 +178,9 @@ export function ContractReviewStep({
                     : "border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400",
                 )}
               >
-                {errors.length} أخطاء / {warnings.length} تنبيهات
+                {isAr
+                  ? `${errors.length} أخطاء / ${warnings.length} تنبيهات`
+                  : `${errors.length} errors / ${warnings.length} warnings`}
               </span>
             )}
           </div>
@@ -183,7 +188,7 @@ export function ContractReviewStep({
 
         <CardContent className="flex flex-col gap-4">
           {errors.length === 0 && warnings.length === 0 ? (
-            <div className="flex items-center gap-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+            <div className="flex items-center gap-2.5 rounded-md border border-emerald-500/20 bg-emerald-500/5 p-4 text-xs font-medium text-emerald-700 dark:text-emerald-400">
               <CheckCircle2 className="h-5 w-5 shrink-0" />
               <span>{t("review.noIssues")}</span>
             </div>
@@ -222,9 +227,6 @@ export function ContractReviewStep({
               <CardTitle className="text-base font-semibold">
                 {t("review.previewTitle")}
               </CardTitle>
-              <p className="text-xs text-muted-foreground">
-                معاينة حية للمستند قبل إرساله للتوقيع
-              </p>
             </div>
           </div>
 
@@ -265,16 +267,47 @@ export function ContractReviewStep({
         </CardHeader>
 
         <CardContent>
-          <div className="rounded-xl border border-border/80 bg-muted/20 p-2 sm:p-4">
+          <div className="rounded-md border border-border/80 bg-muted/20 p-2 sm:p-4">
             {loading ? (
-              <DocumentSkeleton className="h-[42rem] rounded-lg" />
+              <DocumentSkeleton className="min-h-[30rem] rounded-md" />
             ) : html ? (
-              <div className="overflow-hidden rounded-lg border border-border/80 bg-white shadow-sm dark:bg-card">
+              <div className="overflow-hidden rounded-md border border-border/80 bg-white shadow-2xs dark:bg-card">
                 <iframe
                   title={t("review.previewTitle")}
-                  sandbox=""
+                  sandbox="allow-same-origin"
                   srcDoc={html}
-                  className="h-[42rem] w-full bg-white"
+                  scrolling="no"
+                  onLoad={(e) => {
+                    const frame = e.currentTarget;
+                    const updateHeight = () => {
+                      try {
+                        if (frame.contentDocument) {
+                          const doc = frame.contentDocument;
+                          if (doc.body) {
+                            doc.body.style.overflow = "hidden";
+                          }
+                          const redBar = doc.querySelector(".bottom-red-bar") as HTMLElement | null;
+                          let h = 0;
+                          if (redBar) {
+                            h = redBar.offsetTop + redBar.offsetHeight;
+                          } else {
+                            const container =
+                              doc.querySelector(".contract-document") ||
+                              doc.querySelector(".invoice-page") ||
+                              doc.body;
+                            h = Math.ceil(container?.getBoundingClientRect().height || doc.body?.scrollHeight || 500);
+                          }
+                          if (h > 0) {
+                            setIframeHeight(Math.max(h, 300));
+                          }
+                        }
+                      } catch {}
+                    };
+                    updateHeight();
+                    frame.contentDocument?.fonts?.ready?.then(updateHeight);
+                  }}
+                  style={{ height: `${iframeHeight}px` }}
+                  className="w-full border-0 bg-white transition-all duration-200 block"
                 />
               </div>
             ) : (

@@ -79,7 +79,7 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
   return (
     <div className="flex flex-col gap-6">
       {/* Search Input Card */}
-      <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-sm">
+      <div className="rounded-lg border border-border bg-card p-5 sm:p-6 shadow-sm">
         <form onSubmit={onLookup} noValidate className="flex flex-col sm:flex-row items-end gap-3">
           <Field label={t("codeLabel")} htmlFor="verify-code" className="w-full flex-1">
             <div className="relative">
@@ -110,7 +110,7 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
         {error ? (
           <div
             role="alert"
-            className="mt-4 flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-xs font-medium text-destructive"
+            className="mt-4 flex items-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-xs font-medium text-destructive"
           >
             <AlertOctagon className="h-4 w-4 shrink-0" />
             <span>{error}</span>
@@ -123,25 +123,26 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
         result === null ? (
           <div
             role="status"
-            className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border bg-card/60 p-8 text-center"
+            className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border bg-card/60 p-8 text-center"
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-destructive/10 text-destructive ring-4 ring-destructive/5">
+            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-destructive/10 text-destructive ring-2 ring-destructive/10">
               <FileX className="h-6 w-6" />
             </div>
             <h3 className="text-base font-bold text-foreground">{t("notFound")}</h3>
             <p className="max-w-sm text-xs text-muted-foreground">
               {isAr
-                ? "لم يتم العثور على أي مستند مطابق لرمز التحقق هذا. يرجى التأكد من كتابة الرمز بدقة أو مسح رمز الاستجابة السريعة (QR)."
-                : "No document matching this verification code was found. Please ensure the code is entered correctly or scan the QR code."}
+                ? "لم يتم العثور على مستند مطابق. تأكد من صحة الرمز المدخل."
+                : "No matching document found. Check the code and try again."}
             </p>
           </div>
         ) : (
           <div className="flex flex-col gap-6">
             {/* Quick Summary Card */}
-            <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="relative overflow-hidden flex flex-col gap-5 rounded-lg border border-border bg-card p-6 shadow-sm">
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/80 via-primary to-rose-400" />
               <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
                     {result.kind === "contract" ? (
                       <FileText className="h-5 w-5" />
                     ) : (
@@ -176,7 +177,7 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
               {/* Document Overview Data */}
               {result.kind === "contract" ? (
                 <div className="flex flex-col gap-3">
-                  <div className="rounded-xl border border-border/70 bg-muted/30 p-3.5">
+                  <div className="rounded-md border border-border/70 bg-muted/30 p-3.5">
                     <div className="text-xs font-medium text-muted-foreground">
                       {t("fields.title")}
                     </div>
@@ -207,7 +208,7 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
-                  <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+                  <div className="rounded-md border border-primary/20 bg-primary/5 p-4">
                     <div className="text-xs font-semibold uppercase tracking-wider text-primary">
                       {t("fields.total")}
                     </div>
@@ -242,7 +243,7 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
               <div className="pt-2">
                 <Link
                   href={`/v/${checkedCode ?? code}?lang=${locale}`}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors no-underline shadow-sm"
+                  className="flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors no-underline shadow-sm"
                 >
                   <span>{t("viewDetails")}</span>
                   {isAr ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
