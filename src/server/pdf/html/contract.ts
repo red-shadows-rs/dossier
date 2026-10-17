@@ -4,6 +4,7 @@ import {
   numberedParagraphLabels,
   parseBody,
   renderInline,
+  renderScopeBlock,
   type Block,
   type SpecialBlockName,
 } from "@/server/templating/render-body";
@@ -71,6 +72,14 @@ function renderBlockHtml(
 ): string {
   switch (block.type) {
     case "paragraph": {
+      const isScope =
+        block.text.trim() === "{{contract.scope}}" ||
+        block.text.trim() === "{{ contract.scope }}" ||
+        block.text.trim() === "> {{contract.scope}}" ||
+        block.text.trim() === "> {{ contract.scope }}";
+      if (isScope) {
+        return renderScopeBlock(vars["contract.scope"], vars, () => {});
+      }
       const inner = renderInline(block.text, vars, () => {});
       if (!block.numbered) return `<p class="note">${inner}</p>`;
       const label = labels[labelIndex.value] ?? "";

@@ -46,7 +46,12 @@ export function parseBody(src: string): Block[] {
     }
 
     const lines = block.split("\n");
-    if (lines.every((line) => line.startsWith("- "))) {
+    if (
+      lines.length > 0 &&
+      (lines.every((line) => line.startsWith("- ")) ||
+        lines.every((line) => line.startsWith("* ")) ||
+        lines.every((line) => line.startsWith("• ")))
+    ) {
       blocks.push({
         type: "bullets",
         items: lines.map((line) => line.slice(2).trim()),
@@ -189,3 +194,40 @@ export function renderInline(
     (_full, index: string) => slots[Number(index)],
   );
 }
+
+export function renderScopeBlock(
+  rawScope: string | undefined,
+  vars: Record<string, string>,
+  onMissing: (key: string) => void = () => {},
+): string {
+  if (rawScope === undefined || rawScope === "") {
+    if (OPTIONAL_VARIABLES.has("contract.scope")) {
+      return `<p class="note">—</p>`;
+    }
+    onMissing("contract.scope");
+    return `<p class="note"><span style="color:#ef4444">⟦missing: contract.scope⟧</span></p>`;
+  }
+  const lines = rawScope
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+  if (lines.length === 0) {
+    return `<p class="note">—</p>`;
+  }
+
+  const isList =
+    lines.length > 1 ||
+    lines.some((l) => /^(\d+[\.\)]|[-*•])\s+/.test(l));
+
+  if (isList) {
+    const items = lines.map((line) => {
+      const cleaned = line.replace(/^(\d+[\.\)]|[-*•])\s+/, "").trim();
+      return `<li>${renderInline(cleaned, vars, onMissing)}</li>`;
+    });
+    return `<ul>${items.join("")}</ul>`;
+  }
+
+  return `<p class="note">${renderInline(lines[0], vars, onMissing)}</p>`;
+}
+

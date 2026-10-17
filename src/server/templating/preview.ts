@@ -14,6 +14,7 @@ import {
   numberedParagraphLabels,
   parseBody,
   renderInline,
+  renderScopeBlock,
   type Block,
 } from "./render-body";
 import { buildVariableMap, type ContractSnapshotV1 } from "./variables";
@@ -44,6 +45,14 @@ function renderBlock(
 ): string {
   switch (block.type) {
     case "paragraph": {
+      const isScope =
+        block.text.trim() === "{{contract.scope}}" ||
+        block.text.trim() === "{{ contract.scope }}" ||
+        block.text.trim() === "> {{contract.scope}}" ||
+        block.text.trim() === "> {{ contract.scope }}";
+      if (isScope) {
+        return renderScopeBlock(vars["contract.scope"], vars, onMissing);
+      }
       const inner = renderInline(block.text, vars, onMissing);
       if (!block.numbered) {
         return `<p class="note">${inner}</p>`;

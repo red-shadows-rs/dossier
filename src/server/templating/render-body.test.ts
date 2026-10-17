@@ -5,6 +5,7 @@ import {
   numberedParagraphLabels,
   parseBody,
   renderInline,
+  renderScopeBlock,
   specialBlockSequence,
   type Block,
   type SpecialBlockName,
@@ -154,3 +155,42 @@ describe("renderInline", () => {
     );
   });
 });
+
+describe("renderScopeBlock", () => {
+  it("converts numbered list items into standard bullet points", () => {
+    const raw =
+      "1. نظام البث الصوتي عالي النقاء.\n2. تشغيل وإدارة قوائم اليوتيوب.\n3. باقة محطات الراديو الحي.";
+    const html = renderScopeBlock(raw, {}, () => {});
+    expect(html).toBe(
+      "<ul><li>نظام البث الصوتي عالي النقاء.</li><li>تشغيل وإدارة قوائم اليوتيوب.</li><li>باقة محطات الراديو الحي.</li></ul>",
+    );
+  });
+
+  it("converts dash and bullet items into standard bullet points", () => {
+    const raw =
+      "- Deliverable A\n- Deliverable B\n- Deliverable C";
+    const html = renderScopeBlock(raw, {}, () => {});
+    expect(html).toBe(
+      "<ul><li>Deliverable A</li><li>Deliverable B</li><li>Deliverable C</li></ul>",
+    );
+  });
+
+  it("renders a single non-list sentence as a clean note paragraph", () => {
+    const raw = "Single sentence describing the scope of work.";
+    const html = renderScopeBlock(raw, {}, () => {});
+    expect(html).toBe(
+      '<p class="note">Single sentence describing the scope of work.</p>',
+    );
+  });
+
+  it("handles empty or missing scope gracefully", () => {
+    const onMissing = vi.fn();
+    const missingHtml = renderScopeBlock(undefined, {}, onMissing);
+    expect(onMissing).toHaveBeenCalledWith("contract.scope");
+    expect(missingHtml).toContain("⟦missing: contract.scope⟧");
+
+    const emptyHtml = renderScopeBlock("", {}, () => {});
+    expect(emptyHtml).toContain("⟦missing: contract.scope⟧");
+  });
+});
+
