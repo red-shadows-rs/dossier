@@ -7,6 +7,7 @@ import MuiDialogContent from "@mui/material/DialogContent";
 import MuiDialogContentText from "@mui/material/DialogContentText";
 import MuiDialogTitle from "@mui/material/DialogTitle";
 import { X } from "lucide-react";
+import { useLocale } from "next-intl";
 import { cn } from "./cn";
 
 export type DialogProps = {
@@ -19,6 +20,7 @@ export type DialogProps = {
   className?: string;
   maxWidth?: "xs" | "sm" | "md" | "lg" | "xl" | false;
   showCloseButton?: boolean;
+  closeLabel?: string;
 };
 
 export function Dialog({
@@ -31,8 +33,14 @@ export function Dialog({
   className,
   maxWidth = "sm",
   showCloseButton = true,
+  closeLabel,
 }: DialogProps) {
   const descriptionId = useId();
+  let activeLocale = "ar";
+  try {
+    activeLocale = useLocale();
+  } catch {}
+  const isAr = activeLocale !== "en";
 
   return (
     <MuiDialog
@@ -72,7 +80,7 @@ export function Dialog({
           <button
             type="button"
             onClick={onClose}
-            aria-label="إغلاق"
+            aria-label={closeLabel ?? (isAr ? "إغلاق" : "Close")}
             className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-card hover:text-foreground focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
           >
             <X className="h-4 w-4" />

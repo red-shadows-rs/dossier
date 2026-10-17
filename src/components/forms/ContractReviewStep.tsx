@@ -251,7 +251,8 @@ export function ContractReviewStep({
               onClick={reloadPreview}
               loading={loading}
               className="h-8 w-8 p-0"
-              aria-label="تحديث المعاينة"
+              aria-label={isAr ? "تحديث المعاينة" : "Refresh preview"}
+              title={isAr ? "تحديث المعاينة" : "Refresh preview"}
             >
               <RefreshCw className="h-3.5 w-3.5" />
             </Button>
