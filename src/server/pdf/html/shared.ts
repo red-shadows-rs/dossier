@@ -118,14 +118,10 @@ p {
   overflow-wrap: anywhere;
 }
 p.note {
-  font-size: 7.8pt;
-  color: #1e293b;
-  margin: 1.2mm 0 1.8mm 0;
-  padding: 1.8mm 3mm;
-  background: #f8fafc;
-  border-radius: 1.5mm;
-  border-inline-start: 1mm solid #e11d48;
-  line-height: 1.6;
+  font-size: 8pt;
+  color: #27272a;
+  margin: 0.8mm 0 1.4mm 0;
+  line-height: 1.7;
 }
 ul {
   margin: 0 0 2.5mm;
