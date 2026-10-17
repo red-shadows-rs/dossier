@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { assertCan } from "@/lib/permissions";
 import type { ActionResult } from "@/lib/result";
 import { templateInputSchema } from "@/lib/validation/template";
@@ -12,6 +13,8 @@ import {
   duplicateTemplate,
   updateTemplate,
 } from "@/server/services/templates";
+import { renderTemplatePreviewHtml } from "@/server/templating/preview";
+import { SAMPLE_SNAPSHOT } from "@/server/templating/sample-snapshot";
 import { runAction } from "./_run";
 
 export async function createTemplateAction(
@@ -70,5 +73,46 @@ export async function archiveTemplateAction(
     revalidatePath("/templates");
     revalidatePath(`/templates/${id}`);
     return null;
+  });
+}
+
+const templatePreviewInputSchema = z.object({
+  clauses: z
+    .array(
+      z.object({
+        key: z.string().nullable().optional(),
+        titleAr: z.string().default(""),
+        titleEn: z.string().default(""),
+        bodyAr: z.string().default(""),
+        bodyEn: z.string().default(""),
+      }),
+    )
+    .default([]),
+  lang: z.enum(["ar", "en", "bilingual"]).default("ar"),
+  titleAr: z.string().optional(),
+  titleEn: z.string().optional(),
+  hasFees: z.boolean().optional(),
+  paymentTermsDays: z.number().optional(),
+});
+
+export async function getTemplatePreviewHtmlAction(
+  raw: unknown,
+): Promise<ActionResult<{ html: string }>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "templates.read");
+    const input = templatePreviewInputSchema.parse(raw ?? {});
+    const html = await renderTemplatePreviewHtml(
+      input.clauses,
+      input.lang,
+      SAMPLE_SNAPSHOT,
+      {
+        templateTitleAr: input.titleAr,
+        templateTitleEn: input.titleEn,
+        hasFees: input.hasFees,
+        paymentTermsDays: input.paymentTermsDays,
+      },
+    );
+    return { html };
   });
 }

@@ -1,4 +1,15 @@
 import type { Locale } from "@/lib/constants";
+import type { DocLang } from "@/server/pdf/html/shared";
+import { renderContractHtml } from "@/server/pdf/html/contract";
+import { getFontCss } from "@/server/pdf/fonts";
+import { makeQrDataUri } from "@/server/pdf/qr";
+import { getSettings } from "@/server/services/settings";
+import { getFileRow, readFile } from "@/server/services/files";
+import { SAMPLE_SNAPSHOT } from "./sample-snapshot";
+
+function toDataUri(mime: string, buffer: Buffer): string {
+  return `data:${mime};base64,${buffer.toString("base64")}`;
+}
 import {
   numberedParagraphLabels,
   parseBody,
@@ -79,40 +90,119 @@ export function clauseHeading(
 }
 
 export type PreviewClause = {
+  key?: string | null;
   titleAr: string;
   titleEn: string;
   bodyAr: string;
   bodyEn: string;
 };
 
-export function renderTemplatePreviewHtml(
-  clauses: PreviewClause[],
-  lang: Locale,
-  snapshot: ContractSnapshotV1,
-): string {
-  const vars = buildVariableMap(snapshot, lang);
-  const dir = lang === "ar" ? "rtl" : "ltr";
-  const sections = clauses
-    .map((clause, index) => {
-      const position = index + 1;
-      const title = lang === "ar" ? clause.titleAr : clause.titleEn;
-      const body = lang === "ar" ? clause.bodyAr : clause.bodyEn;
-      const heading = clauseHeading(position, title, lang);
-      const html = renderClauseBodyHtml(body, vars, position);
-      return `<section class="clause"><h2>${escapeHtml(heading)}</h2>${html}</section>`;
-    })
-    .join("\n");
+export type TemplatePreviewOptions = {
+  templateTitleAr?: string;
+  templateTitleEn?: string;
+  hasFees?: boolean;
+  paymentTermsDays?: number;
+};
 
-  return `<!doctype html><html dir="${dir}" lang="${lang}"><head><meta charset="utf-8"><style>
-body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;padding:24px;color:#111;line-height:1.7;background:#fff}
-.clause{margin-bottom:24px}
-.clause h2{font-size:16px;margin:0 0 8px;border-bottom:1px solid #ddd;padding-bottom:4px}
-.para{margin:0 0 8px}
-.num{color:#666;font-weight:600;margin-inline-end:4px}
-.note{margin:0 0 8px;padding-inline-start:16px;border-inline-start:2px solid #eee;color:#333}
-.bullets{margin:0 0 8px;padding-inline-start:20px}
-.bullets li{margin-bottom:4px}
-.block{margin:12px 0;padding:12px;border:1px dashed #bbb;border-radius:6px;color:#666;font-size:13px;text-align:center}
-bdi{unicode-bidi:isolate}
-</style></head><body>${sections}</body></html>`;
+function imageByFileId(fileId: string | null): string | null {
+  if (!fileId) return null;
+  const row = getFileRow(fileId);
+  if (!row) return null;
+  try {
+    const file = readFile(row.id);
+    return toDataUri(file.mime, file.buffer);
+  } catch {
+    return null;
+  }
+}
+
+export async function renderTemplatePreviewHtml(
+  clauses: PreviewClause[],
+  lang: DocLang | Locale = "ar",
+  snapshot: ContractSnapshotV1 = SAMPLE_SNAPSHOT,
+  options?: TemplatePreviewOptions,
+): Promise<string> {
+  const docLang: DocLang =
+    lang === "en" ? "en" : lang === "bilingual" ? "bilingual" : "ar";
+
+  let company: any = null;
+  try {
+    company = getSettings("company");
+  } catch {
+    company = null;
+  }
+
+  const logoDataUri = company ? imageByFileId(company.logoFileId ?? null) : null;
+  const stampDataUri = company ? imageByFileId(company.stampFileId ?? null) : null;
+
+  let fonts = "";
+  try {
+    fonts = getFontCss();
+  } catch {
+    fonts = "";
+  }
+
+  let qrDataUri = "";
+  try {
+    qrDataUri = await makeQrDataUri("https://red-shadows-rs.com");
+  } catch {
+    qrDataUri = "";
+  }
+
+  const effectiveClauses =
+    clauses && clauses.length > 0 ? clauses : snapshot.clauses;
+
+  const mergedSnapshot: ContractSnapshotV1 = {
+    ...snapshot,
+    contract: {
+      ...snapshot.contract,
+      number: "DOS-TPL-PREVIEW",
+      titleAr: options?.templateTitleAr?.trim() || snapshot.contract.titleAr,
+      titleEn: options?.templateTitleEn?.trim() || snapshot.contract.titleEn,
+      languageMode: docLang,
+      hasFees:
+        options?.hasFees !== undefined
+          ? options.hasFees
+          : snapshot.contract.hasFees,
+      paymentTermsDays:
+        options?.paymentTermsDays ?? snapshot.contract.paymentTermsDays,
+    },
+    provider: {
+      ...snapshot.provider,
+      nameAr: company?.legalNameAr || snapshot.provider.nameAr,
+      nameEn: company?.legalNameEn || snapshot.provider.nameEn,
+      crNumber: company?.crNumber || snapshot.provider.crNumber,
+      taxNumber: company?.taxNumber || snapshot.provider.taxNumber,
+      addressAr: company?.addressAr || snapshot.provider.addressAr,
+      addressEn: company?.addressEn || snapshot.provider.addressEn,
+      email: company?.email || snapshot.provider.email,
+      phone: company?.phone || snapshot.provider.phone,
+      website: company?.website || snapshot.provider.website,
+    },
+    clauses: effectiveClauses.map((clause, index) => ({
+      id: `clause-${index + 1}`,
+      position: index + 1,
+      key: clause.key ?? null,
+      titleAr: clause.titleAr,
+      titleEn: clause.titleEn,
+      bodyAr: clause.bodyAr,
+      bodyEn: clause.bodyEn,
+    })),
+  };
+
+  return renderContractHtml({
+    snapshot: mergedSnapshot,
+    lang: docLang,
+    mode: "preview",
+    fonts,
+    logoDataUri,
+    stampDataUri,
+    signatures: [],
+    verification: {
+      code: "DOS-TPL-PREVIEW",
+      url: "https://red-shadows-rs.com",
+      qrDataUri,
+    },
+    certificate: null,
+  });
 }

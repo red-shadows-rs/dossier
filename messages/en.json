@@ -577,6 +577,17 @@
     "noFeesRequired": "No Fees (Confidentiality Agreement)",
     "hasFeesRequired": "Includes Financial Fees",
     "basicInfo": "Basic information",
+    "builder": {
+      "steps": "Template Builder Steps",
+      "step": {
+        "basics": "Basic Information",
+        "clauses": "Template Clauses",
+        "defaults": "Defaults & Milestones",
+        "preview": "Document Preview"
+      },
+      "prev": "Previous",
+      "next": "Next"
+    },
     "defaults": "Defaults",
     "nameAr": "Name (Arabic)",
     "nameEn": "Name (English)",

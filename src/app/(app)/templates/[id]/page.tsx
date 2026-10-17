@@ -27,6 +27,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { TemplateActions } from "@/components/forms/TemplateActions";
+import { TemplateDocumentViewer } from "@/components/forms/TemplateDocumentViewer";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -85,10 +86,16 @@ export default async function TemplateDetailPage({
   );
   const rawLocale = await getLocale();
   const locale = isLocale(rawLocale) ? rawLocale : "ar";
-  const previewHtml = renderTemplatePreviewHtml(
+  const previewHtml = await renderTemplatePreviewHtml(
     clauses,
     locale,
     SAMPLE_SNAPSHOT,
+    {
+      templateTitleAr: defaults.titleAr || template.nameAr,
+      templateTitleEn: defaults.titleEn || template.nameEn,
+      hasFees: defaults.hasFees,
+      paymentTermsDays: defaults.paymentTermsDays,
+    },
   );
 
   const { icon: IconComponent, bg: iconBg } = getTemplateIcon(template.key, template.type);
@@ -385,11 +392,14 @@ export default async function TemplateDetailPage({
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           <p className="text-xs text-muted-foreground">{t("previewHint")}</p>
-          <iframe
-            title={t("previewTitle")}
-            sandbox=""
-            srcDoc={previewHtml}
-            className="h-[36rem] w-full rounded-md border border-border bg-white"
+          <TemplateDocumentViewer
+            clauses={clauses}
+            initialHtml={previewHtml}
+            defaultLang={locale === "ar" ? "ar" : "en"}
+            templateTitleAr={defaults.titleAr || template.nameAr}
+            templateTitleEn={defaults.titleEn || template.nameEn}
+            hasFees={defaults.hasFees}
+            paymentTermsDays={defaults.paymentTermsDays}
           />
         </CardContent>
       </Card>

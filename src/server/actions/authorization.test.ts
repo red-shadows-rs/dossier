@@ -88,6 +88,7 @@ import {
   archiveTemplateAction,
   createTemplateAction,
   duplicateTemplateAction,
+  getTemplatePreviewHtmlAction,
   updateTemplateAction,
 } from "./templates";
 import {
@@ -158,6 +159,7 @@ const TABLE: Entry[] = [
   { name: "updateTemplateAction", action: updateTemplateAction, viewerForbidden: true },
   { name: "duplicateTemplateAction", action: duplicateTemplateAction, viewerForbidden: true },
   { name: "archiveTemplateAction", action: archiveTemplateAction, viewerForbidden: true },
+  { name: "getTemplatePreviewHtmlAction", action: getTemplatePreviewHtmlAction, viewerForbidden: false },
 
   { name: "createUserAction", action: createUserAction, viewerForbidden: true },
   { name: "updateUserAction", action: updateUserAction, viewerForbidden: true },
