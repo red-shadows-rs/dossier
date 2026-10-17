@@ -26,7 +26,6 @@ import {
   Server,
   ShieldCheck,
   Smartphone,
-  Sparkles,
 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -50,46 +49,26 @@ export type TemplateItem = {
 };
 
 function getTemplateIcon(key: string | null, type: string) {
+  const iconClass = "bg-primary/10 text-primary border-primary/20";
   switch (key) {
     case "web-development":
-      return {
-        icon: Globe,
-        bg: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-      };
+      return { icon: Globe, bg: iconClass };
     case "mobile-development":
-      return {
-        icon: Smartphone,
-        bg: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-      };
+      return { icon: Smartphone, bg: iconClass };
     case "desktop-development":
-      return {
-        icon: Monitor,
-        bg: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-      };
+      return { icon: Monitor, bg: iconClass };
     case "api-integrations":
-      return {
-        icon: Network,
-        bg: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-      };
+      return { icon: Network, bg: iconClass };
     case "automation-bot-development":
-      return {
-        icon: Bot,
-        bg: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-      };
+      return { icon: Bot, bg: iconClass };
     case "devops-infrastructure":
-      return {
-        icon: Server,
-        bg: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-      };
+      return { icon: Server, bg: iconClass };
     case "nda":
-      return {
-        icon: ShieldCheck,
-        bg: "bg-red-500/10 text-red-400 border-red-500/20",
-      };
+      return { icon: ShieldCheck, bg: iconClass };
     default:
       return {
         icon: type === "nda" ? ShieldCheck : FileCode2,
-        bg: "bg-primary/10 text-primary border-primary/20",
+        bg: iconClass,
       };
   }
 }
@@ -277,31 +256,30 @@ export function TemplatesGallery({
             return (
               <div
                 key={row.id}
-                className="group relative flex flex-col justify-between rounded-lg border border-border/80 bg-card p-5 transition-all duration-200 hover:border-primary/50 hover:shadow-md hover:-translate-y-0.5"
+                className="group relative flex flex-col justify-between rounded border border-border bg-card p-4 sm:p-5 transition-colors hover:border-border/80"
               >
                 <div className="flex flex-col gap-3">
                   {/* Card Header: Icon + Badges */}
                   <div className="flex items-center justify-between gap-3">
                     <div
-                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border transition-transform duration-200 group-hover:scale-105 ${iconBg}`}
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded border ${iconBg}`}
                     >
-                      <IconComponent size={22} aria-hidden="true" />
+                      <IconComponent size={20} aria-hidden="true" />
                     </div>
 
                     <div className="flex items-center gap-1.5 flex-wrap justify-end">
                       {row.isSystem ? (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-400">
-                          <CheckCircle2 size={12} className="shrink-0" />
-                          <span>{labels.system}</span>
-                        </span>
+                        <Badge tone="green" className="text-xs">
+                          {labels.system}
+                        </Badge>
                       ) : (
                         <Badge tone="gray" className="text-xs">
                           {labels.custom}
                         </Badge>
                       )}
-                      <span className="inline-flex items-center rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-xs text-muted-foreground">
+                      <Badge tone="gray" className="text-xs">
                         {labels.typeValues[row.type] ?? row.type}
-                      </span>
+                      </Badge>
                     </div>
                   </div>
 
@@ -309,13 +287,13 @@ export function TemplatesGallery({
                   <div className="flex flex-col gap-0.5 pt-1">
                     <Link
                       href={`/templates/${row.id}`}
-                      className="font-bold text-base sm:text-lg text-foreground tracking-tight transition-colors group-hover:text-primary line-clamp-1"
+                      className="font-bold text-base sm:text-lg text-foreground tracking-tight transition-colors hover:text-primary line-clamp-1"
                     >
                       {primaryTitle}
                     </Link>
                     {secondaryTitle ? (
                       <p
-                        className="text-xs font-medium text-muted-foreground/80 line-clamp-1 font-sans"
+                        className="text-xs font-medium text-muted-foreground line-clamp-1 font-sans"
                         dir={locale === "ar" ? "ltr" : "rtl"}
                       >
                         {secondaryTitle}
@@ -335,34 +313,34 @@ export function TemplatesGallery({
                   {/* Metadata Chips */}
                   <div className="flex flex-wrap items-center gap-2 pt-2 text-xs">
                     <span className="inline-flex items-center gap-1 rounded border border-border/60 bg-muted/20 px-2 py-1 font-medium text-muted-foreground">
-                      <ListOrdered size={13} className="text-primary/70 shrink-0" />
+                      <ListOrdered size={13} className="text-muted-foreground shrink-0" />
                       <span>{row.clauseCount} {locale === "ar" ? "بنداً" : "clauses"}</span>
                     </span>
 
                     <span className="inline-flex items-center gap-1 rounded border border-border/60 bg-muted/20 px-2 py-1 font-medium text-muted-foreground">
                       {hasFees ? (
                         <>
-                          <Coins size={13} className="text-amber-400 shrink-0" />
+                          <Coins size={13} className="text-muted-foreground shrink-0" />
                           <span>{locale === "ar" ? "يتضمن أتعاباً" : "Has fees"}</span>
                         </>
                       ) : (
                         <>
-                          <FileLock2 size={13} className="text-blue-400 shrink-0" />
+                          <FileLock2 size={13} className="text-muted-foreground shrink-0" />
                           <span>{locale === "ar" ? "بدون أتعاب" : "No fees"}</span>
                         </>
                       )}
                     </span>
 
                     <span className="inline-flex items-center gap-1 rounded border border-border/60 bg-muted/20 px-2 py-1 font-medium text-muted-foreground">
-                      <Languages size={13} className="text-cyan-400 shrink-0" />
+                      <Languages size={13} className="text-muted-foreground shrink-0" />
                       <span>{labels.languageValues[row.defaultLanguageMode] ?? row.defaultLanguageMode}</span>
                     </span>
                   </div>
 
                   {/* Milestone Preset Roadmap snippet */}
                   {milestones && milestones.length > 0 ? (
-                    <div className="flex flex-col gap-1 rounded border border-border/50 bg-muted/15 p-2.5 text-xs">
-                      <div className="flex items-center justify-between text-muted-foreground/80 font-medium">
+                    <div className="flex flex-col gap-1 rounded border border-border bg-muted/20 p-2.5 text-xs">
+                      <div className="flex items-center justify-between text-muted-foreground font-medium">
                         <span>{locale === "ar" ? "دفعات الإنجاز المقترحة" : "Suggested milestones"}</span>
                         <span className="font-mono text-[11px]">{milestones.length} {locale === "ar" ? "دفعات" : "steps"}</span>
                       </div>
@@ -370,7 +348,7 @@ export function TemplatesGallery({
                         {milestones.map((m, idx) => (
                           <div
                             key={idx}
-                            className="flex-1 rounded bg-muted/40 border border-border/60 py-1 text-center font-mono text-[11px] text-foreground font-semibold"
+                            className="flex-1 rounded bg-muted/40 border border-border py-1 text-center font-mono text-[11px] text-foreground font-semibold"
                             title={`${locale === "ar" ? m.titleAr : m.titleEn} (${(m.percentBp ?? 0) / 100}%)`}
                           >
                             {(m.percentBp ?? 0) / 100}%
@@ -394,7 +372,7 @@ export function TemplatesGallery({
                         className="w-full gap-1.5 text-xs font-medium shadow-xs"
                       >
                         <FilePlus2 size={14} aria-hidden="true" />
-                        <span>{labels.useTemplate ?? (locale === "ar" ? "إنشاء عقد بهذا القالب" : "Use template")}</span>
+                        <span>{labels.useTemplate ?? (locale === "ar" ? "استخدام القالب" : "Use template")}</span>
                       </Button>
                     </Link>
                   ) : null}
@@ -407,7 +385,7 @@ export function TemplatesGallery({
                       className="w-full gap-1.5 text-xs font-medium border-border/80"
                     >
                       <Eye size={14} aria-hidden="true" />
-                      <span>{labels.viewDetails ?? (locale === "ar" ? "معاينة وتفاصيل" : "Details")}</span>
+                      <span>{labels.viewDetails ?? (locale === "ar" ? "المعاينة" : "Preview")}</span>
                     </Button>
                   </Link>
                 </div>

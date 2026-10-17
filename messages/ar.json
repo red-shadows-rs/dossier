@@ -440,13 +440,13 @@
     "noContracts": "لا توجد عقود لهذا العميل بعد",
     "noInvoices": "لا توجد فواتير لهذا العميل بعد",
     "tabs": {
-      "overview": "نظرة عامة والبيانات",
+      "overview": "نظرة عامة",
       "projectsAndContracts": "المشاريع والعقود",
-      "invoices": "الفواتير والمدفوعات"
+      "invoices": "الفواتير"
     },
     "formSteps": {
       "basics": "البيانات الأساسية",
-      "contact": "الاتصال والعناوين",
+      "contact": "الاتصال",
       "legal": "البيانات القانونية"
     }
   },
@@ -526,19 +526,10 @@
     "activityWhen": "الوقت",
     "activityAction": "الإجراء",
     "activityEntity": "الكيان",
-    "tabs": {
-      "overview": "نظرة عامة والملخص المالي",
-      "contracts": "العقود والمراحل",
-      "invoices": "الفواتير",
-      "filesAndActivity": "الملفات وسجل النشاط",
-      "files": "الملفات",
-      "activity": "سجل النشاط"
-    },
-
     "formSteps": {
-      "basics": "الأساسيات والميزانية",
-      "timeline": "الجدول الزمني والعميل",
-      "notes": "الوصف والملاحظات"
+      "basics": "الأساسيات",
+      "timeline": "الجدول الزمني",
+      "notes": "الملاحظات"
     }
   },
   "templates": {
@@ -584,30 +575,35 @@
     "archive": "أرشفة",
     "archiveConfirm": "أرشفة هذا القالب وإخفاؤه من القائمة؟",
     "archivedToast": "تمت أرشفة القالب",
-    "systemReadOnlyNotice": "قالب استوديو رسمي ومعتمد للقراءة فقط. يمكنك نسخه لإنشاء مسودة مخصصة والتعديل عليها بحرية.",
-    "useTemplate": "إنشاء عقد بهذا القالب",
-    "viewDetails": "معاينة وتفاصيل",
-    "searchPlaceholder": "ابحث في القوالب بالاسم أو الوصف...",
+    "systemReadOnlyNotice": "قالب نظامي للقراءة فقط. يمكنك نسخه لإنشاء قالب مخصص.",
+    "useTemplate": "استخدام القالب",
+    "viewDetails": "المعاينة",
+    "searchPlaceholder": "بحث بالاسم أو النوع...",
     "viewCards": "عرض البطاقات",
     "viewTable": "عرض الجدول",
-    "officialStudioTemplate": "قالب استوديو معتمد",
+    "officialStudioTemplate": "قالب نظامي",
     "customTemplate": "قالب مخصص",
-    "templateIdentity": "الهوية والمسمى القانوني",
-    "templateSpecs": "المواصفات والخصائص",
+    "templateIdentity": "الهوية والمسمى",
+    "templateSpecs": "المواصفات",
     "arabicTitle": "المسمى بالعربية",
     "englishTitle": "المسمى بالإنجليزية",
     "arabicDesc": "الوصف بالعربية",
     "englishDesc": "الوصف بالإنجليزية",
     "noFeesRequired": "بدون أتعاب (اتفاقية سرية)",
-    "hasFeesRequired": "يتضمن أتعابا مالية",
+    "hasFeesRequired": "يتضمن أتعابا",
     "basicInfo": "البيانات الأساسية",
+    "tabs": {
+      "preview": "المعاينة",
+      "details": "البيانات",
+      "clauses": "البنود"
+    },
     "builder": {
-      "steps": "خطوات إعداد القالب",
+      "steps": "إعداد القالب",
       "step": {
         "basics": "البيانات الأساسية",
-        "clauses": "بنود القالب",
-        "defaults": "الإعدادات والدفعات",
-        "preview": "معاينة المستند"
+        "clauses": "البنود",
+        "defaults": "الإعدادات",
+        "preview": "المعاينة"
       },
       "prev": "السابق",
       "next": "التالي"
@@ -882,10 +878,9 @@
     "signaturesPlaceholder": "تظهر التوقيعات بعد التوقيع.",
     "totalsTitle": "الملخص",
     "tabs": {
-      "summary": "الملخص",
-      "document": "المستند",
-      "signatures": "التوقيعات",
-      "history": "السجل"
+      "preview": "المعاينة",
+      "details": "البيانات",
+      "activity": "النشاط"
     },
     "sort": {
       "createdAt": "تاريخ الإنشاء",
@@ -929,9 +924,9 @@
     "newTitle": "إنشاء مسودة فاتورة",
     "createDraft": "إنشاء المسودة",
     "tabs": {
-      "details": "بيانات الفاتورة والبنود",
-      "preview": "معاينة الوثيقة المباشرة",
-      "payments": "سجل الدفعات والسداد"
+      "preview": "المعاينة",
+      "details": "البيانات",
+      "payments": "المدفوعات"
     },
     "empty": "لا توجد فواتير بعد",
     "emptyHint": "أنشئ فاتورة جديدة أو من دفعة عقد.",

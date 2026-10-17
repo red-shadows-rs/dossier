@@ -62,7 +62,7 @@ export function NewInvoiceForm({
       {statusError && (
         <div
           role="alert"
-          className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive animate-in fade-in-50"
+          className="rounded border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive animate-in fade-in-50"
         >
           {statusError}
         </div>
@@ -163,7 +163,7 @@ export function NewInvoiceForm({
       </Card>
 
       {/* Sticky Bottom Action Bar */}
-      <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card/95 backdrop-blur-md p-3 shadow-lg">
+      <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
         <Button
           type="button"
           variant="ghost"

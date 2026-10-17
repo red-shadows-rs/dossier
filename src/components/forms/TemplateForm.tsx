@@ -122,7 +122,7 @@ function getClauseBlocks(body: string) {
       name: "parties",
       labelAr: "أطراف العقد",
       labelEn: "Parties",
-      color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
+      color: "bg-muted text-foreground/80 border-border",
     });
   }
   if (body.includes("{{block.pricing_table}}")) {
@@ -130,7 +130,7 @@ function getClauseBlocks(body: string) {
       name: "pricing_table",
       labelAr: "جدول التسعير",
       labelEn: "Pricing Table",
-      color: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+      color: "bg-primary/10 text-primary border-primary/20",
     });
   }
   if (body.includes("{{block.payment_schedule}}")) {
@@ -138,7 +138,7 @@ function getClauseBlocks(body: string) {
       name: "payment_schedule",
       labelAr: "جدول الدفعات",
       labelEn: "Payment Schedule",
-      color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+      color: "bg-primary/10 text-primary border-primary/20",
     });
   }
   if (body.includes("{{block.signatures}}")) {
@@ -146,7 +146,7 @@ function getClauseBlocks(body: string) {
       name: "signatures",
       labelAr: "كتلة التوقيع",
       labelEn: "Signatures",
-      color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+      color: "bg-muted text-foreground/80 border-border",
     });
   }
   return blocks;
@@ -400,7 +400,7 @@ export function TemplateForm({
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6 pb-28">
       {/* Sleek Step Navigation Header */}
-      <div className="relative sm:sticky sm:top-14 z-20 rounded-lg border border-border bg-card p-1 shadow-xs">
+      <div className="relative sm:sticky sm:top-14 z-20 rounded border border-border bg-card p-1 shadow-xs">
         <nav
           aria-label={t("templates.builder.steps")}
           className="flex items-center gap-1 overflow-x-auto touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:gap-1.5"
@@ -421,7 +421,7 @@ export function TemplateForm({
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all shrink-0 cursor-pointer sm:px-3 sm:py-2 sm:text-sm",
+                  "inline-flex items-center gap-2 rounded px-2.5 py-1.5 text-xs font-medium transition-all shrink-0 cursor-pointer sm:px-3 sm:py-2 sm:text-sm",
                   active
                     ? "bg-primary text-primary-foreground shadow-xs"
                     : completed
@@ -1201,7 +1201,7 @@ export function TemplateForm({
       )}
 
       {/* Persistent Bottom Action Bar */}
-      <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card/95 backdrop-blur-md p-3 shadow-lg">
+      <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
         <div className="flex items-center gap-2">
           {currentIndex > 0 && (
             <Button
@@ -1212,7 +1212,7 @@ export function TemplateForm({
               className="gap-1.5 text-xs sm:text-sm"
             >
               {isAr ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-              <span>{t("templates.builder.prev")}</span>
+              <span>{t("common.previous")}</span>
             </Button>
           )}
 
@@ -1224,7 +1224,7 @@ export function TemplateForm({
               disabled={pending}
               className="gap-1.5 text-xs sm:text-sm"
             >
-              <span>{t("templates.builder.next")}</span>
+              <span>{t("common.next")}</span>
               {isAr ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
             </Button>
           )}

@@ -144,10 +144,8 @@ export function ProjectDetailView({
   const tinvoices = useTranslations("invoices");
 
   const searchParams = useSearchParams();
-  const rawTab = searchParams.get("tab") || "overview";
-  const initialTab =
-    rawTab === "files" || rawTab === "activity" ? "filesAndActivity" : rawTab;
-  const [currentTab, setActiveTab] = useState(initialTab);
+  const currentTab = searchParams.get("tab") || "overview";
+  const [, setActiveTab] = useState(currentTab);
 
   const projectName =
     (locale === "ar"
@@ -205,10 +203,16 @@ export function ProjectDetailView({
       badge: invoices.length,
     },
     {
-      id: "filesAndActivity",
-      label: t("tabs.filesAndActivity"),
+      id: "files",
+      label: t("tabs.files"),
       icon: Paperclip,
-      badge: attachments.length + activity.length,
+      badge: attachments.length,
+    },
+    {
+      id: "activity",
+      label: t("tabs.activity"),
+      icon: History,
+      badge: activity.length,
     },
   ];
 
@@ -234,8 +238,8 @@ export function ProjectDetailView({
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
           <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary shadow-xs">
-              <FolderKanban size={22} aria-hidden="true" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary">
+              <FolderKanban size={20} aria-hidden="true" />
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex flex-wrap items-center gap-2">
@@ -293,21 +297,21 @@ export function ProjectDetailView({
 
       {/* 2. Overview Stat Cards Row */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="flex flex-col gap-1 rounded-lg border border-border/80 bg-card p-3.5 shadow-xs">
+        <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">
               {t("budget")}
             </span>
             <Coins className="h-4 w-4 text-primary/60" />
           </div>
-          <span className="text-xl font-bold font-mono tabular-nums text-foreground truncate">
+          <span className="text-lg font-bold font-mono tabular-nums text-foreground truncate">
             {project.budgetMinor
               ? formatMoney(project.budgetMinor, primaryCurrency, locale)
               : "-"}
           </span>
         </div>
 
-        <div className="flex flex-col gap-1 rounded-lg border border-border/80 bg-card p-3.5 shadow-xs">
+        <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">
               {t("summary.contracted")}
@@ -315,13 +319,13 @@ export function ProjectDetailView({
             <FileText className="h-4 w-4 text-primary/60" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-xl font-bold font-mono tabular-nums text-foreground truncate">
+            <span className="text-lg font-bold font-mono tabular-nums text-foreground truncate">
               {formatMoney(totalContractedMinor, primaryCurrency, locale)}
             </span>
           </div>
         </div>
 
-        <div className="flex flex-col gap-1 rounded-lg border border-border/80 bg-card p-3.5 shadow-xs">
+        <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">
               {t("summary.invoiced")}
@@ -329,13 +333,13 @@ export function ProjectDetailView({
             <Receipt className="h-4 w-4 text-primary/60" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-xl font-bold font-mono tabular-nums text-foreground truncate">
+            <span className="text-lg font-bold font-mono tabular-nums text-foreground truncate">
               {formatMoney(totalInvoicedMinor, primaryCurrency, locale)}
             </span>
           </div>
         </div>
 
-        <div className="flex flex-col gap-1 rounded-lg border border-border/80 bg-card p-3.5 shadow-xs">
+        <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">
               {t("summary.paid")}
@@ -344,7 +348,7 @@ export function ProjectDetailView({
               {collectedPct}%
             </span>
           </div>
-          <span className="text-xl font-bold font-mono tabular-nums text-emerald-600 dark:text-emerald-400 truncate">
+          <span className="text-lg font-bold font-mono tabular-nums text-emerald-600 dark:text-emerald-400 truncate">
             {formatMoney(totalPaidMinor, primaryCurrency, locale)}
           </span>
         </div>
@@ -822,18 +826,13 @@ export function ProjectDetailView({
         </Card>
       </div>
 
-      {/* TAB 4: FILES & ACTIVITY */}
-      <div
-        className={
-          currentTab === "filesAndActivity" ? "block space-y-6" : "hidden"
-        }
-      >
-        {/* Project Files Card */}
+      {/* TAB 4: FILES */}
+      <div className={currentTab === "files" ? "block space-y-6" : "hidden"}>
         <Card>
           <CardHeader>
             <CardTitle className="inline-flex items-center gap-2">
               <Paperclip size={18} className="text-primary" aria-hidden="true" />
-              <span>{t("files.title")}</span>
+              <span>{t("tabs.files")}</span>
               <span className="text-xs text-muted-foreground font-mono">
                 ({attachments.length})
               </span>
@@ -847,8 +846,10 @@ export function ProjectDetailView({
             />
           </CardContent>
         </Card>
+      </div>
 
-        {/* Project Activity Card */}
+      {/* TAB 5: ACTIVITY */}
+      <div className={currentTab === "activity" ? "block space-y-6" : "hidden"}>
         <Card>
           <CardHeader>
             <CardTitle className="inline-flex items-center gap-2">
@@ -890,7 +891,6 @@ export function ProjectDetailView({
                       </TableCell>
                     </TableRow>
                   ))}
-
                 </TableBody>
               </Table>
             )}

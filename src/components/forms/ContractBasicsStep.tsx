@@ -465,15 +465,7 @@ export function ContractBasicsStep({
             loading={pending}
             className="gap-2 text-xs font-semibold"
           >
-            <span>
-              {hasFees
-                ? isAr
-                  ? "التالي: التسعير"
-                  : "Next: Pricing"
-                : isAr
-                  ? "التالي: البنود"
-                  : "Next: Clauses"}
-            </span>
+            <span>{t("common.next")}</span>
             {isAr ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
           </Button>
         ) : null}

@@ -175,7 +175,7 @@ export function ContractBuilder({
   return (
     <div className="flex flex-col gap-6 pb-28">
       {/* Sleek Dossier Step Navigation */}
-      <div className="relative sm:sticky sm:top-14 z-20 rounded-lg border border-border bg-card p-1 shadow-xs">
+      <div className="relative sm:sticky sm:top-14 z-20 rounded border border-border bg-card p-1 shadow-xs">
         <nav
           aria-label={t("builder.steps")}
           className="flex items-center gap-1 overflow-x-auto touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:gap-1.5"
@@ -198,7 +198,7 @@ export function ContractBuilder({
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 className={cn(
-                  "group flex shrink-0 sm:flex-1 items-center gap-1.5 sm:gap-2 rounded-md px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-semibold transition-all select-none cursor-pointer",
+                  "group flex shrink-0 sm:flex-1 items-center gap-1.5 sm:gap-2 rounded px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-semibold transition-all select-none cursor-pointer",
                   active
                     ? "bg-primary text-primary-foreground shadow-xs"
                     : completed

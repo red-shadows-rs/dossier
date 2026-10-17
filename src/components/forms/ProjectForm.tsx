@@ -164,7 +164,7 @@ export function ProjectForm({
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6 pb-28">
       {/* 1. Top Stepped Workflow Navigation */}
-      <div className="rounded-lg border border-border/80 bg-card p-1.5 shadow-xs">
+      <div className="rounded border border-border bg-card p-1 shadow-xs">
         <nav
           aria-label="Form Steps"
           className="flex items-center gap-1.5 text-xs sm:text-sm font-medium overflow-x-auto touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
@@ -179,7 +179,7 @@ export function ProjectForm({
                 type="button"
                 onClick={() => setStep(s.id)}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 sm:px-3 sm:py-2 transition-all text-start shrink-0 cursor-pointer",
+                  "inline-flex items-center gap-2 rounded px-2.5 py-1.5 sm:px-3 sm:py-2 transition-all text-start shrink-0 cursor-pointer",
                   active
                     ? "bg-primary text-primary-foreground shadow-xs font-semibold"
                     : completed
@@ -439,7 +439,7 @@ export function ProjectForm({
       )}
 
       {/* Persistent Bottom Action Bar */}
-      <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card/95 backdrop-blur-md p-3 shadow-lg">
+      <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
         <div className="flex items-center gap-2">
           {currentIndex > 0 && (
             <Button

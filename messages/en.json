@@ -440,14 +440,14 @@
     "noContracts": "No contracts for this client yet",
     "noInvoices": "No invoices for this client yet",
     "tabs": {
-      "overview": "Overview & Details",
+      "overview": "Overview",
       "projectsAndContracts": "Projects & Contracts",
-      "invoices": "Invoices & Payments"
+      "invoices": "Invoices"
     },
     "formSteps": {
-      "basics": "Basic Information",
-      "contact": "Contact & Address",
-      "legal": "Legal & Tax Details"
+      "basics": "Basics",
+      "contact": "Contact",
+      "legal": "Legal"
     }
   },
   "projects": {
@@ -526,19 +526,10 @@
     "activityWhen": "When",
     "activityAction": "Action",
     "activityEntity": "Entity",
-    "tabs": {
-      "overview": "Overview & Financials",
-      "contracts": "Contracts & Milestones",
-      "invoices": "Invoices",
-      "filesAndActivity": "Files & Activity",
-      "files": "Files",
-      "activity": "Activity"
-    },
-
     "formSteps": {
-      "basics": "Basics & Budget",
-      "timeline": "Timeline & Client",
-      "notes": "Description & Notes"
+      "basics": "Basics",
+      "timeline": "Timeline",
+      "notes": "Notes"
     }
   },
   "templates": {
@@ -584,30 +575,35 @@
     "archive": "Archive",
     "archiveConfirm": "Archive this template and hide from the list?",
     "archivedToast": "Template archived",
-    "systemReadOnlyNotice": "Official studio template (read-only). Duplicate it to create a custom copy and edit freely.",
-    "useTemplate": "Create Contract with Template",
-    "viewDetails": "Preview & Clauses",
-    "searchPlaceholder": "Search templates by name or description...",
-    "viewCards": "Cards View",
-    "viewTable": "Table View",
-    "officialStudioTemplate": "Official Studio Template",
-    "customTemplate": "Custom Template",
-    "templateIdentity": "Identity & Legal Title",
-    "templateSpecs": "Specifications & Attributes",
+    "systemReadOnlyNotice": "System template (read-only). Duplicate it to customize.",
+    "useTemplate": "Use template",
+    "viewDetails": "Preview",
+    "searchPlaceholder": "Search by name or type...",
+    "viewCards": "Cards",
+    "viewTable": "Table",
+    "officialStudioTemplate": "System template",
+    "customTemplate": "Custom template",
+    "templateIdentity": "Identity",
+    "templateSpecs": "Specifications",
     "arabicTitle": "Title in Arabic",
     "englishTitle": "Title in English",
     "arabicDesc": "Description in Arabic",
     "englishDesc": "Description in English",
-    "noFeesRequired": "No Fees (Confidentiality Agreement)",
-    "hasFeesRequired": "Includes Financial Fees",
+    "noFeesRequired": "No fees",
+    "hasFeesRequired": "Includes fees",
     "basicInfo": "Basic information",
+    "tabs": {
+      "preview": "Preview",
+      "details": "Details",
+      "clauses": "Clauses"
+    },
     "builder": {
-      "steps": "Template Builder Steps",
+      "steps": "Template Builder",
       "step": {
-        "basics": "Basic Information",
-        "clauses": "Template Clauses",
-        "defaults": "Defaults & Milestones",
-        "preview": "Document Preview"
+        "basics": "Basics",
+        "clauses": "Clauses",
+        "defaults": "Defaults",
+        "preview": "Preview"
       },
       "prev": "Previous",
       "next": "Next"
@@ -882,10 +878,9 @@
     "signaturesPlaceholder": "Signatures appear here after signing.",
     "totalsTitle": "Financial summary",
     "tabs": {
-      "summary": "Summary",
-      "document": "Document",
-      "signatures": "Signatures",
-      "history": "History"
+      "preview": "Preview",
+      "details": "Details",
+      "activity": "Activity"
     },
     "sort": {
       "createdAt": "Created",
@@ -929,9 +924,9 @@
     "newTitle": "Create a draft invoice",
     "createDraft": "Create draft",
     "tabs": {
-      "details": "Invoice Details & Lines",
-      "preview": "Document Preview",
-      "payments": "Payments & Transactions"
+      "preview": "Preview",
+      "details": "Details",
+      "payments": "Payments"
     },
     "empty": "No invoices yet",
     "emptyHint": "Create an invoice from a milestone or standalone.",

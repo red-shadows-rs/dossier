@@ -64,7 +64,7 @@ export function NewContractForm({
       {statusError ? (
         <p
           role="alert"
-          className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-xs font-semibold text-destructive"
+          className="rounded border border-destructive/30 bg-destructive/10 px-4 py-3 text-xs font-semibold text-destructive"
         >
           {statusError}
         </p>

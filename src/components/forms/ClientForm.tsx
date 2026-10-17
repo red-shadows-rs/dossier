@@ -149,7 +149,7 @@ export function ClientForm({
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6 pb-28">
       {/* Sleek Step Navigation Header */}
-      <div className="relative sm:sticky sm:top-14 z-20 rounded-lg border border-border bg-card p-1 shadow-xs">
+      <div className="relative sm:sticky sm:top-14 z-20 rounded border border-border bg-card p-1 shadow-xs">
         <nav
           aria-label={t("clients.formSteps.basics")}
           className="flex items-center gap-1 overflow-x-auto touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:gap-1.5"
@@ -170,7 +170,7 @@ export function ClientForm({
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all shrink-0 cursor-pointer sm:px-3 sm:py-2 sm:text-sm",
+                  "inline-flex items-center gap-2 rounded px-2.5 py-1.5 text-xs font-medium transition-all shrink-0 cursor-pointer sm:px-3 sm:py-2 sm:text-sm",
                   active
                     ? "bg-primary text-primary-foreground shadow-xs"
                     : completed
@@ -204,7 +204,7 @@ export function ClientForm({
       {statusError ? (
         <p
           role="alert"
-          className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive"
+          className="rounded border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive"
         >
           {statusError}
         </p>
@@ -582,7 +582,7 @@ export function ClientForm({
       )}
 
       {/* Persistent Bottom Action Bar */}
-      <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card/95 backdrop-blur-md p-3 shadow-lg">
+      <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
         <div className="flex items-center gap-2">
           {currentIndex > 0 && (
             <Button

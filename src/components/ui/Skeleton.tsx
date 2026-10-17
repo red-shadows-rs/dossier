@@ -334,18 +334,19 @@ export function AuditTableSkeleton() {
   );
 }
 
-export function ProjectDetailSkeleton() {
+export function DetailViewSkeleton({ tabsCount = 3 }: { tabsCount?: number }) {
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-11 w-11 rounded shrink-0" />
+    <div className="flex flex-col gap-5 sm:gap-6">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+        <div className="flex items-center gap-3.5">
+          <Skeleton className="h-10 w-10 rounded shrink-0" />
           <div className="flex flex-col gap-1.5">
             <div className="flex flex-wrap items-center gap-2">
-              <Skeleton className="h-7 w-48" />
-              <Skeleton className="h-5 w-16 rounded" />
-              <Skeleton className="h-5 w-20 rounded-full" />
+              <Skeleton className="h-7 w-48 rounded" />
+              <Skeleton className="h-5 w-20 rounded" />
             </div>
+            <Skeleton className="h-3.5 w-36 rounded" />
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -354,213 +355,58 @@ export function ProjectDetailSkeleton() {
         </div>
       </div>
 
-      <TabsSkeleton count={5} />
-
-      <div className="rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-5 w-5 rounded" />
-          <Skeleton className="h-5 w-28" />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="flex flex-col gap-1.5">
-              <Skeleton className="h-3.5 w-24" />
-              <Skeleton className="h-5 w-36" />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-5 w-5 rounded" />
-          <Skeleton className="h-5 w-32" />
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex flex-col gap-1.5">
-              <Skeleton className="h-3.5 w-20" />
-              <Skeleton className="h-6 w-28" />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export function ContractDetailSkeleton() {
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-11 w-11 rounded shrink-0" />
-          <div className="flex flex-col gap-1.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <Skeleton className="h-7 w-56" />
-              <Skeleton className="h-5 w-20 rounded-full" />
-              <Skeleton className="h-4 w-32" />
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-9 w-24 rounded" />
-          <Skeleton className="h-9 w-28 rounded" />
-        </div>
-      </div>
-
-      <TabsSkeleton count={4} />
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-5 w-5 rounded" />
-            <Skeleton className="h-5 w-32" />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="flex flex-col gap-1.5">
-                <Skeleton className="h-3.5 w-24" />
-                <Skeleton className="h-5 w-40" />
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-3">
-          <Skeleton className="h-5 w-28" />
-          <div className="flex flex-col gap-3 pt-2">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-5/6" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export function InvoiceDetailSkeleton() {
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-11 w-11 rounded shrink-0" />
-          <div className="flex flex-col gap-1.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <Skeleton className="h-7 w-44" />
-              <Skeleton className="h-5 w-20 rounded-full" />
-            </div>
-            <Skeleton className="h-3.5 w-40" />
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-9 w-24 rounded" />
-          <Skeleton className="h-9 w-28 rounded" />
-          <Skeleton className="h-9 w-24 rounded" />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      {/* 4-KPI Metric Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
-            className="rounded border border-border bg-card p-4 flex flex-col gap-2"
+            className="flex flex-col gap-1 rounded border border-border bg-card p-3"
           >
-            <Skeleton className="h-3.5 w-20" />
-            <Skeleton className="h-7 w-28" />
+            <Skeleton className="h-3.5 w-20 rounded" />
+            <Skeleton className="h-6 w-28 rounded" />
           </div>
         ))}
       </div>
 
+      {/* Tabs */}
+      <TabsSkeleton count={tabsCount} />
+
+      {/* Main Tab Content Card */}
       <div className="rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Skeleton className="h-5 w-5 rounded" />
-            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-5 w-32 rounded" />
           </div>
           <Skeleton className="h-8 w-24 rounded" />
         </div>
-        <div className="divide-y divide-border/60">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex items-center justify-between py-3 gap-4">
-              <div className="flex flex-col gap-1 flex-1">
-                <Skeleton className="h-4 w-48" />
-                <Skeleton className="h-3 w-32" />
-              </div>
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-24 text-end" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-1.5">
+              <Skeleton className="h-3.5 w-24 rounded" />
+              <Skeleton className="h-5 w-36 rounded" />
             </div>
           ))}
-        </div>
-        <div className="ms-auto w-64 flex flex-col gap-2 pt-4 border-t border-border">
-          <div className="flex justify-between">
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-          <div className="flex justify-between">
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-          <div className="flex justify-between pt-2 border-t border-border">
-            <Skeleton className="h-5 w-24" />
-            <Skeleton className="h-5 w-24" />
-          </div>
         </div>
       </div>
     </div>
   );
 }
 
+export function ProjectDetailSkeleton() {
+  return <DetailViewSkeleton tabsCount={5} />;
+}
+
+export function ContractDetailSkeleton() {
+  return <DetailViewSkeleton tabsCount={3} />;
+}
+
+export function InvoiceDetailSkeleton() {
+  return <DetailViewSkeleton tabsCount={4} />;
+}
+
 export function ClientDetailSkeleton() {
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-11 w-11 rounded shrink-0" />
-          <div className="flex flex-col gap-1.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <Skeleton className="h-7 w-44" />
-              <Skeleton className="h-5 w-16 rounded-full" />
-            </div>
-          </div>
-        </div>
-        <Skeleton className="h-9 w-24 rounded" />
-      </div>
-
-      <div className="rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-5 w-5 rounded" />
-          <Skeleton className="h-5 w-28" />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 9 }).map((_, i) => (
-            <div key={i} className="flex flex-col gap-1.5">
-              <Skeleton className="h-3.5 w-24" />
-              <Skeleton className="h-4 w-36" />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-3">
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-5 w-5 rounded" />
-          <Skeleton className="h-5 w-28" />
-        </div>
-        <div className="divide-y divide-border/60">
-          {Array.from({ length: 2 }).map((_, i) => (
-            <div key={i} className="flex items-center justify-between py-2.5">
-              <div className="flex items-center gap-2">
-                <Skeleton className="h-5 w-16 rounded" />
-                <Skeleton className="h-4 w-36" />
-              </div>
-              <Skeleton className="h-5 w-20 rounded-full" />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  return <DetailViewSkeleton tabsCount={4} />;
 }
 
 export function UserDetailSkeleton() {
@@ -568,7 +414,7 @@ export function UserDetailSkeleton() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Skeleton className="h-11 w-11 rounded shrink-0" />
+          <Skeleton className="h-10 w-10 rounded shrink-0" />
           <div className="flex flex-col gap-1.5">
             <Skeleton className="h-7 w-40" />
             <Skeleton className="h-4 w-28" />
@@ -601,21 +447,7 @@ export function UserDetailSkeleton() {
 }
 
 export function TemplateDetailSkeleton() {
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-11 w-11 rounded shrink-0" />
-          <Skeleton className="h-7 w-48" />
-        </div>
-        <Skeleton className="h-9 w-24 rounded" />
-      </div>
-      <div className="rounded border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
-        <Skeleton className="h-5 w-32" />
-        <Skeleton className="h-20 w-full" />
-      </div>
-    </div>
-  );
+  return <DetailViewSkeleton tabsCount={3} />;
 }
 
 export function ContractEditSkeleton() {

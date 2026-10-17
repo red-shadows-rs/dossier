@@ -157,8 +157,8 @@ export function ClientDetailView({
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
           <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary shadow-xs">
-              <Building2 size={22} aria-hidden="true" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary">
+              <Building2 size={20} aria-hidden="true" />
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex flex-wrap items-center gap-2">
@@ -170,7 +170,7 @@ export function ClientDetailView({
                 ) : (
                   <Badge tone="green">{t("clients.active")}</Badge>
                 )}
-                <Badge tone="blue">
+                <Badge tone="gray">
                   {t(`clients.type.${client.type}`)}
                 </Badge>
               </div>
@@ -206,7 +206,7 @@ export function ClientDetailView({
 
       {/* 2. Overview Stat Cards Row */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="flex flex-col gap-1 rounded-lg border border-border/80 bg-card p-3.5 shadow-xs">
+        <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">
               {t("clients.projects")}
@@ -214,7 +214,7 @@ export function ClientDetailView({
             <FolderKanban className="h-4 w-4 text-primary/60" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-xl font-bold font-mono tabular-nums text-foreground">
+            <span className="text-lg font-bold font-mono tabular-nums text-foreground">
               {projects.length}
             </span>
             <span className="text-xs text-muted-foreground">
@@ -223,7 +223,7 @@ export function ClientDetailView({
           </div>
         </div>
 
-        <div className="flex flex-col gap-1 rounded-lg border border-border/80 bg-card p-3.5 shadow-xs">
+        <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">
               {t("clients.contracts")}
@@ -231,7 +231,7 @@ export function ClientDetailView({
             <FileText className="h-4 w-4 text-primary/60" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-xl font-bold font-mono tabular-nums text-foreground">
+            <span className="text-lg font-bold font-mono tabular-nums text-foreground">
               {contracts.length}
             </span>
             <span className="text-xs text-muted-foreground">
@@ -240,7 +240,7 @@ export function ClientDetailView({
           </div>
         </div>
 
-        <div className="flex flex-col gap-1 rounded-lg border border-border/80 bg-card p-3.5 shadow-xs">
+        <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">
               {t("clients.invoices")}
@@ -248,7 +248,7 @@ export function ClientDetailView({
             <Receipt className="h-4 w-4 text-primary/60" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-xl font-bold font-mono tabular-nums text-foreground">
+            <span className="text-lg font-bold font-mono tabular-nums text-foreground">
               {invoices.length}
             </span>
             <span className="text-xs text-muted-foreground">
@@ -257,14 +257,14 @@ export function ClientDetailView({
           </div>
         </div>
 
-        <div className="flex flex-col gap-1 rounded-lg border border-border/80 bg-card p-3.5 shadow-xs">
+        <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">
               {t("common.total")}
             </span>
             <CreditCard className="h-4 w-4 text-primary/60" />
           </div>
-          <span className="text-xl font-bold font-mono tabular-nums text-foreground truncate">
+          <span className="text-lg font-bold font-mono tabular-nums text-foreground truncate">
             {formatMoney(totalInvoicedMinor, primaryCurrency, locale)}
           </span>
         </div>

@@ -471,7 +471,7 @@ export function ContractPricingStep({
             className="gap-2"
           >
             <ArrowRight className="h-4 w-4 rtl:rotate-0 rotate-180" />
-            <span>{t("contracts.builder.step.basics")}</span>
+            <span>{t("common.previous")}</span>
           </Button>
         ) : (
           <div />
@@ -495,7 +495,7 @@ export function ContractPricingStep({
               onClick={() => void handleSave(true)}
               className="gap-2"
             >
-              <span>{t("contracts.builder.step.schedule")}</span>
+              <span>{t("common.next")}</span>
               <ArrowLeft className="h-4 w-4 rtl:rotate-0 rotate-180" />
             </Button>
           ) : null}

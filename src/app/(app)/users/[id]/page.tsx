@@ -83,8 +83,8 @@ export default async function UserDetailPage({
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
           <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary shadow-xs">
-              <UserCog size={22} aria-hidden="true" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary">
+              <UserCog size={20} aria-hidden="true" />
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex flex-wrap items-center gap-2">
@@ -96,7 +96,7 @@ export default async function UserDetailPage({
                 ) : (
                   <Badge tone="gray">{t("disabled")}</Badge>
                 )}
-                <Badge tone="blue">{t(`role.${target.role}`)}</Badge>
+                <Badge tone="gray">{t(`role.${target.role}`)}</Badge>
               </div>
               <p className="text-xs text-muted-foreground font-mono">
                 {target.email}

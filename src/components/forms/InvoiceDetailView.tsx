@@ -167,8 +167,8 @@ export function InvoiceDetailView({
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
           <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary shadow-xs">
-              <Receipt size={22} aria-hidden="true" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary">
+              <Receipt size={20} aria-hidden="true" />
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex flex-wrap items-center gap-2">
@@ -231,29 +231,29 @@ export function InvoiceDetailView({
 
       {/* 2. Overview Stat Cards Row */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="flex flex-col gap-1 rounded-lg border border-border/80 bg-card p-3.5 shadow-xs">
+        <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <span className="text-xs font-medium text-muted-foreground">
             {t("total")}
           </span>
-          <span className="text-xl font-bold font-mono tabular-nums text-foreground truncate">
+          <span className="text-lg font-bold font-mono tabular-nums text-foreground truncate">
             {formatMoney(invoice.totalMinor, currency, locale)}
           </span>
         </div>
 
-        <div className="flex flex-col gap-1 rounded-lg border border-border/80 bg-card p-3.5 shadow-xs">
+        <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <span className="text-xs font-medium text-muted-foreground">
             {t("paid")}
           </span>
-          <span className="text-xl font-bold font-mono tabular-nums text-emerald-600 dark:text-emerald-400 truncate">
+          <span className="text-lg font-bold font-mono tabular-nums text-emerald-600 dark:text-emerald-400 truncate">
             {formatMoney(invoice.paidMinor, currency, locale)}
           </span>
         </div>
 
-        <div className="flex flex-col gap-1 rounded-lg border border-border/80 bg-card p-3.5 shadow-xs">
+        <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <span className="text-xs font-medium text-muted-foreground">
             {t("balance")}
           </span>
-          <span className="text-xl font-bold font-mono tabular-nums text-foreground truncate">
+          <span className="text-lg font-bold font-mono tabular-nums text-foreground truncate">
             {formatMoney(
               invoice.totalMinor - invoice.paidMinor,
               currency,
@@ -262,11 +262,11 @@ export function InvoiceDetailView({
           </span>
         </div>
 
-        <div className="flex flex-col gap-1 rounded-lg border border-border/80 bg-card p-3.5 shadow-xs">
+        <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <span className="text-xs font-medium text-muted-foreground">
             {t("paymentsTitle")}
           </span>
-          <span className="text-xl font-bold font-mono tabular-nums text-foreground">
+          <span className="text-lg font-bold font-mono tabular-nums text-foreground">
             {payments.length}
           </span>
         </div>
