@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Check,
   Copy,
@@ -42,6 +43,9 @@ export function BankAccountsManager({
 }) {
   const router = useRouter();
   const toast = useToast();
+  const locale = useLocale();
+  const isAr = locale === "ar";
+  const t = useTranslations("settings.bankAccounts");
   const [accounts, setAccounts] = useState<BankAccount[]>(initialAccounts);
   const [pending, setPending] = useState(false);
 
@@ -67,7 +71,7 @@ export function BankAccountsManager({
     navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
-    toast({ title: "تم نسخ الحساب إلى الحافظة", tone: "success" });
+    toast({ title: t("copied"), tone: "success" });
   }
 
   function openCreateDialog() {
@@ -124,18 +128,18 @@ export function BankAccountsManager({
     setPending(false);
     if (result.ok) {
       setAccounts(nextAccounts);
-      toast({ title: "تم حفظ بيانات الحسابات بنجاح", tone: "success" });
+      toast({ title: t("saved"), tone: "success" });
       router.refresh();
       return true;
     }
-    toast({ title: "حدث خطأ أثناء الحفظ", tone: "error" });
+    toast({ title: t("saveError"), tone: "error" });
     return false;
   }
 
   async function handleFormSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!iban.trim()) {
-      toast({ title: "يرجى إدخال رقم الحساب أو الآيبان", tone: "error" });
+      toast({ title: t("ibanRequired"), tone: "error" });
       return;
     }
 
@@ -213,7 +217,7 @@ export function BankAccountsManager({
       <CardHeader className="flex flex-row items-center justify-between gap-4 pb-4">
         <CardTitle className="inline-flex items-center gap-2.5">
           <Landmark size={18} className="text-primary shrink-0" aria-hidden="true" />
-          <span>الحسابات البنكية ووسائل الدفع</span>
+          <span>{t("title")}</span>
         </CardTitle>
 
         <Button
@@ -224,7 +228,7 @@ export function BankAccountsManager({
           className="gap-1.5"
         >
           <Plus size={15} aria-hidden="true" />
-          <span>إضافة حساب</span>
+          <span>{t("add")}</span>
         </Button>
       </CardHeader>
 
@@ -235,10 +239,10 @@ export function BankAccountsManager({
               <Landmark size={24} aria-hidden="true" />
             </div>
             <h4 className="text-sm font-semibold text-foreground mb-1">
-              لا توجد حسابات بنكية مضافة
+              {t("emptyTitle")}
             </h4>
             <p className="text-xs text-muted-foreground max-w-md mb-4">
-              أضف حساباً بنكياً لعرضه في الفواتير والمدفوعات.
+              {t("emptyDesc")}
             </p>
             <Button
               type="button"
@@ -249,7 +253,7 @@ export function BankAccountsManager({
               className="gap-1.5"
             >
               <Plus size={15} aria-hidden="true" />
-              <span>إضافة حساب جديد</span>
+              <span>{t("addNew")}</span>
             </Button>
           </div>
         ) : (
@@ -282,7 +286,7 @@ export function BankAccountsManager({
                             /* eslint-disable-next-line @next/next/no-img-element */
                             <img
                               src={prov.icon}
-                              alt={prov.nameAr}
+                              alt={isAr ? prov.nameAr : prov.nameEn}
                               className="max-h-full max-w-full object-contain"
                             />
                           ) : (
@@ -292,10 +296,10 @@ export function BankAccountsManager({
 
                         <div className="flex flex-col min-w-0">
                           <span className="font-semibold text-sm text-foreground truncate">
-                            {acc.bankNameAr || prov.nameAr}
+                            {isAr ? (acc.bankNameAr || prov.nameAr) : (acc.bankNameEn || prov.nameEn || acc.bankNameAr)}
                           </span>
                           <span className="text-[11px] text-muted-foreground truncate" dir="ltr">
-                            {acc.bankNameEn || prov.nameEn}
+                            {isAr ? (acc.bankNameEn || prov.nameEn) : (acc.bankNameAr || prov.nameAr)}
                           </span>
                         </div>
                       </div>
@@ -305,7 +309,7 @@ export function BankAccountsManager({
                           <Badge tone="red" dot={false} className="gap-1 px-2.5 py-0.5 text-[11px] whitespace-nowrap">
                             <span className="inline-flex items-center gap-1 whitespace-nowrap">
                               <Star size={11} className="fill-rose-500 text-rose-500 shrink-0" />
-                              <span>رئيسي</span>
+                              <span>{t("primary")}</span>
                             </span>
                           </Badge>
                         ) : null}
@@ -314,7 +318,7 @@ export function BankAccountsManager({
                           tone={acc.isActive ? "green" : "gray"}
                           className="px-2.5 py-0.5 text-[11px] whitespace-nowrap"
                         >
-                          {acc.isActive ? "نشط" : "معطل"}
+                          {acc.isActive ? t("active") : t("inactive")}
                         </Badge>
                       </div>
                     </div>
@@ -322,7 +326,7 @@ export function BankAccountsManager({
                     <div className="space-y-1.5 py-2.5 border-y border-border/50 text-xs">
                       {acc.accountHolder ? (
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground shrink-0">المستفيد:</span>
+                          <span className="text-muted-foreground shrink-0">{t("beneficiary")}:</span>
                           <span className="font-medium text-foreground truncate">
                             {acc.accountHolder}
                           </span>
@@ -331,7 +335,7 @@ export function BankAccountsManager({
 
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-muted-foreground shrink-0">
-                          {prov.identifierLabelAr}:
+                          {isAr ? prov.identifierLabelAr : prov.identifierLabelEn}:
                         </span>
                         <div className="flex items-center gap-1 min-w-0">
                           <span
@@ -344,7 +348,7 @@ export function BankAccountsManager({
                             type="button"
                             onClick={() => handleCopy(acc.id, acc.iban)}
                             className="text-muted-foreground hover:text-foreground p-0.5 rounded transition-colors"
-                            title="نسخ"
+                            title={t("copy")}
                           >
                             {isCopied ? (
                               <Check size={12} className="text-emerald-500" />
@@ -357,7 +361,7 @@ export function BankAccountsManager({
 
                       {acc.swift ? (
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground shrink-0">السويفت:</span>
+                          <span className="text-muted-foreground shrink-0">{t("swift")}:</span>
                           <span className="font-mono text-[11px] text-foreground" dir="ltr">
                             {acc.swift}
                           </span>
@@ -365,7 +369,7 @@ export function BankAccountsManager({
                       ) : null}
 
                       <div className="flex items-center justify-between gap-2 pt-0.5">
-                        <span className="text-muted-foreground shrink-0">العملة:</span>
+                        <span className="text-muted-foreground shrink-0">{t("currency")}:</span>
                         <span className="font-mono text-[11px] font-bold text-foreground">
                           {acc.currency}
                         </span>
@@ -381,10 +385,10 @@ export function BankAccountsManager({
                           disabled={disabled || pending}
                           onClick={() => handleTogglePrimary(acc.id)}
                           className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-primary transition-colors p-1 rounded hover:bg-muted"
-                          title="تعيين كحساب رئيسي"
+                          title={t("setPrimary")}
                         >
                           <Star size={13} />
-                          <span>رئيسي</span>
+                          <span>{t("primary")}</span>
                         </button>
                       ) : null}
 
@@ -398,10 +402,10 @@ export function BankAccountsManager({
                             ? "text-muted-foreground hover:text-amber-500"
                             : "text-muted-foreground hover:text-emerald-500",
                         )}
-                        title={acc.isActive ? "تعطيل الحساب" : "تفعيل الحساب"}
+                        title={acc.isActive ? t("deactivate") : t("activate")}
                       >
                         <Power size={13} />
-                        <span>{acc.isActive ? "تعطيل" : "تفعيل"}</span>
+                        <span>{acc.isActive ? t("deactivate") : t("activate")}</span>
                       </button>
                     </div>
 
@@ -411,7 +415,7 @@ export function BankAccountsManager({
                         disabled={disabled || pending}
                         onClick={() => openEditDialog(acc)}
                         className="p-1.5 text-muted-foreground hover:text-foreground rounded hover:bg-muted transition-colors"
-                        title="تعديل الحساب"
+                        title={t("edit")}
                       >
                         <Edit2 size={13} />
                       </button>
@@ -421,7 +425,7 @@ export function BankAccountsManager({
                         disabled={disabled || pending}
                         onClick={() => setDeleteTargetId(acc.id)}
                         className="p-1.5 text-muted-foreground hover:text-destructive rounded hover:bg-destructive/10 transition-colors"
-                        title="حذف الحساب"
+                        title={t("delete")}
                       >
                         <Trash2 size={13} />
                       </button>
@@ -437,7 +441,7 @@ export function BankAccountsManager({
       <Dialog
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        title={editingAccount ? "تعديل الحساب البنكي" : "إضافة حساب بنكي"}
+        title={editingAccount ? t("editDialogTitle") : t("addDialogTitle")}
         maxWidth="md"
         footer={null}
       >
@@ -448,7 +452,7 @@ export function BankAccountsManager({
         >
           <div className="flex flex-col gap-2">
             <span className="text-xs font-semibold text-foreground/90 select-none">
-              اختر البنك أو وسيلة الدفع
+              {t("chooseProvider")}
             </span>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
               {BANK_PROVIDERS.filter((p) => p.id !== "other").map((p) => {
@@ -473,14 +477,14 @@ export function BankAccountsManager({
                         /* eslint-disable-next-line @next/next/no-img-element */
                         <img
                           src={p.icon}
-                          alt={p.nameAr}
+                          alt={isAr ? p.nameAr : p.nameEn}
                           className="max-h-full max-w-full object-contain"
                         />
                       ) : (
                         <Landmark size={14} className="text-primary" />
                       )}
                     </div>
-                    <span className="text-xs font-medium leading-tight">{p.nameAr}</span>
+                    <span className="text-xs font-medium leading-tight">{isAr ? p.nameAr : p.nameEn}</span>
                   </button>
                 );
               })}
@@ -502,14 +506,14 @@ export function BankAccountsManager({
                   )}
                 >
                   <Landmark size={14} className="shrink-0" />
-                  <span>حساب بنكي آخر أو مخصص</span>
+                  <span>{t("otherProvider")}</span>
                 </button>
               );
             })()}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="اسم البنك / الجهة (عربي)" htmlFor="acc-bank-name-ar" required>
+            <Field label={t("bankNameAr")} htmlFor="acc-bank-name-ar" required>
               <Input
                 id="acc-bank-name-ar"
                 value={bankNameAr}
@@ -520,7 +524,7 @@ export function BankAccountsManager({
               />
             </Field>
 
-            <Field label="اسم البنك / الجهة (إنجليزي)" htmlFor="acc-bank-name-en">
+            <Field label={t("bankNameEn")} htmlFor="acc-bank-name-en">
               <Input
                 id="acc-bank-name-en"
                 value={bankNameEn}
@@ -532,16 +536,16 @@ export function BankAccountsManager({
             </Field>
           </div>
 
-          <Field label="اسم المستفيد" htmlFor="acc-holder">
+          <Field label={t("accountHolder")} htmlFor="acc-holder">
             <Input
               id="acc-holder"
               value={accountHolder}
               onChange={(e) => setAccountHolder(e.target.value)}
-              placeholder="اسم المستفيد أو المنشأة لدى البنك"
+              placeholder={t("accountHolderPlaceholder")}
             />
           </Field>
 
-          <Field label={selectedProviderDef.identifierLabelAr} htmlFor="acc-iban" required>
+          <Field label={isAr ? selectedProviderDef.identifierLabelAr : selectedProviderDef.identifierLabelEn} htmlFor="acc-iban" required>
             <Input
               id="acc-iban"
               value={iban}
@@ -554,7 +558,7 @@ export function BankAccountsManager({
           </Field>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="رمز السويفت (SWIFT)" htmlFor="acc-swift">
+            <Field label={t("swiftLabel")} htmlFor="acc-swift">
               <Input
                 id="acc-swift"
                 value={swift}
@@ -565,7 +569,7 @@ export function BankAccountsManager({
               />
             </Field>
 
-            <Field label="العملة" htmlFor="acc-currency" required>
+            <Field label={t("currencyLabel")} htmlFor="acc-currency" required>
               <Input
                 id="acc-currency"
                 value={currency}
@@ -580,7 +584,7 @@ export function BankAccountsManager({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <label className="flex h-11 cursor-pointer items-center justify-between rounded-lg border border-border/80 bg-muted/20 px-3.5 text-xs text-foreground transition-colors hover:bg-muted/30 select-none">
-              <span className="font-medium">حساب نشط (يظهر في تعليمات الدفع)</span>
+              <span className="font-medium">{t("activeCheckbox")}</span>
               <Checkbox
                 checked={isActive}
                 onChange={(e) => setIsActive(e.target.checked)}
@@ -589,7 +593,7 @@ export function BankAccountsManager({
             </label>
 
             <label className="flex h-11 cursor-pointer items-center justify-between rounded-lg border border-border/80 bg-muted/20 px-3.5 text-xs text-foreground transition-colors hover:bg-muted/30 select-none">
-              <span className="font-medium">تعيين كحساب رئيسي</span>
+              <span className="font-medium">{t("primaryCheckbox")}</span>
               <Checkbox
                 checked={isPrimary}
                 onChange={(e) => setIsPrimary(e.target.checked)}
@@ -607,7 +611,7 @@ export function BankAccountsManager({
               className="gap-2"
             >
               <X size={15} aria-hidden="true" />
-              <span>إلغاء</span>
+              <span>{t("cancel")}</span>
             </Button>
             <Button
               type="submit"
@@ -615,7 +619,7 @@ export function BankAccountsManager({
               className="gap-2"
             >
               <Check size={15} aria-hidden="true" />
-              <span>حفظ</span>
+              <span>{t("save")}</span>
             </Button>
           </div>
         </form>
@@ -625,10 +629,10 @@ export function BankAccountsManager({
         open={Boolean(deleteTargetId)}
         onClose={() => setDeleteTargetId(null)}
         onConfirm={handleDeleteConfirm}
-        title="حذف الحساب"
-        message="هل أنت متأكد من حذف هذا الحساب البنكي؟"
-        confirmLabel="حذف الحساب"
-        cancelLabel="إلغاء"
+        title={t("deleteConfirmTitle")}
+        message={t("deleteConfirmMsg")}
+        confirmLabel={t("delete")}
+        cancelLabel={t("cancel")}
         pending={pending}
       />
     </Card>
