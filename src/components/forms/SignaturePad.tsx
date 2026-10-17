@@ -173,7 +173,7 @@ export const SignaturePad = forwardRef<
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-slate-400">
             <PenLine className="h-6 w-6 stroke-[1.5] text-slate-400/80" />
             <span className="text-xs font-medium">
-              ارسم التوقيع هنا بالماوس أو شاشة اللمس
+              {t("drawHint")}
             </span>
           </div>
         ) : null}
@@ -184,16 +184,16 @@ export const SignaturePad = forwardRef<
           {points >= MIN_POINTS ? (
             <span className="inline-flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
               <CheckCircle2 className="h-4 w-4" />
-              <span>تم التقاط التوقيع بنجاح</span>
+              <span>{t("drawSuccess")}</span>
             </span>
           ) : points > 0 ? (
             <span className="inline-flex items-center gap-1 font-medium text-amber-600 dark:text-amber-400">
               <AlertCircle className="h-4 w-4" />
-              <span>أكمل رسم التوقيع...</span>
+              <span>{t("drawIncomplete")}</span>
             </span>
           ) : (
             <span className="text-muted-foreground">
-              ارسم توقيعك داخل المربع أعلاه
+              {t("drawGuide")}
             </span>
           )}
         </div>

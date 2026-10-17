@@ -95,6 +95,10 @@
     "documentTitle": "Contract document",
     "downloadPdf": "Download PDF",
     "clear": "Clear",
+    "drawHint": "Draw signature here using mouse or touch screen",
+    "drawSuccess": "Signature captured successfully",
+    "drawIncomplete": "Complete drawing your signature...",
+    "drawGuide": "Draw your signature inside the box above",
     "language": {
       "ar": "Arabic",
       "en": "English",
