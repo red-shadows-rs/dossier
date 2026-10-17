@@ -3,8 +3,8 @@
 import { useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
-  ArrowLeft,
-  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
   BookOpen,
   Building2,
   Calendar,
@@ -442,33 +442,37 @@ export function ContractBasicsStep({
       </Card>
 
       {/* Unified Action Footer */}
-      <div className="flex flex-wrap items-center justify-end gap-2.5 pt-2">
-        <Button
-          type="submit"
-          variant="secondary"
-          loading={pending}
-          className="gap-2 text-xs font-semibold"
-        >
-          <Save className="h-4 w-4" />
-          <span>{t("common.save")}</span>
-        </Button>
+      <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
+        <div className="flex items-center gap-2">
+          {onNext ? (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={(e) => {
+                const form = e.currentTarget.closest("form");
+                if (form) {
+                  void performSave(form, true);
+                }
+              }}
+              disabled={pending}
+              className="gap-1.5 text-xs sm:text-sm"
+            >
+              <span>{t("common.next")}</span>
+              {isAr ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            </Button>
+          ) : null}
+        </div>
 
-        {onNext ? (
+        <div className="flex items-center gap-2 ms-auto">
           <Button
-            type="button"
-            onClick={(e) => {
-              const form = e.currentTarget.closest("form");
-              if (form) {
-                void performSave(form, true);
-              }
-            }}
+            type="submit"
             loading={pending}
-            className="gap-2 text-xs font-semibold"
+            className="gap-2 px-5 font-medium text-xs sm:text-sm shadow-xs"
           >
-            <span>{t("common.next")}</span>
-            {isAr ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
+            <Save className="h-4 w-4" />
+            <span>{t("common.save")}</span>
           </Button>
-        ) : null}
+        </div>
       </div>
     </form>
   );

@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
-  ArrowLeft,
-  ArrowRight,
   Calculator,
+  ChevronLeft,
+  ChevronRight,
   Percent,
   Plus,
   Receipt,
@@ -72,6 +72,8 @@ export function ContractPricingStep({
   onNext?: () => void;
 }) {
   const t = useTranslations();
+  const locale = useLocale();
+  const isAr = locale === "ar";
   const toast = useToast();
   const [rows, setRows] = useState<Row[]>(() =>
     initialItems.length > 0
@@ -462,43 +464,44 @@ export function ContractPricingStep({
       </Card>
 
       {/* Unified Action Footer */}
-      <div className="flex flex-col-reverse items-stretch justify-between gap-3 sm:flex-row sm:items-center">
-        {onPrev ? (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onPrev}
-            className="gap-2"
-          >
-            <ArrowRight className="h-4 w-4 rtl:rotate-0 rotate-180" />
-            <span>{t("common.previous")}</span>
-          </Button>
-        ) : (
-          <div />
-        )}
-
+      <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
         <div className="flex items-center gap-2">
+          {onPrev && (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={onPrev}
+              disabled={pending}
+              className="gap-1.5 text-xs sm:text-sm"
+            >
+              {isAr ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+              <span>{t("common.previous")}</span>
+            </Button>
+          )}
+
+          {onNext && (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => void handleSave(true)}
+              disabled={pending}
+              className="gap-1.5 text-xs sm:text-sm"
+            >
+              <span>{t("common.next")}</span>
+              {isAr ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            </Button>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 ms-auto">
           <Button
             type="submit"
-            variant="secondary"
             loading={pending}
-            className="gap-2"
+            className="gap-2 px-5 font-medium text-xs sm:text-sm shadow-xs"
           >
             <Save className="h-4 w-4" />
             <span>{t("common.save")}</span>
           </Button>
-
-          {onNext ? (
-            <Button
-              type="button"
-              loading={pending}
-              onClick={() => void handleSave(true)}
-              className="gap-2"
-            >
-              <span>{t("common.next")}</span>
-              <ArrowLeft className="h-4 w-4 rtl:rotate-0 rotate-180" />
-            </Button>
-          ) : null}
         </div>
       </div>
     </form>

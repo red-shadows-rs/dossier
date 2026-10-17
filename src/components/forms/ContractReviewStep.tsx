@@ -5,8 +5,9 @@ import { useLocale, useTranslations } from "next-intl";
 import {
   AlertCircle,
   AlertTriangle,
-  ArrowRight,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   ExternalLink,
   FileCheck,
   RefreshCw,
@@ -326,33 +327,33 @@ export function ContractReviewStep({
       </Card>
 
       {/* Unified Action Footer */}
-      <div className="flex flex-col-reverse items-stretch justify-between gap-3 sm:flex-row sm:items-center">
-        {onPrev ? (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onPrev}
-            className="gap-2"
-          >
-            <ArrowRight className="h-4 w-4 rtl:rotate-0 rotate-180" />
-            <span>{t("builder.step.clauses")}</span>
-          </Button>
-        ) : (
-          <div />
-        )}
+      <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
+        <div className="flex items-center gap-2">
+          {onPrev && (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={onPrev}
+              className="gap-1.5 text-xs sm:text-sm"
+            >
+              {isAr ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+              <span>{tRoot("common.previous")}</span>
+            </Button>
+          )}
+        </div>
 
-        <div className="flex items-center gap-3">
-          {errors.length > 0 ? (
+        <div className="flex items-center gap-3 ms-auto">
+          {errors.length > 0 && (
             <span className="text-xs font-medium text-destructive">
               {t("review.fixErrorsHint")}
             </span>
-          ) : null}
+          )}
 
           <Button
             type="button"
             disabled={errors.length > 0}
             onClick={() => setSendOpen(true)}
-            className="gap-2"
+            className="gap-2 px-5 font-medium text-xs sm:text-sm shadow-xs"
           >
             <Send className="h-4 w-4" />
             <span>{t("review.send")}</span>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
-import { ArrowRight, Pencil } from "lucide-react";
+import { ArrowLeft, Pencil } from "lucide-react";
 import { getLocale } from "next-intl/server";
 import { Button } from "@/components/ui/Button";
 import { db } from "@/db";
@@ -192,7 +192,7 @@ export default async function ContractEditPage({
         <div className="flex flex-wrap items-center gap-2">
           <Link href={`/contracts/${id}`}>
             <Button type="button" variant="secondary" className="gap-1.5 font-medium shadow-xs">
-              <ArrowRight size={15} className="rtl:rotate-180" aria-hidden="true" />
+              <ArrowLeft size={15} className="rtl:rotate-180" aria-hidden="true" />
               <span>{locale === "ar" ? "العودة للعقد" : "Back to contract"}</span>
             </Button>
           </Link>

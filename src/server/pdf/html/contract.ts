@@ -107,7 +107,7 @@ function renderClauseSingle(
   const body = lang === "ar" ? clause.bodyAr : clause.bodyEn;
   const badgeLabel =
     lang === "ar"
-      ? `المادة (${clause.position})`
+      ? `المادة ${clause.position} —`
       : `Article ${clause.position} —`;
   const blocks = parseBody(body);
   const labels = numberedParagraphLabels(clause.position, blocks);
@@ -195,7 +195,7 @@ function renderClauseBilingual(
 
   const rows: string[] = [];
   rows.push(
-    `<tr class="clause-heading-row"><th class="col-en divider" dir="ltr" style="width: 50%;"><div class="article-header"><span class="article-badge">Article ${clause.position} —</span> <span class="article-title">${esc(clause.titleEn)}</span></div></th><th class="col-ar" dir="rtl" style="width: 50%;"><div class="article-header"><span class="article-badge">المادة (${clause.position}):</span> <span class="article-title">${esc(clause.titleAr)}</span></div></th></tr>`,
+    `<tr class="clause-heading-row"><th class="col-en divider" dir="ltr" style="width: 50%;"><div class="article-header"><span class="article-badge">Article ${clause.position} —</span> <span class="article-title">${esc(clause.titleEn)}</span></div></th><th class="col-ar" dir="rtl" style="width: 50%;"><div class="article-header"><span class="article-badge">المادة ${clause.position} —</span> <span class="article-title">${esc(clause.titleAr)}</span></div></th></tr>`,
   );
 
   const count = Math.max(enSegments.length, arSegments.length);

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { ArrowRight, ChevronRight, Pencil } from "lucide-react";
+import { ArrowLeft, ChevronRight, Pencil } from "lucide-react";
 import {
   ClientForm,
   type ClientFormValues,
@@ -86,7 +86,7 @@ export default async function EditClientPage({
 
         <Link href={`/clients/${id}`}>
           <Button type="button" variant="secondary" size="sm" className="gap-1.5 font-medium shadow-xs">
-            <ArrowRight size={15} className="rtl:rotate-180" aria-hidden="true" />
+            <ArrowLeft size={15} className="rtl:rotate-180" aria-hidden="true" />
             <span>{tc("back")}</span>
           </Button>
         </Link>

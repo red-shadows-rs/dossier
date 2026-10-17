@@ -216,7 +216,7 @@ describe("renderContractHtml — language modes", () => {
   it("ar mode sets rtl and Arabic headings", () => {
     const html = renderContractHtml(input({ lang: "ar" }));
     expect(html).toContain('dir="rtl"');
-    expect(html).toContain("المادة (1)");
+    expect(html).toContain("المادة 1 —");
   });
 
   it("en mode sets ltr and English headings", () => {
@@ -229,7 +229,7 @@ describe("renderContractHtml — language modes", () => {
     const html = renderContractHtml(input({ lang: "bilingual" }));
     expect(html).toContain('class="bilingual-clause"');
     expect(html).toContain("Article 2 —");
-    expect(html).toContain("المادة (2):");
+    expect(html).toContain("المادة 2 —");
     expect(html).toContain("Description");
     expect(html).toContain("الوصف");
   });

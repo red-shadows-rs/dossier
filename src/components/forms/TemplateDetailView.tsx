@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
-  ArrowRight,
+  ArrowLeft,
   Bot,
   Coins,
   Copy,
@@ -204,7 +204,7 @@ export function TemplateDetailView({
 
             <Link href="/templates">
               <Button type="button" variant="secondary" className="gap-1.5 font-medium shadow-xs">
-                <ArrowRight size={15} className="rtl:rotate-180" aria-hidden="true" />
+                <ArrowLeft size={15} className="rtl:rotate-180" aria-hidden="true" />
                 <span>{t("backToList")}</span>
               </Button>
             </Link>

@@ -161,7 +161,7 @@ describe("buildContractHtml", () => {
     const html = await buildContractHtml(id, "bilingual", "preview");
     expect(html).toContain("DRAFT / مسودة");
     expect(html).toContain("Article 1");
-    expect(html).toContain("المادة (1)");
+    expect(html).toContain("المادة 1 —");
   });
 
   it("renders unsigned without a watermark", async () => {

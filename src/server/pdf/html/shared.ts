@@ -217,11 +217,15 @@ li {
   margin: 0;
   padding: 0;
   width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   background: #ffffff;
 }
 .contract-body {
+  flex: 1 0 auto;
   padding: 0 10mm;
 }
 .doc-number {
@@ -680,7 +684,7 @@ li {
 /* Full Bleed Footer Dividing Line & Section (Shared across Invoices & Contracts) */
 .inv-footer-wrap {
   width: 100%;
-  margin-top: 8mm !important;
+  margin-top: auto !important;
   margin-bottom: 0 !important;
   border-top: 0.35mm solid #cbd5e1;
   break-inside: avoid;
@@ -830,7 +834,10 @@ li {
 }
 @media print {
   .bottom-red-bar {
-    display: none !important;
+    background: #e11d48 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color: #ffffff !important;
   }
 }
 `;
