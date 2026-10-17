@@ -581,61 +581,61 @@ li {
 /* Signatures */
 .sig-grid {
   display: flex;
-  gap: 2.5mm;
-  margin-top: 1mm;
+  gap: 3mm;
+  margin-top: 1.5mm;
 }
 .sig-card {
   flex: 1;
   background: #fafafa;
   border: 0.3mm solid #e4e4e7;
   border-radius: 2mm;
-  padding: 2.5mm;
-  min-height: 25mm;
+  padding: 3mm 3.5mm;
+  min-height: 32mm;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   break-inside: avoid;
 }
 .sig-role {
-  font-size: 6.8pt;
+  font-size: 7.2pt;
   font-weight: 800;
   color: #e11d48;
   text-transform: uppercase;
-  margin-bottom: 1mm;
+  margin-bottom: 1.5mm;
 }
 .sig-mark-area {
-  min-height: 11mm;
+  min-height: 18mm;
   display: flex;
   align-items: center;
-  gap: 2mm;
-  margin: 1mm 0;
+  gap: 3mm;
+  margin: 1.5mm 0;
 }
 .sig-img {
-  max-height: 11mm;
-  max-width: 30mm;
+  max-height: 20mm;
+  max-width: 55mm;
   object-fit: contain;
 }
 .stamp {
-  max-height: 13mm;
-  max-width: 22mm;
+  max-height: 20mm;
+  max-width: 30mm;
   object-fit: contain;
 }
 .sig-name {
-  font-size: 8.2pt;
+  font-size: 8.8pt;
   font-weight: 800;
   color: #14141a;
 }
 .sig-title {
-  font-size: 7pt;
+  font-size: 7.2pt;
   color: #71717a;
 }
 .sig-date {
-  font-size: 6.5pt;
+  font-size: 6.8pt;
   color: #71717a;
   margin-top: 0.8mm;
 }
 .sig-pending {
-  font-size: 7pt;
+  font-size: 7.5pt;
   color: #a1a1aa;
   font-style: italic;
 }
@@ -1443,7 +1443,7 @@ export function renderSignaturesBlock(
     if (sig?.imageDataUri) {
       mark = `<img class="sig-img" src="${esc(sig.imageDataUri)}" alt="Signature" />`;
     } else if (sig?.method === "typed" && sig.typedName) {
-      mark = `<em style="font-family: serif; font-size: 13pt; color: #1e1b4b;">${esc(sig.typedName)}</em>`;
+      mark = `<em style="font-family: serif; font-size: 16pt; color: #1e1b4b;">${esc(sig.typedName)}</em>`;
     }
 
     const stamp =
