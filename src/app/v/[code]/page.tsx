@@ -79,7 +79,6 @@ export default async function VerifyCodePage({
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <div className="flex min-h-dvh flex-col bg-background">
-        {/* Navigation Header */}
         <header className="sticky top-0 z-10 flex items-center justify-between gap-2 sm:gap-3 border-b border-border/60 bg-background/80 px-3 py-2.5 sm:px-8 sm:py-3 backdrop-blur">
           <div className="flex items-center gap-2 sm:gap-3">
             <Logo />
@@ -104,10 +103,8 @@ export default async function VerifyCodePage({
           </div>
         </header>
 
-        {/* Main Content Area */}
         <main dir={dir} className="flex-1 px-4 py-8 sm:px-6 sm:py-12">
           <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
-            {/* Hero Verification Status Header */}
             <div className="flex flex-col items-center text-center gap-2.5">
               <div
                 className={`flex h-14 w-14 items-center justify-center rounded-lg ring-4 ${
@@ -157,7 +154,6 @@ export default async function VerifyCodePage({
                         : "This document is no longer active in system records."}
               </p>
 
-              {/* Monospace Code Pill */}
               <div className="mt-1 flex items-center gap-2">
                 <span className="text-xs font-medium text-muted-foreground">
                   {t.codeLabel}:
@@ -171,7 +167,6 @@ export default async function VerifyCodePage({
               </div>
             </div>
 
-            {/* Document Details Card */}
             {limited ? (
               <Notice tone="error" text={t.rateLimited} />
             ) : result === null ? (
@@ -193,12 +188,10 @@ export default async function VerifyCodePage({
               <InvoiceCard result={result} code={code} locale={locale} t={t} />
             )}
 
-            {/* PDF File Integrity Checker (Only if document found) */}
             {result !== null ? (
               <VerificationPdfChecker code={code} />
             ) : null}
 
-            {/* Bottom Actions */}
             <div className="flex items-center justify-center pt-2">
               <Link
                 href="/verify"
@@ -298,7 +291,6 @@ function ContractCard({
     <div className="relative overflow-hidden flex flex-col gap-5 rounded-lg border border-border bg-card p-5 sm:p-7 shadow-sm">
       <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/80 via-primary to-rose-400" />
 
-      {/* Top Header Row */}
       <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-4">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
@@ -326,7 +318,6 @@ function ContractCard({
         </div>
       )}
 
-      {/* Code 39 Barcode Box */}
       <div className="flex flex-col items-center justify-center gap-1.5 rounded-md border border-border/70 bg-muted/20 py-3.5 px-4 text-center">
         <div
           className="max-w-[280px] overflow-hidden"
@@ -339,13 +330,11 @@ function ContractCard({
         </div>
       </div>
 
-      {/* Contract Title */}
       <div className="rounded-md border border-border/70 bg-muted/30 p-4">
         <div className="text-xs font-medium text-muted-foreground">{t.fields.title}</div>
         <div className="mt-0.5 text-base font-semibold text-foreground">{title ?? "-"}</div>
       </div>
 
-      {/* Parties & Dates Grid */}
       <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <DetailItem
           icon={<Building2 className="h-4 w-4" />}
@@ -365,7 +354,6 @@ function ContractCard({
         />
       </dl>
 
-      {/* Cryptographic SHA-256 Hash */}
       <div className="flex flex-col gap-1.5 rounded-md border border-border/70 bg-muted/40 p-3.5">
         <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
           <Fingerprint className="h-3.5 w-3.5 text-primary" />
@@ -396,7 +384,6 @@ function InvoiceCard({
     <div className="relative overflow-hidden flex flex-col gap-5 rounded-lg border border-border bg-card p-5 sm:p-7 shadow-sm">
       <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/80 via-primary to-rose-400" />
 
-      {/* Top Header Row */}
       <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-4">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
@@ -424,7 +411,6 @@ function InvoiceCard({
         </div>
       )}
 
-      {/* Code 39 Barcode Box */}
       <div className="flex flex-col items-center justify-center gap-1.5 rounded-md border border-border/70 bg-muted/20 py-3.5 px-4 text-center">
         <div
           className="max-w-[280px] overflow-hidden"
@@ -437,7 +423,6 @@ function InvoiceCard({
         </div>
       </div>
 
-      {/* Amount Highlight */}
       <div className="rounded-md border border-primary/20 bg-primary/5 p-4 sm:p-5">
         <div className="text-xs font-semibold uppercase tracking-wider text-primary">
           {t.fields.total}
@@ -447,7 +432,6 @@ function InvoiceCard({
         </div>
       </div>
 
-      {/* Details Grid */}
       <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <DetailItem
           icon={<Building2 className="h-4 w-4" />}

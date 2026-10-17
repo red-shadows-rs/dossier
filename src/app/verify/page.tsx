@@ -40,7 +40,6 @@ export default async function VerifyPage({
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <div className="flex min-h-dvh flex-col bg-background">
-        {/* Navigation Header */}
         <header className="sticky top-0 z-10 flex items-center justify-between gap-2 sm:gap-3 border-b border-border/60 bg-background/80 px-3 py-2.5 sm:px-8 sm:py-3 backdrop-blur">
           <div className="flex items-center gap-2 sm:gap-3">
             <Logo />
@@ -65,10 +64,8 @@ export default async function VerifyPage({
           </div>
         </header>
 
-        {/* Main Content Area */}
         <main dir={dir} className="flex-1 px-4 py-8 sm:px-6 sm:py-12">
           <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
-            {/* Hero Header */}
             <div className="flex flex-col items-center text-center gap-2.5">
               <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-primary/10 text-primary ring-4 ring-primary/5">
                 <ShieldCheck className="h-7 w-7" />

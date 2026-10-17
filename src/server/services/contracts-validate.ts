@@ -353,7 +353,6 @@ export function validateContractForSend(
     issues.push(error("paymentScheduleBlock", "blocks"));
   }
 
-  // Tax numbers are explicitly optional for both parties per user requirements
   if (contract.endDate && milestones.length > 0) {
     const lastDue = milestones
       .map((m) => m.dueDate)

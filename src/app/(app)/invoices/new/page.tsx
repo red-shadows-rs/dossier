@@ -28,7 +28,6 @@ export default async function NewInvoicePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* 1. Standardized Header with Breadcrumbs */}
       <div className="flex flex-col gap-2">
         <nav
           aria-label="Breadcrumb"
@@ -73,7 +72,6 @@ export default async function NewInvoicePage() {
         </div>
       </div>
 
-      {/* Invoice Mode Switcher */}
       <div className="flex flex-wrap items-center gap-2 border-b border-border/60 pb-3">
         <Link href="/invoices/new">
           <Button type="button" variant="primary" size="sm" className="gap-1.5 shadow-xs">

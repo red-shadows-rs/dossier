@@ -51,7 +51,6 @@ export default async function EditClientPage({
 
   return (
     <div className="flex flex-col gap-5 sm:gap-6">
-      {/* Unified Header with Breadcrumbs & Back Button */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
         <div className="flex items-center gap-3.5">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary shadow-xs">

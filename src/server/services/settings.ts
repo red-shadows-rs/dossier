@@ -189,7 +189,6 @@ export function buildPaymentInstructions(
       .join("\n");
   }
 
-  // Fallback to legacy single bank
   const bank = company.bank;
   if (!bank.bankNameAr && !bank.bankNameEn && !bank.iban) {
     return "";

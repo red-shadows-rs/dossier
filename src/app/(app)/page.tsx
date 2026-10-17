@@ -661,7 +661,6 @@ export default async function DashboardPage() {
             </div>
           ) : (
             <>
-              {/* Mobile Recent Activity Cards (< md) */}
               <div className="md:hidden divide-y divide-border/60">
                 {data.recentActivity.map((row) => {
                   const href =
@@ -717,7 +716,6 @@ export default async function DashboardPage() {
                 })}
               </div>
 
-              {/* Desktop Recent Activity Table (>= md) */}
               <div className="hidden md:block">
                 <Table>
                   <TableHead>

@@ -248,7 +248,6 @@ describe("renderInvoiceHtml — multi-page pagination and branding", () => {
     }));
     const html = renderInvoiceHtml(input({ lines }));
     const pages = html.split('class="invoice-page"');
-    // split gives 2 parts for 1 occurrence (before and after)
     expect(pages.length).toBe(2);
     expect(html).toContain('class="hero-header"');
     expect(html).not.toContain('class="subsequent-header"');

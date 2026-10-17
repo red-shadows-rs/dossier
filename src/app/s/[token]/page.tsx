@@ -126,7 +126,6 @@ export default async function SigningPage({
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <div className="flex min-h-dvh flex-col bg-background">
-        {/* Navigation Header */}
         <header className="sticky top-0 z-10 flex items-center justify-between gap-2 sm:gap-3 border-b border-border/60 bg-background/80 px-4 py-2.5 sm:px-8 sm:py-3 backdrop-blur">
           <div className="flex items-center gap-2 sm:gap-3">
             <Logo />
@@ -137,12 +136,10 @@ export default async function SigningPage({
           </div>
         </header>
 
-        {/* Main Content Area */}
         <main
           dir={dir}
           className="flex w-full flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8"
         >
-          {/* Document Header Card */}
           <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5 sm:p-6 shadow-xs">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="flex flex-col gap-1.5">
@@ -212,10 +209,8 @@ export default async function SigningPage({
             </div>
           </div>
 
-          {/* Continuous Document Viewer */}
           <PublicContractViewer html={html} title={t.documentTitle} />
 
-          {/* Signing Experience Box */}
           <div className="rounded-xl border border-border bg-card p-5 sm:p-6 shadow-xs">
             <SigningExperience
               token={token}
@@ -227,7 +222,6 @@ export default async function SigningPage({
           </div>
         </main>
 
-        {/* Site Footer */}
         <Footer />
       </div>
     </NextIntlClientProvider>

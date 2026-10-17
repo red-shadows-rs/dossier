@@ -21,7 +21,6 @@ export type TemplateDef = {
 };
 
 export const CLAUSES: Record<string, ClauseDef> = {
-  // --- المشتركة (Shared Core) ---
   parties: {
     titleEn: "Parties",
     titleAr: "الأطراف",
@@ -123,7 +122,6 @@ export const CLAUSES: Record<string, ClauseDef> = {
     bodyAr: "{{block.signatures}}",
   },
 
-  // --- 1. تطوير تطبيقات الويب (Web App Development) ---
   purpose_web: {
     titleEn: "Purpose & Web Engagement",
     titleAr: "موضوع العقد وتطوير الويب",
@@ -141,7 +139,6 @@ export const CLAUSES: Record<string, ClauseDef> = {
       "يلتزم المزود بتنفيذ خدمات تطوير تطبيق الويب وفق المواصفات المحددة أدناه:\n\n> {{contract.scope}}\n\nلا تشمل الأتعاب تكاليف النطاقات، أو الخوادم السحابية، أو اشتراكات الخدمات الخارجية المدفوعة ما لم ينص نطاق العمل أعلاه على خلاف ذلك صراحة.",
   },
 
-  // --- 2. تطوير تطبيقات الجوال (Mobile App Development) ---
   purpose_mobile: {
     titleEn: "Purpose & Mobile Engagement",
     titleAr: "موضوع العقد وتطوير تطبيقات الجوال",
@@ -167,7 +164,6 @@ export const CLAUSES: Record<string, ClauseDef> = {
       "يلتزم العميل بتوفير حسابات مطورين نشطة في متجري Apple و Google ويتحمل رسومها بشكل مستقل.\n\nيتولى المزود تجهيز حزم الإطلاق ومساعدة العميل في رفع التطبيق للمراجعة. وتخضع مواعيد وسياسات القبول لسياسات المتجرين المستقلة.",
   },
 
-  // --- 3. تطوير تطبيقات سطح المكتب (Desktop Software) ---
   purpose_desktop: {
     titleEn: "Purpose & Desktop Engagement",
     titleAr: "موضوع العقد وتطبيقات سطح المكتب",
@@ -193,7 +189,6 @@ export const CLAUSES: Record<string, ClauseDef> = {
       "يطور البرنامج ليعمل على إصدارات أنظمة التشغيل الحديثة المتفق عليها في النطاق. وتعد تعريفات العتاد الخاص وشهادات توقيع الأكواد الرقمية (Code Signing) خارج النطاق ما لم يتفق عليها صراحة.",
   },
 
-  // --- 4. الواجهات والتكاملات (APIs & Integrations) ---
   purpose_apis: {
     titleEn: "Purpose & API Integration",
     titleAr: "موضوع العقد والواجهات البرمجية",
@@ -219,7 +214,6 @@ export const CLAUSES: Record<string, ClauseDef> = {
       "تبنى الواجهات البرمجية بضوابط تحقق وأمان موثوقة (مثل OAuth 2.0 ومفاتيح API الآمنة). ويتحمل العميل أي رسوم استهلاك تفرضها الخدمات الخارجية المرتبطة.",
   },
 
-  // --- 5. البوتات والأتمتة (Bots & Automation) ---
   purpose_bots: {
     titleEn: "Purpose & Automation Engagement",
     titleAr: "موضوع العقد وتطوير البوتات",
@@ -245,7 +239,6 @@ export const CLAUSES: Record<string, ClauseDef> = {
       "يلتزم العميل بامتلاك حسابات صالحة والتأكد من توافق استخدام البوت مع شروط المنصات، ولا يتحمل المزود مسؤولية أي حظر أو قيود ناتجة عن تعديل سياسات المنصات الخارجية.",
   },
 
-  // --- 6. البنية التحتية و DevOps (DevOps & Infrastructure) ---
   purpose_devops: {
     titleEn: "Purpose & DevOps Services",
     titleAr: "موضوع العقد والبنية التحتية",
@@ -271,7 +264,6 @@ export const CLAUSES: Record<string, ClauseDef> = {
       "تكون تكاليف الخوادم والاشتراكات السحابية (مثل Hetzner أو AWS) مدفوعة مباشرة من العميل لمزود الخدمة، وتقتصر مسؤولية المزود على الإدارة والتشغيل الفني.",
   },
 
-  // --- 7. اتفاقية السرية وعدم الإفصاح (Mutual NDA) ---
   nda_purpose: {
     titleEn: "Purpose of Disclosure",
     titleAr: "الغرض من الإفصاح",

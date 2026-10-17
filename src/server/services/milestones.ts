@@ -116,12 +116,10 @@ export function planMilestones(input: MilestonePlanInput): PlannedMilestone[] {
     const total = input.net + input.tax;
 
     if (input.tax > 0 && sum === total) {
-      // User entered total (gross) milestone amounts matching contract total
       totals = rawAmounts;
       amounts = allocateProportional(input.net, totals);
       taxes = totals.map((tot, i) => tot - amounts[i]);
     } else {
-      // User entered net milestone amounts
       amounts = rawAmounts;
       taxes = allocateProportional(input.tax, amounts);
       totals = amounts.map((a, i) => a + taxes[i]);

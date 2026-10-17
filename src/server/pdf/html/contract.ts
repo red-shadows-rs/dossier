@@ -417,8 +417,6 @@ export function paginateContractClauses(
     pages.push(currentPage);
   }
 
-  // Prevent empty footer page: if last page has no room for footer,
-  // redistribute so that the last page has content as well.
   const lastPageBudget = pages.length === 1 ? P1_BUDGET : 220;
   const lastPageClauseMm = pages[pages.length - 1].reduce(
     (acc, cl) => acc + estimateClauseMm(cl),
@@ -537,7 +535,6 @@ export function renderContractHtml(input: ContractHtmlInput): string {
 
   const footerHtml = renderContractFooter(input);
 
-  // When previewed on screen (dashboard / editor / review), render as a single continuous page
   if (mode === "preview") {
     const headerHtml = renderHeroHeader(snapshot, lang, input.logoDataUri);
     const clausesHtml = snapshot.clauses

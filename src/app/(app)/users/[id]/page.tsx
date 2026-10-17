@@ -63,7 +63,6 @@ export default async function UserDetailPage({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* 1. Standardized Header with Breadcrumbs */}
       <div className="flex flex-col gap-2">
         <nav
           aria-label="Breadcrumb"
@@ -121,7 +120,6 @@ export default async function UserDetailPage({
         </div>
       </div>
 
-      {/* User Info Card */}
       <Card>
         <CardHeader>
           <CardTitle className="inline-flex items-center gap-2">
@@ -153,7 +151,6 @@ export default async function UserDetailPage({
         </CardContent>
       </Card>
 
-      {/* Edit User Form Card */}
       <Card>
         <CardHeader>
           <CardTitle className="inline-flex items-center gap-2">
@@ -175,7 +172,6 @@ export default async function UserDetailPage({
         </CardContent>
       </Card>
 
-      {/* Password Reset Card */}
       <Card>
         <CardHeader>
           <CardTitle className="inline-flex items-center gap-2">

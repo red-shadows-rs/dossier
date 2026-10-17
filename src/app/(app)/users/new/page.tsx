@@ -26,7 +26,6 @@ export default async function NewUserPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* 1. Standardized Header with Breadcrumbs */}
       <div className="flex flex-col gap-2">
         <nav
           aria-label="Breadcrumb"

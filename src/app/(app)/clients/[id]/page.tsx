@@ -34,7 +34,6 @@ export default async function ClientDetailPage({
   const canWrite = can(user, "clients.write");
   const canDelete = canDeleteClient(id);
 
-  // Fetch associated records for this client
   const projectsPage = listProjects({ clientId: id });
   const contractsPage = listContracts({ clientId: id });
   const invoicesPage = listInvoices({ clientId: id });
