@@ -29,6 +29,7 @@ export function ServerDataTable<R extends { id: string | number }>({
   emptyDescription,
   emptyAction,
   minWidth = "min-w-[560px]",
+  renderMobileCard,
 }: {
   rows: R[];
   columns: ColumnDef<R>[];
@@ -43,6 +44,7 @@ export function ServerDataTable<R extends { id: string | number }>({
   emptyDescription?: ReactNode;
   emptyAction?: ReactNode;
   minWidth?: string;
+  renderMobileCard?: (row: R) => ReactNode;
 }) {
   const [clientPage, setClientPage] = useState(1);
 
@@ -101,8 +103,11 @@ export function ServerDataTable<R extends { id: string | number }>({
       {externalLoading ? (
         <div className="absolute inset-0 z-10 flex flex-col justify-start bg-card/75 backdrop-blur-[1px] p-4 divide-y divide-border/50 pointer-events-none">
           {Array.from({ length: Math.min(rows.length || 5, 6) }).map((_, i) => (
-            <div key={i} className="flex items-center gap-4 py-3.5">
-              <Skeleton className="h-4 w-36 rounded" />
+            <div key={i} className="py-3.5 flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+              <div className="flex items-center justify-between w-full md:w-auto">
+                <Skeleton className="h-4 w-36 rounded" />
+                <Skeleton className="h-5 w-16 rounded md:hidden" />
+              </div>
               <Skeleton className="h-4 w-28 rounded hidden sm:block" />
               <Skeleton className="h-4 w-32 rounded hidden md:block" />
               <Skeleton className="h-4 w-20 rounded hidden lg:block" />
@@ -112,12 +117,52 @@ export function ServerDataTable<R extends { id: string | number }>({
         </div>
       ) : null}
 
-      <div className="relative w-full">
+      {/* Mobile Responsive Cards (< md) */}
+      <div className="md:hidden flex flex-col divide-y divide-border/60">
+        {displayRows.map((row) => (
+          <div key={row.id} className="p-3.5 hover:bg-muted/15 transition-colors">
+            {renderMobileCard ? (
+              renderMobileCard(row)
+            ) : (
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="font-semibold text-sm text-foreground">
+                    {columns[0]?.render(row)}
+                  </div>
+                  {columns.length > 2 && (
+                    <div className="shrink-0">
+                      {columns[2]?.render(row)}
+                    </div>
+                  )}
+                </div>
+                {columns.length > 3 && (
+                  <div className="grid grid-cols-2 gap-2 text-xs py-1 border-t border-border/40">
+                    {columns.slice(1, -1).map((col) => (
+                      <div key={col.id} className="flex flex-col gap-0.5">
+                        <span className="text-[11px] text-muted-foreground">{col.header}</span>
+                        <div className="text-foreground">{col.render(row)}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {columns[columns.length - 1]?.id === "actions" && (
+                  <div className="flex items-center justify-end pt-1.5 border-t border-border/50">
+                    {columns[columns.length - 1]?.render(row)}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Table View (>= md) */}
+      <div className="hidden md:block relative w-full">
         {canScrollLeft ? (
-          <div className="pointer-events-none absolute inset-y-0 start-0 z-10 w-6 bg-gradient-to-r from-card to-transparent rtl:bg-gradient-to-l opacity-80 sm:hidden" />
+          <div className="pointer-events-none absolute inset-y-0 start-0 z-10 w-6 bg-gradient-to-r from-card to-transparent rtl:bg-gradient-to-l opacity-80" />
         ) : null}
         {canScrollRight ? (
-          <div className="pointer-events-none absolute inset-y-0 end-0 z-10 w-6 bg-gradient-to-l from-card to-transparent rtl:bg-gradient-to-r opacity-80 sm:hidden" />
+          <div className="pointer-events-none absolute inset-y-0 end-0 z-10 w-6 bg-gradient-to-l from-card to-transparent rtl:bg-gradient-to-r opacity-80" />
         ) : null}
 
         <div

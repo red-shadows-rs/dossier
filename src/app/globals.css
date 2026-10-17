@@ -116,8 +116,8 @@
 }
 
 @media (pointer: coarse) {
-  button,
-  [role="button"],
+  button:not(.aspect-square):not(.MuiIconButton-root):not([data-icon-button]),
+  [role="button"]:not(.aspect-square):not(.MuiIconButton-root):not([data-icon-button]),
   summary,
   select,
   input:not([type="checkbox"]):not([type="radio"]),

@@ -256,7 +256,7 @@ export function InvoiceLinesEditor({
                     }
                     disabled={rows.length <= 1}
                     aria-label={t("common.delete")}
-                    className="flex h-9 w-9 items-center justify-center rounded border border-border/70 bg-card text-muted-foreground hover:bg-destructive/10 hover:border-destructive/40 hover:text-destructive transition-all shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="flex h-9 w-9 shrink-0 aspect-square items-center justify-center rounded border border-border/70 bg-card text-muted-foreground hover:bg-destructive/10 hover:border-destructive/40 hover:text-destructive transition-all shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>

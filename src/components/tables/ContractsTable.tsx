@@ -145,6 +145,61 @@ export function ContractsTable({
       noRowsLabel={labels.empty}
       emptyIcon={<FileText size={36} className="text-muted-foreground" aria-hidden="true" />}
       minWidth="min-w-[420px] sm:min-w-full"
+      renderMobileCard={(row) => {
+        const title =
+          locale === "ar"
+            ? (row.titleAr || row.titleEn || "-")
+            : (row.titleEn || row.titleAr || "-");
+        return (
+          <div className="flex flex-col gap-3 rounded-lg border border-border/70 bg-card/70 p-3.5 shadow-xs">
+            <div className="flex items-start justify-between gap-2">
+              <Link
+                href={`/contracts/${row.id}`}
+                className="font-bold text-sm text-foreground hover:text-primary transition-colors leading-snug line-clamp-2"
+              >
+                {title}
+              </Link>
+              <Badge tone={contractStatusTone(row.status)} className="shrink-0 text-xs">
+                {labels.statusValues[row.status] ?? row.status}
+              </Badge>
+            </div>
+
+            <div className="flex items-center gap-3 text-xs text-muted-foreground font-mono">
+              <span className="inline-flex items-center gap-1">
+                <span className="text-[11px] text-muted-foreground/70">{labels.number}:</span>
+                <span dir="ltr" className="font-semibold text-foreground">{row.number ?? "-"}</span>
+              </span>
+            </div>
+
+            <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-border/50">
+              <ActionLink
+                href={`/contracts/${row.id}`}
+                action="preview"
+                label={labels.preview}
+              />
+              {canDelete(row.status) ? (
+                <ActionLink
+                  href={`/contracts/${row.id}/edit`}
+                  action="edit"
+                  label={labels.edit}
+                />
+              ) : null}
+              {canDelete(row.status) ? (
+                <RowActionButton
+                  id={row.id}
+                  action={deleteAction}
+                  kind="delete"
+                  label={labels.deleteTitle}
+                  title={labels.deleteTitle}
+                  message={labels.deleteMessage}
+                  confirmLabel={labels.deleteTitle}
+                  successTitle={labels.deleted}
+                />
+              ) : null}
+            </div>
+          </div>
+        );
+      }}
     />
   );
 }

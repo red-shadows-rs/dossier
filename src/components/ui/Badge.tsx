@@ -112,3 +112,15 @@ export function invoiceStatusTone(status: string, overdue = false): BadgeTone {
   if (overdue) return "red";
   return INVOICE_TONES[status] ?? "gray";
 }
+
+const PROJECT_TONES: Record<string, BadgeTone> = {
+  lead: "blue",
+  active: "green",
+  on_hold: "amber",
+  completed: "teal",
+  cancelled: "red",
+};
+
+export function projectStatusTone(status: string): BadgeTone {
+  return PROJECT_TONES[status] ?? "gray";
+}

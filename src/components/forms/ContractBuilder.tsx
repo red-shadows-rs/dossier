@@ -173,7 +173,7 @@ export function ContractBuilder({
   const currentIndex = STEPS.indexOf(step);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 pb-28">
       {/* Sleek Dossier Step Navigation */}
       <div className="relative sm:sticky sm:top-14 z-20 rounded-lg border border-border bg-card p-1 shadow-xs">
         <nav
@@ -198,7 +198,7 @@ export function ContractBuilder({
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 className={cn(
-                  "group flex shrink-0 sm:flex-1 min-w-[85px] sm:min-w-[110px] items-center gap-1.5 sm:gap-2 rounded-md px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-semibold transition-all select-none cursor-pointer",
+                  "group flex shrink-0 sm:flex-1 items-center gap-1.5 sm:gap-2 rounded-md px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-semibold transition-all select-none cursor-pointer",
                   active
                     ? "bg-primary text-primary-foreground shadow-xs"
                     : completed
@@ -223,7 +223,7 @@ export function ContractBuilder({
                     <Icon className="h-3.5 w-3.5" />
                   )}
                 </div>
-                <div className="flex flex-col items-start leading-tight">
+                <div className={cn("flex-col items-start leading-tight", active ? "flex" : "hidden sm:flex")}>
                   <span className="text-[10px] opacity-70 font-mono" dir="ltr">
                     {`0${index + 1}`}
                   </span>

@@ -192,6 +192,74 @@ export function ClientsTable({
       query={query}
       noRowsLabel={labels.empty}
       emptyIcon={<Users size={36} className="text-muted-foreground" aria-hidden="true" />}
+      renderMobileCard={(row) => {
+        const name =
+          locale === "ar"
+            ? (row.nameAr || row.nameEn || "-")
+            : (row.nameEn || row.nameAr || "-");
+        return (
+          <div className="flex flex-col gap-3 rounded-lg border border-border/70 bg-card/70 p-3.5 shadow-xs">
+            <div className="flex items-start justify-between gap-2">
+              <Link
+                href={`/clients/${row.id}`}
+                className="font-bold text-sm text-foreground hover:text-primary transition-colors line-clamp-1"
+              >
+                {name}
+              </Link>
+              <Badge tone={row.archivedAt ? "gray" : "green"} className="shrink-0 text-xs">
+                {row.archivedAt ? labels.archived : labels.active}
+              </Badge>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+              <span className="rounded bg-muted/40 border border-border/50 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                {labels.typeValues[row.type] ?? row.type}
+              </span>
+              {row.city ? <span>{row.city}</span> : null}
+              {row.phone ? <span dir="ltr" className="font-mono">{row.phone}</span> : null}
+            </div>
+
+            <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-border/50">
+              <ActionLink
+                href={`/clients/${row.id}`}
+                action="preview"
+                label={labels.preview}
+              />
+              {canWrite && !row.archivedAt ? (
+                <ActionLink
+                  href={`/clients/${row.id}/edit`}
+                  action="edit"
+                  label={labels.edit}
+                />
+              ) : null}
+              {canWrite && !row.archivedAt ? (
+                <RowActionButton
+                  id={row.id}
+                  action={archiveAction}
+                  kind="archive"
+                  label={labels.archive}
+                  title={labels.archive}
+                  message={labels.archiveConfirm}
+                  confirmLabel={labels.archive}
+                  successTitle={labels.archivedToast}
+                />
+              ) : null}
+              {canWrite && row.canDelete && deleteAction ? (
+                <RowActionButton
+                  id={row.id}
+                  action={deleteAction}
+                  kind="delete"
+                  label={labels.delete ?? "حذف"}
+                  title={labels.delete ?? "حذف"}
+                  message={labels.deleteConfirm ?? ""}
+                  confirmLabel={labels.delete ?? "حذف"}
+                  successTitle={labels.deletedToast ?? ""}
+                />
+              ) : null}
+            </div>
+          </div>
+        );
+      }}
     />
   );
 }

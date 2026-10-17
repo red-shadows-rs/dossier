@@ -50,6 +50,32 @@ import { smoothLoading } from "@/lib/smooth-loader";
 
 const HEARTBEAT_STALE_MS = 5 * 60 * 1000;
 
+const ACTION_LABELS: Record<string, { ar: string; en: string }> = {
+  "contract.created": { ar: "إنشاء عقد", en: "Contract created" },
+  "contract.sent": { ar: "إرسال عقد", en: "Contract sent" },
+  "contract.signed": { ar: "توقيع عقد", en: "Contract signed" },
+  "contract.cancelled": { ar: "إلغاء عقد", en: "Contract cancelled" },
+  "contract.revised": { ar: "تعديل عقد", en: "Contract revised" },
+  "contract.completed": { ar: "اكتمال عقد", en: "Contract completed" },
+  "contract.terminated": { ar: "إنهاء عقد", en: "Contract terminated" },
+  "invoice.created": { ar: "مسودة فاتورة", en: "Invoice draft" },
+  "invoice.issued": { ar: "إصدار فاتورة", en: "Invoice issued" },
+  "invoice.updated": { ar: "تحديث فاتورة", en: "Invoice updated" },
+  "invoice.sent": { ar: "إرسال فاتورة", en: "Invoice sent" },
+  "invoice.paid": { ar: "سداد فاتورة", en: "Invoice paid" },
+  "invoice.cancelled": { ar: "إلغاء فاتورة", en: "Invoice cancelled" },
+  "invoice.voided": { ar: "إبطال فاتورة", en: "Invoice voided" },
+  "client.created": { ar: "إضافة عميل", en: "Client created" },
+  "client.updated": { ar: "تحديث عميل", en: "Client updated" },
+  "client.archived": { ar: "أرشفة عميل", en: "Client archived" },
+  "project.created": { ar: "إنشاء مشروع", en: "Project created" },
+  "project.updated": { ar: "تحديث مشروع", en: "Project updated" },
+  "project.archived": { ar: "أرشفة مشروع", en: "Project archived" },
+  "user.created": { ar: "إضافة مستخدم", en: "User created" },
+  "user.updated": { ar: "تحديث مستخدم", en: "User updated" },
+  "user.login": { ar: "تسجيل دخول", en: "User login" },
+};
+
 
 
 function SectionHeading({
@@ -634,30 +660,9 @@ export default async function DashboardPage() {
               <span className="text-sm font-medium text-foreground">{t("activityEmpty")}</span>
             </div>
           ) : (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableHeaderCell>
-                    <span className="inline-flex items-center gap-1.5">
-                      <Clock size={14} className="text-muted-foreground" aria-hidden="true" />
-                      {t("when")}
-                    </span>
-                  </TableHeaderCell>
-                  <TableHeaderCell>
-                    <span className="inline-flex items-center gap-1.5">
-                      <Activity size={14} className="text-muted-foreground" aria-hidden="true" />
-                      {t("action")}
-                    </span>
-                  </TableHeaderCell>
-                  <TableHeaderCell>
-                    <span className="inline-flex items-center gap-1.5">
-                      <Layers size={14} className="text-muted-foreground" aria-hidden="true" />
-                      {t("entity")}
-                    </span>
-                  </TableHeaderCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
+            <>
+              {/* Mobile Recent Activity Cards (< md) */}
+              <div className="md:hidden divide-y divide-border/60">
                 {data.recentActivity.map((row) => {
                   const href =
                     row.entityType === "contract"
@@ -671,41 +676,126 @@ export default async function DashboardPage() {
                       : row.entityType === "invoice"
                         ? tn("invoices")
                         : row.entityType;
+                  const actionText =
+                    ACTION_LABELS[row.action]?.[locale === "ar" ? "ar" : "en"] ?? row.action;
+
                   return (
-                    <TableRow key={row.id} className="hover:bg-muted/30 transition-colors">
-                      <TableCell className="whitespace-nowrap tabular-nums font-mono text-xs text-muted-foreground">
-                        {formatInstant(row.ts, timezone, locale)}
-                      </TableCell>
-                      <TableCell>
-                        <span className="rounded border border-border/60 bg-muted/30 px-2 py-0.5 font-mono text-xs font-medium text-foreground">
-                          {row.action}
+                    <div key={row.id} className="p-3.5 flex flex-col gap-2 hover:bg-muted/15 transition-colors">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-semibold text-xs text-foreground">
+                          {actionText}
                         </span>
-                      </TableCell>
-                      <TableCell>
+                        <span className="tabular-nums font-mono text-[11px] text-muted-foreground">
+                          {formatInstant(row.ts, timezone, locale)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
                         {href ? (
                           <Link
                             href={href}
-                            className="inline-flex items-center gap-1.5 font-medium text-foreground hover:text-primary transition-colors"
+                            className="inline-flex items-center gap-1.5 font-medium text-xs text-foreground hover:text-primary transition-colors"
                           >
                             {row.entityType === "contract" ? (
-                              <FileText size={15} className="text-primary" aria-hidden="true" />
+                              <FileText size={14} className="text-primary" aria-hidden="true" />
                             ) : (
-                              <Receipt size={15} className="text-sky-500" aria-hidden="true" />
+                              <Receipt size={14} className="text-sky-500" aria-hidden="true" />
                             )}
                             <span>{entityLabel}</span>
                           </Link>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-                            <FolderKanban size={15} aria-hidden="true" />
+                          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <FolderKanban size={14} aria-hidden="true" />
                             <span>{entityLabel}</span>
                           </span>
                         )}
-                      </TableCell>
-                    </TableRow>
+                        <span className="font-mono text-[10px] text-muted-foreground/60" dir="ltr">
+                          {row.entityId.slice(0, 8)}...
+                        </span>
+                      </div>
+                    </div>
                   );
                 })}
-              </TableBody>
-            </Table>
+              </div>
+
+              {/* Desktop Recent Activity Table (>= md) */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableHeaderCell>
+                        <span className="inline-flex items-center gap-1.5">
+                          <Clock size={14} className="text-muted-foreground" aria-hidden="true" />
+                          {t("when")}
+                        </span>
+                      </TableHeaderCell>
+                      <TableHeaderCell>
+                        <span className="inline-flex items-center gap-1.5">
+                          <Activity size={14} className="text-muted-foreground" aria-hidden="true" />
+                          {t("action")}
+                        </span>
+                      </TableHeaderCell>
+                      <TableHeaderCell>
+                        <span className="inline-flex items-center gap-1.5">
+                          <Layers size={14} className="text-muted-foreground" aria-hidden="true" />
+                          {t("entity")}
+                        </span>
+                      </TableHeaderCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {data.recentActivity.map((row) => {
+                      const href =
+                        row.entityType === "contract"
+                          ? `/contracts/${row.entityId}`
+                          : row.entityType === "invoice"
+                            ? `/invoices/${row.entityId}`
+                            : null;
+                      const entityLabel =
+                        row.entityType === "contract"
+                          ? tn("contracts")
+                          : row.entityType === "invoice"
+                            ? tn("invoices")
+                            : row.entityType;
+                      const actionText =
+                        ACTION_LABELS[row.action]?.[locale === "ar" ? "ar" : "en"] ?? row.action;
+
+                      return (
+                        <TableRow key={row.id} className="hover:bg-muted/30 transition-colors">
+                          <TableCell className="whitespace-nowrap tabular-nums font-mono text-xs text-muted-foreground">
+                            {formatInstant(row.ts, timezone, locale)}
+                          </TableCell>
+                          <TableCell>
+                            <span className="rounded border border-border/60 bg-muted/30 px-2 py-0.5 text-xs font-medium text-foreground">
+                              {actionText}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            {href ? (
+                              <Link
+                                href={href}
+                                className="inline-flex items-center gap-1.5 font-medium text-foreground hover:text-primary transition-colors"
+                              >
+                                {row.entityType === "contract" ? (
+                                  <FileText size={15} className="text-primary" aria-hidden="true" />
+                                ) : (
+                                  <Receipt size={15} className="text-sky-500" aria-hidden="true" />
+                                )}
+                                <span>{entityLabel}</span>
+                              </Link>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                                <FolderKanban size={15} aria-hidden="true" />
+                                <span>{entityLabel}</span>
+                              </span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </div>
       </div>

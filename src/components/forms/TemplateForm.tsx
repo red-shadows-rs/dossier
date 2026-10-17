@@ -398,7 +398,7 @@ export function TemplateForm({
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6 pb-28">
       {/* Sleek Step Navigation Header */}
       <div className="relative sm:sticky sm:top-14 z-20 rounded-lg border border-border bg-card p-1 shadow-xs">
         <nav
@@ -421,7 +421,7 @@ export function TemplateForm({
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-md px-3 py-2 text-xs font-medium transition-all shrink-0 cursor-pointer sm:text-sm",
+                  "inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all shrink-0 cursor-pointer sm:px-3 sm:py-2 sm:text-sm",
                   active
                     ? "bg-primary text-primary-foreground shadow-xs"
                     : completed
@@ -431,7 +431,7 @@ export function TemplateForm({
               >
                 <div
                   className={cn(
-                    "flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold",
+                    "flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold shrink-0",
                     active
                       ? "bg-primary-foreground/20 text-primary-foreground"
                       : completed
@@ -442,13 +442,16 @@ export function TemplateForm({
                   {completed ? <CheckCircle2 className="h-3.5 w-3.5" /> : index + 1}
                 </div>
 
-                <Icon className="h-4 w-4" />
-                <span>{t(`templates.builder.step.${value}`)}</span>
+                <Icon className="h-4 w-4 shrink-0" />
+                <span className={cn(active ? "inline" : "hidden sm:inline")}>
+                  {t(`templates.builder.step.${value}`)}
+                </span>
 
                 {value === "clauses" && (
                   <span
                     className={cn(
-                      "ms-1 rounded-full px-1.5 py-0.2 text-[10px] font-mono",
+                      "rounded-full px-1.5 py-0.2 text-[10px] font-mono",
+                      active ? "inline" : "hidden sm:inline",
                       active
                         ? "bg-primary-foreground/20 text-primary-foreground"
                         : "bg-muted text-muted-foreground",

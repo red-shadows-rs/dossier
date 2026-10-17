@@ -1,10 +1,12 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { KeyRound, UserCheck, UserCog } from "lucide-react";
+import { ArrowLeft, KeyRound, UserCheck, UserCog } from "lucide-react";
 import { UserForm } from "@/components/forms/UserForm";
 import { UserPasswordForm } from "@/components/forms/UserPasswordForm";
 import { UserStatusButton } from "@/components/forms/UserStatusButton";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import type { Locale } from "@/lib/constants";
 import { formatInstant } from "@/lib/dates";
@@ -27,9 +29,9 @@ function Row({
 }) {
   if (!value) return null;
   return (
-    <div className="flex flex-col gap-0.5">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd dir={dir} className="text-sm text-foreground">
+    <div className="flex flex-col gap-1 rounded border border-border/60 bg-muted/20 p-2.5 transition-colors hover:bg-muted/30">
+      <dt className="text-xs font-medium text-muted-foreground">{label}</dt>
+      <dd dir={dir} className="text-sm font-semibold tracking-tight text-foreground break-words">
         {value}
       </dd>
     </div>
@@ -45,6 +47,7 @@ export default async function UserDetailPage({
   const actor = await requireUserPage();
   assertCan(actor, "users.manage");
   const t = await getTranslations("users");
+  const tc = await getTranslations("common");
   const rawLocale = await getLocale();
   const locale: Locale = isLocale(rawLocale) ? rawLocale : actor.locale;
   const timezone = getSettings("defaults").timezone;
@@ -59,30 +62,66 @@ export default async function UserDetailPage({
   }
 
   return (
-    <div className="flex flex-col gap-5 sm:gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
-        <div className="flex items-center gap-3.5">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
-            <UserCog size={20} aria-hidden="true" />
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                {target.name}
-              </h1>
-              {target.status === "active" ? (
-                <Badge tone="green">{t("active")}</Badge>
-              ) : (
-                <Badge tone="gray">{t("disabled")}</Badge>
-              )}
+    <div className="flex flex-col gap-6">
+      {/* 1. Standardized Header with Breadcrumbs */}
+      <div className="flex flex-col gap-2">
+        <nav
+          aria-label="Breadcrumb"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground"
+        >
+          <Link
+            href="/users"
+            className="hover:text-foreground transition-colors"
+          >
+            {t("title")}
+          </Link>
+          <span className="text-border">/</span>
+          <span className="text-foreground font-medium truncate max-w-[240px]">
+            {target.name}
+          </span>
+        </nav>
+
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary shadow-xs">
+              <UserCog size={22} aria-hidden="true" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                  {target.name}
+                </h1>
+                {target.status === "active" ? (
+                  <Badge tone="green">{t("active")}</Badge>
+                ) : (
+                  <Badge tone="gray">{t("disabled")}</Badge>
+                )}
+                <Badge tone="blue">{t(`role.${target.role}`)}</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground font-mono">
+                {target.email}
+              </p>
             </div>
           </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <UserStatusButton userId={target.id} status={target.status} />
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href="/users">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="gap-1.5 font-medium shadow-xs"
+              >
+                <ArrowLeft size={15} className="rtl:rotate-180" aria-hidden="true" />
+                <span>{tc("back")}</span>
+              </Button>
+            </Link>
+            <UserStatusButton userId={target.id} status={target.status} />
+          </div>
         </div>
       </div>
 
+      {/* User Info Card */}
       <Card>
         <CardHeader>
           <CardTitle className="inline-flex items-center gap-2">
@@ -91,7 +130,7 @@ export default async function UserDetailPage({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <Row label={t("email")} value={target.email} dir="ltr" />
             <Row label={t("roleLabel")} value={t(`role.${target.role}`)} />
             <Row
@@ -114,6 +153,7 @@ export default async function UserDetailPage({
         </CardContent>
       </Card>
 
+      {/* Edit User Form Card */}
       <Card>
         <CardHeader>
           <CardTitle className="inline-flex items-center gap-2">
@@ -135,6 +175,7 @@ export default async function UserDetailPage({
         </CardContent>
       </Card>
 
+      {/* Password Reset Card */}
       <Card>
         <CardHeader>
           <CardTitle className="inline-flex items-center gap-2">

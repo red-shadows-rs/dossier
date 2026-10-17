@@ -438,7 +438,17 @@
     "invoices": "Invoices",
     "noProjects": "No projects for this client yet",
     "noContracts": "No contracts for this client yet",
-    "noInvoices": "No invoices for this client yet"
+    "noInvoices": "No invoices for this client yet",
+    "tabs": {
+      "overview": "Overview & Details",
+      "projectsAndContracts": "Projects & Contracts",
+      "invoices": "Invoices & Payments"
+    },
+    "formSteps": {
+      "basics": "Basic Information",
+      "contact": "Contact & Address",
+      "legal": "Legal & Tax Details"
+    }
   },
   "projects": {
     "title": "Projects",
@@ -515,7 +525,21 @@
     "noActivity": "No activity yet",
     "activityWhen": "When",
     "activityAction": "Action",
-    "activityEntity": "Entity"
+    "activityEntity": "Entity",
+    "tabs": {
+      "overview": "Overview & Financials",
+      "contracts": "Contracts & Milestones",
+      "invoices": "Invoices",
+      "filesAndActivity": "Files & Activity",
+      "files": "Files",
+      "activity": "Activity"
+    },
+
+    "formSteps": {
+      "basics": "Basics & Budget",
+      "timeline": "Timeline & Client",
+      "notes": "Description & Notes"
+    }
   },
   "templates": {
     "title": "Templates",
@@ -904,6 +928,11 @@
     "new": "New invoice",
     "newTitle": "Create a draft invoice",
     "createDraft": "Create draft",
+    "tabs": {
+      "details": "Invoice Details & Lines",
+      "preview": "Document Preview",
+      "payments": "Payments & Transactions"
+    },
     "empty": "No invoices yet",
     "emptyHint": "Create an invoice from a milestone or standalone.",
     "searchPlaceholder": "Search by invoice number...",

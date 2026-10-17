@@ -32,7 +32,15 @@ export function UserMenu({ user }: { user: SessionUser }) {
         aria-expanded={open}
         aria-label={user.name}
         size="small"
-        sx={{ p: 0.5 }}
+        sx={{
+          p: 0,
+          width: 32,
+          height: 32,
+          minWidth: 32,
+          minHeight: 32,
+          aspectRatio: "1 / 1",
+          borderRadius: "50%",
+        }}
       >
         <MuiAvatar
           sx={{

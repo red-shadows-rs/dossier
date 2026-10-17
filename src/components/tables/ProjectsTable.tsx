@@ -165,6 +165,68 @@ export function ProjectsTable({
       query={query}
       noRowsLabel={labels.empty}
       emptyIcon={<FolderKanban size={36} className="text-muted-foreground" aria-hidden="true" />}
+      renderMobileCard={(row) => {
+        const name =
+          locale === "ar"
+            ? (row.nameAr || row.nameEn || "-")
+            : (row.nameEn || row.nameAr || "-");
+        const client = clientNames[row.clientId ?? ""] ?? "-";
+        return (
+          <div className="flex flex-col gap-3 rounded-lg border border-border/70 bg-card/70 p-3.5 shadow-xs">
+            <div className="flex items-start justify-between gap-2">
+              <Link
+                href={`/projects/${row.id}`}
+                className="font-bold text-sm text-foreground hover:text-primary transition-colors line-clamp-2"
+              >
+                {name}
+              </Link>
+              <Badge tone={row.status === "active" ? "green" : row.status === "draft" ? "amber" : "gray"} className="shrink-0 text-xs">
+                {labels.statusValues[row.status] ?? row.status}
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-xs py-1">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] text-muted-foreground">{labels.client}</span>
+                <span className="font-medium text-foreground truncate">{client}</span>
+              </div>
+              <div className="flex flex-col gap-0.5 items-end text-end">
+                <span className="text-[11px] text-muted-foreground">{labels.code}</span>
+                <span dir="ltr" className="font-mono font-semibold text-foreground">
+                  {row.code}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-border/50">
+              <ActionLink
+                href={`/projects/${row.id}`}
+                action="preview"
+                label={labels.preview}
+              />
+              {canWrite && !row.archivedAt ? (
+                <ActionLink
+                  href={`/projects/${row.id}/edit`}
+                  action="edit"
+                  label={labels.edit}
+                />
+              ) : null}
+              {canWrite && !row.archivedAt ? (
+                <RowActionButton
+                  id={row.id}
+                  action={archiveAction}
+                  kind="archive"
+                  label={labels.archive}
+                  title={labels.archive}
+                  message={labels.archiveConfirm}
+                  confirmLabel={labels.archive}
+                  successTitle={labels.archivedToast}
+                />
+              ) : null}
+            </div>
+          </div>
+        );
+      }}
     />
   );
 }

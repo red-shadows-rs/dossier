@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { FilePlus2, X } from "lucide-react";
+import { FilePlus2, Receipt, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Field } from "@/components/ui/Field";
@@ -58,18 +58,22 @@ export function NewInvoiceForm({
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
-      {statusError ? (
-        <p
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6 pb-28">
+      {statusError && (
+        <div
           role="alert"
-          className="rounded border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm font-medium text-destructive"
+          className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive animate-in fade-in-50"
         >
           {statusError}
-        </p>
-      ) : null}
+        </div>
+      )}
+
       <Card>
         <CardHeader>
-          <CardTitle>{t("invoices.newTitle")}</CardTitle>
+          <CardTitle className="inline-flex items-center gap-2">
+            <Receipt size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("invoices.newTitle")}</span>
+          </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -77,6 +81,7 @@ export function NewInvoiceForm({
               label={t("invoices.project")}
               htmlFor="ni-project"
               required
+              className="md:col-span-2"
             >
               <Select
                 id="ni-project"
@@ -91,6 +96,7 @@ export function NewInvoiceForm({
                 ))}
               </Select>
             </Field>
+
             <Field label={t("invoices.languageMode")} htmlFor="ni-lang">
               <Select
                 id="ni-lang"
@@ -105,6 +111,7 @@ export function NewInvoiceForm({
                 ))}
               </Select>
             </Field>
+
             <Field label={t("invoices.currency")} htmlFor="ni-currency">
               <Select
                 id="ni-currency"
@@ -119,6 +126,7 @@ export function NewInvoiceForm({
                 ))}
               </Select>
             </Field>
+
             <Field
               label={t("invoices.notesAr")}
               htmlFor="ni-notes-ar"
@@ -129,10 +137,12 @@ export function NewInvoiceForm({
                 name="notesAr"
                 dir="rtl"
                 lang="ar"
+                rows={3}
                 disabled={pending}
                 className="text-start"
               />
             </Field>
+
             <Field
               label={t("invoices.notesEn")}
               htmlFor="ni-notes-en"
@@ -143,6 +153,7 @@ export function NewInvoiceForm({
                 name="notesEn"
                 dir="ltr"
                 lang="en"
+                rows={3}
                 disabled={pending}
                 className="text-start"
               />
@@ -151,20 +162,26 @@ export function NewInvoiceForm({
         </CardContent>
       </Card>
 
-      <div className="flex justify-end gap-2">
+      {/* Sticky Bottom Action Bar */}
+      <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card/95 backdrop-blur-md p-3 shadow-lg">
         <Button
           type="button"
-          variant="secondary"
+          variant="ghost"
           onClick={() => router.back()}
           disabled={pending}
-          className="gap-2"
+          className="gap-1.5 text-xs sm:text-sm"
         >
           <X className="h-4 w-4" />
-          {t("common.cancel")}
+          <span>{t("common.cancel")}</span>
         </Button>
-        <Button type="submit" loading={pending} className="gap-2">
+
+        <Button
+          type="submit"
+          loading={pending}
+          className="gap-2 px-5 font-medium text-xs sm:text-sm shadow-xs ms-auto"
+        >
           <FilePlus2 className="h-4 w-4" />
-          {t("invoices.createDraft")}
+          <span>{t("invoices.createDraft")}</span>
         </Button>
       </div>
     </form>

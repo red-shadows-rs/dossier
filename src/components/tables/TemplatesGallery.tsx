@@ -382,7 +382,7 @@ export function TemplatesGallery({
                 </div>
 
                 {/* Card Actions Footer */}
-                <div className="flex items-center gap-2 pt-4 mt-3 border-t border-border/50">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-4 mt-3 border-t border-border/50">
                   {canWrite ? (
                     <Link
                       href={`/contracts/new?templateId=${row.id}`}
@@ -394,20 +394,20 @@ export function TemplatesGallery({
                         className="w-full gap-1.5 text-xs font-medium shadow-xs"
                       >
                         <FilePlus2 size={14} aria-hidden="true" />
-                        <span>{labels.useTemplate ?? (locale === "ar" ? "إنشاء عقد" : "Use template")}</span>
+                        <span>{labels.useTemplate ?? (locale === "ar" ? "إنشاء عقد بهذا القالب" : "Use template")}</span>
                       </Button>
                     </Link>
                   ) : null}
 
-                  <Link href={`/templates/${row.id}`} className={canWrite ? "shrink-0" : "flex-1"}>
+                  <Link href={`/templates/${row.id}`} className={canWrite ? "sm:shrink-0" : "flex-1"}>
                     <Button
                       type="button"
                       variant="secondary"
                       size="sm"
-                      className={`gap-1.5 text-xs font-medium border-border/80 ${canWrite ? "" : "w-full"}`}
+                      className="w-full gap-1.5 text-xs font-medium border-border/80"
                     >
                       <Eye size={14} aria-hidden="true" />
-                      <span>{labels.viewDetails ?? (locale === "ar" ? "تفاصيل" : "Details")}</span>
+                      <span>{labels.viewDetails ?? (locale === "ar" ? "معاينة وتفاصيل" : "Details")}</span>
                     </Button>
                   </Link>
                 </div>

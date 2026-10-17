@@ -87,15 +87,16 @@ export function UserForm({
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
-      {statusError ? (
-        <p
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6 pb-28">
+      {statusError && (
+        <div
           role="alert"
-          className="rounded border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm font-medium text-destructive"
+          className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive animate-in fade-in-50"
         >
           {statusError}
-        </p>
-      ) : null}
+        </div>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="inline-flex items-center gap-2">
@@ -104,7 +105,7 @@ export function UserForm({
           </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {mode === "create" ? (
+          {mode === "create" && (
             <Field
               label={t("users.email")}
               htmlFor="user-email"
@@ -121,7 +122,8 @@ export function UserForm({
                 className="text-start"
               />
             </Field>
-          ) : null}
+          )}
+
           <Field
             label={t("users.name")}
             htmlFor="user-name"
@@ -135,6 +137,7 @@ export function UserForm({
               disabled={pending}
             />
           </Field>
+
           <Field label={t("users.roleLabel")} htmlFor="user-role">
             <Select
               id="user-role"
@@ -151,7 +154,8 @@ export function UserForm({
               ))}
             </Select>
           </Field>
-          {mode === "create" ? (
+
+          {mode === "create" && (
             <Field
               label={t("users.password")}
               htmlFor="user-password"
@@ -168,8 +172,9 @@ export function UserForm({
                 className="text-start"
               />
             </Field>
-          ) : null}
-          <div className="self-end pb-1">
+          )}
+
+          <div className="flex items-center pt-2 md:col-span-2">
             <Checkbox
               checked={canSign}
               onChange={(event) => setCanSign(event.currentTarget.checked)}
@@ -180,27 +185,33 @@ export function UserForm({
         </CardContent>
       </Card>
 
-      <div className="flex justify-end gap-2">
+      {/* Persistent Bottom Action Bar */}
+      <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card/95 backdrop-blur-md p-3 shadow-lg">
         <Button
           type="button"
-          variant="secondary"
+          variant="ghost"
           onClick={() => router.back()}
           disabled={pending}
-          className="gap-2"
+          className="gap-1.5 text-xs sm:text-sm"
         >
           <X className="h-4 w-4" />
-          {t("common.cancel")}
+          <span>{t("common.cancel")}</span>
         </Button>
-        <Button type="submit" loading={pending} className="gap-2">
+
+        <Button
+          type="submit"
+          loading={pending}
+          className="gap-2 px-5 font-medium text-xs sm:text-sm shadow-xs ms-auto"
+        >
           {mode === "create" ? (
             <>
               <UserPlus className="h-4 w-4" />
-              {t("users.create")}
+              <span>{t("users.create")}</span>
             </>
           ) : (
             <>
               <Save className="h-4 w-4" />
-              {t("common.save")}
+              <span>{t("common.save")}</span>
             </>
           )}
         </Button>

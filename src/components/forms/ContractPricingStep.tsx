@@ -312,7 +312,7 @@ export function ContractPricingStep({
                         )
                       }
                       disabled={rows.length <= 1}
-                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/70 bg-card text-muted-foreground transition-all hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer shadow-2xs"
+                      className="flex h-9 w-9 shrink-0 aspect-square items-center justify-center rounded-lg border border-border/70 bg-card text-muted-foreground transition-all hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer shadow-2xs"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>

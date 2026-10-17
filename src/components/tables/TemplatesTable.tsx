@@ -141,6 +141,59 @@ export function TemplatesTable({
       columns={columns}
       noRowsLabel={labels.empty}
       emptyIcon={<FileCode2 size={36} className="text-muted-foreground" aria-hidden="true" />}
+      renderMobileCard={(row) => {
+        const name =
+          locale === "ar"
+            ? (row.nameAr || row.nameEn || "-")
+            : (row.nameEn || row.nameAr || "-");
+        return (
+          <div className="flex flex-col gap-3 rounded-lg border border-border/70 bg-card/70 p-3.5 shadow-xs">
+            <div className="flex items-start justify-between gap-2">
+              <Link
+                href={`/templates/${row.id}`}
+                className="font-bold text-sm text-foreground hover:text-primary transition-colors line-clamp-1"
+              >
+                {name}
+              </Link>
+              <Badge tone={row.isSystem ? "blue" : "gray"} className="shrink-0 text-xs">
+                {row.isSystem ? labels.system : labels.custom}
+              </Badge>
+            </div>
+
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <span className="rounded bg-muted/40 border border-border/50 px-2 py-0.5 text-[11px] font-medium">
+                {labels.typeValues[row.type] ?? row.type}
+              </span>
+              <span>
+                {labels.languageValues[row.defaultLanguageMode] ?? row.defaultLanguageMode}
+              </span>
+              <span className="font-mono text-[11px]">
+                {row.clauseCount} {labels.clauses}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-border/50">
+              <ActionLink
+                href={`/templates/${row.id}`}
+                action="preview"
+                label={labels.preview}
+              />
+              {!row.isSystem ? (
+                <RowActionButton
+                  id={row.id}
+                  action={archiveAction}
+                  kind="archive"
+                  label={labels.archive}
+                  title={labels.archive}
+                  message={labels.archiveConfirm}
+                  confirmLabel={labels.archive}
+                  successTitle={labels.archivedToast}
+                />
+              ) : null}
+            </div>
+          </div>
+        );
+      }}
     />
   );
 }

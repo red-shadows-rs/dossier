@@ -80,6 +80,8 @@ export function createAppTheme(
         styleOverrides: {
           root: {
             cursor: "pointer",
+            aspectRatio: "1 / 1",
+            borderRadius: "50%",
             "&.Mui-disabled": { cursor: "not-allowed" },
           },
         },

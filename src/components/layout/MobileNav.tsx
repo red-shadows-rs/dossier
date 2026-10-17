@@ -36,9 +36,19 @@ export function MobileNav({
       <MuiIconButton
         onClick={() => setOpen(true)}
         aria-label={t("menu")}
-        sx={{ display: { xs: "inline-flex", md: "none" } }}
+        size="small"
+        sx={{
+          display: { xs: "inline-flex", md: "none" },
+          width: 36,
+          height: 36,
+          minWidth: 36,
+          minHeight: 36,
+          p: 0,
+          aspectRatio: "1 / 1",
+          borderRadius: "50%",
+        }}
       >
-        <MenuIcon size={18} aria-hidden="true" />
+        <MenuIcon size={20} aria-hidden="true" />
       </MuiIconButton>
       <MuiDrawer anchor={side} open={open} onClose={() => setOpen(false)}>
         <MuiBox

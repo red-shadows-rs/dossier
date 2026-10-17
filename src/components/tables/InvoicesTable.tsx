@@ -166,6 +166,72 @@ export function InvoicesTable({
       query={query}
       noRowsLabel={labels.empty}
       emptyIcon={<Receipt size={36} className="text-muted-foreground" aria-hidden="true" />}
+      renderMobileCard={(row) => {
+        const proj = projectNames[row.projectId ?? ""] ?? "-";
+        return (
+          <div className="flex flex-col gap-3 rounded-lg border border-border/70 bg-card/70 p-3.5 shadow-xs">
+            <div className="flex items-start justify-between gap-2">
+              <Link
+                href={`/invoices/${row.id}`}
+                className="font-bold text-sm font-mono text-foreground hover:text-primary transition-colors"
+                dir="ltr"
+              >
+                {row.number ?? "-"}
+              </Link>
+              <Badge tone={invoiceStatusTone(row.status, row.overdue)} className="shrink-0 text-xs">
+                {row.overdue
+                  ? labels.overdue
+                  : (labels.statusValues[row.status] ?? row.status)}
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-xs py-1">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] text-muted-foreground">{labels.project}</span>
+                <span className="font-medium text-foreground truncate">{proj}</span>
+              </div>
+              <div className="flex flex-col gap-0.5 items-end text-end">
+                <span className="text-[11px] text-muted-foreground">{labels.total}</span>
+                <span dir="ltr" className="font-mono font-bold text-foreground">
+                  {formatMoney(row.totalMinor, row.currency as CurrencyCode, "en")}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-border/50 text-xs">
+              <span className="text-muted-foreground font-mono" dir="ltr">
+                {row.dueDate ? `${labels.dueDate}: ${row.dueDate}` : ""}
+              </span>
+              <div className="inline-flex items-center gap-1.5">
+                <ActionLink
+                  href={`/invoices/${row.id}`}
+                  action="preview"
+                  label={labels.preview}
+                />
+                {canDelete(row.status) ? (
+                  <ActionLink
+                    href={`/invoices/${row.id}/edit`}
+                    action="edit"
+                    label={labels.edit}
+                  />
+                ) : null}
+                {canDelete(row.status) ? (
+                  <RowActionButton
+                    id={row.id}
+                    action={deleteAction}
+                    kind="delete"
+                    label={labels.deleteTitle}
+                    title={labels.deleteTitle}
+                    message={labels.deleteMessage}
+                    confirmLabel={labels.deleteTitle}
+                    successTitle={labels.deleted}
+                  />
+                ) : null}
+              </div>
+            </div>
+          </div>
+        );
+      }}
     />
   );
 }
