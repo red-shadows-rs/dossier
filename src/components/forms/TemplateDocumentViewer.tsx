@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { DocumentSkeleton } from "@/components/ui/Skeleton";
@@ -29,6 +29,8 @@ export function TemplateDocumentViewer({
 }) {
   const t = useTranslations("contracts");
   const tTemplates = useTranslations("templates");
+  const locale = useLocale();
+  const isAr = locale === "ar";
   const [lang, setLang] = useState<DocLang>(defaultLang);
   const [html, setHtml] = useState<string | null>(initialHtml ?? null);
   const [loading, setLoading] = useState(false);
@@ -111,7 +113,15 @@ export function TemplateDocumentViewer({
           disabled={loading}
         >
           <RefreshCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />
-          <span>{loading ? t("refreshing") : t("refreshPreview")}</span>
+          <span>
+            {loading
+              ? isAr
+                ? "جار التحديث..."
+                : "Refreshing..."
+              : isAr
+                ? "تحديث المعاينة"
+                : "Refresh preview"}
+          </span>
         </Button>
       </div>
 
@@ -171,3 +181,4 @@ export function TemplateDocumentViewer({
     </div>
   );
 }
+
