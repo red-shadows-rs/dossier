@@ -60,22 +60,18 @@ export function finalizeContractTx(
     .get();
   if (!contract || contract.status !== "sent") return false;
 
-  const signatories = contract.currentVersionId
-    ? tx
-        .select()
-        .from(contractSignatories)
-        .where(
-          and(
+  const signatories = tx
+    .select()
+    .from(contractSignatories)
+    .where(
+      contract.currentVersionId
+        ? and(
             eq(contractSignatories.contractId, contractId),
             eq(contractSignatories.versionId, contract.currentVersionId),
-          ),
-        )
-        .all()
-    : tx
-        .select()
-        .from(contractSignatories)
-        .where(eq(contractSignatories.contractId, contractId))
-        .all();
+          )
+        : eq(contractSignatories.contractId, contractId),
+    )
+    .all();
   if (signatories.length === 0) return false;
   if (!signatories.every((row) => row.status === "signed")) return false;
 
@@ -247,26 +243,32 @@ function enqueueSignedCopyEmails(
     .select()
     .from(contractSignatories)
     .where(
-      and(
-        eq(contractSignatories.contractId, contract.id),
-        eq(contractSignatories.role, "client"),
-        contract.currentVersionId
-          ? eq(contractSignatories.versionId, contract.currentVersionId)
-          : undefined,
-      ),
+      contract.currentVersionId
+        ? and(
+            eq(contractSignatories.contractId, contract.id),
+            eq(contractSignatories.role, "client"),
+            eq(contractSignatories.versionId, contract.currentVersionId),
+          )
+        : and(
+            eq(contractSignatories.contractId, contract.id),
+            eq(contractSignatories.role, "client"),
+          ),
     )
     .get();
   const providerSignatory = tx
     .select()
     .from(contractSignatories)
     .where(
-      and(
-        eq(contractSignatories.contractId, contract.id),
-        eq(contractSignatories.role, "provider"),
-        contract.currentVersionId
-          ? eq(contractSignatories.versionId, contract.currentVersionId)
-          : undefined,
-      ),
+      contract.currentVersionId
+        ? and(
+            eq(contractSignatories.contractId, contract.id),
+            eq(contractSignatories.role, "provider"),
+            eq(contractSignatories.versionId, contract.currentVersionId),
+          )
+        : and(
+            eq(contractSignatories.contractId, contract.id),
+            eq(contractSignatories.role, "provider"),
+          ),
     )
     .get();
 
@@ -376,10 +378,12 @@ export async function generateSealedPdf(
       .select()
       .from(contractSignatories)
       .where(
-        and(
-          eq(contractSignatories.contractId, contractId),
-          eq(contractSignatories.versionId, contract.currentVersionId),
-        ),
+        contract.currentVersionId
+          ? and(
+              eq(contractSignatories.contractId, contractId),
+              eq(contractSignatories.versionId, contract.currentVersionId),
+            )
+          : eq(contractSignatories.contractId, contractId),
       )
       .all();
 

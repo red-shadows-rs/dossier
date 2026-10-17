@@ -383,7 +383,14 @@ export async function signAsProvider(
     const provider = tx
       .select()
       .from(contractSignatories)
-      .where(eq(contractSignatories.contractId, contractId))
+      .where(
+        contract.currentVersionId
+          ? and(
+              eq(contractSignatories.contractId, contractId),
+              eq(contractSignatories.versionId, contract.currentVersionId),
+            )
+          : eq(contractSignatories.contractId, contractId),
+      )
       .orderBy(asc(contractSignatories.sortOrder))
       .all()
       .find((row) => row.role === "provider");

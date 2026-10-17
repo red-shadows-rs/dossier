@@ -143,10 +143,16 @@ export function regenerateSigningLink(
       .select()
       .from(contractSignatories)
       .where(
-        and(
-          eq(contractSignatories.contractId, id),
-          eq(contractSignatories.role, "client"),
-        ),
+        current.currentVersionId
+          ? and(
+              eq(contractSignatories.contractId, id),
+              eq(contractSignatories.role, "client"),
+              eq(contractSignatories.versionId, current.currentVersionId),
+            )
+          : and(
+              eq(contractSignatories.contractId, id),
+              eq(contractSignatories.role, "client"),
+            ),
       )
       .orderBy(asc(contractSignatories.sortOrder))
       .all()
