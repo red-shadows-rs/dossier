@@ -173,7 +173,7 @@ export function ContractBuilder({
   const currentIndex = STEPS.indexOf(step);
 
   return (
-    <div className="flex flex-col gap-6 pb-28">
+    <div className="flex flex-col gap-6">
       {/* Sleek Dossier Step Navigation */}
       <div className="relative sm:sticky sm:top-14 z-20 rounded border border-border bg-card p-1 shadow-xs">
         <nav
@@ -198,39 +198,37 @@ export function ContractBuilder({
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 className={cn(
-                  "group flex shrink-0 sm:flex-1 items-center gap-1.5 sm:gap-2 rounded px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-semibold transition-all select-none cursor-pointer",
+                  "inline-flex items-center gap-2 rounded px-2.5 py-1.5 text-xs font-medium transition-all shrink-0 cursor-pointer sm:px-3 sm:py-2 sm:text-sm",
                   active
                     ? "bg-primary text-primary-foreground shadow-xs"
                     : completed
-                      ? "bg-muted/50 text-foreground hover:bg-muted"
-                      : "bg-transparent text-muted-foreground hover:bg-muted/40 hover:text-foreground",
-                  disabled && "opacity-40 cursor-not-allowed hover:bg-transparent hover:text-muted-foreground",
+                      ? "text-foreground hover:bg-muted/60"
+                      : "text-muted-foreground hover:bg-muted/40 hover:text-foreground",
+                  disabled &&
+                    "opacity-40 cursor-not-allowed hover:bg-transparent hover:text-muted-foreground",
                 )}
               >
                 <div
                   className={cn(
-                    "flex h-6 w-6 shrink-0 items-center justify-center rounded text-xs font-bold transition-colors",
+                    "flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold shrink-0",
                     active
                       ? "bg-primary-foreground/20 text-primary-foreground"
                       : completed
-                        ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                        ? "bg-primary/10 text-primary"
                         : "bg-muted text-muted-foreground",
                   )}
                 >
                   {completed ? (
                     <CheckCircle2 className="h-3.5 w-3.5" />
                   ) : (
-                    <Icon className="h-3.5 w-3.5" />
+                    index + 1
                   )}
                 </div>
-                <div className={cn("flex-col items-start leading-tight", active ? "flex" : "hidden sm:flex")}>
-                  <span className="text-[10px] opacity-70 font-mono" dir="ltr">
-                    {`0${index + 1}`}
-                  </span>
-                  <span className="whitespace-nowrap text-xs font-bold">
-                    {t(`builder.step.${value}`)}
-                  </span>
-                </div>
+
+                <Icon className="h-4 w-4 shrink-0" />
+                <span className={cn(active ? "inline" : "hidden sm:inline")}>
+                  {t(`builder.step.${value}`)}
+                </span>
               </button>
             );
           })}

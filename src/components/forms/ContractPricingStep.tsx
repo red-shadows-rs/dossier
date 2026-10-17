@@ -6,7 +6,6 @@ import {
   Calculator,
   ChevronLeft,
   ChevronRight,
-  Percent,
   Plus,
   Receipt,
   Save,
@@ -190,20 +189,11 @@ export function ContractPricingStep({
       {/* Items Section */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-3">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <Receipt className="h-4 w-4" />
-            </div>
-            <div>
-              <CardTitle className="text-base font-semibold">
-                {t("contracts.builder.pricingTitle")}
-              </CardTitle>
-              <p className="text-xs text-muted-foreground">
-                {t("contracts.items")} ({rows.length})
-              </p>
-            </div>
-          </div>
-          <span className="rounded-md border border-border/70 bg-muted/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground">
+          <CardTitle className="inline-flex items-center gap-2">
+            <Receipt size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("contracts.builder.pricingTitle")}</span>
+          </CardTitle>
+          <span className="rounded border border-border/70 bg-muted/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground">
             {currency}
           </span>
         </CardHeader>
@@ -213,7 +203,7 @@ export function ContractPricingStep({
             {rows.map((row, index) => (
               <div
                 key={index}
-                className="group relative grid grid-cols-1 gap-3 rounded-md border border-border/80 bg-card p-3.5 shadow-2xs transition-all hover:border-border hover:shadow-xs md:grid-cols-12 md:items-start"
+                className="group relative grid grid-cols-1 gap-3 rounded border border-border bg-card p-3 shadow-2xs md:grid-cols-12 md:items-end"
               >
                 <div className="flex items-center justify-between md:hidden pb-1">
                   <span className="text-xs font-bold text-muted-foreground font-mono">
@@ -301,7 +291,7 @@ export function ContractPricingStep({
                   />
                 </Field>
 
-                <div className="hidden md:flex h-[38px] items-center justify-center pt-6 md:col-span-1">
+                <div className="hidden md:flex justify-center pb-0.5 md:col-span-1">
                   <Tooltip content={t("common.delete")}>
                     <button
                       type="button"
@@ -314,7 +304,7 @@ export function ContractPricingStep({
                         )
                       }
                       disabled={rows.length <= 1}
-                      className="flex h-9 w-9 shrink-0 aspect-square items-center justify-center rounded-lg border border-border/70 bg-card text-muted-foreground transition-all hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer shadow-2xs"
+                      className="flex h-9 w-9 shrink-0 aspect-square items-center justify-center rounded border border-border/70 bg-card text-muted-foreground transition-all hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer shadow-2xs"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -344,19 +334,11 @@ export function ContractPricingStep({
 
       {/* Totals & Tax Calculation Card */}
       <Card>
-        <CardHeader className="flex flex-row items-center gap-2.5 pb-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-            <Calculator className="h-4 w-4" />
-          </div>
-          <div>
-            <CardTitle className="text-base font-semibold">
-              {t("contracts.builder.totalsTitle")}
-            </CardTitle>
-            <p className="text-xs text-muted-foreground">
-              {t("contracts.discountLabel")}، {t("contracts.taxRate")}،{" "}
-              {t("common.total")}
-            </p>
-          </div>
+        <CardHeader className="pb-3">
+          <CardTitle className="inline-flex items-center gap-2">
+            <Calculator size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("contracts.builder.totalsTitle")}</span>
+          </CardTitle>
         </CardHeader>
 
         <CardContent className="grid grid-cols-1 gap-6 lg:grid-cols-12">
@@ -396,23 +378,18 @@ export function ContractPricingStep({
             </Field>
 
             <Field label={t("contracts.taxRate")} htmlFor="cb-tax">
-              <div className="relative">
-                <Input
-                  id="cb-tax"
-                  dir="ltr"
-                  value={taxPercent}
-                  onChange={(event) => setTaxPercent(event.target.value)}
-                  className="pe-8 text-start font-mono"
-                />
-                <span className="pointer-events-none absolute inset-y-0 end-2.5 flex items-center text-xs text-muted-foreground">
-                  <Percent className="h-3.5 w-3.5" />
-                </span>
-              </div>
+              <Input
+                id="cb-tax"
+                dir="ltr"
+                value={taxPercent}
+                onChange={(event) => setTaxPercent(event.target.value)}
+                className="text-start font-mono"
+              />
             </Field>
           </div>
 
           {/* Breakdown Card Column */}
-          <div className="rounded-md border border-border/80 bg-muted/30 p-4 lg:col-span-5">
+          <div className="rounded border border-border bg-card/60 p-4 lg:col-span-5">
             {totals ? (
               <div className="flex flex-col gap-2.5">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -447,7 +424,7 @@ export function ContractPricingStep({
                   </span>
                 </div>
 
-                <div className="mt-1 flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm font-bold text-foreground">
+                <div className="mt-1 flex items-center justify-between rounded border border-primary/20 bg-primary/5 px-3 py-2 text-sm font-bold text-foreground">
                   <span>{t("common.total")}</span>
                   <span className="text-base font-bold text-primary font-mono" dir="ltr">
                     {money(totals.total)}

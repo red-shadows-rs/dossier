@@ -162,11 +162,12 @@ export function ContractReviewStep({
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base font-semibold">
-              {t("review.issuesTitle")}
+            <CardTitle className="inline-flex items-center gap-2">
+              <CheckCircle2 size={18} className="text-primary" aria-hidden="true" />
+              <span>{t("review.issuesTitle")}</span>
             </CardTitle>
             {errors.length === 0 && warnings.length === 0 ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 <span>{isAr ? "جاهز للإرسال" : "Ready to send"}</span>
               </span>
@@ -189,8 +190,8 @@ export function ContractReviewStep({
 
         <CardContent className="flex flex-col gap-4">
           {errors.length === 0 && warnings.length === 0 ? (
-            <div className="flex items-center gap-2.5 rounded-md border border-emerald-500/20 bg-emerald-500/5 p-4 text-xs font-medium text-emerald-700 dark:text-emerald-400">
-              <CheckCircle2 className="h-5 w-5 shrink-0" />
+            <div className="flex items-center gap-2.5 rounded border border-primary/20 bg-primary/5 p-4 text-xs font-medium text-foreground">
+              <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" />
               <span>{t("review.noIssues")}</span>
             </div>
           ) : null}
@@ -220,20 +221,14 @@ export function ContractReviewStep({
       {/* Document Live Preview Card */}
       <Card>
         <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-3">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <FileCheck className="h-4 w-4" />
-            </div>
-            <div>
-              <CardTitle className="text-base font-semibold">
-                {t("review.previewTitle")}
-              </CardTitle>
-            </div>
-          </div>
+          <CardTitle className="inline-flex items-center gap-2">
+            <FileCheck size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("review.previewTitle")}</span>
+          </CardTitle>
 
           <div className="flex items-center gap-2">
             {langs.length > 1 ? (
-              <div className="flex rounded-lg border border-border/80 bg-muted/40 p-0.5">
+              <div className="flex rounded border border-border/80 bg-muted/40 p-0.5">
                 {langs.map((value) => (
                   <button
                     key={value}
@@ -241,7 +236,7 @@ export function ContractReviewStep({
                     aria-current={value === lang ? "true" : undefined}
                     onClick={() => setLang(value)}
                     className={cn(
-                      "rounded-md px-3 py-1 text-xs font-semibold transition-all select-none",
+                      "rounded px-3 py-1 text-xs font-semibold transition-all select-none",
                       value === lang
                         ? "bg-primary text-primary-foreground shadow-2xs"
                         : "text-muted-foreground hover:text-foreground",
@@ -268,11 +263,11 @@ export function ContractReviewStep({
         </CardHeader>
 
         <CardContent>
-          <div className="rounded-md border border-border/80 bg-muted/20 p-2 sm:p-4">
+          <div className="rounded border border-border/80 bg-muted/20 p-2 sm:p-4">
             {loading ? (
-              <DocumentSkeleton className="min-h-[30rem] rounded-md" />
+              <DocumentSkeleton className="min-h-[30rem] rounded" />
             ) : html ? (
-              <div className="overflow-hidden rounded-md border border-border/80 bg-white shadow-2xs dark:bg-card">
+              <div className="overflow-hidden rounded border border-border/80 bg-white shadow-2xs dark:bg-card">
                 <iframe
                   title={t("review.previewTitle")}
                   sandbox="allow-same-origin"
@@ -312,7 +307,7 @@ export function ContractReviewStep({
                 />
               </div>
             ) : (
-              <div className="flex h-[42rem] flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border text-center p-6 text-xs text-muted-foreground">
+              <div className="flex h-[42rem] flex-col items-center justify-center gap-3 rounded border border-dashed border-border text-center p-6 text-xs text-muted-foreground">
                 <FileCheck className="h-10 w-10 text-muted-foreground/40" />
                 <p>{t("review.previewUnavailable")}</p>
                 {errors.length > 0 ? (

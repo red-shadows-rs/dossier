@@ -158,19 +158,10 @@ export function ContractClausesStep({
         {/* Card Header & Controls Toolbar */}
         <CardHeader className="flex flex-col gap-4 pb-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <ScrollText className="h-4 w-4" />
-              </div>
-              <div>
-                <CardTitle className="text-base font-semibold">
-                  {t("contracts.builder.clausesTitle")}
-                </CardTitle>
-                <p className="text-xs text-muted-foreground">
-                  {t("contracts.clauses")} ({clauses.length})
-                </p>
-              </div>
-            </div>
+            <CardTitle className="inline-flex items-center gap-2">
+              <ScrollText size={18} className="text-primary" aria-hidden="true" />
+              <span>{t("contracts.builder.clausesTitle")}</span>
+            </CardTitle>
 
             <div className="flex items-center gap-2">
               <Button
@@ -229,14 +220,14 @@ export function ContractClausesStep({
           {generalError ? (
             <p
               role="alert"
-              className="rounded-lg border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-xs font-medium text-destructive"
+              className="rounded border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-xs font-medium text-destructive"
             >
               {t(generalError)}
             </p>
           ) : null}
 
           {filteredClauses.length === 0 ? (
-            <div className="rounded-md border border-dashed border-border p-8 text-center text-xs text-muted-foreground">
+            <div className="rounded border border-dashed border-border p-8 text-center text-xs text-muted-foreground">
               {t("common.noResults")}
             </div>
           ) : null}
@@ -248,15 +239,15 @@ export function ContractClausesStep({
               return (
                 <div
                   key={index}
-                  className="group flex flex-col rounded-md border border-border/80 bg-card shadow-2xs transition-all hover:border-border hover:shadow-xs"
+                  className="group flex flex-col rounded border border-border bg-card shadow-2xs transition-all hover:border-border hover:shadow-xs"
                 >
                   {/* Clause Header Bar */}
-                  <div className="flex items-center justify-between border-b border-border/50 bg-muted/20 px-4 py-2.5 rounded-t-md">
+                  <div className="flex items-center justify-between border-b border-border/50 bg-muted/20 px-4 py-2.5 rounded-t">
                     <div
                       className="flex flex-1 items-center gap-3 cursor-pointer select-none overflow-hidden pe-2"
                       onClick={() => toggleCollapse(index)}
                     >
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-bold text-foreground font-mono">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-muted text-xs font-bold text-foreground font-mono">
                         {index + 1}
                       </span>
                       <span className="truncate text-xs font-semibold text-foreground">
@@ -276,7 +267,7 @@ export function ContractClausesStep({
                           aria-label={t("contracts.clause.up")}
                           onClick={() => move(index, -1)}
                           disabled={index === 0}
-                          className="hidden sm:flex h-7 w-7 items-center justify-center rounded-md border border-border/70 text-muted-foreground transition-all hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
+                          className="hidden sm:flex h-7 w-7 items-center justify-center rounded border border-border/70 text-muted-foreground transition-all hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
                         >
                           <ArrowUp className="h-3.5 w-3.5" />
                         </button>
@@ -288,7 +279,7 @@ export function ContractClausesStep({
                           aria-label={t("contracts.clause.down")}
                           onClick={() => move(index, 1)}
                           disabled={index === clauses.length - 1}
-                          className="hidden sm:flex h-7 w-7 items-center justify-center rounded-md border border-border/70 text-muted-foreground transition-all hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
+                          className="hidden sm:flex h-7 w-7 items-center justify-center rounded border border-border/70 text-muted-foreground transition-all hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
                         >
                           <ArrowDown className="h-3.5 w-3.5" />
                         </button>
@@ -299,7 +290,7 @@ export function ContractClausesStep({
                           type="button"
                           aria-label={t("contracts.clause.duplicate")}
                           onClick={() => duplicate(index)}
-                          className="flex h-7 w-7 items-center justify-center rounded-md border border-border/70 text-muted-foreground transition-all hover:bg-muted hover:text-foreground cursor-pointer"
+                          className="flex h-7 w-7 items-center justify-center rounded border border-border/70 text-muted-foreground transition-all hover:bg-muted hover:text-foreground cursor-pointer"
                         >
                           <Copy className="h-3.5 w-3.5" />
                         </button>
@@ -317,7 +308,7 @@ export function ContractClausesStep({
                             )
                           }
                           disabled={clauses.length <= 1}
-                          className="flex h-7 w-7 items-center justify-center rounded-md border border-border/70 text-muted-foreground transition-all hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
+                          className="flex h-7 w-7 items-center justify-center rounded border border-border/70 text-muted-foreground transition-all hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -328,7 +319,7 @@ export function ContractClausesStep({
                       <button
                         type="button"
                         onClick={() => toggleCollapse(index)}
-                        className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+                        className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
                       >
                         {isCollapsed ? (
                           <ChevronDown className="h-4 w-4" />

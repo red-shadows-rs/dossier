@@ -175,19 +175,10 @@ export function ContractScheduleStep({
     <form onSubmit={onSubmit} className="flex flex-col gap-6 pb-28">
       <Card>
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-3">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <CalendarClock className="h-4 w-4" />
-            </div>
-            <div>
-              <CardTitle className="text-base font-semibold">
-                {t("contracts.builder.scheduleTitle")}
-              </CardTitle>
-              <p className="text-xs text-muted-foreground">
-                {t("contracts.milestones")} ({rows.length})
-              </p>
-            </div>
-          </div>
+          <CardTitle className="inline-flex items-center gap-2">
+            <CalendarClock size={18} className="text-primary" aria-hidden="true" />
+            <span>{t("contracts.builder.scheduleTitle")}</span>
+          </CardTitle>
 
           <div className="flex flex-wrap items-center gap-2">
             <Field label="" className="mb-0">
@@ -221,7 +212,7 @@ export function ContractScheduleStep({
 
         <CardContent className="flex flex-col gap-5">
           {/* Progress / Status banner */}
-          <div className="rounded-md border border-border/80 bg-muted/30 p-3.5">
+          <div className="rounded border border-border bg-card/60 p-3.5">
             {mode === "percent" ? (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between text-xs font-medium">
@@ -232,8 +223,8 @@ export function ContractScheduleStep({
                     className={cn(
                       "font-mono font-bold",
                       isPercentComplete
-                        ? "text-emerald-600 dark:text-emerald-400"
-                        : "text-amber-600 dark:text-amber-400",
+                        ? "text-primary"
+                        : "text-muted-foreground",
                     )}
                   >
                     {sum}% / 100%
@@ -243,7 +234,7 @@ export function ContractScheduleStep({
                   <div
                     className={cn(
                       "h-full transition-all duration-300",
-                      isPercentComplete ? "bg-emerald-500" : "bg-amber-500",
+                      isPercentComplete ? "bg-primary" : "bg-primary/50",
                     )}
                     style={{ width: `${Math.min(100, Math.max(0, sum))}%` }}
                   />
@@ -265,7 +256,7 @@ export function ContractScheduleStep({
           {error ? (
             <p
               role="alert"
-              className="rounded-lg border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-xs font-medium text-destructive"
+              className="rounded border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-xs font-medium text-destructive"
             >
               {t(error)}
             </p>
@@ -276,11 +267,11 @@ export function ContractScheduleStep({
             {rows.map((row, index) => (
               <div
                 key={index}
-                className="group flex flex-col gap-3 rounded-md border border-border/80 bg-card p-4 shadow-2xs transition-all hover:border-border hover:shadow-xs"
+                className="group flex flex-col gap-3 rounded border border-border bg-card p-4 shadow-2xs transition-all hover:border-border hover:shadow-xs"
               >
                 {/* Milestone Card Header */}
                 <div className="flex items-center justify-between border-b border-border/60 pb-2.5">
-                  <span className="inline-flex items-center gap-1.5 rounded-md bg-muted px-2 py-0.5 text-xs font-semibold text-foreground font-mono">
+                  <span className="inline-flex items-center gap-1.5 rounded bg-muted px-2 py-0.5 text-xs font-semibold text-foreground font-mono">
                     #{index + 1}
                   </span>
                   <Tooltip content={t("common.delete")}>
@@ -295,7 +286,7 @@ export function ContractScheduleStep({
                         )
                       }
                       disabled={rows.length <= 1}
-                      className="flex h-7 w-7 items-center justify-center rounded-md border border-border/70 text-muted-foreground transition-all hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
+                      className="flex h-7 w-7 items-center justify-center rounded border border-border/70 text-muted-foreground transition-all hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -340,45 +331,35 @@ export function ContractScheduleStep({
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12">
                   {mode === "percent" ? (
                     <Field
-                      label={t("contracts.milestone.percent")}
+                      label={`${t("contracts.milestone.percent")} (%)`}
                       htmlFor={`ms-pct-${index}`}
                       className="lg:col-span-3"
                     >
-                      <div className="relative">
-                        <Input
-                          id={`ms-pct-${index}`}
-                          dir="ltr"
-                          value={row.percent}
-                          onChange={(event) =>
-                            updateRow(index, { percent: event.target.value })
-                          }
-                          className="pe-7 text-start font-mono"
-                        />
-                        <span className="pointer-events-none absolute inset-y-0 end-2 flex items-center text-xs font-semibold text-muted-foreground">
-                          %
-                        </span>
-                      </div>
+                      <Input
+                        id={`ms-pct-${index}`}
+                        dir="ltr"
+                        value={row.percent}
+                        onChange={(event) =>
+                          updateRow(index, { percent: event.target.value })
+                        }
+                        className="text-start font-mono"
+                      />
                     </Field>
                   ) : (
                     <Field
-                      label={t("contracts.milestone.amount")}
+                      label={`${t("contracts.milestone.amount")} (${currency})`}
                       htmlFor={`ms-amt-${index}`}
                       className="lg:col-span-3"
                     >
-                      <div className="relative">
-                        <Input
-                          id={`ms-amt-${index}`}
-                          dir="ltr"
-                          value={row.amount}
-                          onChange={(event) =>
-                            updateRow(index, { amount: event.target.value })
-                          }
-                          className="pe-12 text-start font-mono"
-                        />
-                        <span className="pointer-events-none absolute inset-y-0 end-2 flex items-center text-[11px] font-mono font-medium text-muted-foreground">
-                          {currency}
-                        </span>
-                      </div>
+                      <Input
+                        id={`ms-amt-${index}`}
+                        dir="ltr"
+                        value={row.amount}
+                        onChange={(event) =>
+                          updateRow(index, { amount: event.target.value })
+                        }
+                        className="text-start font-mono"
+                      />
                     </Field>
                   )}
 
