@@ -54,7 +54,13 @@ export function parseBody(src: string): Block[] {
       continue;
     }
 
-    if (lines[0].startsWith("> ")) {
+    const isScopeBlock =
+      block === "{{contract.scope}}" ||
+      block === "{{ contract.scope }}" ||
+      block.startsWith("{{contract.scope}}") ||
+      block.startsWith("{{ contract.scope }}");
+
+    if (lines[0].startsWith("> ") || isScopeBlock) {
       blocks.push({
         type: "paragraph",
         numbered: false,

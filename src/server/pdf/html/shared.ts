@@ -112,14 +112,20 @@ body {
   line-height: 1.75;
 }
 p {
-  margin: 0 0 2mm;
+  margin: 0 0 1.4mm;
   orphans: 3;
   widows: 3;
   overflow-wrap: anywhere;
 }
 p.note {
   font-size: 7.8pt;
-  color: #52525b;
+  color: #1e293b;
+  margin: 1.2mm 0 1.8mm 0;
+  padding: 1.8mm 3mm;
+  background: #f8fafc;
+  border-radius: 1.5mm;
+  border-inline-start: 1mm solid #e11d48;
+  line-height: 1.6;
 }
 ul {
   margin: 0 0 2.5mm;
@@ -153,10 +159,10 @@ li {
 /* Angular 3D Geometric Brand Header — Matching Dossier Identity */
 .hero-header {
   position: relative;
-  min-height: 48mm;
+  min-height: 40mm;
   width: 100%;
   overflow: hidden;
-  margin: 0 0 3mm 0;
+  margin: 0 0 2mm 0;
 }
 .hero-svg-bg {
   position: absolute;
@@ -173,12 +179,12 @@ li {
   position: relative;
   z-index: 2;
   display: flex;
-  min-height: 48mm;
+  min-height: 40mm;
   width: 100%;
 }
 .hero-red-box {
   width: 44%;
-  padding: 6mm 8mm;
+  padding: 4.5mm 7mm;
   color: #ffffff;
   display: flex;
   flex-direction: column;
@@ -203,8 +209,8 @@ li {
 }
 .hero-dark-box {
   width: 56%;
-  min-height: 48mm;
-  padding: 6mm 8mm;
+  min-height: 40mm;
+  padding: 4.5mm 7mm;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -404,11 +410,11 @@ li {
 
 /* Clauses single mode */
 .contract-single-clause {
-  margin-bottom: 4mm;
+  margin-bottom: 2mm;
   break-inside: auto;
 }
 .clause-body-single {
-  padding-top: 1.5mm;
+  padding-top: 0.8mm;
 }
 
 /* Cards & Tables */
@@ -416,8 +422,8 @@ li {
   background: #f8fafc;
   border: 0.35mm solid #e2e8f0;
   border-radius: 2mm;
-  padding: 3mm 3.5mm;
-  margin: 2mm 0;
+  padding: 2.2mm 3mm;
+  margin: 1.4mm 0;
   break-inside: avoid;
 }
 .section-badge {
@@ -426,41 +432,41 @@ li {
   color: #0f172a;
   border: 0.25mm solid #cbd5e1;
   border-radius: 1mm;
-  padding: 0.6mm 2.2mm;
-  font-size: 7pt;
+  padding: 0.5mm 2mm;
+  font-size: 6.8pt;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  margin-bottom: 2mm;
+  margin-bottom: 1.2mm;
 }
 .party-box {
   background: #ffffff;
   border: 0.25mm solid #e2e8f0;
   border-radius: 1.5mm;
-  padding: 2.5mm 3mm;
-  margin-bottom: 2mm;
+  padding: 1.8mm 2.5mm;
+  margin-bottom: 1.2mm;
 }
 .party-box:last-child {
   margin-bottom: 0;
 }
 .party-role {
-  font-size: 7.2pt;
+  font-size: 7pt;
   font-weight: 800;
   color: #e11d48;
   text-transform: uppercase;
-  margin-bottom: 0.8mm;
+  margin-bottom: 0.5mm;
   letter-spacing: 0.02em;
 }
 .party-name {
-  font-size: 9.5pt;
+  font-size: 9pt;
   font-weight: 800;
   color: #14141a;
-  margin-bottom: 0.8mm;
+  margin-bottom: 0.5mm;
 }
 .party-meta {
-  font-size: 7.4pt;
+  font-size: 7.2pt;
   color: #64748b;
-  line-height: 1.45;
+  line-height: 1.4;
 }
 .party-lbl {
   color: #94a3b8;
@@ -476,8 +482,8 @@ li {
   width: 100%;
   table-layout: fixed;
   border-collapse: collapse;
-  margin: 2mm 0;
-  font-size: 7.2pt;
+  margin: 1.4mm 0;
+  font-size: 7pt;
   border-radius: 1.5mm;
   overflow: hidden;
   break-inside: auto;
@@ -490,23 +496,23 @@ li {
 .contract-table th {
   background: #e11d48;
   color: #ffffff;
-  font-size: 7.2pt;
+  font-size: 7pt;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  padding: 2.2mm 2.5mm;
+  padding: 1.5mm 2.2mm;
   border: none;
   vertical-align: middle;
   line-height: 1.25;
 }
 .contract-table td {
-  padding: 2.2mm 2.5mm;
+  padding: 1.5mm 2.2mm;
   border: none;
   border-bottom: 0.25mm solid #f1f5f9;
   vertical-align: middle;
   color: #14141a;
-  font-size: 7.2pt;
-  line-height: 1.3;
+  font-size: 7pt;
+  line-height: 1.25;
   word-break: break-word;
   overflow-wrap: anywhere;
 }

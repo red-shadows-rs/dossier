@@ -343,31 +343,31 @@ export function paginateContractClauses(
     return { pages: [[]], separateFooterPage: false };
   }
 
-  const P1_BUDGET = 185;
-  const PSUB_BUDGET = 235;
+  const P1_BUDGET = 190;
+  const PSUB_BUDGET = 140;
   const FOOTER_MM = 48;
 
   function estimateClauseMm(clause: ContractClause): number {
-    let mm = 10;
+    let mm = 8;
     const body = clause.bodyAr || clause.bodyEn || "";
     if (body.includes("{{block.parties}}")) {
-      mm += 36;
+      mm += 32;
     }
     if (body.includes("{{block.pricing_table}}")) {
       const itemsCount = snapshot.items?.length ?? 2;
-      mm += 22 + itemsCount * 6.5;
+      mm += 18 + itemsCount * 5.8;
     }
     if (body.includes("{{block.payment_schedule}}")) {
       const mCount = snapshot.milestones?.length ?? 2;
-      mm += 22 + mCount * 6.5;
+      mm += 18 + mCount * 5.8;
     }
     if (body.includes("{{block.signatures}}")) {
-      mm += 30;
+      mm += 28;
     }
     const textOnly = body.replace(/\{\{block\.[^}]+\}\}/g, "").trim();
     const approxLines = Math.ceil(textOnly.length / 95);
-    mm += approxLines * 4.4;
-    return Math.max(mm, 14);
+    mm += approxLines * 4.0;
+    return Math.max(mm, 12);
   }
 
   const heights = clauses.map(estimateClauseMm);
@@ -404,7 +404,7 @@ export function paginateContractClauses(
 
   // Prevent empty footer page: if last page has no room for footer,
   // redistribute so that the last page has content as well.
-  const lastPageBudget = pages.length === 1 ? P1_BUDGET : PSUB_BUDGET;
+  const lastPageBudget = pages.length === 1 ? P1_BUDGET : 220;
   const lastPageClauseMm = pages[pages.length - 1].reduce(
     (acc, cl) => acc + estimateClauseMm(cl),
     0,
