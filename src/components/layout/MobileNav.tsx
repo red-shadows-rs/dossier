@@ -22,16 +22,18 @@ export function MobileNav({
   role,
   canSignForCompany,
   theme,
+  isDemo,
 }: {
   role: NavSubject["role"];
   canSignForCompany: boolean;
   theme: Theme;
+  isDemo?: boolean;
 }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const locale = useLocale();
   const [open, setOpen] = useState(false);
-  const entries = navEntries({ role, canSignForCompany });
+  const entries = navEntries({ role, canSignForCompany, isDemo });
   const side = locale === "ar" ? "right" : "left";
 
   return (

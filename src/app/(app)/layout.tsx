@@ -26,10 +26,14 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         {tc("skipToContent")}
       </a>
       <div className="flex min-h-dvh bg-background">
-        <Sidebar role={user.role} canSignForCompany={user.canSignForCompany} />
+        <Sidebar
+          role={user.role}
+          canSignForCompany={user.canSignForCompany}
+          isDemo={isDemo}
+        />
         <div className="flex min-w-0 flex-1 flex-col">
           {isDemo && <DemoBanner />}
-          <TopBar user={user} />
+          <TopBar user={user} isDemo={isDemo} />
           <main
             id="main"
             className="w-full flex-1 p-3 pt-3 md:p-4 lg:p-6 lg:pt-4"

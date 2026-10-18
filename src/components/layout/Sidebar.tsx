@@ -35,14 +35,16 @@ const sectionLabelSx = {
 export function Sidebar({
   role,
   canSignForCompany,
+  isDemo,
 }: {
   role: NavSubject["role"];
   canSignForCompany: boolean;
+  isDemo?: boolean;
 }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  const entries = navEntries({ role, canSignForCompany });
+  const entries = navEntries({ role, canSignForCompany, isDemo });
   const mainEntries = entries.filter((entry) => entry.section === "main");
   const manageEntries = entries.filter((entry) => entry.section === "manage");
   const width = collapsed ? COLLAPSED_WIDTH : WIDTH;

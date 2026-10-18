@@ -9,16 +9,21 @@ import { TemplatesGallery } from "@/components/tables/TemplatesGallery";
 import { archiveTemplateAction } from "@/server/actions/templates";
 import { LANG_MODES, TEMPLATE_TYPES } from "@/lib/constants";
 import { can } from "@/lib/permissions";
+import { withDbInstance } from "@/db";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import { listTemplates } from "@/server/services/templates";
 import { smoothLoading } from "@/lib/smooth-loader";
 
 export default async function TemplatesPage() {
   await smoothLoading();
   const user = await requireUserPage();
-  const t = await getTranslations("templates");
-  const tc = await getTranslations("common");
-  const { rows } = listTemplates();
+  const isDemo = isDemoUser(user.email);
+
+  return withDbInstance(isDemo, async () => {
+    const t = await getTranslations("templates");
+    const tc = await getTranslations("common");
+    const { rows } = listTemplates();
 
   const labels = {
     name: t("name"),
@@ -84,5 +89,6 @@ export default async function TemplatesPage() {
         canWrite={canWrite}
       />
     </div>
-  );
+    );
+  });
 }

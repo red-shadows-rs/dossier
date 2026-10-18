@@ -13,7 +13,9 @@ import { FilterDropdown } from "@/components/tables/FilterDropdown";
 import { deleteDraftContractAction } from "@/server/actions/contracts";
 import { CONTRACT_STATUSES } from "@/lib/constants";
 import { can } from "@/lib/permissions";
+import { withDbInstance } from "@/db";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import {
   CONTRACT_SORT_FIELDS,
   listContracts,
@@ -36,9 +38,12 @@ export default async function ContractsPage({
 }) {
   await smoothLoading();
   const user = await requireUserPage();
-  const t = await getTranslations("contracts");
-  const tc = await getTranslations("common");
-  const params = await searchParams;
+  const isDemo = isDemoUser(user.email);
+
+  return withDbInstance(isDemo, async () => {
+    const t = await getTranslations("contracts");
+    const tc = await getTranslations("common");
+    const params = await searchParams;
 
   const q = readParam(params.q);
   const statusParam = readParam(params.status);
@@ -325,5 +330,6 @@ export default async function ContractsPage({
         />
       </div>
     </div>
-  );
+    );
+  });
 }

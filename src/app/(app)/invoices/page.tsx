@@ -15,7 +15,9 @@ import { deleteDraftInvoiceAction } from "@/server/actions/invoices";
 import { INVOICE_STATUSES } from "@/lib/constants";
 import { todayInTz } from "@/lib/dates";
 import { can } from "@/lib/permissions";
+import { withDbInstance } from "@/db";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import {
   INVOICE_SORT_FIELDS,
   isOverdue,
@@ -40,9 +42,12 @@ export default async function InvoicesPage({
 }) {
   await smoothLoading();
   const user = await requireUserPage();
-  const t = await getTranslations("invoices");
-  const tc = await getTranslations("common");
-  const rawLocale = await getLocale();
+  const isDemo = isDemoUser(user.email);
+
+  return withDbInstance(isDemo, async () => {
+    const t = await getTranslations("invoices");
+    const tc = await getTranslations("common");
+    const rawLocale = await getLocale();
   const locale = rawLocale === "en" ? "en" : "ar";
   const params = await searchParams;
 
@@ -369,5 +374,6 @@ export default async function InvoicesPage({
         />
       </div>
     </div>
-  );
+    );
+  });
 }

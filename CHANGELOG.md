@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.2.1] - 2026-10-19
+
+### Security & Privacy
+- **Settings Concealment in Demo Mode:** Completely removed the "Settings" entry from navigation and mobile menus for demo visitors to prevent exposing company operational configurations and bank details.
+- **Route Guard for Settings:** Added automatic redirect from `/settings` and any settings subpage to `/` when authenticated as a demo user.
+- **Scoped Operational Pages:** Wrapped clients, projects, contracts, invoices, and templates pages in `withDbInstance` to guarantee complete query routing to `dossier-demo.sqlite`.
+
 ## [v1.2.0] - 2026-10-18
 
 ### Added

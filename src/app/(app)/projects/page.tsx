@@ -14,7 +14,9 @@ import { FilterDropdown } from "@/components/tables/FilterDropdown";
 import { archiveProjectAction } from "@/server/actions/projects";
 import { PROJECT_STATUSES, type ProjectStatus } from "@/lib/constants";
 import { can } from "@/lib/permissions";
+import { withDbInstance } from "@/db";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import { listClientOptions } from "@/server/services/clients";
 import { listProjects } from "@/server/services/projects";
 import { smoothLoading } from "@/lib/smooth-loader";
@@ -34,11 +36,14 @@ export default async function ProjectsPage({
 }) {
   await smoothLoading();
   const user = await requireUserPage();
-  const t = await getTranslations("projects");
-  const tc = await getTranslations("common");
-  const rawLocale = await getLocale();
-  const locale = rawLocale === "en" ? "en" : "ar";
-  const params = await searchParams;
+  const isDemo = isDemoUser(user.email);
+
+  return withDbInstance(isDemo, async () => {
+    const t = await getTranslations("projects");
+    const tc = await getTranslations("common");
+    const rawLocale = await getLocale();
+    const locale = rawLocale === "en" ? "en" : "ar";
+    const params = await searchParams;
 
   const q = readParam(params.q);
   const statusParam = readParam(params.status);
@@ -287,5 +292,6 @@ export default async function ProjectsPage({
         />
       </div>
     </div>
-  );
+    );
+  });
 }

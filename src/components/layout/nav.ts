@@ -18,6 +18,7 @@ import { can, type Permission } from "@/lib/permissions";
 export type NavSubject = {
   role: "owner" | "member" | "viewer";
   canSignForCompany: boolean;
+  isDemo?: boolean;
 };
 
 export type NavEntry = {
@@ -95,9 +96,12 @@ export const NAV: NavEntry[] = [
 ];
 
 export function navEntries(subject: NavSubject): NavEntry[] {
-  return NAV.filter(
-    (entry) => entry.permission === null || can(subject, entry.permission),
-  );
+  return NAV.filter((entry) => {
+    if (subject.isDemo && entry.key === "settings") {
+      return false;
+    }
+    return entry.permission === null || can(subject, entry.permission);
+  });
 }
 
 export function isActive(pathname: string, href: string): boolean {

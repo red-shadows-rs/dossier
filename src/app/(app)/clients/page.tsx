@@ -13,7 +13,9 @@ import { FilterDropdown } from "@/components/tables/FilterDropdown";
 import { archiveClientAction, deleteClientAction } from "@/server/actions/clients";
 import { CLIENT_TYPES } from "@/lib/constants";
 import { can } from "@/lib/permissions";
+import { withDbInstance } from "@/db";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import { listClients } from "@/server/services/clients";
 import { smoothLoading } from "@/lib/smooth-loader";
 
@@ -32,9 +34,12 @@ export default async function ClientsPage({
 }) {
   await smoothLoading();
   const user = await requireUserPage();
-  const t = await getTranslations("clients");
-  const tc = await getTranslations("common");
-  const params = await searchParams;
+  const isDemo = isDemoUser(user.email);
+
+  return withDbInstance(isDemo, async () => {
+    const t = await getTranslations("clients");
+    const tc = await getTranslations("common");
+    const params = await searchParams;
 
   const q = readParam(params.q);
   const archivedParam = readParam(params.archived);
@@ -214,5 +219,6 @@ export default async function ClientsPage({
         />
       </div>
     </div>
-  );
+    );
+  });
 }

@@ -2,11 +2,13 @@
 // https://github.com/red-shadows-rs/dossier
 
 import type { ReactNode } from "react";
+import { redirect } from "next/navigation";
 import { Settings } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { SettingsNav } from "@/components/layout/SettingsNav";
 import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 
 export default async function SettingsLayout({
   children,
@@ -14,6 +16,9 @@ export default async function SettingsLayout({
   children: ReactNode;
 }) {
   const user = await requireUserPage();
+  if (isDemoUser(user.email)) {
+    redirect("/");
+  }
   assertCan(user, "settings.read");
   const t = await getTranslations("settings");
 

@@ -14,7 +14,13 @@ import { UserMenu } from "@/components/layout/UserMenu";
 import { resolveTheme, THEME_COOKIE } from "@/lib/i18n";
 import type { SessionUser } from "@/server/auth/session";
 
-export async function TopBar({ user }: { user: SessionUser }) {
+export async function TopBar({
+  user,
+  isDemo,
+}: {
+  user: SessionUser;
+  isDemo?: boolean;
+}) {
   const store = await cookies();
   const theme = resolveTheme(store.get(THEME_COOKIE)?.value);
 
@@ -51,6 +57,7 @@ export async function TopBar({ user }: { user: SessionUser }) {
             role={user.role}
             canSignForCompany={user.canSignForCompany}
             theme={theme}
+            isDemo={isDemo}
           />
           <Logo />
         </MuiBox>
