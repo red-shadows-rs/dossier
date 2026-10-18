@@ -4,6 +4,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { LogOut, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -12,6 +13,7 @@ import { exitDemoAction, resetDemoAction } from "@/server/actions/demo";
 
 export function DemoBanner() {
   const t = useTranslations("demo");
+  const router = useRouter();
   const toast = useToast();
   const [resetting, setResetting] = useState(false);
 
@@ -24,7 +26,7 @@ export function DemoBanner() {
         title: t("resetSuccess"),
         tone: "success",
       });
-      window.location.reload();
+      router.refresh();
     }
   }
 

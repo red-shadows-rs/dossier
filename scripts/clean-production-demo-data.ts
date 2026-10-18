@@ -1,7 +1,7 @@
 // Dossier - Clean Production Demo Data Script
 // https://github.com/red-shadows-rs/dossier
 
-import { and, eq, inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { db, sqlite, withTx } from "@/db";
 import {
   clients,
