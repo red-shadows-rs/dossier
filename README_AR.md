@@ -9,7 +9,7 @@
 منصة متكاملة لإدارة العقود والفواتير مع التوثيق المشفر، الجدولة الآلية للدفعات، وتوليد ملفات PDF ثنائية اللغة (عربي / إنجليزي).
 
 [![الإصدار](https://img.shields.io/badge/version-1.1.0-2563eb?style=for-the-badge)](CHANGELOG.md)
-[![الرخصة](https://img.shields.io/badge/license-AGPL--3.0-dc2626?style=for-the-badge)](LICENSE)
+[![الرخصة](https://img.shields.io/badge/license-GPL--3.0-dc2626?style=for-the-badge)](LICENSE)
 ![TypeScript](https://img.shields.io/badge/typescript-5.9%2B-3178c6?style=for-the-badge&logo=typescript)
 ![Next.js](https://img.shields.io/badge/next.js-16.3-000000?style=for-the-badge&logo=next.js)
 ![المنصة](https://img.shields.io/badge/platform-Linux%20%7C%20Self--Hosted-9333ea?style=for-the-badge&logo=linux)
@@ -80,7 +80,7 @@
 | باركودات توثيق مشفرة (SHA-256) | ❌ مغلق | ❌ | ❌ | ❌ | ✅ SHA-256 + Code39 + QR |
 | عقود ثنائية اللغة جنباً إلى جنب | ❌ | ❌ | ❌ | ❌ | ✅ عربي / إنجليزي |
 | قفل العقود الموقعة بقواعد البيانات | ❌ | ❌ | ❌ | ❌ | ✅ SQLite triggers |
-| اشتراكات شهرية ورسوم إضافية | ❌ \$10-40/شهرياً | ❌ \$19-49/شهرياً | ❌ \$19-60/شهرياً | ❌ رسوم معاملات | ✅ مجاني ومفتوح المصدر (AGPL-3.0) |
+| اشتراكات شهرية ورسوم إضافية | ❌ \$10-40/شهرياً | ❌ \$19-49/شهرياً | ❌ \$19-60/شهرياً | ❌ رسوم معاملات | ✅ مجاني ومفتوح المصدر (GPL-3.0) |
 
 </div>
 
@@ -308,7 +308,7 @@ curl -I https://dossier.red-shadows-rs.com/v/DEMO-2026-X7K9
 <a id="license"></a>
 ## الرخصة
 
-مرخص تحت [رخصة AGPL-3.0](LICENSE).
+مرخّص تحت [رخصة GPL-3.0](LICENSE).
 
 ---
 

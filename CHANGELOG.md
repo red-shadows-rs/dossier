@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Team Identity Standardization:** Aligned team branding to `RED SHADOWS | RS` across all project documentation, footers, legal templates, and GitHub metadata.
+- **Description & License Alignment:** Streamlined repository and `package.json` descriptions to match Orbiscreen standard without redundant team attribution; adopted `GPL-3.0-or-later` license and unified badge layout across all documentation suites.
 
 ## [v1.0.0] - 2026-10-18
 

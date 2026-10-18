@@ -9,7 +9,7 @@
 Contracts & invoices platform with cryptographic verification, automated milestone billing, and bidirectional Arabic/English PDF rendering.
 
 [![Version](https://img.shields.io/badge/version-1.1.0-2563eb?style=for-the-badge)](CHANGELOG.md)
-[![License](https://img.shields.io/badge/license-AGPL--3.0-dc2626?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/license-GPL--3.0-dc2626?style=for-the-badge)](LICENSE)
 ![TypeScript](https://img.shields.io/badge/typescript-5.9%2B-3178c6?style=for-the-badge&logo=typescript)
 ![Next.js](https://img.shields.io/badge/next.js-16.3-000000?style=for-the-badge&logo=next.js)
 ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Self--Hosted-9333ea?style=for-the-badge&logo=linux)
@@ -78,7 +78,7 @@ Built from the ground up with **zero external SaaS dependencies**, Dossier runs 
 | Cryptographic Verification Barcodes | ❌ Proprietary | ❌ | ❌ | ❌ | ✅ SHA-256 + Code39 + QR |
 | Side-by-Side Bilingual Contracts | ❌ | ❌ | ❌ | ❌ | ✅ Arabic / English |
 | Immutable Database Triggers | ❌ | ❌ | ❌ | ❌ | ✅ SQLite triggers |
-| External Subscriptions Required | ❌ \$10-40/mo | ❌ \$19-49/mo | ❌ \$19-60/mo | ❌ Transaction fee | ✅ Free & Open Source (AGPL-3.0) |
+| External Subscriptions Required | ❌ \$10-40/mo | ❌ \$19-49/mo | ❌ \$19-60/mo | ❌ Transaction fee | ✅ Free & Open Source (GPL-3.0) |
 
 ---
 
@@ -292,7 +292,7 @@ Read the [Contributing Guidelines](CONTRIBUTING.md) and the [Code of Conduct](CO
 <a id="license"></a>
 ## License
 
-Distributed under the [AGPL-3.0 License](LICENSE).
+Distributed under the [GPL-3.0 License](LICENSE).
 
 ---
 
