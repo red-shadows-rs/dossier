@@ -38,7 +38,7 @@ export function sessionCookieOptions() {
     httpOnly: true,
     sameSite: "lax" as const,
     path: "/",
-    secure: env.NODE_ENV === "production",
+    secure: env.NODE_ENV === "production" && env.APP_URL.startsWith("https://"),
     maxAge: SESSION_TTL_MS / 1000,
   };
 }

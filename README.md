@@ -8,7 +8,7 @@
 
 Contracts & invoices platform with cryptographic verification, automated milestone billing, and bidirectional Arabic/English PDF rendering.
 
-[![Version](https://img.shields.io/badge/version-1.0.0-2563eb?style=for-the-badge)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.1.0-2563eb?style=for-the-badge)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-AGPL--3.0-dc2626?style=for-the-badge)](LICENSE)
 ![TypeScript](https://img.shields.io/badge/typescript-5.9%2B-3178c6?style=for-the-badge&logo=typescript)
 ![Next.js](https://img.shields.io/badge/next.js-16.3-000000?style=for-the-badge&logo=next.js)
@@ -27,6 +27,7 @@ Contracts & invoices platform with cryptographic verification, automated milesto
 ## Table of Contents
 
 - [Overview](#overview)
+- [Live Demo](#live-demo)
 - [Comparison](#comparison)
 - [Key Features](#features)
 - [System Architecture](#architecture)
@@ -39,6 +40,21 @@ Contracts & invoices platform with cryptographic verification, automated milesto
 - [Documentation](#documentation)
 - [Contributing](#contributing)
 - [License](#license)
+
+---
+
+<a id="live-demo"></a>
+## Live Demo
+
+Experience Dossier in a fully functional, interactive sandbox pre-populated with bilingual clients, contracts, payment milestones, and invoices:
+
+<div align="center">
+
+[![Try Live Demo](https://img.shields.io/badge/Live_Demo-Instant_Access-059669?style=for-the-badge&logo=rocket)](https://dossier.red-shadows-rs.com/demo)
+
+**[Launch Live Demo](https://dossier.red-shadows-rs.com/demo)** (One-click instant login - no registration required)
+
+</div>
 
 ---
 
@@ -282,10 +298,10 @@ Distributed under the [AGPL-3.0 License](LICENSE).
 
 <div align="center">
 
-Built by <a href="https://github.com/red-shadows-rs">RED SHADOWS</a> (<a href="https://github.com/shadow-x78">shadow-x78</a>) ·
+Built by <a href="https://github.com/red-shadows-rs">RED SHADOWS | RS</a> (<a href="https://github.com/shadow-x78">shadow-x78</a>) ·
 [Changelog](CHANGELOG.md) ·
 [Security](SECURITY.md)
 
-<sub>&copy; 2026 Dossier - RED SHADOWS (shadow-x78)</sub>
+<sub>&copy; 2026 Dossier - RED SHADOWS | RS (shadow-x78)</sub>
 
 </div>

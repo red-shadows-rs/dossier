@@ -8,7 +8,7 @@
 
 منصة متكاملة لإدارة العقود والفواتير مع التوثيق المشفر، الجدولة الآلية للدفعات، وتوليد ملفات PDF ثنائية اللغة (عربي / إنجليزي).
 
-[![الإصدار](https://img.shields.io/badge/version-1.0.0-2563eb?style=for-the-badge)](CHANGELOG.md)
+[![الإصدار](https://img.shields.io/badge/version-1.1.0-2563eb?style=for-the-badge)](CHANGELOG.md)
 [![الرخصة](https://img.shields.io/badge/license-AGPL--3.0-dc2626?style=for-the-badge)](LICENSE)
 ![TypeScript](https://img.shields.io/badge/typescript-5.9%2B-3178c6?style=for-the-badge&logo=typescript)
 ![Next.js](https://img.shields.io/badge/next.js-16.3-000000?style=for-the-badge&logo=next.js)
@@ -27,6 +27,7 @@
 ## فهرس المحتويات
 
 - [نظرة عامة](#نظرة-عامة)
+- [التجربة الحية (ديمو مباشر)](#التجربة-الحية)
 - [المقارنة](#المقارنة)
 - [المزايا الرئيسية](#المزايا-الرئيسية)
 - [معمارية النظام](#معمارية-النظام)
@@ -39,6 +40,21 @@
 - [التوثيق التفصيلي](#التوثيق-التفصيلي)
 - [المساهمة](#المساهمة)
 - [الرخصة](#الرخصة)
+
+---
+
+<a id="التجربة-الحية"></a>
+## التجربة الحية (ديمو مباشر)
+
+جرب منصة Dossier بشكل فوري وتفاعلي مع بيانات نموذجية مهيأة مسبقاً للعقود، مراحل الدفع، والفواتير الضريبية:
+
+<div align="center">
+
+[![تجربة الديمو](https://img.shields.io/badge/Live_Demo-تجربة_الآن-059669?style=for-the-badge&logo=rocket)](https://dossier.red-shadows-rs.com/demo)
+
+**[بدء التجربة المباشرة](https://dossier.red-shadows-rs.com/demo)** (تسجيل دخول فوري بنقرة واحدة - دون الحاجة لبيانات اعتماد)
+
+</div>
 
 ---
 
@@ -298,11 +314,11 @@ curl -I https://dossier.red-shadows-rs.com/v/DEMO-2026-X7K9
 
 <div align="center">
 
-تم التطوير بواسطة <a href="https://github.com/red-shadows-rs">RED SHADOWS</a> (<a href="https://github.com/shadow-x78">shadow-x78</a>) ·
+تم التطوير بواسطة <a href="https://github.com/red-shadows-rs">RED SHADOWS | RS</a> (<a href="https://github.com/shadow-x78">shadow-x78</a>) ·
 [سجل التغييرات](CHANGELOG.md) ·
 [الأمان](SECURITY.md)
 
-<sub>&copy; 2026 Dossier - RED SHADOWS (shadow-x78)</sub>
+<sub>&copy; 2026 Dossier - RED SHADOWS | RS (shadow-x78)</sub>
 
 </div>
 

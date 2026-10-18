@@ -2,7 +2,7 @@
 
 # Troubleshooting Guide - Dossier
 
-[![Version](https://img.shields.io/badge/version-1.0.0-2563eb?style=flat-square&logo=semver)](../CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.1.0-2563eb?style=flat-square&logo=semver)](../CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-AGPL--3.0-dc2626?style=flat-square)](../LICENSE)
 ![TypeScript](https://img.shields.io/badge/typescript-5.9%2B-3178c6?style=flat-square&logo=typescript)
 ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Self--Hosted-9333ea?style=flat-square&logo=linux)
@@ -95,10 +95,10 @@ All barcodes are rendered as vector SVGs using `currentColor` for rect fills (`t
 
 <div align="center">
 
-Built by <a href="https://github.com/red-shadows-rs">RED SHADOWS</a> (<a href="https://github.com/shadow-x78">shadow-x78</a>) ·
+Built by <a href="https://github.com/red-shadows-rs">RED SHADOWS | RS</a> (<a href="https://github.com/shadow-x78">shadow-x78</a>) ·
 [Back to README](../README.md)
 
-<sub>&copy; 2026 Dossier - RED SHADOWS (shadow-x78)</sub>
+<sub>&copy; 2026 Dossier - RED SHADOWS | RS (shadow-x78)</sub>
 
 </div>
 

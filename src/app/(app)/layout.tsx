@@ -3,11 +3,13 @@
 
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
+import { DemoBanner } from "@/components/layout/DemoBanner";
 import { Footer } from "@/components/layout/Footer";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { ToastProvider } from "@/components/ui/Toast";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const user = await requireUserPage();
@@ -24,6 +26,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       <div className="flex min-h-dvh bg-background">
         <Sidebar role={user.role} canSignForCompany={user.canSignForCompany} />
         <div className="flex min-w-0 flex-1 flex-col">
+          {isDemoUser(user.email) && <DemoBanner />}
           <TopBar user={user} />
           <main
             id="main"

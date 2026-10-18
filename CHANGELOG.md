@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.1.0] - 2026-10-18
+
+### Added
+- **Interactive Live Demo System:** Added `/demo` route featuring immediate one-click guest authentication, automatic provisioning of realistic bilingual contracts and invoices, and a persistent session for hands-on evaluation.
+- **Demo Mode Banner:** Context-aware floating status banner rendering across the application when authenticated as a demo user, with instant "Reset Demo Data" action and session exit.
+- **Login Demo CTA:** Prominent "Try Live Demo" one-click shortcut on `/login` and direct documentation links.
+- **Repository Discussions & Auto-Merge:** Synchronized GitHub repository features with Orbiscreen standard, including GitHub Discussions, automatic branch deletion on merge, and pull request auto-merge support.
+
+### Changed
+- **Team Identity Standardization:** Aligned team branding to `RED SHADOWS | RS` across all project documentation, footers, legal templates, and GitHub metadata.
+
 ## [v1.0.0] - 2026-10-18
 
 ### Added
@@ -104,9 +115,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <div align="center">
 
-Built by <a href="https://github.com/red-shadows-rs">RED SHADOWS</a> (<a href="https://github.com/shadow-x78">shadow-x78</a>) ·
+Built by <a href="https://github.com/red-shadows-rs">RED SHADOWS | RS</a> (<a href="https://github.com/shadow-x78">shadow-x78</a>) ·
 [Back to README](README.md)
 
-<sub>&copy; 2026 Dossier - RED SHADOWS (shadow-x78)</sub>
+<sub>&copy; 2026 Dossier - RED SHADOWS | RS (shadow-x78)</sub>
 
 </div>

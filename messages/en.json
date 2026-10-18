@@ -1136,5 +1136,16 @@
     "passwordResetToast": "Password updated",
     "enabledToast": "User enabled",
     "disabledToast": "User disabled"
+  },
+  "demo": {
+    "badge": "Demo Mode",
+    "bannerTitle": "Interactive Demo Environment",
+    "bannerDesc": "You are browsing Dossier as a demo manager. Create contracts, test milestone billing, and issue invoices freely.",
+    "resetButton": "Reset Demo Data",
+    "resetting": "Resetting...",
+    "resetSuccess": "Demo data has been restored to default state.",
+    "exitButton": "Exit Demo",
+    "tryDemoButton": "Try Live Demo",
+    "tryDemoDesc": "Explore the full platform instantly without credentials"
   }
 }

@@ -6,11 +6,12 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Eye, EyeOff, LogIn, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, LogIn, Lock, Mail, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input, InputAdornment } from "@/components/ui/Input";
 import type { ErrorCode } from "@/lib/errors";
 import { loginAction } from "@/server/actions/auth";
+import { loginAsDemoAction } from "@/server/actions/demo";
 
 export function LoginForm() {
   const t = useTranslations();
@@ -128,6 +129,30 @@ export function LoginForm() {
       <Button type="submit" loading={pending}>
         {pending ? null : <LogIn size={16} aria-hidden="true" />}
         {pending ? t("auth.signingIn") : t("auth.signIn")}
+      </Button>
+
+      <div className="relative my-2 flex items-center justify-center">
+        <div className="w-full border-t border-border" />
+      </div>
+
+      <Button
+        type="button"
+        variant="outline"
+        disabled={pending}
+        onClick={async () => {
+          setPending(true);
+          const result = await loginAsDemoAction();
+          if (result.ok) {
+            router.replace("/");
+            router.refresh();
+            return;
+          }
+          setPending(false);
+        }}
+        className="w-full gap-2 border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary/50"
+      >
+        <Sparkles size={16} aria-hidden="true" />
+        <span>{t("demo.tryDemoButton")}</span>
       </Button>
     </form>
   );
