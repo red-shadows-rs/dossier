@@ -1076,9 +1076,12 @@ export function buildFooterTemplate(meta: {
     overflow: visible !important;
   }
 </style>
-<div style="position: absolute; bottom: -3mm; left: -5mm; width: calc(100% + 10mm); height: 11mm; margin: 0; padding: 0 calc(8mm + 5mm); padding-bottom: 3mm; background-color: #e11d48; -webkit-print-color-adjust: exact; color: #ffffff; font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 7.2pt; font-weight: 700; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; direction: ${isRtlDoc ? "rtl" : "ltr"};">
-  <span dir="ltr">Dossier</span>
-  <span dir="ltr"><span class="pageNumber"></span> / <span class="totalPages"></span></span>
+<div style="position: absolute; bottom: -3mm; left: -5mm; width: calc(100% + 10mm); height: 11mm; margin: 0; padding: 0 calc(8mm + 5mm); padding-bottom: 3mm; background-color: #e11d48; -webkit-print-color-adjust: exact; color: #ffffff; font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 7.2pt; font-weight: 700; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
+  ${
+    isRtlDoc
+      ? `<span dir="ltr"><span class="pageNumber"></span> / <span class="totalPages"></span></span><span dir="ltr">Dossier</span>`
+      : `<span dir="ltr">Dossier</span><span dir="ltr"><span class="pageNumber"></span> / <span class="totalPages"></span></span>`
+  }
 </div>`;
 }
 
@@ -1252,7 +1255,6 @@ export function renderPartiesBlock(
   if (lang === "ar") {
     return `
       <div class="contract-card" dir="rtl">
-        <div class="section-badge">أطراف العقد</div>
         <div style="display: flex; gap: 4mm;">
           <div style="flex: 1;">${arProvider}</div>
           <div style="flex: 1;">${arClient}</div>
@@ -1263,7 +1265,6 @@ export function renderPartiesBlock(
 
   return `
     <div class="contract-card" dir="ltr">
-      <div class="section-badge">PARTIES TO THE AGREEMENT</div>
       <div style="display: flex; gap: 4mm;">
         <div style="flex: 1;">${enProvider}</div>
         <div style="flex: 1;">${enClient}</div>
@@ -1321,11 +1322,8 @@ export function renderPricingTableBlock(
   }
 
   const currentLocale = lang === "ar" ? "ar" : "en";
-  const badge =
-    lang === "ar" ? "تفاصيل الأتعاب والأسعار" : "PRICING SPECIFICATION";
   return `
     <div dir="${docDir(lang)}">
-      <div class="section-badge">${badge}</div>
       ${tableHtml(currentLocale)}
     </div>
   `;
@@ -1396,11 +1394,8 @@ export function renderPaymentScheduleBlock(
   }
 
   const currentLocale = lang === "ar" ? "ar" : "en";
-  const badge =
-    lang === "ar" ? "جدول الدفعات والمراحل" : "PAYMENT SCHEDULE";
   return `
     <div dir="${docDir(lang)}">
-      <div class="section-badge">${badge}</div>
       ${tableHtml(currentLocale)}
     </div>
   `;
@@ -1468,6 +1463,14 @@ export function renderSignaturesBlock(
         ? "بانتظار التوقيع"
         : "Pending signature";
 
+    const displayTitle =
+      sig?.title &&
+      sig.title.trim() !== "العميل" &&
+      sig.title.trim().toLowerCase() !== "client" &&
+      !roleTitle.includes(sig.title.trim())
+        ? sig.title
+        : null;
+
     return `
       <div class="sig-card">
         <div>
@@ -1482,7 +1485,7 @@ export function renderSignaturesBlock(
           <div class="sig-name">${esc(
             sig?.name ?? (isArabic ? "المفوض بالتوقيع" : "Authorized Signatory"),
           )}</div>
-          ${sig?.title ? `<div class="sig-title">${esc(sig.title)}</div>` : ""}
+          ${displayTitle ? `<div class="sig-title">${esc(displayTitle)}</div>` : ""}
           <div class="sig-date">${dateNote}</div>
         </div>
       </div>
@@ -1504,10 +1507,8 @@ export function renderSignaturesBlock(
   `;
 
 
-  const badge = lang === "ar" ? "التوقيع والاعتماد" : "EXECUTION & SIGNATURES";
   return `
     <div dir="${docDir(lang)}">
-      <div class="section-badge">${badge}</div>
       ${lang === "ar" ? arCards : enCards}
     </div>
   `;

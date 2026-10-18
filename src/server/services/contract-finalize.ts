@@ -395,6 +395,8 @@ export async function generateSealedPdf(
     const buffer = await render(html, {
       docNumber: contract.number ?? "DRAFT",
       code,
+      lang: contract.languageMode,
+      kind: "contract",
     });
 
     const file = saveFile({

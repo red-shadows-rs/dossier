@@ -122,9 +122,16 @@ export function renderCertificateSection(
           : isAr
             ? "لا"
             : "No";
+        const displayTitle =
+          s.title &&
+          s.title.trim() !== "العميل" &&
+          s.title.trim().toLowerCase() !== "client" &&
+          s.title.trim() !== role
+            ? s.title
+            : null;
         return `<tr>
           <td class="cert-col-role"><strong>${esc(role)}</strong></td>
-          <td class="cert-col-name">${esc(s.name)}${s.title ? `<br><span class="muted">${esc(s.title)}</span>` : ""}</td>
+          <td class="cert-col-name">${esc(s.name)}${displayTitle ? `<br><span class="muted">${esc(displayTitle)}</span>` : ""}</td>
           <td class="cert-col-email" style="font-size: 7.2pt;"><span dir="ltr">${esc(s.email ?? "—")}</span></td>
           <td class="cert-col-method">${esc(methodText)}</td>
           <td class="cert-col-signed">${signedAt}</td>
@@ -185,8 +192,6 @@ export function renderCertificateSection(
     : "";
 
   const title = isArabic ? "شهادة إتمام التوقيع" : "Certificate of Completion";
-  const badge = isArabic ? "شهادة إثبات التوثيق" : "AUTHENTICATION CERTIFICATE";
-  const sigHeading = isArabic ? "سجل الموقعين والأدلة" : "SIGNATORIES & EVIDENCE";
   const statement = isArabic ? statementAr : statementEn;
   const genStamp = isArabic
     ? `تم إصدار الشهادة في <span dir="ltr">${esc(utcStamp(cert.generatedAtMs))}</span> UTC`
@@ -194,11 +199,9 @@ export function renderCertificateSection(
 
   return `
     <section class="cert" dir="${isArabic ? "rtl" : "ltr"}">
-      <div class="doc-badge">${badge}</div>
       <h1 style="font-size: 13pt; margin: 1mm 0 2mm;">${title}</h1>
       ${infoTable(isArabic ? "ar" : "en")}
       ${verificationBlock}
-      <div class="section-badge" style="margin-top: 3mm;">${sigHeading}</div>
       ${signatoriesTable(isArabic ? "ar" : "en")}
       <p class="muted" style="margin-top: 2.5mm;">${esc(statement)}</p>
       <p class="muted" style="margin-top: 1mm;">${genStamp}</p>
