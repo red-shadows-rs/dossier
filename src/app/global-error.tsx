@@ -130,31 +130,6 @@ export default function GlobalError({
                 <AlertCircle size={28} strokeWidth={2} />
               </div>
 
-              <div
-                style={{
-                  marginBottom: "0.75rem",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.375rem",
-                  padding: "0.25rem 0.625rem",
-                  borderRadius: "0.375rem",
-                  fontSize: "0.75rem",
-                  fontWeight: 600,
-                  backgroundColor: "var(--dest-bg)",
-                  color: "var(--dest)",
-                  border: "1px solid var(--dest-border)",
-                }}
-              >
-                <span
-                  style={{
-                    width: "6px",
-                    height: "6px",
-                    borderRadius: "50%",
-                    backgroundColor: "var(--dest)",
-                  }}
-                />
-                <span>خطأ في النظام</span>
-              </div>
 
               <h1
                 style={{

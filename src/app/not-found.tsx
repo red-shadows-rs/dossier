@@ -9,7 +9,6 @@ import { Footer } from "@/components/layout/Footer";
 import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
 import { Logo } from "@/components/layout/Logo";
 import { ThemeSwitch } from "@/components/layout/ThemeSwitch";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { resolveTheme, THEME_COOKIE } from "@/lib/i18n";
@@ -31,37 +30,29 @@ export default async function NotFound() {
       </header>
 
       <main className="flex flex-1 items-center justify-center p-4">
-        <Card className="w-full max-w-lg overflow-hidden border border-border/80 bg-card text-center shadow-sm">
-          <div className="h-1 w-full bg-primary/70" />
-
-          <div className="flex flex-col items-center p-6 sm:p-8">
-            <div className="relative mb-3 flex items-center justify-center">
-              <span className="select-none font-mono text-7xl font-black tracking-widest text-muted-foreground/15 sm:text-8xl">
-                404
-              </span>
-              <div className="absolute flex h-12 w-12 items-center justify-center rounded-md border border-primary/20 bg-primary/10 text-primary shadow-sm">
-                <FileQuestion size={24} strokeWidth={2} aria-hidden="true" />
-              </div>
+        <Card className="w-full max-w-md border border-border bg-card p-8 text-center shadow-sm">
+          <div className="flex flex-col items-center">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-muted/40 text-muted-foreground shadow-sm">
+              <FileQuestion size={26} strokeWidth={1.75} aria-hidden="true" />
             </div>
 
-            <div className="mb-3">
-              <Badge tone="gray" dot>
-                {t("notFoundTitle")}
-              </Badge>
-            </div>
+            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-primary">
+              404
+            </span>
 
-            <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+            <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground">
               {t("notFoundTitle")}
             </h1>
-            <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
+
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               {t("notFoundDescription")}
             </p>
 
-            <div className="mt-6 flex w-full justify-center">
-              <Link href="/">
+            <div className="mt-6 flex w-full flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-center">
+              <Link href="/" className="w-full sm:w-auto">
                 <Button
                   variant="primary"
-                  className="inline-flex items-center gap-2"
+                  className="w-full justify-center gap-2 sm:w-auto"
                 >
                   <Gauge size={16} aria-hidden="true" />
                   <span>{tn("dashboard")}</span>

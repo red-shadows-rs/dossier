@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
 import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 
 export default function RootError({
@@ -57,34 +56,27 @@ export default function RootError({
         </div>
       </header>
 
-      <main className="relative flex flex-1 items-center justify-center p-4 overflow-hidden">
-        <div
-          className="pointer-events-none absolute -top-24 inset-x-0 mx-auto h-72 w-72 rounded-full bg-rose-500/10 blur-3xl"
-          aria-hidden="true"
-        />
-
-        <div className="relative w-full max-w-lg rounded-lg border border-border/70 bg-card/90 p-8 sm:p-10 shadow-2xl backdrop-blur-md">
-          <div className="flex flex-col items-center text-center">
-            <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-lg bg-rose-500/10 text-rose-500 ring-4 ring-rose-500/5 shadow-inner">
-              <AlertCircle size={32} strokeWidth={2.2} aria-hidden="true" />
+      <main className="flex flex-1 items-center justify-center p-4">
+        <div className="w-full max-w-md rounded-lg border border-border bg-card p-8 text-center shadow-sm">
+          <div className="flex flex-col items-center">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-destructive/20 bg-destructive/10 text-destructive shadow-sm">
+              <AlertCircle size={26} strokeWidth={1.75} aria-hidden="true" />
             </div>
 
-            <div className="mb-3">
-              <Badge tone="red" dot>
-                {t("systemError")}
-              </Badge>
-            </div>
+            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-destructive">
+              500 Error
+            </span>
 
-            <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+            <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground">
               {t("somethingWentWrong")}
             </h1>
 
-            <p className="mt-2.5 max-w-sm text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               {t("errorDescription")}
             </p>
 
             {error.digest ? (
-              <div className="mt-5 flex w-full max-w-xs items-center justify-between gap-2 rounded-md border border-border/80 bg-muted/40 px-3.5 py-2 text-xs font-mono text-muted-foreground">
+              <div className="mt-5 flex w-full max-w-xs items-center justify-between gap-2 rounded-md border border-border bg-muted/40 px-3.5 py-2 text-xs font-mono text-muted-foreground">
                 <span className="truncate">
                   <span className="text-muted-foreground/70">{t("errorReference")}: </span>
                   <span className="select-all font-semibold text-foreground tracking-wide">
@@ -126,7 +118,7 @@ export default function RootError({
                 type="button"
                 variant="primary"
                 onClick={reset}
-                className="w-full justify-center gap-2 sm:w-auto shadow-sm"
+                className="w-full justify-center gap-2 sm:w-auto"
               >
                 <RotateCcw size={16} aria-hidden="true" />
                 <span>{tc("retry")}</span>
@@ -147,7 +139,7 @@ export default function RootError({
             </button>
           </div>
 
-          <div className="mt-8 border-t border-border/50 pt-4 text-center text-xs text-muted-foreground/80">
+          <div className="mt-6 border-t border-border pt-4 text-center text-xs text-muted-foreground/80">
             {t("supportHint")}
           </div>
         </div>
