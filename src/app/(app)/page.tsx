@@ -339,14 +339,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             <p className="text-xs text-muted-foreground">{t("subtitle")}</p>
           </div>
         </div>
-      </div>
 
-      <DashboardFilter
-        currentRange={activeRange}
-        from={sp.from}
-        to={sp.to}
-        locale={locale}
-      />
+        <DashboardFilter
+          currentRange={activeRange}
+          from={sp.from}
+          to={sp.to}
+          locale={locale}
+        />
+      </div>
 
       {workerStale ? (
         <div className="flex items-center gap-2.5 rounded border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-600 dark:text-amber-400">
