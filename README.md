@@ -1,7 +1,7 @@
 <div align="center">
 
 <a href="https://github.com/red-shadows-rs/dossier">
-  <img src="https://raw.githubusercontent.com/red-shadows-rs/dossier/main/public/logo.svg" alt="Dossier Logo" width="120" />
+  <img src="public/logo.svg" alt="Dossier Logo" width="120" />
 </a>
 
 # Dossier
@@ -62,7 +62,7 @@ Built from the ground up with **zero external SaaS dependencies**, Dossier runs 
 | Cryptographic Verification Barcodes | ❌ Proprietary | ❌ | ❌ | ❌ | ✅ SHA-256 + Code39 + QR |
 | Side-by-Side Bilingual Contracts | ❌ | ❌ | ❌ | ❌ | ✅ Arabic / English |
 | Immutable Database Triggers | ❌ | ❌ | ❌ | ❌ | ✅ SQLite triggers |
-| External Subscriptions Required | ❌ \$10-40/mo | ❌ \$19-49/mo | ❌ \$19-60/mo | ❌ Transaction fee | ✅ Free & Open Source (MIT) |
+| External Subscriptions Required | ❌ \$10-40/mo | ❌ \$19-49/mo | ❌ \$19-60/mo | ❌ Transaction fee | ✅ Free & Open Source (AGPL-3.0) |
 
 ---
 
@@ -248,36 +248,30 @@ Every signed contract contains a tamper-evident seal verified against its immuta
 
 ```bash
 # Test public verification endpoint via curl:
-curl -I https://dossier.red-shadows-rs.com/v/MG35RR0RJ8YX
+curl -I https://dossier.red-shadows-rs.com/v/DEMO-2026-X7K9
 ```
 
 The endpoint returns `HTTP/2 200 OK` and presents the complete historical certificate, signatories, and SHA-256 hash.
-
----
 
 <a id="documentation"></a>
 ## Documentation
 
 | Document | Description |
 |----------|-------------|
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) ([العربية](docs/ARCHITECTURE_AR.md)) | System architecture, state machines, and cryptographic design |
-| [DEPLOYMENT.md](docs/DEPLOYMENT.md) ([العربية](docs/DEPLOYMENT_AR.md)) | Production Docker Compose, Nginx SSL reverse proxy, and backups |
-| [API_SPEC.md](docs/API_SPEC.md) ([العربية](docs/API_SPEC_AR.md)) | Public verification routes, PDF streaming, and health checks |
-| [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) ([العربية](docs/TROUBLESHOOTING_AR.md)) | Common diagnostic procedures and deployment fixes |
-
----
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System topology, state machines, and cryptographic design |
+| [DEPLOYMENT.md](docs/DEPLOYMENT.md) | Production Docker Compose, Nginx SSL reverse proxy, and backups |
+| [API_SPEC.md](docs/API_SPEC.md) | Public verification routes, PDF streaming, and health checks |
+| [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Common diagnostic procedures and deployment fixes |
 
 <a id="contributing"></a>
 ## Contributing
 
-1. Fork the repository and create a feature branch (`feature/your-feature`).
+1. Fork the repository and create a branch (`feature/`, `fix/`, `docs/`, `chore/`).
 2. Ensure all verification checks pass: `npm run check` (typecheck, lint, check-rtl, check-comments, tests).
 3. Add a `CHANGELOG.md` entry.
-4. Open a pull request against `main`.
+4. Commit as `dossier | <type>: <description>` and open a pull request against `main`.
 
-Please review our [Contributing Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
-
----
+Read the [Contributing Guidelines](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md). Report problems through [GitHub Issues](https://github.com/red-shadows-rs/dossier/issues).
 
 <a id="license"></a>
 ## License

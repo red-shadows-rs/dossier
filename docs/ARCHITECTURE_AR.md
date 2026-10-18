@@ -2,8 +2,8 @@
 
 # مواصفات المعمارية - Dossier
 
-[![الإصدار](https://img.shields.io/badge/version-0.1.0-2563eb?style=flat-square&logo=semver)](../CHANGELOG.md)
-[![الرخصة](https://img.shields.io/badge/license-MIT-dc2626?style=flat-square)](../LICENSE)
+[![الإصدار](https://img.shields.io/badge/version-1.0.0-2563eb?style=flat-square&logo=semver)](../CHANGELOG.md)
+[![الرخصة](https://img.shields.io/badge/license-AGPL--3.0-dc2626?style=flat-square)](../LICENSE)
 ![TypeScript](https://img.shields.io/badge/typescript-5.9%2B-3178c6?style=flat-square&logo=typescript)
 ![المنصة](https://img.shields.io/badge/platform-Linux%20%7C%20Self--Hosted-9333ea?style=flat-square&logo=linux)
 

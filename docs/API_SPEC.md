@@ -2,8 +2,8 @@
 
 # API & Verification Specification - Dossier
 
-[![Version](https://img.shields.io/badge/version-0.1.0-2563eb?style=flat-square&logo=semver)](../CHANGELOG.md)
-[![License](https://img.shields.io/badge/license-MIT-dc2626?style=flat-square)](../LICENSE)
+[![Version](https://img.shields.io/badge/version-1.0.0-2563eb?style=flat-square&logo=semver)](../CHANGELOG.md)
+[![License](https://img.shields.io/badge/license-AGPL--3.0-dc2626?style=flat-square)](../LICENSE)
 ![TypeScript](https://img.shields.io/badge/typescript-5.9%2B-3178c6?style=flat-square&logo=typescript)
 ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Self--Hosted-9333ea?style=flat-square&logo=linux)
 
@@ -60,7 +60,7 @@ Checks application liveness and SQLite connectivity.
 <a id="public-verification-view"></a>
 ### 2. Public Verification View
 
-Renders the full tamper-evident certificate for a signed contract matching `code` (e.g. `MG35RR0RJ8YX`).
+Renders the full tamper-evident certificate for a signed contract matching `code` (e.g. `DEMO-2026-X7K9`).
 
 - **URL:** `/v/:code`
 - **Method:** `GET`

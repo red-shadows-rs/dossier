@@ -1,7 +1,7 @@
 <div align="center">
 
 <a href="https://github.com/red-shadows-rs/dossier">
-  <img src="https://raw.githubusercontent.com/red-shadows-rs/dossier/main/public/logo.svg" alt="شعار Dossier" width="120" />
+  <img src="public/logo.svg" alt="شعار Dossier" width="120" />
 </a>
 
 # Dossier
@@ -64,7 +64,7 @@
 | باركودات توثيق مشفرة (SHA-256) | ❌ مغلق | ❌ | ❌ | ❌ | ✅ SHA-256 + Code39 + QR |
 | عقود ثنائية اللغة جنباً إلى جنب | ❌ | ❌ | ❌ | ❌ | ✅ عربي / إنجليزي |
 | قفل العقود الموقعة بقواعد البيانات | ❌ | ❌ | ❌ | ❌ | ✅ SQLite triggers |
-| اشتراكات شهرية ورسوم إضافية | ❌ \$10-40/شهرياً | ❌ \$19-49/شهرياً | ❌ \$19-60/شهرياً | ❌ رسوم معاملات | ✅ مجاني ومفتوح المصدر (MIT) |
+| اشتراكات شهرية ورسوم إضافية | ❌ \$10-40/شهرياً | ❌ \$19-49/شهرياً | ❌ \$19-60/شهرياً | ❌ رسوم معاملات | ✅ مجاني ومفتوح المصدر (AGPL-3.0) |
 
 </div>
 
@@ -253,49 +253,43 @@ npm run dev
 
 ---
 
-<a id="نظام-التوثيق-المشفر"></a>
+<a id="verification"></a>
 ## نظام التوثيق المشفر
 
 يحمل كل عقد موقع ختماً جنائياً محمياً بمشغلات قاعدة البيانات غير القابلة للاختراق:
 
 ```bash
 # اختبار صفحة التحقق العامة عبر curl:
-curl -I https://dossier.red-shadows-rs.com/v/MG35RR0RJ8YX
+curl -I https://dossier.red-shadows-rs.com/v/DEMO-2026-X7K9
 ```
 
 تستجيب المنصة بـ `HTTP/2 200 OK` وتعرض شهادة الإتمام التاريخية الكاملة وأطراف التوقيع وبصمة SHA-256.
 
----
-
-<a id="التوثيق-التفصيلي"></a>
+<a id="documentation"></a>
 ## التوثيق
 
 <div dir="rtl" align="right">
 
 | الوثيقة | الوصف |
-|----------|-------|
-| [ARCHITECTURE_AR.md](docs/ARCHITECTURE_AR.md) ([English](docs/ARCHITECTURE.md)) | مواصفات المعمارية وآلة الحالات والتشفير |
-| [DEPLOYMENT_AR.md](docs/DEPLOYMENT_AR.md) ([English](docs/DEPLOYMENT.md)) | دليل النشر عبر Docker و Nginx والنسخ الاحتياطي |
-| [API_SPEC_AR.md](docs/API_SPEC_AR.md) ([English](docs/API_SPEC.md)) | مواصفات واجهات البرمجة العامة ومسارات التحقق وتوليد PDF |
-| [TROUBLESHOOTING_AR.md](docs/TROUBLESHOOTING_AR.md) ([English](docs/TROUBLESHOOTING.md)) | استكشاف الأخطاء الشائعة وحلول التشغيل |
+| :--- | :--- |
+| [ARCHITECTURE_AR.md](docs/ARCHITECTURE_AR.md) | معمارية النظام، آلة الحالات، ونظام التوثيق المشفر |
+| [DEPLOYMENT_AR.md](docs/DEPLOYMENT_AR.md) | دليل النشر عبر Docker و Nginx والنسخ الاحتياطي |
+| [API_SPEC_AR.md](docs/API_SPEC_AR.md) | مواصفات واجهات البرمجة العامة ومسارات التحقق وتوليد PDF |
+| [TROUBLESHOOTING_AR.md](docs/TROUBLESHOOTING_AR.md) | استكشاف الأخطاء الشائعة وحلول التشغيل |
 
 </div>
 
----
-
-<a id="المساهمة"></a>
+<a id="contributing"></a>
 ## المساهمة
 
-1. اعمل Fork للمستودع وأنشئ فرعاً بميزة جديدة (`feature/your-feature`).
-2. تأكد من اجتياز كافة الفحوصات: `npm run check` (typecheck, lint, check-rtl, check-comments, test).
+1. اعمل Fork للمستودع وأنشئ فرعاً مناسباً: `feature/` أو `fix/` أو `docs/` أو `chore/`.
+2. تأكد من اجتياز كافة الفحوصات: `npm run check` (typecheck, lint, check-rtl, check-comments, tests).
 3. أضف قيداً في `CHANGELOG.md`.
-4. افتح Pull Request نحو فرع `main`.
+4. أنشئ الكوميت بصيغة `dossier | <type>: <description>` وافتح Pull Request نحو فرع `main`.
 
-راجع [إرشادات المساهمة](CONTRIBUTING.md) و[ميثاق السلوك](CODE_OF_CONDUCT.md).
+راجع [إرشادات المساهمة](CONTRIBUTING.md) و[ميثاق السلوك](CODE_OF_CONDUCT.md). وأبلغ عن أي مشكلة عبر [GitHub Issues](https://github.com/red-shadows-rs/dossier/issues).
 
----
-
-<a id="الرخصة"></a>
+<a id="license"></a>
 ## الرخصة
 
 مرخص تحت [رخصة AGPL-3.0](LICENSE).
