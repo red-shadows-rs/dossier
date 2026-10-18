@@ -8,16 +8,13 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
-  ExternalLink,
   FileSearch,
   FileText,
   Fingerprint,
-  QrCode,
   Receipt,
   ShieldCheck,
   User,
   Wallet,
-  XCircle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -99,7 +96,7 @@ export default async function VerifyCodePage({
 
         <main
           dir={dir}
-          className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
+          className="flex w-full flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8"
         >
           {/* Breadcrumb Navigation */}
           <nav
@@ -353,10 +350,10 @@ export default async function VerifyCodePage({
                 </CardHeader>
                 <CardContent className="p-5 sm:p-6 flex flex-col gap-6">
                   {/* Barcode Frame */}
-                  <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-border/60 bg-muted/20 py-4 px-4 text-center">
+                  <div className="flex flex-col items-center justify-center gap-2.5 rounded-xl border border-border/60 bg-muted/20 dark:bg-card/70 py-5 px-4 text-center">
                     <div
-                      className="max-w-[320px] overflow-hidden"
-                      dangerouslySetInnerHTML={{ __html: renderCode39Svg(code, 32) }}
+                      className="max-w-[360px] overflow-hidden text-foreground dark:text-zinc-100 [&_rect]:fill-current"
+                      dangerouslySetInnerHTML={{ __html: renderCode39Svg(code, 36, "currentColor") }}
                     />
                     <div className="flex items-center gap-2 mt-1">
                       <span

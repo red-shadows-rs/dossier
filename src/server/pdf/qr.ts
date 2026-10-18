@@ -60,7 +60,11 @@ const CODE39_PATTERNS: Record<string, string> = {
   "*": "010010100",
 };
 
-export function renderCode39Svg(text: string, height = 24): string {
+export function renderCode39Svg(
+  text: string,
+  height = 24,
+  color = "currentColor",
+): string {
   const clean = (
     "*" +
     (text || "INV")
@@ -83,7 +87,7 @@ export function renderCode39Svg(text: string, height = 24): string {
       const w = isWide ? wide : narrow;
       if (isBar) {
         rects.push(
-          `<rect x="${x.toFixed(1)}" y="0" width="${w.toFixed(1)}" height="${height}" fill="#0f172a" />`,
+          `<rect x="${x.toFixed(1)}" y="0" width="${w.toFixed(1)}" height="${height}" fill="${color}" />`,
         );
       }
       x += w;

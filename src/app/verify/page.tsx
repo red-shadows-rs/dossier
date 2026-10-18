@@ -49,7 +49,7 @@ export default async function VerifyPage({
 
         <main
           dir={dir}
-          className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:px-8"
+          className="flex w-full flex-1 flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:px-8"
         >
           <div className="flex flex-col items-center text-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
