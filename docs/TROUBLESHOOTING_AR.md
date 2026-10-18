@@ -92,10 +92,10 @@ sudo apt-get install -y libnss3 libatk-bridge2.0-0 libdrm2 libxkbcommon0 libgbm1
 
 <div align="center">
 
-بُني بواسطة <a href="https://github.com/shadow-x78">shadow-x78</a> ·
+تم التطوير بواسطة <a href="https://github.com/red-shadows-rs">RED SHADOWS</a> (<a href="https://github.com/shadow-x78">shadow-x78</a>) ·
 [العودة للملف الرئيسي](../README_AR.md)
 
-<sub>&copy; 2026 Dossier (shadow-x78)</sub>
+<sub>&copy; 2026 Dossier — RED SHADOWS (shadow-x78)</sub>
 
 </div>
 

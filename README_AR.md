@@ -8,8 +8,8 @@
 
 منصة متكاملة لإدارة العقود والفواتير مع التوثيق المشفر، الجدولة الآلية للدفعات، وتوليد ملفات PDF ثنائية اللغة (عربي / إنجليزي).
 
-[![الإصدار](https://img.shields.io/badge/version-0.1.0-2563eb?style=for-the-badge)](CHANGELOG.md)
-[![الرخصة](https://img.shields.io/badge/license-MIT-dc2626?style=for-the-badge)](LICENSE)
+[![الإصدار](https://img.shields.io/badge/version-1.0.0-2563eb?style=for-the-badge)](CHANGELOG.md)
+[![الرخصة](https://img.shields.io/badge/license-AGPL--3.0-dc2626?style=for-the-badge)](LICENSE)
 ![TypeScript](https://img.shields.io/badge/typescript-5.9%2B-3178c6?style=for-the-badge&logo=typescript)
 ![Next.js](https://img.shields.io/badge/next.js-16.3-000000?style=for-the-badge&logo=next.js)
 ![المنصة](https://img.shields.io/badge/platform-Linux%20%7C%20Self--Hosted-9333ea?style=for-the-badge&logo=linux)
@@ -268,22 +268,16 @@ curl -I https://dossier.red-shadows-rs.com/v/MG35RR0RJ8YX
 ---
 
 <a id="التوثيق-التفصيلي"></a>
-## التوثيق التفصيلي
-
-أدلة شاملة لكافة جوانب المنظمة:
+## التوثيق
 
 <div dir="rtl" align="right">
 
-| الوثيقة | اللغة | الوصف |
-| :--- | :---: | :--- |
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | 🇬🇧 English | مواصفات المعمارية وآلة الحالات والتشفير |
-| [ARCHITECTURE_AR.md](docs/ARCHITECTURE_AR.md) | 🇸🇦 العربية | معمارية النظام، آلة الحالات، ونظام التوثيق المشفر |
-| [DEPLOYMENT.md](docs/DEPLOYMENT.md) | 🇬🇧 English | دليل النشر عبر Docker و Nginx والنسخ الاحتياطي |
-| [DEPLOYMENT_AR.md](docs/DEPLOYMENT_AR.md) | 🇸🇦 العربية | دليل النشر والتشغيل في بيئة الإنتاج والنسخ الاحتياطي |
-| [API_SPEC.md](docs/API_SPEC.md) | 🇬🇧 English | مواصفات مسارات التحقق وتوليد PDF |
-| [API_SPEC_AR.md](docs/API_SPEC_AR.md) | 🇸🇦 العربية | مواصفات واجهات البرمجة العامة ومسارات التحقق وتوليد PDF |
-| [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | 🇬🇧 English | حلول المشاكل التقنية واستكشاف الأخطاء |
-| [TROUBLESHOOTING_AR.md](docs/TROUBLESHOOTING_AR.md) | 🇸🇦 العربية | استكشاف الأخطاء الشائعة وحلول التشغيل |
+| الوثيقة | الوصف |
+|----------|-------|
+| [ARCHITECTURE_AR.md](docs/ARCHITECTURE_AR.md) ([English](docs/ARCHITECTURE.md)) | مواصفات المعمارية وآلة الحالات والتشفير |
+| [DEPLOYMENT_AR.md](docs/DEPLOYMENT_AR.md) ([English](docs/DEPLOYMENT.md)) | دليل النشر عبر Docker و Nginx والنسخ الاحتياطي |
+| [API_SPEC_AR.md](docs/API_SPEC_AR.md) ([English](docs/API_SPEC.md)) | مواصفات واجهات البرمجة العامة ومسارات التحقق وتوليد PDF |
+| [TROUBLESHOOTING_AR.md](docs/TROUBLESHOOTING_AR.md) ([English](docs/TROUBLESHOOTING.md)) | استكشاف الأخطاء الشائعة وحلول التشغيل |
 
 </div>
 
@@ -304,17 +298,17 @@ curl -I https://dossier.red-shadows-rs.com/v/MG35RR0RJ8YX
 <a id="الرخصة"></a>
 ## الرخصة
 
-مرخص تحت [رخصة MIT](LICENSE).
+مرخص تحت [رخصة AGPL-3.0](LICENSE).
 
 ---
 
 <div align="center">
 
-بُني بواسطة <a href="https://github.com/shadow-x78">shadow-x78</a> ·
+تم التطوير بواسطة <a href="https://github.com/red-shadows-rs">RED SHADOWS</a> (<a href="https://github.com/shadow-x78">shadow-x78</a>) ·
 [سجل التغييرات](CHANGELOG.md) ·
 [الأمان](SECURITY.md)
 
-<sub>&copy; 2026 Dossier (shadow-x78)</sub>
+<sub>&copy; 2026 Dossier — RED SHADOWS (shadow-x78)</sub>
 
 </div>
 

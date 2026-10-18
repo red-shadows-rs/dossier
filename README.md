@@ -8,8 +8,8 @@
 
 Contracts & invoices platform with cryptographic verification, automated milestone billing, and bidirectional Arabic/English PDF rendering.
 
-[![Version](https://img.shields.io/badge/version-0.1.0-2563eb?style=for-the-badge)](CHANGELOG.md)
-[![License](https://img.shields.io/badge/license-MIT-dc2626?style=for-the-badge)](LICENSE)
+[![Version](https://img.shields.io/badge/version-1.0.0-2563eb?style=for-the-badge)](CHANGELOG.md)
+[![License](https://img.shields.io/badge/license-AGPL--3.0-dc2626?style=for-the-badge)](LICENSE)
 ![TypeScript](https://img.shields.io/badge/typescript-5.9%2B-3178c6?style=for-the-badge&logo=typescript)
 ![Next.js](https://img.shields.io/badge/next.js-16.3-000000?style=for-the-badge&logo=next.js)
 ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Self--Hosted-9333ea?style=for-the-badge&logo=linux)
@@ -258,18 +258,12 @@ The endpoint returns `HTTP/2 200 OK` and presents the complete historical certif
 <a id="documentation"></a>
 ## Documentation
 
-Detailed architectural, deployment, and operational guides:
-
-| Document | Language | Description |
-| :--- | :---: | :--- |
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | 🇬🇧 English | System architecture, state machines, and cryptographic design |
-| [ARCHITECTURE_AR.md](docs/ARCHITECTURE_AR.md) | 🇸🇦 العربية | معمارية النظام، آلة الحالات، ونظام التوثيق المشفر |
-| [DEPLOYMENT.md](docs/DEPLOYMENT.md) | 🇬🇧 English | Docker Compose, Nginx SSL reverse proxy, and backups |
-| [DEPLOYMENT_AR.md](docs/DEPLOYMENT_AR.md) | 🇸🇦 العربية | دليل النشر والتشغيل في بيئة الإنتاج والنسخ الاحتياطي |
-| [API_SPEC.md](docs/API_SPEC.md) | 🇬🇧 English | Public verification routes, PDF streaming, and health checks |
-| [API_SPEC_AR.md](docs/API_SPEC_AR.md) | 🇸🇦 العربية | مواصفات واجهات البرمجة العامة ومسارات التحقق وتوليد PDF |
-| [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | 🇬🇧 English | Common diagnostic procedures and deployment fixes |
-| [TROUBLESHOOTING_AR.md](docs/TROUBLESHOOTING_AR.md) | 🇸🇦 العربية | استكشاف الأخطاء الشائعة وحلول التشغيل |
+| Document | Description |
+|----------|-------------|
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) ([العربية](docs/ARCHITECTURE_AR.md)) | System architecture, state machines, and cryptographic design |
+| [DEPLOYMENT.md](docs/DEPLOYMENT.md) ([العربية](docs/DEPLOYMENT_AR.md)) | Production Docker Compose, Nginx SSL reverse proxy, and backups |
+| [API_SPEC.md](docs/API_SPEC.md) ([العربية](docs/API_SPEC_AR.md)) | Public verification routes, PDF streaming, and health checks |
+| [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) ([العربية](docs/TROUBLESHOOTING_AR.md)) | Common diagnostic procedures and deployment fixes |
 
 ---
 
@@ -288,16 +282,16 @@ Please review our [Contributing Guidelines](CONTRIBUTING.md) and [Code of Conduc
 <a id="license"></a>
 ## License
 
-Distributed under the [MIT License](LICENSE).
+Distributed under the [AGPL-3.0 License](LICENSE).
 
 ---
 
 <div align="center">
 
-Built by <a href="https://github.com/shadow-x78">shadow-x78</a> ·
+Built by <a href="https://github.com/red-shadows-rs">RED SHADOWS</a> (<a href="https://github.com/shadow-x78">shadow-x78</a>) ·
 [Changelog](CHANGELOG.md) ·
 [Security](SECURITY.md)
 
-<sub>&copy; 2026 Dossier (shadow-x78)</sub>
+<sub>&copy; 2026 Dossier — RED SHADOWS (shadow-x78)</sub>
 
 </div>

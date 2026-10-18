@@ -4,7 +4,7 @@
   "private": true,
   "description": "Contracts & invoices platform by RED SHADOWS | RS — one dossier per project",
   "author": "RED SHADOWS | RS",
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",

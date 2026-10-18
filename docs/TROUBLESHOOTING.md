@@ -95,10 +95,10 @@ All barcodes are rendered as vector SVGs using `currentColor` for rect fills (`t
 
 <div align="center">
 
-Built by <a href="https://github.com/shadow-x78">shadow-x78</a> ·
+Built by <a href="https://github.com/red-shadows-rs">RED SHADOWS</a> (<a href="https://github.com/shadow-x78">shadow-x78</a>) ·
 [Back to README](../README.md)
 
-<sub>&copy; 2026 Dossier (shadow-x78)</sub>
+<sub>&copy; 2026 Dossier — RED SHADOWS (shadow-x78)</sub>
 
 </div>
 
