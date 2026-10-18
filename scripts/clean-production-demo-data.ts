@@ -54,6 +54,10 @@ const DEMO_CLIENT_EMAILS = [
 ];
 
 async function main() {
+  if (process.env.ALLOW_DEMO_CLEANUP !== "true") {
+    console.log("Demo cleanup skipped: ALLOW_DEMO_CLEANUP is not set to 'true'.");
+    return;
+  }
   console.log("Cleaning demo data from production database...");
 
   const demoUser = db
