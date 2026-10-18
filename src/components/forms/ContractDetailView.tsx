@@ -22,6 +22,7 @@ import { ContractDocumentViewer } from "@/components/forms/ContractDocumentViewe
 import { ContractDraftActions } from "@/components/forms/ContractDraftActions";
 import { ContractLifecycleActions } from "@/components/forms/ContractLifecycleActions";
 import { FinalizeRetryBanner } from "@/components/forms/FinalizeRetryBanner";
+import { formatAuditAction, formatAuditActor } from "@/lib/audit-format";
 import { Badge, contractStatusTone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -742,14 +743,17 @@ export function ContractDetailView({
                         className="flex flex-col gap-0.5 border-b border-border/40 pb-2 last:border-b-0 last:pb-0"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-mono text-xs font-semibold text-foreground">{row.action}</span>
+                          <span className="inline-flex items-center gap-1.5 font-medium text-xs text-foreground">
+                            <span className="h-1.5 w-1.5 rounded-full bg-primary/80 shrink-0" />
+                            <span>{formatAuditAction(row.action, locale)}</span>
+                          </span>
                           <span className="text-[11px] text-muted-foreground whitespace-nowrap">
                             {formatInstant(row.ts, "UTC", locale)}
                           </span>
                         </div>
-                        <div className="text-[11px] text-muted-foreground">
-                          {row.actorType}
-                          {row.actorId ? <span className="ms-1 font-mono" dir="ltr">({row.actorId.slice(0, 8)})</span> : null}
+                        <div className="text-[11px] text-muted-foreground flex items-center gap-1">
+                          <span className="font-medium">{formatAuditActor(row.actorType, locale)}</span>
+                          {row.actorId ? <span className="ms-1 font-mono text-muted-foreground/75" dir="ltr">({row.actorId.slice(0, 8)})</span> : null}
                         </div>
                       </div>
                     ))}

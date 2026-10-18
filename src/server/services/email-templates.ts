@@ -67,7 +67,7 @@ function shell(
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${escapeHtml(companyName)}</title>
+<title>Dossier</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f4f4f5;font-family:${fontStack};-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f5;padding:32px 12px;">
@@ -75,35 +75,14 @@ function shell(
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border:1px solid #e4e4e7;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.06);">
   <!-- Brand Header -->
   <tr>
-    <td style="background-color:#14141a;padding:16px 24px;border-bottom:3px solid #e11d48;direction:${dir};">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+    <td style="background-color:#14141a;padding:20px 24px;border-bottom:3px solid #e11d48;direction:${dir};">
+      <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;display:table;">
         <tr>
-          <!-- Project Logo & Name -->
-          <td align="${align}" style="vertical-align:middle;">
-            <table role="presentation" cellpadding="0" cellspacing="0" style="display:inline-table;">
-              <tr>
-                <td style="vertical-align:middle;padding:0;line-height:0;">
-                  <img src="${env.APP_URL}/apple-touch-icon.png" width="28" height="28" alt="Dossier" style="display:block;width:28px;height:28px;border-radius:6px;border:0;outline:0;text-decoration:none;" />
-                </td>
-                <td style="vertical-align:middle;padding-${locale === "ar" ? "right" : "left"}:10px;">
-                  <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:16px;font-weight:700;color:#ffffff;letter-spacing:0.3px;line-height:1;">Dossier</span>
-                </td>
-              </tr>
-            </table>
+          <td style="vertical-align:middle;padding:0;line-height:0;">
+            <img src="${env.APP_URL}/apple-touch-icon.png" width="30" height="30" alt="Dossier" style="display:block;width:30px;height:30px;border-radius:6px;border:0;outline:0;text-decoration:none;" />
           </td>
-
-          <!-- Company Logo & Name -->
-          <td align="${locale === "ar" ? "left" : "right"}" style="vertical-align:middle;">
-            <table role="presentation" cellpadding="0" cellspacing="0" style="display:inline-table;direction:ltr;">
-              <tr>
-                <td style="vertical-align:middle;padding:0;line-height:0;">
-                  <img src="${env.APP_URL}/red-shadows-logo.png" width="35" height="24" alt="RED SHADOWS" style="display:block;width:35px;height:24px;border:0;outline:0;text-decoration:none;" />
-                </td>
-                <td style="vertical-align:middle;padding-left:10px;">
-                  <span style="font-family:${fontStack};font-size:14px;font-weight:700;color:#ffffff;letter-spacing:0.5px;line-height:1;">${escapeHtml(companyName)}</span>
-                </td>
-              </tr>
-            </table>
+          <td style="vertical-align:middle;padding-${locale === "ar" ? "right" : "left"}:10px;">
+            <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:18px;font-weight:700;color:#ffffff;letter-spacing:0.5px;line-height:1;">Dossier</span>
           </td>
         </tr>
       </table>
@@ -142,9 +121,13 @@ ${inner}
 }
 
 function button(url: string, label: string): string {
-  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0;"><tr><td style="border-radius:6px;background-color:#e11d48;">
-<a href="${escapeHtml(url)}" style="display:inline-block;padding:12px 28px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:6px;background-color:#e11d48;">${escapeHtml(label)}</a>
-</td></tr></table>`;
+  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+<tr>
+  <td style="border-radius:8px;background-color:#e11d48;">
+    <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:12px 32px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:8px;background-color:#e11d48;letter-spacing:0.3px;">${escapeHtml(label)}</a>
+  </td>
+</tr>
+</table>`;
 }
 
 function codeBlock(code: string): string {
@@ -252,15 +235,30 @@ function renderSigningLink(
     [
       `<div style="font-size:16px;font-weight:600;color:#18181b;margin-bottom:12px;">${escapeHtml(greetingRaw)}</div>`,
       `<div style="font-size:14px;color:#52525b;margin-bottom:20px;line-height:1.6;">${escapeHtml(leadRaw)}</div>`,
-      `<div style="background:#fcfcfc;border:1px solid #e4e4e7;border-radius:10px;padding:18px 20px;margin-bottom:20px;">`,
-      `  <div style="font-size:15px;font-weight:700;color:#18181b;margin-bottom:8px;">${escapeHtml(title)} <span style="display:inline-block;background:#18181b;color:#ffffff;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:3px 8px;border-radius:4px;letter-spacing:0.5px;margin-right:6px;margin-left:6px;">${escapeHtml(number)}</span></div>`,
-      `  <div style="font-size:13px;color:#71717a;">${ar ? "يرجى الضغط على الزر أدناه لمعاينة بنود العقد والتوقيع عليه إلكترونياً." : "Please click the button below to review the contract terms and sign electronically."}</div>`,
+      `<div style="background:#fcfcfc;border:1px solid #e4e4e7;border-radius:10px;padding:20px;margin-bottom:20px;">`,
+      `  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px;">`,
+      `    <tr>`,
+      `      <td align="${ar ? "right" : "left"}" style="vertical-align:middle;">`,
+      `        <span style="display:inline-block;background:#18181b;color:#ffffff;font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;padding:5px 12px;border-radius:6px;letter-spacing:0.5px;">${escapeHtml(number)}</span>`,
+      `      </td>`,
+      expiry
+        ? `      <td align="${ar ? "left" : "right"}" style="vertical-align:middle;font-size:12px;color:#71717a;">` +
+          `        <span style="color:#a1a1aa;">${ar ? "صالح حتى:" : "Valid until:"}</span> <strong style="color:#18181b;">${escapeHtml(expiry)}</strong>` +
+          `      </td>`
+        : "",
+      `    </tr>`,
+      `  </table>`,
+      `  <div style="font-size:16px;font-weight:700;color:#18181b;margin-bottom:6px;">${escapeHtml(title)}</div>`,
+      `  <div style="font-size:13px;color:#71717a;line-height:1.6;">${ar ? "يرجى الضغط على الزر أدناه لمعاينة بنود العقد والتوقيع عليه إلكترونياً." : "Please click the button below to review contract terms and sign electronically."}</div>`,
       `</div>`,
       button(url, ar ? "المراجعة والتوقيع" : "Review and sign"),
-      validRaw
-        ? `<div style="margin:16px 0 8px;color:#71717a;font-size:13px;">⏱ ${escapeHtml(validRaw)}</div>`
+      url
+        ? `<div style="margin:12px 0 20px;font-size:12px;color:#71717a;word-break:break-all;">` +
+          `  <span style="color:#a1a1aa;">${ar ? "أو يمكنك نسخ الرابط وفتحه مباشرة في المتصفح:" : "Or copy and open the link directly in your browser:"}</span><br />` +
+          `  <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color:#e11d48;text-decoration:underline;">${escapeHtml(url)}</a>` +
+          `</div>`
         : "",
-      `<div style="margin:0;color:#a1a1aa;font-size:12px;">${escapeHtml(ignoreRaw)}</div>`,
+      `<div style="background:#f4f4f5;border-radius:6px;padding:10px 14px;font-size:12px;color:#71717a;">${escapeHtml(ignoreRaw)}</div>`,
     ]
       .filter(Boolean)
       .join("\n"),
@@ -309,7 +307,14 @@ function renderOtp(
   const docCard =
     title || number
       ? `<div style="background:#fcfcfc;border:1px solid #e4e4e7;border-radius:10px;padding:16px 20px;margin-bottom:20px;">
-  <div style="font-size:15px;font-weight:700;color:#18181b;margin-bottom:4px;">${escapeHtml(title)} ${number ? `<span style="display:inline-block;background:#18181b;color:#ffffff;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:3px 8px;border-radius:4px;letter-spacing:0.5px;margin-right:6px;margin-left:6px;">${escapeHtml(number)}</span>` : ""}</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
+    <tr>
+      <td align="${ar ? "right" : "left"}" style="vertical-align:middle;">
+        ${number ? `<span style="display:inline-block;background:#18181b;color:#ffffff;font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:5px 12px;border-radius:6px;letter-spacing:0.5px;">${escapeHtml(number)}</span>` : ""}
+      </td>
+    </tr>
+  </table>
+  <div style="font-size:15px;font-weight:700;color:#18181b;margin-bottom:4px;">${escapeHtml(title)}</div>
   <div style="font-size:13px;color:#71717a;">${ar ? "رمز التحقق المطلوب لاعتماد وتوقيع العقد إلكترونياً." : "The verification code required to review and sign the contract."}</div>
 </div>`
       : "";
@@ -321,8 +326,8 @@ function renderOtp(
       docCard,
       `<div style="font-size:14px;color:#52525b;margin-bottom:12px;">${escapeHtml(leadRaw)}</div>`,
       codeBlock(otp),
-      `<div style="margin:16px 0 6px;color:#71717a;font-size:13px;">⏱ ${escapeHtml(expiresRaw)}</div>`,
-      `<div style="margin:0;color:#e11d48;font-size:13px;font-weight:500;">🔒 ${escapeHtml(shareRaw)}</div>`,
+      `<div style="margin:16px 0 6px;color:#71717a;font-size:13px;"><span style="display:inline-block;background:#fef3c7;color:#92400e;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;margin-${ar ? "left" : "right"}:6px;">${ar ? "المدة" : "Validity"}</span>${escapeHtml(expiresRaw)}</div>`,
+      `<div style="margin:0;color:#e11d48;font-size:13px;font-weight:500;"><span style="display:inline-block;background:#fee2e2;color:#991b1b;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;margin-${ar ? "left" : "right"}:6px;">${ar ? "تنبيه" : "Security"}</span>${escapeHtml(shareRaw)}</div>`,
     ]
       .filter(Boolean)
       .join("\n"),
@@ -378,14 +383,24 @@ function renderSignedCopy(
     locale,
     [
       `<div style="font-size:16px;font-weight:600;color:#18181b;margin-bottom:12px;">${escapeHtml(greetingRaw)}</div>`,
-      `<div style="display:inline-block;background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-size:13px;font-weight:600;padding:6px 12px;border-radius:6px;margin-bottom:16px;">✓ ${escapeHtml(leadRaw)}</div>`,
-      `<div style="background:#fcfcfc;border:1px solid #e4e4e7;border-radius:10px;padding:18px 20px;margin-bottom:20px;">`,
-      `  <div style="font-size:15px;font-weight:700;color:#18181b;margin-bottom:8px;">${escapeHtml(title)} <span style="display:inline-block;background:#18181b;color:#ffffff;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:3px 8px;border-radius:4px;letter-spacing:0.5px;margin-right:6px;margin-left:6px;">${escapeHtml(number)}</span></div>`,
+      `<div style="display:inline-block;background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-size:13px;font-weight:600;padding:6px 12px;border-radius:6px;margin-bottom:16px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#16a34a;margin-${ar ? "left" : "right"}:8px;vertical-align:middle;"></span>${escapeHtml(leadRaw)}</div>`,
+      `<div style="background:#fcfcfc;border:1px solid #e4e4e7;border-radius:10px;padding:20px;margin-bottom:20px;">`,
+      `  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px;">`,
+      `    <tr>`,
+      `      <td align="${ar ? "right" : "left"}" style="vertical-align:middle;">`,
+      `        <span style="display:inline-block;background:#18181b;color:#ffffff;font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:5px 12px;border-radius:6px;letter-spacing:0.5px;">${escapeHtml(number)}</span>`,
+      `      </td>`,
+      `      <td align="${ar ? "left" : "right"}" style="vertical-align:middle;">`,
+      `        <span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:11px;font-weight:700;padding:3px 10px;border-radius:4px;">${ar ? "مكتمل التوقيع" : "Fully Signed"}</span>`,
+      `      </td>`,
+      `    </tr>`,
+      `  </table>`,
+      `  <div style="font-size:16px;font-weight:700;color:#18181b;margin-bottom:6px;">${escapeHtml(title)}</div>`,
       verifyRaw ? `  <div style="font-size:13px;color:#52525b;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">${escapeHtml(verifyRaw)}</div>` : "",
       `</div>`,
       url ? button(url, ar ? "معاينة العقد" : "View Contract") : "",
-      url ? `<div style="margin:12px 0;font-size:12px;color:#71717a;" dir="ltr"><a href="${escapeHtml(url)}" style="color:#71717a;text-decoration:none;">${escapeHtml(url)}</a></div>` : "",
-      `<div style="background:#f4f4f5;border-radius:6px;padding:10px 14px;font-size:13px;color:#52525b;margin-top:16px;">📎 ${escapeHtml(attachmentNote)}</div>`,
+      url ? `<div style="margin:12px 0;font-size:12px;color:#71717a;" dir="ltr"><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color:#e11d48;text-decoration:underline;">${escapeHtml(url)}</a></div>` : "",
+      `<div style="background:#f4f4f5;border-radius:6px;padding:10px 14px;font-size:13px;color:#52525b;margin-top:16px;"><span style="display:inline-block;background:#e4e4e7;color:#27272a;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;margin-${ar ? "left" : "right"}:8px;">PDF</span>${escapeHtml(attachmentNote)}</div>`,
     ]
       .filter(Boolean)
       .join("\n"),
@@ -517,10 +532,7 @@ function renderInvoiceIssued(
         : "",
       `</div>`,
       bankCardHtml,
-      `<div style="display:table;width:100%;box-sizing:border-box;background:#f4f4f5;border-radius:6px;padding:10px 14px;font-size:13px;color:#52525b;">`,
-      `  <span style="font-size:15px;${ar ? "margin-left:8px;" : "margin-right:8px;"}">📎</span>`,
-      `  <span>${escapeHtml(attachmentNote)}</span>`,
-      `</div>`,
+      `<div style="background:#f4f4f5;border-radius:6px;padding:10px 14px;font-size:13px;color:#52525b;"><span style="display:inline-block;background:#e4e4e7;color:#27272a;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;margin-${ar ? "left" : "right"}:8px;">PDF</span>${escapeHtml(attachmentNote)}</div>`,
     ]
       .filter(Boolean)
       .join("\n"),
@@ -579,7 +591,7 @@ function renderInvoiceOverdueReminder(
     locale,
     [
       `<div style="font-size:16px;font-weight:600;color:#18181b;margin-bottom:12px;">${escapeHtml(greetingRaw)}</div>`,
-      `<div style="font-size:14px;color:#e11d48;font-weight:600;margin-bottom:20px;line-height:1.6;">⚠️ ${escapeHtml(leadRaw)}</div>`,
+      `<div style="font-size:14px;color:#e11d48;font-weight:600;margin-bottom:20px;line-height:1.6;"><span style="display:inline-block;background:#fee2e2;color:#991b1b;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;margin-${ar ? "left" : "right"}:8px;">${ar ? "تنبيه" : "Alert"}</span>${escapeHtml(leadRaw)}</div>`,
       `<div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:10px;padding:20px;margin-bottom:20px;">`,
       `  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">`,
       `    <tr>`,
@@ -645,7 +657,7 @@ function renderTestEmail(
     locale,
     [
       `<div style="font-size:16px;font-weight:600;color:#18181b;margin-bottom:12px;">${escapeHtml(greetingRaw)}</div>`,
-      `<div style="display:inline-block;background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-size:13px;font-weight:600;padding:6px 12px;border-radius:6px;margin-bottom:16px;">✓ ${escapeHtml(bodyRaw)}</div>`,
+      `<div style="display:inline-block;background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-size:13px;font-weight:600;padding:6px 12px;border-radius:6px;margin-bottom:16px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#16a34a;margin-${ar ? "left" : "right"}:8px;vertical-align:middle;"></span>${escapeHtml(bodyRaw)}</div>`,
       `<div style="background:#fcfcfc;border:1px solid #e4e4e7;border-radius:8px;padding:16px;color:#52525b;font-size:13px;line-height:1.6;">${escapeHtml(noteRaw)}</div>`,
     ].join("\n"),
     companyName,

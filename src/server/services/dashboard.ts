@@ -8,7 +8,7 @@ import {
   payments,
   projects,
 } from "@/db/schema";
-import { addDays, nowMs, todayInTz, utcStartOfDayMs } from "@/lib/dates";
+import { addDays, nowMs, todayInTz, utcEndOfDayMs, utcStartOfDayMs } from "@/lib/dates";
 import { getSettings } from "@/server/services/settings";
 
 const MS_PER_DAY = 86_400_000;
@@ -60,7 +60,31 @@ export type MonthlyPoint = {
   signed: number;
 };
 
+export type DashboardRange =
+  | "today"
+  | "7d"
+  | "30d"
+  | "this_month"
+  | "last_month"
+  | "this_year"
+  | "all"
+  | "custom";
+
+export type DashboardFilterOptions = {
+  range?: DashboardRange;
+  from?: string;
+  to?: string;
+};
+
 export type DashboardData = {
+  filter: {
+    range: DashboardRange;
+    start: string;
+    end: string;
+    isFiltered: boolean;
+  };
+  revenueInPeriod: CurrencyAmount[];
+  issuedInPeriod: { count: number; amounts: CurrencyAmount[] };
   awaitingSignature: { count: number; rows: AwaitingSignatureRow[] };
   signedLast30Days: number;
   draftContracts: number;
@@ -278,11 +302,14 @@ function endingSoon(today: string): { count: number; rows: EndingSoonRow[] } {
   return { count: rows.length, rows };
 }
 
-function recentActivity(): ActivityRow[] {
+function recentActivity(startMs?: number, endMs?: number): ActivityRow[] {
+  const conditions = [inArray(auditLog.entityType, ["contract", "invoice", "payment"])];
+  if (startMs !== undefined) conditions.push(gte(auditLog.ts, startMs));
+  if (endMs !== undefined) conditions.push(lte(auditLog.ts, endMs));
   return db
     .select()
     .from(auditLog)
-    .where(inArray(auditLog.entityType, ["contract", "invoice", "payment"]))
+    .where(and(...conditions))
     .orderBy(desc(auditLog.ts), desc(auditLog.id))
     .limit(ACTIVITY_LIMIT)
     .all();
@@ -433,6 +460,7 @@ function monthlyActivity(today: string, count = 6): MonthlyPoint[] {
 
 export function getDashboard(
   today = todayInTz(getSettings("defaults").timezone),
+  filterOptions?: DashboardFilterOptions,
 ): DashboardData {
   const { currentStart, currentEnd, previousStart, previousEnd } =
     monthBounds(today);
@@ -440,7 +468,77 @@ export function getDashboard(
   const clientStats = clientCounts(currentStart);
   const issued = issuedInRange(currentStart, currentEnd);
 
+  const range: DashboardRange = filterOptions?.range ?? "this_month";
+  const year = today.slice(0, 4);
+
+  let periodStart = currentStart;
+  let periodEnd = currentEnd;
+  let isFiltered = false;
+
+  switch (range) {
+    case "today":
+      periodStart = today;
+      periodEnd = today;
+      isFiltered = true;
+      break;
+    case "7d":
+      periodStart = addDays(today, -7);
+      periodEnd = today;
+      isFiltered = true;
+      break;
+    case "30d":
+      periodStart = addDays(today, -30);
+      periodEnd = today;
+      isFiltered = true;
+      break;
+    case "last_month":
+      periodStart = previousStart;
+      periodEnd = previousEnd;
+      isFiltered = true;
+      break;
+    case "this_year":
+      periodStart = `${year}-01-01`;
+      periodEnd = `${year}-12-31`;
+      isFiltered = true;
+      break;
+    case "all":
+      periodStart = "1970-01-01";
+      periodEnd = "2099-12-31";
+      isFiltered = true;
+      break;
+    case "custom":
+      periodStart =
+        filterOptions?.from && filterOptions.from.length === 10
+          ? filterOptions.from
+          : currentStart;
+      periodEnd =
+        filterOptions?.to && filterOptions.to.length === 10
+          ? filterOptions.to
+          : today;
+      isFiltered = true;
+      break;
+    case "this_month":
+    default:
+      periodStart = currentStart;
+      periodEnd = currentEnd;
+      isFiltered = false;
+      break;
+  }
+
+  const revenueInPeriod = revenueInRange(periodStart, periodEnd);
+  const issuedInPeriod = issuedInRange(periodStart, periodEnd);
+  const activityStartMs = isFiltered ? utcStartOfDayMs(periodStart) : undefined;
+  const activityEndMs = isFiltered ? utcEndOfDayMs(periodEnd) : undefined;
+
   return {
+    filter: {
+      range,
+      start: periodStart,
+      end: periodEnd,
+      isFiltered,
+    },
+    revenueInPeriod,
+    issuedInPeriod,
     awaitingSignature: awaitingSignature(),
     signedLast30Days: signedLast30Days(),
     draftContracts:
@@ -463,7 +561,7 @@ export function getDashboard(
       previousMonth: revenueInRange(previousStart, previousEnd),
     },
     endingSoon: endingSoon(today),
-    recentActivity: recentActivity(),
+    recentActivity: recentActivity(activityStartMs, activityEndMs),
     clientsTotal: clientStats.total,
     clientsNewThisMonth: clientStats.newThisMonth,
     projectsActive: activeProjects(),

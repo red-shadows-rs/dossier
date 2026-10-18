@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { CreateInvoiceFromMilestoneButton } from "@/components/forms/CreateInvoiceFromMilestoneButton";
 import { ProjectActions } from "@/components/forms/ProjectActions";
+import { formatAuditAction, formatAuditEntity } from "@/lib/audit-format";
 import {
   ProjectFiles,
   type AttachmentItem,
@@ -866,11 +867,21 @@ export function ProjectDetailView({
                       <TableCell className="font-mono text-xs text-muted-foreground whitespace-nowrap">
                         {formatInstant(item.ts, "UTC", locale)}
                       </TableCell>
-                      <TableCell className="font-semibold text-foreground">
-                        {item.action}
+                      <TableCell className="font-semibold text-foreground text-xs">
+                        <span className="inline-flex items-center gap-1.5">
+                          <span className="h-1.5 w-1.5 rounded-full bg-primary/80 shrink-0" />
+                          <span>{formatAuditAction(item.action, locale)}</span>
+                        </span>
                       </TableCell>
-                      <TableCell className="font-mono text-xs">
-                        {item.entityType}:{item.entityId}
+                      <TableCell className="text-xs">
+                        <span className="inline-flex items-center gap-1">
+                          <span className="rounded bg-muted px-1.5 py-0.5 text-[11px] font-semibold text-foreground">
+                            {formatAuditEntity(item.entityType, locale)}
+                          </span>
+                          <span className="font-mono text-muted-foreground text-[11px]">
+                            {item.entityId.slice(0, 8)}...
+                          </span>
+                        </span>
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
                         {item.actorId ?? "-"}

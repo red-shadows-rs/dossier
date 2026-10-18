@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import clsx from "clsx";
 import { useLocale } from "next-intl";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Pagination } from "@/components/ui/Pagination";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -238,9 +239,10 @@ export function ServerDataTable<R extends { id: string | number }>({
                 type="button"
                 disabled={clientPage <= 1}
                 onClick={() => setClientPage((p) => Math.max(1, p - 1))}
-                className="rounded border border-border px-3 py-1 text-xs font-medium text-foreground disabled:opacity-50 hover:bg-muted/40 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded border border-border px-3 py-1 text-xs font-medium text-foreground disabled:opacity-50 hover:bg-muted/40 transition-colors cursor-pointer disabled:cursor-not-allowed"
               >
-                {isAr ? "السابق" : "Previous"}
+                <ChevronLeft size={14} className="rtl:rotate-180 shrink-0" aria-hidden="true" />
+                <span>{isAr ? "السابق" : "Previous"}</span>
               </button>
               <span className="text-xs text-muted-foreground tabular-nums font-mono" dir="ltr">
                 {clientPage} / {totalPages}
@@ -249,9 +251,10 @@ export function ServerDataTable<R extends { id: string | number }>({
                 type="button"
                 disabled={clientPage >= totalPages}
                 onClick={() => setClientPage((p) => Math.min(totalPages, p + 1))}
-                className="rounded border border-border px-3 py-1 text-xs font-medium text-foreground disabled:opacity-50 hover:bg-muted/40 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded border border-border px-3 py-1 text-xs font-medium text-foreground disabled:opacity-50 hover:bg-muted/40 transition-colors cursor-pointer disabled:cursor-not-allowed"
               >
-                {isAr ? "التالي" : "Next"}
+                <span>{isAr ? "التالي" : "Next"}</span>
+                <ChevronRight size={14} className="rtl:rotate-180 shrink-0" aria-hidden="true" />
               </button>
             </div>
           )}

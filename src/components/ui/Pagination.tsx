@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import MuiBox from "@mui/material/Box";
 import MuiButton from "@mui/material/Button";
 import MuiTypography from "@mui/material/Typography";
@@ -47,11 +48,18 @@ export function Pagination({
           variant="outlined"
           color="inherit"
           size="small"
+          startIcon={<ChevronLeft size={16} className="rtl:rotate-180" />}
         >
           {t("previous")}
         </MuiButton>
       ) : (
-        <MuiButton variant="outlined" color="inherit" size="small" disabled>
+        <MuiButton
+          variant="outlined"
+          color="inherit"
+          size="small"
+          disabled
+          startIcon={<ChevronLeft size={16} className="rtl:rotate-180" />}
+        >
           {t("previous")}
         </MuiButton>
       )}
@@ -72,11 +80,18 @@ export function Pagination({
           variant="outlined"
           color="inherit"
           size="small"
+          endIcon={<ChevronRight size={16} className="rtl:rotate-180" />}
         >
           {t("next")}
         </MuiButton>
       ) : (
-        <MuiButton variant="outlined" color="inherit" size="small" disabled>
+        <MuiButton
+          variant="outlined"
+          color="inherit"
+          size="small"
+          disabled
+          endIcon={<ChevronRight size={16} className="rtl:rotate-180" />}
+        >
           {t("next")}
         </MuiButton>
       )}

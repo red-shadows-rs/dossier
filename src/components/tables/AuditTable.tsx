@@ -3,6 +3,7 @@
 import { ShieldCheck } from "lucide-react";
 import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
 import { formatInstant } from "@/lib/dates";
+import { formatAuditAction, formatAuditEntity, formatAuditActor } from "@/lib/audit-format";
 import type { Locale } from "@/lib/constants";
 
 export type AuditTableRow = {
@@ -60,7 +61,7 @@ export function AuditTable({
       render: (row) => (
         <span className="flex flex-col gap-0.5">
           <span className="font-medium text-foreground">
-            {labels.actorTypes[row.actorType] ?? row.actorType}
+            {formatAuditActor(row.actorType, locale)}
           </span>
           {row.actorId ? (
             <span className="text-xs text-muted-foreground font-mono">
@@ -74,8 +75,9 @@ export function AuditTable({
       id: "action",
       header: labels.action,
       render: (row) => (
-        <span className="font-mono text-xs font-semibold text-foreground">
-          {row.action}
+        <span className="inline-flex items-center gap-1.5 font-medium text-xs text-foreground">
+          <span className="h-1.5 w-1.5 rounded-full bg-primary/80 shrink-0" />
+          <span>{formatAuditAction(row.action, locale)}</span>
         </span>
       ),
     },
@@ -84,7 +86,11 @@ export function AuditTable({
       header: labels.entity,
       render: (row) => (
         <span className="flex flex-col gap-0.5">
-          <span className="font-medium text-foreground">{row.entityType}</span>
+          <span className="inline-flex items-center gap-1">
+            <span className="rounded bg-muted px-1.5 py-0.5 text-[11px] font-semibold text-foreground">
+              {formatAuditEntity(row.entityType, locale)}
+            </span>
+          </span>
           <span className="text-xs text-muted-foreground font-mono">
             {row.entityId}
           </span>
@@ -113,8 +119,8 @@ export function AuditTable({
       renderMobileCard={(row) => (
         <div className="flex flex-col gap-2 rounded-lg border border-border/70 bg-card/70 p-3.5 shadow-xs">
           <div className="flex items-center justify-between gap-2">
-            <span className="font-semibold text-xs text-foreground font-mono">
-              {row.action}
+            <span className="font-semibold text-xs text-foreground">
+              {formatAuditAction(row.action, locale)}
             </span>
             <span className="tabular-nums font-mono text-[11px] text-muted-foreground">
               {formatInstant(row.ts, "UTC", locale)}
@@ -123,11 +129,11 @@ export function AuditTable({
           <div className="grid grid-cols-2 gap-2 text-xs py-1 border-t border-border/40">
             <div className="flex flex-col gap-0.5">
               <span className="text-[11px] text-muted-foreground">{labels.actor}</span>
-              <span className="font-medium text-foreground">{labels.actorTypes[row.actorType] ?? row.actorType}</span>
+              <span className="font-medium text-foreground">{formatAuditActor(row.actorType, locale)}</span>
             </div>
             <div className="flex flex-col gap-0.5">
               <span className="text-[11px] text-muted-foreground">{labels.entity}</span>
-              <span className="font-medium text-foreground">{row.entityType}</span>
+              <span className="font-medium text-foreground">{formatAuditEntity(row.entityType, locale)}</span>
             </div>
           </div>
           {row.ip ? (

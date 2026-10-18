@@ -54,7 +54,7 @@
     "asc": "تصاعدي"
   },
   "nav": {
-    "dashboard": "لوحة التحكم",
+    "dashboard": "لوحة المعلومات",
     "clients": "العملاء",
     "projects": "المشاريع",
     "contracts": "العقود",
@@ -237,9 +237,14 @@
     "overdue": "المتأخر",
     "overdueHint": "تجاوزت موعد الاستحقاق",
     "collectedThisMonth": "المحصل هذا الشهر",
+    "collectedPeriod": "المحصل (الفترة المحددة)",
+    "collectedAllTime": "إجمالي المحصل (الكل)",
     "lastMonth": "الشهر الماضي",
     "issuedThisMonth": "المصدر هذا الشهر",
+    "issuedPeriod": "المصدر (الفترة المحددة)",
+    "issuedAllTime": "إجمالي المصدر (الكل)",
     "invoicesCount": "{count} فاتورة",
+    "filterTitle": "تصفية الفترة",
     "awaitingSignature": "بانتظار التوقيع",
     "awaitingHint": "عقود بانتظار توقيع العميل",
     "contractsActive": "عقود سارية",

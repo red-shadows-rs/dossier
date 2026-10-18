@@ -44,37 +44,13 @@ import { requireUserPage } from "@/server/auth/require-user";
 import {
   getDashboard,
   type CurrencyAmount,
+  type DashboardRange,
 } from "@/server/services/dashboard";
 import { getInternalSetting, getSettings } from "@/server/services/settings";
 import { smoothLoading } from "@/lib/smooth-loader";
+import { DashboardFilter } from "@/components/dashboard/DashboardFilter";
+import { formatAuditAction, formatAuditEntity } from "@/lib/audit-format";
 
-const HEARTBEAT_STALE_MS = 5 * 60 * 1000;
-
-const ACTION_LABELS: Record<string, { ar: string; en: string }> = {
-  "contract.created": { ar: "إنشاء عقد", en: "Contract created" },
-  "contract.sent": { ar: "إرسال عقد", en: "Contract sent" },
-  "contract.signed": { ar: "توقيع عقد", en: "Contract signed" },
-  "contract.cancelled": { ar: "إلغاء عقد", en: "Contract cancelled" },
-  "contract.revised": { ar: "تعديل عقد", en: "Contract revised" },
-  "contract.completed": { ar: "اكتمال عقد", en: "Contract completed" },
-  "contract.terminated": { ar: "إنهاء عقد", en: "Contract terminated" },
-  "invoice.created": { ar: "مسودة فاتورة", en: "Invoice draft" },
-  "invoice.issued": { ar: "إصدار فاتورة", en: "Invoice issued" },
-  "invoice.updated": { ar: "تحديث فاتورة", en: "Invoice updated" },
-  "invoice.sent": { ar: "إرسال فاتورة", en: "Invoice sent" },
-  "invoice.paid": { ar: "سداد فاتورة", en: "Invoice paid" },
-  "invoice.cancelled": { ar: "إلغاء فاتورة", en: "Invoice cancelled" },
-  "invoice.voided": { ar: "إبطال فاتورة", en: "Invoice voided" },
-  "client.created": { ar: "إضافة عميل", en: "Client created" },
-  "client.updated": { ar: "تحديث عميل", en: "Client updated" },
-  "client.archived": { ar: "أرشفة عميل", en: "Client archived" },
-  "project.created": { ar: "إنشاء مشروع", en: "Project created" },
-  "project.updated": { ar: "تحديث مشروع", en: "Project updated" },
-  "project.archived": { ar: "أرشفة مشروع", en: "Project archived" },
-  "user.created": { ar: "إضافة مستخدم", en: "User created" },
-  "user.updated": { ar: "تحديث مستخدم", en: "User updated" },
-  "user.login": { ar: "تسجيل دخول", en: "User login" },
-};
 
 
 
@@ -208,19 +184,39 @@ function ClientName({
 
 
 
-export default async function DashboardPage() {
+const HEARTBEAT_STALE_MS = 5 * 60 * 1000;
+
+interface DashboardPageProps {
+  searchParams?: Promise<{
+    range?: string;
+    from?: string;
+    to?: string;
+  }>;
+}
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   await smoothLoading();
+  const sp = searchParams ? await searchParams : {};
+  const activeRange: DashboardRange = (
+    ["today", "7d", "30d", "this_month", "last_month", "this_year", "all", "custom"].includes(sp.range ?? "")
+      ? sp.range
+      : "this_month"
+  ) as DashboardRange;
+
   const user = await requireUserPage();
   const t = await getTranslations("dashboard");
   const tc = await getTranslations("common");
   const tContracts = await getTranslations("contracts");
   const tInvoices = await getTranslations("invoices");
-  const tn = await getTranslations("nav");
   const rawLocale = await getLocale();
   const locale: Locale = isLocale(rawLocale) ? rawLocale : user.locale;
 
   const timezone = getSettings("defaults").timezone;
-  const data = getDashboard();
+  const data = getDashboard(undefined, {
+    range: activeRange,
+    from: sp.from,
+    to: sp.to,
+  });
 
   const heartbeat = getInternalSetting(
     "worker_heartbeat",
@@ -242,6 +238,20 @@ export default async function DashboardPage() {
             ),
           )
           .join(" · ");
+
+  const collectedLabel =
+    activeRange === "this_month"
+      ? t("collectedThisMonth")
+      : activeRange === "all"
+        ? t("collectedAllTime")
+        : t("collectedPeriod");
+
+  const issuedLabel =
+    activeRange === "this_month"
+      ? t("issuedThisMonth")
+      : activeRange === "all"
+        ? t("issuedAllTime")
+        : t("issuedPeriod");
 
   const financial = [
     {
@@ -266,18 +276,18 @@ export default async function DashboardPage() {
       accent: "danger" as const,
     },
     {
-      label: t("collectedThisMonth"),
-      value: <AmountList amounts={data.revenue.currentMonth} locale={locale} />,
+      label: collectedLabel,
+      value: <AmountList amounts={data.revenueInPeriod} locale={locale} />,
       hint: `${t("lastMonth")}: ${currencyLines(data.revenue.previousMonth) ?? "-"}`,
       icon: TrendingUp,
       accent: "success" as const,
     },
     {
-      label: t("issuedThisMonth"),
+      label: issuedLabel,
       value: (
-        <AmountList amounts={data.issuedThisMonth.amounts} locale={locale} />
+        <AmountList amounts={data.issuedInPeriod.amounts} locale={locale} />
       ),
-      hint: t("invoicesCount", { count: data.issuedThisMonth.count }),
+      hint: t("invoicesCount", { count: data.issuedInPeriod.count }),
       icon: Receipt,
       accent: "info" as const,
     },
@@ -330,6 +340,13 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      <DashboardFilter
+        currentRange={activeRange}
+        from={sp.from}
+        to={sp.to}
+        locale={locale}
+      />
 
       {workerStale ? (
         <div className="flex items-center gap-2.5 rounded border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-600 dark:text-amber-400">
@@ -669,14 +686,8 @@ export default async function DashboardPage() {
                       : row.entityType === "invoice"
                         ? `/invoices/${row.entityId}`
                         : null;
-                  const entityLabel =
-                    row.entityType === "contract"
-                      ? tn("contracts")
-                      : row.entityType === "invoice"
-                        ? tn("invoices")
-                        : row.entityType;
-                  const actionText =
-                    ACTION_LABELS[row.action]?.[locale === "ar" ? "ar" : "en"] ?? row.action;
+                  const entityLabel = formatAuditEntity(row.entityType, locale);
+                  const actionText = formatAuditAction(row.action, locale);
 
                   return (
                     <div key={row.id} className="p-3.5 flex flex-col gap-2 hover:bg-muted/15 transition-colors">
@@ -748,14 +759,8 @@ export default async function DashboardPage() {
                           : row.entityType === "invoice"
                             ? `/invoices/${row.entityId}`
                             : null;
-                      const entityLabel =
-                        row.entityType === "contract"
-                          ? tn("contracts")
-                          : row.entityType === "invoice"
-                            ? tn("invoices")
-                            : row.entityType;
-                      const actionText =
-                        ACTION_LABELS[row.action]?.[locale === "ar" ? "ar" : "en"] ?? row.action;
+                      const entityLabel = formatAuditEntity(row.entityType, locale);
+                      const actionText = formatAuditAction(row.action, locale);
 
                       return (
                         <TableRow key={row.id} className="hover:bg-muted/30 transition-colors">
