@@ -8,7 +8,12 @@ import { revalidatePath } from "next/cache";
 import type { ActionResult } from "@/lib/result";
 import { AppError } from "@/lib/errors";
 import { getCurrentUser } from "@/server/auth/require-user";
-import { SESSION_COOKIE, sessionCookieOptions } from "@/server/auth/session";
+import {
+  deleteSession,
+  DEMO_COOKIE,
+  SESSION_COOKIE,
+  sessionCookieOptions,
+} from "@/server/auth/session";
 import { getRequestMeta } from "@/server/services/audit";
 import { isDemoUser, loginAsDemo, resetDemoData } from "@/server/services/demo";
 import { runAction } from "./_run";
@@ -32,7 +37,20 @@ export async function loginAsDemoAction(): Promise<ActionResult<null>> {
     const token = await loginAsDemo(meta);
     const store = await cookies();
     store.set(SESSION_COOKIE, token, sessionCookieOptions());
+    store.set(DEMO_COOKIE, "1", sessionCookieOptions());
     return null;
   });
 }
 
+export async function exitDemoAction(): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const store = await cookies();
+    const token = store.get(SESSION_COOKIE)?.value;
+    if (token) {
+      deleteSession(token);
+    }
+    store.delete(SESSION_COOKIE);
+    store.delete(DEMO_COOKIE);
+    return null;
+  });
+}

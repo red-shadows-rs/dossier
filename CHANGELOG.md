@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.2.0] - 2026-10-18
+
+### Added
+- **Physical Demo Database Isolation:** Introduced dedicated SQLite database (`dossier-demo.sqlite`) activated automatically via AsyncLocalStorage and session token routing (`demo_*`), guaranteeing 100% data separation and zero real customer or pricing leakage.
+- **Pure Synthetic Demo Dataset:** Replaced all seed fixtures with completely fictional, randomized Saudi corporate entities, contracts, and invoices.
+- **Production Sanitization Tooling:** Added `scripts/clean-production-demo-data.ts` to purge any previously injected demo records from production SQLite database.
+- **One-Click Demo Lifecycle Actions:** Added `exitDemoAction` to reliably terminate demo sessions and navigate immediately to `/login`, and enhanced `resetDemoAction` to refresh data instantly.
+
+### Changed
+- **AI-Slop & Visual Cleanup:** Fully removed all decorative `Sparkles` icons, glowing neon box shadows, multi-color gradient bars, and decorative accent lines across forms, templates, clauses, charts, and the demo banner.
+- **Enterprise Demo Banner:** Redesigned demo banner to a sleek minimalist enterprise top bar with subtle badge and standard buttons.
+- **Dashboard Layout Unification:** Harmonized KPI card heights and padding, fixed `- 0` overdue invoice formatting bug, and balanced metrics layout across light and dark modes.
+
 ## [v1.1.0] - 2026-10-18
 
 ### Added

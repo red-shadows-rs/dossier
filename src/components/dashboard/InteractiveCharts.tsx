@@ -267,11 +267,11 @@ export function MonthlyChart({
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-4 text-xs">
         <div className="flex items-center gap-1.5 font-medium text-muted-foreground">
-          <span className="h-3 w-3 rounded-xs bg-primary shadow-[0_0_6px_var(--primary)]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-primary shrink-0" />
           <span>{issuedLabel}</span>
         </div>
         <div className="flex items-center gap-1.5 font-medium text-muted-foreground">
-          <span className="h-3 w-3 rounded-xs bg-sky-500 shadow-[0_0_6px_#0ea5e9]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-sky-500 shrink-0" />
           <span>{signedLabel}</span>
         </div>
       </div>
@@ -313,7 +313,7 @@ export function MonthlyChart({
                     <div className="flex flex-col gap-1.5 text-xs">
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-1.5 text-muted-foreground">
-                          <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]" />
+                          <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
                           <span>{issuedLabel}</span>
                         </div>
                         <span className="font-mono font-bold tabular-nums text-foreground">
@@ -322,7 +322,7 @@ export function MonthlyChart({
                       </div>
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-1.5 text-muted-foreground">
-                          <span className="h-2 w-2 rounded-full bg-sky-500 shadow-[0_0_6px_#0ea5e9]" />
+                          <span className="h-2 w-2 rounded-full bg-sky-500 shrink-0" />
                           <span>{signedLabel}</span>
                         </div>
                         <span className="font-mono font-bold tabular-nums text-foreground">

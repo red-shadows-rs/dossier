@@ -19,7 +19,6 @@ import {
   Save,
   ScrollText,
   Search,
-  Sparkles,
   Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -294,7 +293,7 @@ export function ContractClausesStep({
             <div className="rounded border border-primary/20 bg-primary/5 p-4 flex flex-col gap-3.5 text-xs animate-in fade-in duration-200">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-primary/15 pb-2.5">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-primary" />
+                  <Code2 className="h-4 w-4 text-primary" />
                   <span className="font-bold text-foreground">
                     {isAr ? "دليل المفاتيح التشغيلية والمتغيرات التلقائية" : "Operational Keys & Variables Guide"}
                   </span>

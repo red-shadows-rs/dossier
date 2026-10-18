@@ -2,7 +2,7 @@
 // https://github.com/red-shadows-rs/dossier
 
 import { and, count, eq } from "drizzle-orm";
-import { db, sqlite, withTx } from "@/db";
+import { db, getDemoInstance, sqlite, withDbInstance, withTx } from "@/db";
 import {
   clients,
   contractClauses,
@@ -22,7 +22,11 @@ import {
 import { addDays, nowMs, todayInTz } from "@/lib/dates";
 import { newId } from "@/lib/ids";
 import { hashPassword } from "@/server/auth/password";
-import { createSession, type RequestMeta, type SessionUser } from "@/server/auth/session";
+import {
+  createDemoSession,
+  type RequestMeta,
+  type SessionUser,
+} from "@/server/auth/session";
 import { clientInputSchema } from "@/lib/validation/clients";
 import { projectInputSchema } from "@/lib/validation/projects";
 import {
@@ -48,38 +52,82 @@ export const DEMO_USER_EMAIL = "demo@red-shadows-rs.com";
 
 const DEMO_CLIENTS = [
   {
-    nameAr: "شركة النخبة للتقنية",
-    nameEn: "Elite Tech Co.",
+    nameAr: "شركة السحاب المتطورة المحدودة",
+    nameEn: "Advanced Cloud Co. Ltd.",
     city: "الرياض",
-    email: "contact@elite-tech.example",
-    phone: "+966500000001",
+    email: "client1@sample-domain.example",
+    phone: "+966501112233",
   },
   {
-    nameAr: "مؤسسة الأفق للحلول الرقمية",
-    nameEn: "Al Ufuq Digital Solutions",
+    nameAr: "مؤسسة البناء الرقمي للتجارة",
+    nameEn: "Digital Build Est.",
     city: "جدة",
-    email: "info@alufuq.example",
-    phone: "+966500000002",
+    email: "client2@sample-domain.example",
+    phone: "+966502223344",
   },
   {
-    nameAr: "مجموعة الرياض الهندسية",
-    nameEn: "Riyadh Engineering Group",
-    city: "الرياض",
-    email: "hello@reg.example",
-    phone: "+966500000003",
+    nameAr: "مجموعة القمة للاستشارات",
+    nameEn: "Summit Consulting Group",
+    city: "الدمام",
+    email: "client3@sample-domain.example",
+    phone: "+966503334455",
+  },
+  {
+    nameAr: "وكالة المدى الإبداعية",
+    nameEn: "Al-Mada Creative Agency",
+    city: "الخبر",
+    email: "client4@sample-domain.example",
+    phone: "+966504445566",
   },
 ];
 
 const DEMO_PROJECTS = [
-  { nameAr: "منصة التجارة الإلكترونية الموحدة", nameEn: "Unified E-Commerce Platform", status: "active" as const },
-  { nameAr: "تطبيق إدارة المشاريع والعقود", nameEn: "Contracts Management App", status: "active" as const },
-  { nameAr: "البوابة السحابية المتقدمة", nameEn: "Advanced Cloud Portal", status: "completed" as const },
+  {
+    nameAr: "تطوير البوابة السحابية الموحدة",
+    nameEn: "Unified Cloud Portal Development",
+    status: "active" as const,
+  },
+  {
+    nameAr: "تصميم وتطوير تطبيق الهواتف الذكية",
+    nameEn: "Mobile Application Design & Build",
+    status: "active" as const,
+  },
+  {
+    nameAr: "نظام إدارة الوثائق والمستندات",
+    nameEn: "Document Management System",
+    status: "completed" as const,
+  },
 ];
 
 const DEMO_INVOICES = [
-  { line: "تطوير المرحلة الأولى وإعداد البنية التحتية", amountMinor: 5_000_000, issue: true, pay: 5_000_000 },
-  { line: "تصميم واجهات المستخدم وتجربة العميل", amountMinor: 3_200_000, issue: true, pay: 1_600_000 },
-  { line: "استشارات أمنية وتدقيق التشفير", amountMinor: 1_800_000, issue: false, pay: 0 },
+  {
+    line: "المرحلة الأولى: التحليل وبناء الهيكل السحابي",
+    amountMinor: 12_500_000,
+    issue: true,
+    pay: 12_500_000,
+    overdue: false,
+  },
+  {
+    line: "المرحلة الثانية: تطوير واجهات المستخدم والتكامل",
+    amountMinor: 8_000_000,
+    issue: true,
+    pay: 4_000_000,
+    overdue: false,
+  },
+  {
+    line: "المرحلة الثالثة: الاختبارات الأمنية ومراجعة الجودة",
+    amountMinor: 5_500_000,
+    issue: true,
+    pay: 0,
+    overdue: true,
+  },
+  {
+    line: "المرحلة الرابعة: إطلاق النسخة التجريبية والتدريب",
+    amountMinor: 15_000_000,
+    issue: false,
+    pay: 0,
+    overdue: false,
+  },
 ];
 
 export function isDemoUser(email: string | null | undefined): boolean {
@@ -87,81 +135,84 @@ export function isDemoUser(email: string | null | undefined): boolean {
 }
 
 export async function getOrCreateDemoUser(): Promise<SessionUser> {
-  const existing = db
-    .select()
-    .from(users)
-    .where(eq(users.email, DEMO_USER_EMAIL))
-    .get();
+  return withDbInstance(true, async () => {
+    const existing = db
+      .select()
+      .from(users)
+      .where(eq(users.email, DEMO_USER_EMAIL))
+      .get();
 
-  if (existing) {
+    if (existing) {
+      return {
+        id: existing.id,
+        email: existing.email,
+        name: existing.name,
+        role: existing.role,
+        locale: existing.locale,
+        canSignForCompany: existing.canSignForCompany,
+        signerTitleAr: existing.signerTitleAr,
+        signerTitleEn: existing.signerTitleEn,
+      };
+    }
+
+    const id = newId();
+    const now = nowMs();
+    const passwordHash = await hashPassword("Demo-Session-2026!");
+
+    db.insert(users)
+      .values({
+        id,
+        email: DEMO_USER_EMAIL,
+        name: "مدير تجريبي (RED SHADOWS | RS)",
+        passwordHash,
+        role: "member",
+        locale: "ar",
+        status: "active",
+        canSignForCompany: true,
+        signerTitleAr: "مدير تجريبي مفوض",
+        signerTitleEn: "Authorized Demo Manager",
+        createdAt: now,
+        updatedAt: now,
+      })
+      .run();
+
     return {
-      id: existing.id,
-      email: existing.email,
-      name: existing.name,
-      role: existing.role,
-      locale: existing.locale,
-      canSignForCompany: existing.canSignForCompany,
-      signerTitleAr: existing.signerTitleAr,
-      signerTitleEn: existing.signerTitleEn,
-    };
-  }
-
-  const id = newId();
-  const now = nowMs();
-  const passwordHash = await hashPassword("Demo-Session-2026!");
-
-  db.insert(users)
-    .values({
       id,
       email: DEMO_USER_EMAIL,
       name: "مدير تجريبي (RED SHADOWS | RS)",
-      passwordHash,
       role: "member",
       locale: "ar",
-      status: "active",
       canSignForCompany: true,
       signerTitleAr: "مدير تجريبي مفوض",
       signerTitleEn: "Authorized Demo Manager",
-      createdAt: now,
-      updatedAt: now,
-    })
-    .run();
-
-  return {
-    id,
-    email: DEMO_USER_EMAIL,
-    name: "مدير تجريبي (RED SHADOWS | RS)",
-    role: "member",
-    locale: "ar",
-    canSignForCompany: true,
-    signerTitleAr: "مدير تجريبي مفوض",
-    signerTitleEn: "Authorized Demo Manager",
-  };
+    };
+  });
 }
 
 export function seedDemoData(user: SessionUser, meta: RequestMeta): void {
-  seedSystemTemplates();
+  withDbInstance(true, () => {
+    seedSystemTemplates();
 
   const currentCompany = getSettings("company");
   if (!currentCompany.nameAr || !currentCompany.nameEn) {
     const demoCompany = {
-      nameAr: "مؤسسة دوسييه (RED SHADOWS | RS)",
-      nameEn: "Dossier Studio (RED SHADOWS | RS)",
-      legalNameAr: "مؤسسة دوسييه للتقنية",
-      legalNameEn: "Dossier Studio LLC",
-      crNumber: "1010000000",
-      taxNumber: "300000000000003",
+      nameAr: "مؤسسة الأفق الذكي لتقنية المعلومات",
+      nameEn: "Smart Horizon IT Solutions",
+      legalNameAr: "مؤسسة الأفق الذكي للحلول البرمجية",
+      legalNameEn: "Smart Horizon Software Solutions LLC",
+      crNumber: "1010999999",
+      taxNumber: "300099999900003",
       addressAr: "الرياض، المملكة العربية السعودية",
       addressEn: "Riyadh, Saudi Arabia",
-      email: "billing@red-shadows-rs.com",
-      phone: "+966110000000",
+      email: "contact@smart-horizon.example",
+      phone: "+966112223333",
       website: "https://dossier.red-shadows-rs.com",
       bank: {
-        bankNameAr: "البنك الأهلي",
-        bankNameEn: "National Bank",
-        accountHolder: "RED SHADOWS | RS",
+        bankNameAr: "البنك الأهلي السعودي",
+        bankNameEn: "Saudi National Bank",
+        accountHolder: "Smart Horizon IT Solutions",
         iban: "SA0000000000000000000000",
-        swift: "NBOKSAJE",
+        swift: "NCBKSARI",
       },
     };
     db.insert(settings)
@@ -202,7 +253,9 @@ export function seedDemoData(user: SessionUser, meta: RequestMeta): void {
     const existing = db
       .select({ id: projects.id })
       .from(projects)
-      .where(and(eq(projects.clientId, clientId), eq(projects.nameAr, project.nameAr)))
+      .where(
+        and(eq(projects.clientId, clientId), eq(projects.nameAr, project.nameAr)),
+      )
       .get();
     if (existing) {
       projectIds.push(existing.id);
@@ -255,13 +308,14 @@ export function seedDemoData(user: SessionUser, meta: RequestMeta): void {
         }),
         meta,
       );
+      const dueDate = inv.overdue ? addDays(today, -5) : addDays(today, 14);
       updateInvoiceDraft(
         user,
         invId,
         updateInvoiceDraftSchema.parse({
           languageMode: "ar",
-          issueDate: inv.issue ? today : null,
-          dueDate: inv.issue ? addDays(today, 14) : null,
+          issueDate: inv.issue ? (inv.overdue ? addDays(today, -20) : today) : null,
+          dueDate: inv.issue ? dueDate : null,
           notesAr: null,
           notesEn: null,
         }),
@@ -305,6 +359,7 @@ export function seedDemoData(user: SessionUser, meta: RequestMeta): void {
       }
     }
   }
+  });
 }
 
 const DROP_INTEGRITY_TRIGGERS = `
@@ -332,29 +387,34 @@ CREATE TRIGGER IF NOT EXISTS milestones_draft_del BEFORE DELETE ON payment_miles
 `;
 
 export function resetDemoData(user: SessionUser, meta: RequestMeta): void {
-  sqlite.exec(DROP_INTEGRITY_TRIGGERS);
-  try {
-    withTx((tx) => {
-      tx.delete(payments).run();
-      tx.delete(invoiceLines).run();
-      tx.delete(invoices).run();
-      tx.delete(paymentMilestones).run();
-      tx.delete(contractSignatories).run();
-      tx.delete(contractClauses).run();
-      tx.delete(contractItems).run();
-      tx.delete(contractVersions).run();
-      tx.delete(contracts).run();
-      tx.delete(projects).run();
-      tx.delete(clients).run();
-    });
-  } finally {
-    sqlite.exec(RESTORE_INTEGRITY_TRIGGERS);
-  }
-  seedDemoData(user, meta);
+  withDbInstance(true, () => {
+    sqlite.exec(DROP_INTEGRITY_TRIGGERS);
+    try {
+      withTx((tx) => {
+        tx.delete(payments).run();
+        tx.delete(invoiceLines).run();
+        tx.delete(invoices).run();
+        tx.delete(paymentMilestones).run();
+        tx.delete(contractSignatories).run();
+        tx.delete(contractClauses).run();
+        tx.delete(contractItems).run();
+        tx.delete(contractVersions).run();
+        tx.delete(contracts).run();
+        tx.delete(projects).run();
+        tx.delete(clients).run();
+      });
+    } finally {
+      sqlite.exec(RESTORE_INTEGRITY_TRIGGERS);
+    }
+    seedDemoData(user, meta);
+  });
 }
 
 export async function loginAsDemo(meta: RequestMeta): Promise<string> {
-  const user = await getOrCreateDemoUser();
-  seedDemoData(user, meta);
-  return withTx((tx) => createSession(tx, user.id, meta));
+  getDemoInstance();
+  return withDbInstance(true, async () => {
+    const user = await getOrCreateDemoUser();
+    seedDemoData(user, meta);
+    return withTx((tx) => createDemoSession(tx, user.id, meta));
+  });
 }

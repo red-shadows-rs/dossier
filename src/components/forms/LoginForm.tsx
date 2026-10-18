@@ -6,7 +6,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Eye, EyeOff, LogIn, Lock, Mail, Sparkles } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, LogIn, Lock, Mail } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input, InputAdornment } from "@/components/ui/Input";
 import type { ErrorCode } from "@/lib/errors";
@@ -154,7 +154,7 @@ export function LoginForm() {
         }}
         className="w-full gap-2 border-border bg-card py-2.5 text-foreground hover:bg-accent hover:text-accent-foreground font-medium shadow-sm transition-colors"
       >
-        <Sparkles size={16} className="text-primary shrink-0" aria-hidden="true" />
+        <ArrowRight size={16} className="text-primary shrink-0 rtl:rotate-180" aria-hidden="true" />
         <span>{t("demo.tryDemoButton")}</span>
       </Button>
       <p className="text-center text-xs text-muted-foreground">

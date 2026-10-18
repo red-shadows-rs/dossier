@@ -53,6 +53,8 @@ import { getInternalSetting, getSettings } from "@/server/services/settings";
 import { smoothLoading } from "@/lib/smooth-loader";
 import { DashboardFilter } from "@/components/dashboard/DashboardFilter";
 import { formatAuditAction, formatAuditEntity } from "@/lib/audit-format";
+import { withDbInstance } from "@/db";
+import { isDemoUser } from "@/server/services/demo";
 
 
 
@@ -99,7 +101,7 @@ function AmountList({
   locale: Locale;
 }) {
   if (amounts.length === 0) {
-    return <span className="text-muted-foreground">-</span>;
+    return <span className="font-bold">0</span>;
   }
   return (
     <div className="flex flex-wrap items-baseline gap-2 font-mono tabular-nums">
@@ -126,21 +128,21 @@ function Kpi({
   accent?: "primary" | "info" | "warning" | "success" | "danger";
 }) {
   const accentClasses = {
-    primary: "border-primary/20 bg-primary/10 text-primary",
-    info: "border-sky-500/20 bg-sky-500/10 text-sky-500",
-    warning: "border-amber-500/20 bg-amber-500/10 text-amber-500",
-    success: "border-emerald-500/20 bg-emerald-500/10 text-emerald-500",
-    danger: "border-rose-500/20 bg-rose-500/10 text-rose-500",
+    primary: "border-border/60 bg-muted/40 text-primary",
+    info: "border-border/60 bg-muted/40 text-sky-500",
+    warning: "border-border/60 bg-muted/40 text-amber-500",
+    success: "border-border/60 bg-muted/40 text-emerald-500",
+    danger: "border-border/60 bg-muted/40 text-rose-500",
   }[accent];
 
   return (
-    <div className="flex flex-col justify-between rounded border border-border/80 bg-card p-3 sm:p-4 transition-all duration-150 hover:border-primary/40 hover:shadow-xs shadow-2xs">
+    <div className="flex min-h-[108px] sm:min-h-[116px] flex-col justify-between rounded-lg border border-border/80 bg-card p-3 sm:p-4 transition-all duration-150 hover:border-border hover:shadow-xs shadow-2xs">
       <div className="flex items-center justify-between gap-1.5 sm:gap-2">
         <span className="text-[11px] sm:text-xs font-semibold text-muted-foreground truncate">{label}</span>
         {Icon ? (
           <span
             className={cn(
-              "flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded border",
+              "flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-md border",
               accentClasses,
             )}
           >
@@ -199,85 +201,89 @@ interface DashboardPageProps {
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   await smoothLoading();
-  const sp = searchParams ? await searchParams : {};
-  const activeRange: DashboardRange = (
-    ["today", "7d", "30d", "this_month", "last_month", "this_year", "all", "custom"].includes(sp.range ?? "")
-      ? sp.range
-      : "this_month"
-  ) as DashboardRange;
-
   const user = await requireUserPage();
-  const t = await getTranslations("dashboard");
-  const tc = await getTranslations("common");
-  const tContracts = await getTranslations("contracts");
-  const tInvoices = await getTranslations("invoices");
-  const rawLocale = await getLocale();
-  const locale: Locale = isLocale(rawLocale) ? rawLocale : user.locale;
+  const isDemo = isDemoUser(user.email);
 
-  const timezone = getSettings("defaults").timezone;
-  const data = getDashboard(undefined, {
-    range: activeRange,
-    from: sp.from,
-    to: sp.to,
-  });
+  return withDbInstance(isDemo, async () => {
+    const sp = searchParams ? await searchParams : {};
+    const activeRange: DashboardRange = (
+      ["today", "7d", "30d", "this_month", "last_month", "this_year", "all", "custom"].includes(sp.range ?? "")
+        ? sp.range
+        : "this_month"
+    ) as DashboardRange;
 
-  const heartbeat = getInternalSetting(
-    "worker_heartbeat",
-    workerHeartbeatSchema,
-  );
-  const workerStale =
-    user.role === "owner" &&
-    (heartbeat === null || nowMs() - heartbeat.ts > HEARTBEAT_STALE_MS);
+    const t = await getTranslations("dashboard");
+    const tc = await getTranslations("common");
+    const tContracts = await getTranslations("contracts");
+    const tInvoices = await getTranslations("invoices");
+    const rawLocale = await getLocale();
+    const locale: Locale = isLocale(rawLocale) ? rawLocale : user.locale;
 
-  const currencyLines = (amounts: CurrencyAmount[]) =>
-    amounts.length === 0
-      ? null
-      : amounts
-          .map((entry) =>
-            formatMoney(
-              entry.amountMinor,
-              entry.currency as CurrencyCode,
-              locale,
-            ),
-          )
-          .join(" · ");
+    const timezone = getSettings("defaults").timezone;
+    const data = getDashboard(undefined, {
+      range: activeRange,
+      from: sp.from,
+      to: sp.to,
+    });
 
-  const collectedLabel =
-    activeRange === "this_month"
-      ? t("collectedThisMonth")
-      : activeRange === "all"
-        ? t("collectedAllTime")
-        : t("collectedPeriod");
+    const heartbeat = getInternalSetting(
+      "worker_heartbeat",
+      workerHeartbeatSchema,
+    );
+    const workerStale =
+      user.role === "owner" &&
+      (heartbeat === null || nowMs() - heartbeat.ts > HEARTBEAT_STALE_MS);
 
-  const issuedLabel =
-    activeRange === "this_month"
-      ? t("issuedThisMonth")
-      : activeRange === "all"
-        ? t("issuedAllTime")
-        : t("issuedPeriod");
+    const currencyLines = (amounts: CurrencyAmount[]) =>
+      amounts.length === 0
+        ? null
+        : amounts
+            .map((entry) =>
+              formatMoney(
+                entry.amountMinor,
+                entry.currency as CurrencyCode,
+                locale,
+              ),
+            )
+            .join(" · ");
 
-  const financial = [
-    {
-      label: t("outstanding"),
-      value: <AmountList amounts={data.outstanding} locale={locale} />,
-      hint: t("outstandingHint"),
-      icon: Wallet,
-      accent: "primary" as const,
-    },
-    {
-      label: t("overdue"),
-      value: (
-        <div className="flex items-baseline gap-2">
-          <span className="tabular-nums font-bold">
-            {data.overdue.count}
-          </span>
-          <AmountList amounts={data.overdue.amounts} locale={locale} />
-        </div>
-      ),
-      hint: t("overdueHint"),
-      icon: AlertTriangle,
-      accent: "danger" as const,
-    },
+    const collectedLabel =
+      activeRange === "this_month"
+        ? t("collectedThisMonth")
+        : activeRange === "all"
+          ? t("collectedAllTime")
+          : t("collectedPeriod");
+
+    const issuedLabel =
+      activeRange === "this_month"
+        ? t("issuedThisMonth")
+        : activeRange === "all"
+          ? t("issuedAllTime")
+          : t("issuedPeriod");
+
+    const financial = [
+      {
+        label: t("outstanding"),
+        value: <AmountList amounts={data.outstanding} locale={locale} />,
+        hint: t("outstandingHint"),
+        icon: Wallet,
+        accent: "primary" as const,
+      },
+      {
+        label: t("overdue"),
+        value:
+          data.overdue.count === 0 ? (
+            "0"
+          ) : (
+            <AmountList amounts={data.overdue.amounts} locale={locale} />
+          ),
+        hint:
+          data.overdue.count === 0
+            ? t("overdueHint")
+            : `${data.overdue.count} ${t("overdueHint")}`,
+        icon: AlertTriangle,
+        accent: "danger" as const,
+      },
     {
       label: collectedLabel,
       value: <AmountList amounts={data.revenueInPeriod} locale={locale} />,
@@ -807,4 +813,5 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </div>
     </div>
   );
+  });
 }

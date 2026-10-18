@@ -136,7 +136,6 @@ export function VerificationForm({ initialCode }: { initialCode?: string }) {
         ) : (
           <div className="flex flex-col gap-6">
             <div className="relative overflow-hidden flex flex-col gap-5 rounded-lg border border-border bg-card p-6 shadow-sm">
-              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/80 via-primary to-rose-400" />
               <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">

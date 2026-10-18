@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 import { count } from "drizzle-orm";
-import { db } from "@/db";
+import { db, withDbInstance } from "@/db";
 import { clients, invoices, projects, users } from "@/db/schema";
 import {
   DEMO_USER_EMAIL,
@@ -31,18 +31,16 @@ describe("demo service", () => {
     expect(user.role).toBe("member");
     expect(user.canSignForCompany).toBe(true);
 
-    const userCountBefore = db
-      .select({ value: count() })
-      .from(users)
-      .get()?.value;
+    const userCountBefore = withDbInstance(true, () =>
+      db.select({ value: count() }).from(users).get()?.value,
+    );
 
     const sameUser = await getOrCreateDemoUser();
     expect(sameUser.id).toBe(user.id);
 
-    const userCountAfter = db
-      .select({ value: count() })
-      .from(users)
-      .get()?.value;
+    const userCountAfter = withDbInstance(true, () =>
+      db.select({ value: count() }).from(users).get()?.value,
+    );
 
     expect(userCountAfter).toBe(userCountBefore);
   });
@@ -51,9 +49,18 @@ describe("demo service", () => {
     const user = await getOrCreateDemoUser();
     seedDemoData(user, meta);
 
-    const clientsCount = db.select({ value: count() }).from(clients).get()?.value ?? 0;
-    const projectsCount = db.select({ value: count() }).from(projects).get()?.value ?? 0;
-    const invoicesCount = db.select({ value: count() }).from(invoices).get()?.value ?? 0;
+    const clientsCount = withDbInstance(
+      true,
+      () => db.select({ value: count() }).from(clients).get()?.value ?? 0,
+    );
+    const projectsCount = withDbInstance(
+      true,
+      () => db.select({ value: count() }).from(projects).get()?.value ?? 0,
+    );
+    const invoicesCount = withDbInstance(
+      true,
+      () => db.select({ value: count() }).from(invoices).get()?.value ?? 0,
+    );
 
     expect(clientsCount).toBeGreaterThanOrEqual(1);
     expect(projectsCount).toBeGreaterThanOrEqual(1);
@@ -61,9 +68,18 @@ describe("demo service", () => {
 
     resetDemoData(user, meta);
 
-    const clientsAfter = db.select({ value: count() }).from(clients).get()?.value ?? 0;
-    const projectsAfter = db.select({ value: count() }).from(projects).get()?.value ?? 0;
-    const invoicesAfter = db.select({ value: count() }).from(invoices).get()?.value ?? 0;
+    const clientsAfter = withDbInstance(
+      true,
+      () => db.select({ value: count() }).from(clients).get()?.value ?? 0,
+    );
+    const projectsAfter = withDbInstance(
+      true,
+      () => db.select({ value: count() }).from(projects).get()?.value ?? 0,
+    );
+    const invoicesAfter = withDbInstance(
+      true,
+      () => db.select({ value: count() }).from(invoices).get()?.value ?? 0,
+    );
 
     expect(clientsAfter).toBeGreaterThanOrEqual(1);
     expect(projectsAfter).toBeGreaterThanOrEqual(1);
@@ -73,6 +89,7 @@ describe("demo service", () => {
   it("authenticates as demo and returns a valid session token", async () => {
     const token = await loginAsDemo(meta);
     expect(typeof token).toBe("string");
-    expect(token.length).toBeGreaterThan(10);
+    expect(token.startsWith("demo_")).toBe(true);
+    expect(token.length).toBeGreaterThan(15);
   });
 });

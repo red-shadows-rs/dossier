@@ -3,6 +3,7 @@
 
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
+import { withDbInstance } from "@/db";
 import { DemoBanner } from "@/components/layout/DemoBanner";
 import { Footer } from "@/components/layout/Footer";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -13,9 +14,10 @@ import { isDemoUser } from "@/server/services/demo";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const user = await requireUserPage();
+  const isDemo = isDemoUser(user.email);
   const tc = await getTranslations("common");
 
-  return (
+  return withDbInstance(isDemo, () => (
     <ToastProvider>
       <a
         href="#main"
@@ -26,7 +28,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       <div className="flex min-h-dvh bg-background">
         <Sidebar role={user.role} canSignForCompany={user.canSignForCompany} />
         <div className="flex min-w-0 flex-1 flex-col">
-          {isDemoUser(user.email) && <DemoBanner />}
+          {isDemo && <DemoBanner />}
           <TopBar user={user} />
           <main
             id="main"
@@ -38,5 +40,5 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         </div>
       </div>
     </ToastProvider>
-  );
+  ));
 }

@@ -21,7 +21,6 @@ import {
   Save,
   ScrollText,
   SlidersHorizontal,
-  Sparkles,
   Trash2,
   X,
 } from "lucide-react";
@@ -786,7 +785,7 @@ export function TemplateForm({
 
                     <div className="flex flex-wrap items-center gap-1.5 rounded-md border border-border/60 bg-muted/20 p-2 text-xs">
                       <span className="text-[11px] font-medium text-muted-foreground me-1 flex items-center gap-1">
-                        <Sparkles className="h-3 w-3 text-primary" />
+                        <Plus className="h-3 w-3 text-primary" />
                         <span>{isAr ? "إدراج سريع:" : "Quick insert:"}</span>
                       </span>
 

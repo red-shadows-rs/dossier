@@ -1,6 +1,7 @@
 // Dossier - Database Index Module
 // https://github.com/red-shadows-rs/dossier
 
+import { AsyncLocalStorage } from "node:async_hooks";
 import { existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import Database from "better-sqlite3";
@@ -30,14 +31,45 @@ export function openDb(path: string): DbInstance {
   return { sqlite, db };
 }
 
-let instance: DbInstance | null = null;
+let mainInstance: DbInstance | null = null;
+let demoInstance: DbInstance | null = null;
+
+const dbStorage = new AsyncLocalStorage<DbInstance>();
+
+export function getMainInstance(): DbInstance {
+  if (mainInstance === null) {
+    mkdirSync(env.DATA_DIR, { recursive: true, mode: 0o700 });
+    mainInstance = openDb(env.DATABASE_PATH);
+  }
+  return mainInstance;
+}
+
+export function getDemoInstance(): DbInstance {
+  if (demoInstance === null) {
+    mkdirSync(env.DATA_DIR, { recursive: true, mode: 0o700 });
+    const demoPath = join(env.DATA_DIR, "dossier-demo.sqlite");
+    demoInstance = openDb(demoPath);
+    runMigrations(demoInstance.db, join(process.cwd(), "drizzle"));
+  }
+  return demoInstance;
+}
+
+export function setDbMode(mode: "main" | "demo"): void {
+  const instance = mode === "demo" ? getDemoInstance() : getMainInstance();
+  dbStorage.enterWith(instance);
+}
+
+export function withDbInstance<T>(isDemo: boolean, fn: () => T): T {
+  const instance = isDemo ? getDemoInstance() : getMainInstance();
+  return dbStorage.run(instance, fn);
+}
 
 function getInstance(): DbInstance {
-  if (instance === null) {
-    mkdirSync(env.DATA_DIR, { recursive: true, mode: 0o700 });
-    instance = openDb(env.DATABASE_PATH);
+  const scoped = dbStorage.getStore();
+  if (scoped) {
+    return scoped;
   }
-  return instance;
+  return getMainInstance();
 }
 
 export const sqlite = new Proxy({} as Database.Database, {

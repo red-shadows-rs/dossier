@@ -8,7 +8,7 @@
 
 منصة متكاملة لإدارة العقود والفواتير مع التوثيق المشفر، الجدولة الآلية للدفعات، وتوليد ملفات PDF ثنائية اللغة (عربي / إنجليزي).
 
-[![الإصدار](https://img.shields.io/badge/version-1.1.0-2563eb?style=for-the-badge)](CHANGELOG.md)
+[![الإصدار](https://img.shields.io/badge/version-1.2.0-2563eb?style=for-the-badge)](CHANGELOG.md)
 [![الرخصة](https://img.shields.io/badge/license-GPL--3.0-dc2626?style=for-the-badge)](LICENSE)
 ![TypeScript](https://img.shields.io/badge/typescript-5.9%2B-3178c6?style=for-the-badge&logo=typescript)
 ![Next.js](https://img.shields.io/badge/next.js-16.3-000000?style=for-the-badge&logo=next.js)
