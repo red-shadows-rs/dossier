@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { ShieldCheck } from "lucide-react";
@@ -40,48 +39,33 @@ export default async function VerifyPage({
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <div className="flex min-h-dvh flex-col bg-background">
-        <header className="sticky top-0 z-10 flex items-center justify-between gap-2 sm:gap-3 border-b border-border/60 bg-background/80 px-3 py-2.5 sm:px-8 sm:py-3 backdrop-blur">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Logo />
-          </div>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <div className="flex items-center gap-1.5 sm:gap-2 border-s border-border/60 ps-2.5 sm:ps-4">
-              <Image
-                src="/red-shadows-logo.png"
-                alt="RED SHADOWS"
-                width={24}
-                height={24}
-                className="h-5 sm:h-6 w-auto shrink-0"
-              />
-              <span className="text-xs sm:text-sm font-bold tracking-tight text-foreground font-mono whitespace-nowrap" dir="ltr">
-                RED SHADOWS
-              </span>
-            </div>
-            <div className="flex items-center gap-1 sm:gap-1.5 border-s border-border/60 ps-2 sm:ps-3">
-              <ThemeSwitch current={theme} />
-              <LocaleSwitch />
-            </div>
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border/60 bg-background/80 px-4 py-3 sm:px-8 backdrop-blur">
+          <Logo />
+          <div className="flex items-center gap-2">
+            <ThemeSwitch current={theme} />
+            <LocaleSwitch />
           </div>
         </header>
 
-        <main dir={dir} className="flex-1 px-4 py-8 sm:px-6 sm:py-12">
-          <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
-            <div className="flex flex-col items-center text-center gap-2.5">
-              <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-primary/10 text-primary ring-4 ring-primary/5">
-                <ShieldCheck className="h-7 w-7" />
-              </div>
-              <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                {t.title}
-              </h1>
-              <p className="text-sm text-muted-foreground max-w-md">
-                {locale === "ar"
-                  ? "التحقق من صحة وموثوقية العقود والفواتير الصادرة."
-                  : "Verify the authenticity of issued invoices and contracts."}
-              </p>
+        <main
+          dir={dir}
+          className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:px-8"
+        >
+          <div className="flex flex-col items-center text-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
+              <ShieldCheck className="h-6 w-6" />
             </div>
-
-            <VerificationForm initialCode={sp.code} />
+            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              {t.title}
+            </h1>
+            <p className="text-sm text-muted-foreground max-w-lg">
+              {locale === "ar"
+                ? "التحقق الفوري من صحة وموثوقية العقود والفواتير الرقمية الصادرة عبر المنظومة."
+                : "Instantly verify the authenticity of digital contracts and invoices issued through the platform."}
+            </p>
           </div>
+
+          <VerificationForm initialCode={sp.code} />
         </main>
 
         <Footer bordered={false} />
@@ -89,4 +73,3 @@ export default async function VerifyPage({
     </NextIntlClientProvider>
   );
 }
-

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
@@ -9,16 +8,21 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  ExternalLink,
   FileSearch,
   FileText,
-  FileX,
   Fingerprint,
+  QrCode,
   Receipt,
   ShieldCheck,
   User,
+  Wallet,
   XCircle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { Footer } from "@/components/layout/Footer";
 import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
 import { Logo } from "@/components/layout/Logo";
@@ -75,392 +79,359 @@ export default async function VerifyCodePage({
   }
 
   const isValid = result !== null && result.state === "valid";
+  const title =
+    result?.kind === "contract"
+      ? (locale === "ar"
+          ? result.titleAr ?? result.titleEn
+          : result.titleEn ?? result.titleAr)
+      : null;
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <div className="flex min-h-dvh flex-col bg-background">
-        <header className="sticky top-0 z-10 flex items-center justify-between gap-2 sm:gap-3 border-b border-border/60 bg-background/80 px-3 py-2.5 sm:px-8 sm:py-3 backdrop-blur">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Logo />
-          </div>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <div className="flex items-center gap-1.5 sm:gap-2 border-s border-border/60 ps-2.5 sm:ps-4">
-              <Image
-                src="/red-shadows-logo.png"
-                alt="RED SHADOWS"
-                width={24}
-                height={24}
-                className="h-5 sm:h-6 w-auto shrink-0"
-              />
-              <span className="text-xs sm:text-sm font-bold tracking-tight text-foreground font-mono whitespace-nowrap" dir="ltr">
-                RED SHADOWS
-              </span>
-            </div>
-            <div className="flex items-center gap-1 sm:gap-1.5 border-s border-border/60 ps-2 sm:ps-3">
-              <ThemeSwitch current={theme} />
-              <LocaleSwitch />
-            </div>
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border/60 bg-background/80 px-4 py-3 sm:px-8 backdrop-blur">
+          <Logo />
+          <div className="flex items-center gap-2">
+            <ThemeSwitch current={theme} />
+            <LocaleSwitch />
           </div>
         </header>
 
-        <main dir={dir} className="flex-1 px-4 py-8 sm:px-6 sm:py-12">
-          <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
-            <div className="flex flex-col items-center text-center gap-2.5">
-              <div
-                className={`flex h-14 w-14 items-center justify-center rounded-lg ring-4 ${
-                  limited
-                    ? "bg-amber-500/10 text-amber-600 ring-amber-500/5 dark:bg-amber-500/20 dark:text-amber-400"
-                    : result === null
-                      ? "bg-destructive/10 text-destructive ring-destructive/5"
-                      : isValid
-                        ? "bg-emerald-500/10 text-emerald-600 ring-emerald-500/5 dark:bg-emerald-500/20 dark:text-emerald-400"
-                        : "bg-destructive/10 text-destructive ring-destructive/5"
-                }`}
-              >
-                {limited ? (
-                  <AlertOctagon className="h-7 w-7" />
-                ) : result === null ? (
-                  <FileX className="h-7 w-7" />
-                ) : isValid ? (
-                  <ShieldCheck className="h-7 w-7" />
-                ) : (
-                  <XCircle className="h-7 w-7" />
-                )}
+        <main
+          dir={dir}
+          className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
+        >
+          {/* Breadcrumb Navigation */}
+          <nav
+            aria-label="Breadcrumb"
+            className="flex items-center gap-1.5 text-xs text-muted-foreground"
+          >
+            <Link
+              href="/verify"
+              className="hover:text-foreground transition-colors flex items-center gap-1"
+            >
+              <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+              <span>{locale === "ar" ? "بوابة التحقق الرقمي" : "Verification Portal"}</span>
+            </Link>
+            <span className="text-border">/</span>
+            <span className="text-foreground font-mono font-medium" dir="ltr">
+              {code}
+            </span>
+          </nav>
+
+          {limited ? (
+            <Card className="rounded-xl border border-border bg-card p-6 shadow-xs">
+              <EmptyState
+                icon={<AlertOctagon className="h-10 w-10 text-amber-500" />}
+                title={t.rateLimited}
+                description={
+                  locale === "ar"
+                    ? "تم تجاوز الحد المسموح من الاستعلامات مؤقتاً، يُرجى الانتظار دقيقة والمحاولة مجدداً."
+                    : "Too many verification requests. Please wait a minute and try again."
+                }
+                action={
+                  <Link href="/verify">
+                    <Button variant="secondary" className="gap-2 text-xs font-medium">
+                      <span>{locale === "ar" ? "العودة للبحث" : "Return to Search"}</span>
+                    </Button>
+                  </Link>
+                }
+              />
+            </Card>
+          ) : result === null ? (
+            <Card className="rounded-xl border border-border bg-card p-6 shadow-xs">
+              <EmptyState
+                icon={<FileSearch className="h-10 w-10 text-muted-foreground" />}
+                title={t.notFound}
+                description={
+                  locale === "ar"
+                    ? "لم يتم العثور على أي مستند مطابق لرمز التحقق المدخل في سجلات المنظومة الرسمية."
+                    : "No document matching this verification code was found in official records."
+                }
+                action={
+                  <Link href="/verify">
+                    <Button variant="secondary" className="gap-2 text-xs font-medium">
+                      <FileSearch className="h-3.5 w-3.5" />
+                      <span>{locale === "ar" ? "البحث برمز آخر" : "Try another code"}</span>
+                    </Button>
+                  </Link>
+                }
+              />
+            </Card>
+          ) : (
+            <>
+              {/* Document Header Banner */}
+              <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5 sm:p-6 shadow-xs">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex items-center gap-3.5">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary">
+                      {result.kind === "contract" ? (
+                        <FileText className="h-6 w-6" />
+                      ) : (
+                        <Receipt className="h-6 w-6" />
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <h1
+                          className="text-xl sm:text-2xl font-bold tracking-tight text-foreground font-mono"
+                          dir="ltr"
+                        >
+                          {result.number ?? code}
+                        </h1>
+                        <Badge tone={isValid ? "green" : "red"}>
+                          {t.states[result.state] ??
+                            (isValid
+                              ? locale === "ar"
+                                ? "معتمد وموثق"
+                                : "Verified"
+                              : result.state)}
+                        </Badge>
+                        {title && title !== "-" ? (
+                          <span className="text-sm font-medium text-muted-foreground">
+                            · <span>{title}</span>
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                        <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
+                          <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                          <span>
+                            {isValid
+                              ? locale === "ar"
+                                ? "مستند رسمي معتمد وموثق إلكترونياً ومطابق لسجلات منصة Dossier"
+                                : "Official document verified electronically in Dossier records"
+                              : locale === "ar"
+                                ? "المستند غير سارٍ في سجلات المنظومة"
+                                : "Document not active in system records"}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Link href="/verify">
+                      <Button variant="secondary" className="gap-1.5 text-xs font-medium shadow-xs">
+                        <FileSearch className="h-3.5 w-3.5" />
+                        <span>{locale === "ar" ? "فحص مستند آخر" : "Verify Another"}</span>
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
               </div>
 
-              <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                {limited
-                  ? t.rateLimited
-                  : result === null
-                    ? t.notFound
-                    : isValid
-                      ? t.found
-                      : t.states[result.state] ?? t.title}
-              </h1>
+              {/* KPI Summary Cards */}
+              {result.kind === "contract" ? (
+                <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-4 shadow-xs">
+                    <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+                      <span>{locale === "ar" ? "الحالة النظامية" : "Legal Status"}</span>
+                      <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                    </div>
+                    <span className="text-base font-bold text-foreground">
+                      {isValid
+                        ? locale === "ar"
+                          ? "سارية ومعتمدة"
+                          : "Active & Verified"
+                        : locale === "ar"
+                          ? "منتهية"
+                          : "Terminated"}
+                    </span>
+                  </div>
 
-              <p className="text-sm text-muted-foreground max-w-md">
-                {limited
-                  ? t.rateLimited
-                  : result === null
-                    ? locale === "ar"
-                      ? "لم يتم العثور على مستند مطابق لرمز التحقق."
-                      : "No document matching this verification code was found in the system."
-                    : isValid
-                      ? locale === "ar"
-                        ? "تم التحقق من صحة المستند ومطابقته لسجلات النظام."
-                        : "This document has been verified against official system records."
-                      : locale === "ar"
-                        ? "هذا المستند غير سارٍ حالياً في سجلات النظام."
-                        : "This document is no longer active in system records."}
-              </p>
+                  <div className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-4 shadow-xs">
+                    <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+                      <span>{t.fields.provider}</span>
+                      <Building2 className="h-4 w-4 text-primary" />
+                    </div>
+                    <span
+                      className="text-base font-bold text-foreground truncate"
+                      title={result.providerName ?? "-"}
+                    >
+                      {result.providerName ?? "-"}
+                    </span>
+                  </div>
 
-              <div className="mt-1 flex items-center gap-2">
-                <span className="text-xs font-medium text-muted-foreground">
-                  {t.codeLabel}:
-                </span>
-                <span
-                  className="rounded-lg border border-border bg-muted/60 px-3 py-1 font-mono text-xs font-bold tracking-wider text-foreground select-all"
-                  dir="ltr"
-                >
-                  {code}
-                </span>
-              </div>
-            </div>
+                  <div className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-4 shadow-xs">
+                    <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+                      <span>{t.fields.client}</span>
+                      <User className="h-4 w-4 text-sky-500" />
+                    </div>
+                    <span
+                      className="text-base font-bold text-foreground truncate"
+                      title={result.clientName ?? "-"}
+                    >
+                      {result.clientName ?? "-"}
+                    </span>
+                  </div>
 
-            {limited ? (
-              <Notice tone="error" text={t.rateLimited} />
-            ) : result === null ? (
-              <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-border bg-card/60 p-8 text-center">
-                <p className="text-sm text-muted-foreground">
-                  {t.notFound}
-                </p>
-                <Link
-                  href="/verify"
-                  className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-xs font-medium text-foreground hover:bg-muted/80 no-underline transition-colors"
-                >
-                  <FileSearch className="h-3.5 w-3.5" />
-                  <span>{locale === "ar" ? "البحث برمز آخر" : "Try another code"}</span>
-                </Link>
-              </div>
-            ) : result.kind === "contract" ? (
-              <ContractCard result={result} code={code} locale={locale} t={t} />
-            ) : (
-              <InvoiceCard result={result} code={code} locale={locale} t={t} />
-            )}
+                  <div className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-4 shadow-xs">
+                    <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+                      <span>{t.fields.signedAt}</span>
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <span
+                      className="text-sm font-semibold font-mono text-foreground"
+                      dir="ltr"
+                    >
+                      {result.signedAt ? formatInstant(result.signedAt, "UTC", locale) : "-"}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-4 shadow-xs">
+                    <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+                      <span>{locale === "ar" ? "حالة الفاتورة" : "Invoice Status"}</span>
+                      <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                    </div>
+                    <span className="text-base font-bold text-foreground">
+                      {isValid
+                        ? locale === "ar"
+                          ? "صادرة ومعتمدة"
+                          : "Issued & Valid"
+                        : locale === "ar"
+                          ? "ملغاة"
+                          : "Void"}
+                    </span>
+                  </div>
 
-            {result !== null ? (
+                  <div className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-4 shadow-xs">
+                    <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+                      <span>{t.fields.issuer}</span>
+                      <Building2 className="h-4 w-4 text-primary" />
+                    </div>
+                    <span
+                      className="text-base font-bold text-foreground truncate"
+                      title={result.issuerName ?? "-"}
+                    >
+                      {result.issuerName ?? "-"}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-4 shadow-xs">
+                    <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+                      <span>{t.fields.issueDate}</span>
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <span
+                      className="text-sm font-semibold font-mono text-foreground"
+                      dir="ltr"
+                    >
+                      {result.issueDate ?? "-"}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-4 shadow-xs">
+                    <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+                      <span>{t.fields.total}</span>
+                      <Wallet className="h-4 w-4 text-emerald-500" />
+                    </div>
+                    <span
+                      className="text-base font-bold font-mono text-foreground"
+                      dir="ltr"
+                    >
+                      {result.totalFormatted}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Cryptographic Proof & Barcode Card */}
+              <Card className="rounded-xl border border-border bg-card shadow-xs">
+                <CardHeader className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 px-5 py-4">
+                  <div className="flex items-center gap-2">
+                    <Fingerprint className="h-4 w-4 text-primary" />
+                    <CardTitle className="text-sm font-semibold text-foreground">
+                      {locale === "ar" ? "بيانات التوثيق الرقمي والباركود" : "Digital Verification & Security Seal"}
+                    </CardTitle>
+                  </div>
+                  <Badge tone="teal">
+                    {locale === "ar" ? "شهادة توثيق رقمية" : "Cryptographic Proof"}
+                  </Badge>
+                </CardHeader>
+                <CardContent className="p-5 sm:p-6 flex flex-col gap-6">
+                  {/* Barcode Frame */}
+                  <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-border/60 bg-muted/20 py-4 px-4 text-center">
+                    <div
+                      className="max-w-[320px] overflow-hidden"
+                      dangerouslySetInnerHTML={{ __html: renderCode39Svg(code, 32) }}
+                    />
+                    <div className="flex items-center gap-2 mt-1">
+                      <span
+                        className="font-mono text-sm font-bold tracking-widest text-foreground select-all"
+                        dir="ltr"
+                      >
+                        {code}
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-muted-foreground">
+                      {locale === "ar"
+                        ? "تم إنشاء التوثيق والباركود عبر منصة Dossier"
+                        : "Verified via Dossier Platform"}
+                    </span>
+                  </div>
+
+                  {/* Technical Attributes Grid */}
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="flex flex-col gap-1 rounded-lg border border-border/60 bg-muted/15 p-3.5">
+                      <span className="text-xs font-medium text-muted-foreground">
+                        {t.codeLabel}
+                      </span>
+                      <span
+                        className="font-mono text-sm font-bold tracking-wider text-foreground select-all"
+                        dir="ltr"
+                      >
+                        {code}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col gap-1 rounded-lg border border-border/60 bg-muted/15 p-3.5">
+                      <span className="text-xs font-medium text-muted-foreground">
+                        {locale === "ar" ? "رابط التحقق المعتمد" : "Permanent Verification URL"}
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className="font-mono text-xs font-semibold text-foreground truncate select-all"
+                          dir="ltr"
+                        >
+                          {`${env.APP_URL}/v/${code}`}
+                        </span>
+                      </div>
+                    </div>
+
+                    {result.kind === "contract" && result.contentHash ? (
+                      <div className="flex flex-col gap-1.5 rounded-lg border border-border/60 bg-muted/15 p-3.5 sm:col-span-2">
+                        <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+                          <span className="flex items-center gap-1.5">
+                            <Fingerprint className="h-3.5 w-3.5 text-primary" />
+                            <span>{t.fields.contentHash}</span>
+                          </span>
+                          <span className="text-[10px] text-muted-foreground/80 font-mono">
+                            SHA-256
+                          </span>
+                        </div>
+                        <code
+                          className="break-all font-mono text-xs leading-relaxed text-foreground select-all bg-background/50 p-2.5 rounded border border-border/40"
+                          dir="ltr"
+                        >
+                          {result.contentHash}
+                        </code>
+                      </div>
+                    ) : null}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* PDF Authenticity Checker */}
               <VerificationPdfChecker code={code} />
-            ) : null}
-
-            <div className="flex items-center justify-center pt-2">
-              <Link
-                href="/verify"
-                className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground hover:text-foreground no-underline transition-colors"
-              >
-                <FileSearch className="h-3.5 w-3.5" />
-                <span>
-                  {locale === "ar"
-                    ? "التحقق من مستند آخر يدويًا"
-                    : "Verify another document manually"}
-                </span>
-              </Link>
-            </div>
-          </div>
+            </>
+          )}
         </main>
 
         <Footer bordered={false} />
       </div>
     </NextIntlClientProvider>
-  );
-}
-
-function Notice({ tone, text }: { tone: "error" | "success"; text: string }) {
-  return (
-    <div
-      role="status"
-      className={
-        tone === "success"
-          ? "rounded-md border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm font-medium text-emerald-700 dark:text-emerald-300"
-          : "rounded-md border border-destructive/30 bg-destructive/10 p-4 text-sm font-medium text-destructive"
-      }
-    >
-      {text}
-    </div>
-  );
-}
-
-type Messages = {
-  title: string;
-  notFound: string;
-  rateLimited: string;
-  found: string;
-  codeLabel: string;
-  contract: Record<string, string>;
-  invoice: Record<string, string>;
-  states: Record<string, string>;
-  fields: Record<string, string>;
-};
-
-function DetailItem({
-  icon,
-  label,
-  value,
-  dir,
-  mono = false,
-}: {
-  icon?: React.ReactNode;
-  label: string;
-  value: React.ReactNode;
-  dir?: "ltr" | "rtl";
-  mono?: boolean;
-}) {
-  return (
-    <div className="flex flex-col gap-1 rounded-md border border-border/50 bg-muted/20 p-3 sm:p-3.5">
-      <dt className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-        {icon ? <span className="text-muted-foreground/70">{icon}</span> : null}
-        <span>{label}</span>
-      </dt>
-      <dd
-        className={`text-sm font-semibold text-foreground ${mono ? "font-mono select-all" : ""}`}
-        dir={dir}
-      >
-        {value}
-      </dd>
-    </div>
-  );
-}
-
-function ContractCard({
-  result,
-  code,
-  locale,
-  t,
-}: {
-  result: Extract<VerificationResult, { kind: "contract" }>;
-  code: string;
-  locale: Locale;
-  t: Messages;
-}) {
-  const title =
-    locale === "ar"
-      ? result.titleAr ?? result.titleEn
-      : result.titleEn ?? result.titleAr;
-  const isValid = result.state === "valid";
-
-  return (
-    <div className="relative overflow-hidden flex flex-col gap-5 rounded-lg border border-border bg-card p-5 sm:p-7 shadow-sm">
-      <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/80 via-primary to-rose-400" />
-
-      <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-            <FileText className="h-5 w-5" />
-          </div>
-          <div>
-            <div className="text-xs font-medium text-muted-foreground">
-              {t.contract.heading}
-            </div>
-            <div className="font-mono text-base font-bold text-foreground" dir="ltr">
-              {result.number ?? "-"}
-            </div>
-          </div>
-        </div>
-        <StateBadge
-          label={t.states[result.state] ?? result.state}
-          valid={isValid}
-        />
-      </div>
-
-      {isValid && (
-        <div className="flex items-center gap-2 rounded-md border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-          <CheckCircle2 className="h-4 w-4 shrink-0" />
-          <span>{locale === "ar" ? "مستند معتمد ومطابق لسجلات النظام" : "Verified Official Record"}</span>
-        </div>
-      )}
-
-      <div className="flex flex-col items-center justify-center gap-1.5 rounded-md border border-border/70 bg-muted/20 py-3.5 px-4 text-center">
-        <div
-          className="max-w-[280px] overflow-hidden"
-          dangerouslySetInnerHTML={{ __html: renderCode39Svg(code, 28) }}
-        />
-        <div className="flex items-center gap-2 mt-1">
-          <span className="font-mono text-xs font-bold tracking-widest text-muted-foreground select-all" dir="ltr">
-            {code}
-          </span>
-        </div>
-      </div>
-
-      <div className="rounded-md border border-border/70 bg-muted/30 p-4">
-        <div className="text-xs font-medium text-muted-foreground">{t.fields.title}</div>
-        <div className="mt-0.5 text-base font-semibold text-foreground">{title ?? "-"}</div>
-      </div>
-
-      <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <DetailItem
-          icon={<Building2 className="h-4 w-4" />}
-          label={t.fields.provider}
-          value={result.providerName ?? "-"}
-        />
-        <DetailItem
-          icon={<User className="h-4 w-4" />}
-          label={t.fields.client}
-          value={result.clientName ?? "-"}
-        />
-        <DetailItem
-          icon={<Clock className="h-4 w-4" />}
-          label={t.fields.signedAt}
-          value={result.signedAt ? formatInstant(result.signedAt, "UTC", locale) : "-"}
-          dir="ltr"
-        />
-      </dl>
-
-      <div className="flex flex-col gap-1.5 rounded-md border border-border/70 bg-muted/40 p-3.5">
-        <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-          <Fingerprint className="h-3.5 w-3.5 text-primary" />
-          <span>{t.fields.contentHash}</span>
-        </div>
-        <code className="break-all font-mono text-[11px] leading-relaxed text-foreground select-all" dir="ltr">
-          {result.contentHash ?? "-"}
-        </code>
-      </div>
-    </div>
-  );
-}
-
-function InvoiceCard({
-  result,
-  code,
-  locale,
-  t,
-}: {
-  result: Extract<VerificationResult, { kind: "invoice" }>;
-  code: string;
-  locale: Locale;
-  t: Messages;
-}) {
-  const isValid = result.state === "valid";
-
-  return (
-    <div className="relative overflow-hidden flex flex-col gap-5 rounded-lg border border-border bg-card p-5 sm:p-7 shadow-sm">
-      <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/80 via-primary to-rose-400" />
-
-      <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-            <Receipt className="h-5 w-5" />
-          </div>
-          <div>
-            <div className="text-xs font-medium text-muted-foreground">
-              {t.invoice.heading}
-            </div>
-            <div className="font-mono text-base font-bold text-foreground" dir="ltr">
-              {result.number ?? "-"}
-            </div>
-          </div>
-        </div>
-        <StateBadge
-          label={t.states[result.state] ?? result.state}
-          valid={isValid}
-        />
-      </div>
-
-      {isValid && (
-        <div className="flex items-center gap-2 rounded-md border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-          <CheckCircle2 className="h-4 w-4 shrink-0" />
-          <span>{locale === "ar" ? "فاتورة معتمدة ومطابقة لسجلات النظام" : "Verified Official Invoice"}</span>
-        </div>
-      )}
-
-      <div className="flex flex-col items-center justify-center gap-1.5 rounded-md border border-border/70 bg-muted/20 py-3.5 px-4 text-center">
-        <div
-          className="max-w-[280px] overflow-hidden"
-          dangerouslySetInnerHTML={{ __html: renderCode39Svg(code, 28) }}
-        />
-        <div className="flex items-center gap-2 mt-1">
-          <span className="font-mono text-xs font-bold tracking-widest text-muted-foreground select-all" dir="ltr">
-            {code}
-          </span>
-        </div>
-      </div>
-
-      <div className="rounded-md border border-primary/20 bg-primary/5 p-4 sm:p-5">
-        <div className="text-xs font-semibold uppercase tracking-wider text-primary">
-          {t.fields.total}
-        </div>
-        <div className="mt-1 font-mono text-2xl font-extrabold text-foreground sm:text-3xl" dir="ltr">
-          {result.totalFormatted}
-        </div>
-      </div>
-
-      <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <DetailItem
-          icon={<Building2 className="h-4 w-4" />}
-          label={t.fields.issuer}
-          value={result.issuerName ?? "-"}
-        />
-        <DetailItem
-          icon={<Calendar className="h-4 w-4" />}
-          label={t.fields.issueDate}
-          value={result.issueDate ?? "-"}
-          dir="ltr"
-        />
-      </dl>
-    </div>
-  );
-}
-
-function StateBadge({ label, valid }: { label: string; valid: boolean }) {
-  return (
-    <Badge
-      tone={valid ? "green" : "red"}
-      className="gap-1.5 px-3 py-1 text-xs font-semibold"
-    >
-      {valid ? (
-        <CheckCircle2 className="h-3.5 w-3.5" />
-      ) : (
-        <XCircle className="h-3.5 w-3.5" />
-      )}
-      <span>{label}</span>
-    </Badge>
   );
 }
