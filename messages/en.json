@@ -579,7 +579,11 @@
       "basics": "Basics",
       "timeline": "Timeline",
       "notes": "Notes"
-    }
+    },
+    "contractsTitle": "Contracts",
+    "invoiceableMilestones": "Milestones to invoice",
+    "milestonesTitle": "Milestones",
+    "invoicesTitle": "Invoices"
   },
   "templates": {
     "title": "Templates",

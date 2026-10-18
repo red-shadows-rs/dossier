@@ -23,9 +23,10 @@ test.describe.serial("contract lifecycle (16.2 #1 + #2)", () => {
     await page.goto("/clients/new");
     await page.locator("#client-nameAr").fill("عميل الاختبار");
     await page.locator("#client-nameEn").fill("E2E Client");
-    await page.locator("#client-email").fill("client@e2e.test");
     await page.locator("#client-repNameAr").fill("ممثل العميل");
     await page.locator("#client-repNameEn").fill("E2E Client Rep");
+    await page.locator("#client-step-btn-contact").click();
+    await page.locator("#client-email").fill("client@e2e.test");
     await page.getByRole("button", { name: "Save" }).click();
     await page.waitForURL(/\/clients\/(?!new$)[^/]+$/);
     const clientId = page.url().split("/").pop() as string;
@@ -85,7 +86,7 @@ test.describe.serial("contract lifecycle (16.2 #1 + #2)", () => {
       page.getByRole("heading", { name: "Verify your email" }),
     ).toBeVisible();
     await page.getByRole("button", { name: /Send (me a )?code/ }).click();
-    await expect(page.getByText("Code sent")).toBeVisible();
+    await expect(page.getByText("Code sent").first()).toBeVisible();
 
     const otp = await waitForOutbox("contract_otp");
     await page.locator("#otp-code").fill(otp.payload.otp as string);
@@ -96,7 +97,7 @@ test.describe.serial("contract lifecycle (16.2 #1 + #2)", () => {
     await page.locator('input[type="checkbox"]').check();
     await page.getByRole("button", { name: "Sign contract" }).click();
     await expect(
-      page.getByText(/Signature recorded successfully|Thank you, your signature was recorded/),
+      page.getByText(/Signature recorded successfully|Thank you, your signature was recorded/).first(),
     ).toBeVisible();
 
     await page.goto(`/contracts/${contractId}`);
@@ -107,7 +108,7 @@ test.describe.serial("contract lifecycle (16.2 #1 + #2)", () => {
     expect(pdf.status()).toBe(200);
     expect(pdf.headers()["content-type"]).toContain("pdf");
 
-    await page.goto(`/projects/${projectId}`);
+    await page.goto(`/projects/${projectId}?tab=contracts`);
     await page.getByRole("button", { name: "Create invoice" }).first().click();
     await expect(page).toHaveURL(/\/invoices\/[^/]+\/edit$/);
     const invoiceId = new URL(page.url()).pathname.split("/")[2];
@@ -133,11 +134,11 @@ test.describe.serial("contract lifecycle (16.2 #1 + #2)", () => {
   }) => {
     expect(state.verificationCode).toBeTruthy();
     await page.goto(`/v/${state.verificationCode}`);
-    await expect(page.getByText("Valid", { exact: true })).toBeVisible();
+    await expect(page.getByText("Valid", { exact: true }).first()).toBeVisible();
 
     await page.goto("/v/ZZZZ-ZZZZ-ZZZZ");
     await expect(
-      page.getByText(/Document not found|No document matches this code/),
+      page.getByText(/Document not found|No document matches this code/).first(),
     ).toBeVisible();
   });
 });

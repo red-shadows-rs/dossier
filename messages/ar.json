@@ -579,7 +579,11 @@
       "basics": "الأساسيات",
       "timeline": "الجدول الزمني",
       "notes": "الملاحظات"
-    }
+    },
+    "contractsTitle": "العقود",
+    "invoiceableMilestones": "دفعات جاهزة للفوترة",
+    "milestonesTitle": "الدفعات",
+    "invoicesTitle": "الفواتير"
   },
   "templates": {
     "title": "القوالب",

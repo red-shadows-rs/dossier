@@ -115,7 +115,7 @@
 تم التطوير بواسطة <a href="https://github.com/red-shadows-rs">RED SHADOWS</a> (<a href="https://github.com/shadow-x78">shadow-x78</a>) ·
 [العودة للملف الرئيسي](../README_AR.md)
 
-<sub>&copy; 2026 Dossier — RED SHADOWS (shadow-x78)</sub>
+<sub>&copy; 2026 Dossier - RED SHADOWS (shadow-x78)</sub>
 
 </div>
 

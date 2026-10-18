@@ -308,7 +308,7 @@ curl -I https://dossier.red-shadows-rs.com/v/MG35RR0RJ8YX
 [سجل التغييرات](CHANGELOG.md) ·
 [الأمان](SECURITY.md)
 
-<sub>&copy; 2026 Dossier — RED SHADOWS (shadow-x78)</sub>
+<sub>&copy; 2026 Dossier - RED SHADOWS (shadow-x78)</sub>
 
 </div>
 

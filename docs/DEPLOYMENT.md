@@ -209,7 +209,7 @@ docker compose ps
 Built by <a href="https://github.com/red-shadows-rs">RED SHADOWS</a> (<a href="https://github.com/shadow-x78">shadow-x78</a>) ·
 [Back to README](../README.md)
 
-<sub>&copy; 2026 Dossier — RED SHADOWS (shadow-x78)</sub>
+<sub>&copy; 2026 Dossier - RED SHADOWS (shadow-x78)</sub>
 
 </div>
 
