@@ -1,0 +1,68 @@
+# ─────────────────────────────────────────────
+# Dossier - Git Version Control Ignore Rules
+# https://github.com/red-shadows-rs/dossier
+# ─────────────────────────────────────────────
+
+# ── Dependencies ──
+node_modules/
+.pnp
+.pnp.js
+
+# ── Build Outputs ──
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# ── Environment & Secrets ──
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+
+# ── Debug & Runtime Logs ──
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ── Editor & Tooling Artifacts ──
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-*
+.kilo/
+.agents/
+.briefwright/
+.playwright-mcp/
+
+# ── Operating System ──
+.DS_Store
+Thumbs.db
+
+# ── Local Runtime Data & Databases ──
+data/
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+local.db*
+tmp/
+
+# ── Testing & Coverage ──
+coverage/
+playwright-report/
+test-results/
+.e2e-data/
+
+# ── Audit & Scratch Reports ──
+audit-report.md
+fix-plan.md
+cleanup-log.md

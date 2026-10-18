@@ -1,0 +1,7 @@
+# ─────────────────────────────────────────────
+# Dossier - Git Attributes
+# https://github.com/red-shadows-rs/dossier
+# ─────────────────────────────────────────────
+
+package-lock.json linguist-generated=true
+*.md linguist-detectable=true
