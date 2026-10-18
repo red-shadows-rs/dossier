@@ -133,6 +133,9 @@ export function LoginForm() {
 
       <div className="relative my-2 flex items-center justify-center">
         <div className="w-full border-t border-border" />
+        <span className="absolute bg-background px-2 text-xs uppercase tracking-wider text-muted-foreground">
+          {t("common.or")}
+        </span>
       </div>
 
       <Button
@@ -149,11 +152,14 @@ export function LoginForm() {
           }
           setPending(false);
         }}
-        className="w-full gap-2 border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary/50"
+        className="w-full gap-2 border-border bg-card py-2.5 text-foreground hover:bg-accent hover:text-accent-foreground font-medium shadow-sm transition-colors"
       >
-        <Sparkles size={16} aria-hidden="true" />
+        <Sparkles size={16} className="text-primary shrink-0" aria-hidden="true" />
         <span>{t("demo.tryDemoButton")}</span>
       </Button>
+      <p className="text-center text-xs text-muted-foreground">
+        {t("demo.tryDemoDesc")}
+      </p>
     </form>
   );
 }
