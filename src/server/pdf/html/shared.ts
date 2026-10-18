@@ -713,21 +713,21 @@ li {
 
 /* Certificate of Completion */
 .cert {
-  break-before: page;
-  padding-top: 2mm;
+  padding-top: 1mm;
 }
 .cert h1 {
-  font-size: 13pt;
+  font-size: 12pt;
   font-weight: 900;
   color: #14141a;
-  margin: 0 0 3mm;
+  margin: 0 0 2mm;
   border-bottom: 0.4mm solid #e4e4e7;
-  padding-bottom: 2mm;
+  padding-bottom: 1.5mm;
 }
 .cert table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
-  margin: 2mm 0;
+  margin: 1.5mm 0;
   border: 0.3mm solid #e4e4e7;
   border-radius: 1.5mm;
   overflow: hidden;
@@ -737,19 +737,30 @@ li {
   color: #3f3f46;
   font-size: 6.8pt;
   font-weight: 700;
-  padding: 1.6mm 2mm;
+  padding: 1.4mm 2mm;
   border-bottom: 0.3mm solid #e4e4e7;
-  text-align: start;
+  vertical-align: middle;
 }
 .cert td {
-  padding: 1.5mm 2mm;
+  padding: 1.3mm 2mm;
   border-bottom: 0.25mm solid #f4f4f5;
-  font-size: 7.5pt;
+  font-size: 7pt;
   color: #18181b;
+  vertical-align: middle;
 }
 .cert tbody tr:last-child td {
   border-bottom: none;
 }
+.cert tbody tr:nth-child(even) td {
+  background: #fafafa;
+}
+.cert-col-role { width: 14%; text-align: start; }
+.cert-col-name { width: 17%; text-align: start; }
+.cert-col-email { width: 22%; text-align: start; }
+.cert-col-method { width: 10%; text-align: center; }
+.cert-col-signed { width: 21%; text-align: center; }
+.cert-col-ip { width: 10%; text-align: center; }
+.cert-col-otp { width: 6%; text-align: center; }
 .muted {
   color: #71717a;
   font-size: 7.2pt;

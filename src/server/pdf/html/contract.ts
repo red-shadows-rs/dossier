@@ -352,6 +352,7 @@ type ContractClause = ContractSnapshotV1["clauses"][number];
 
 export function paginateContractClauses(
   snapshot: ContractSnapshotV1,
+  hasCertPage: boolean = false,
 ): { pages: ContractClause[][]; separateFooterPage: boolean } {
   const clauses = snapshot.clauses;
   if (!clauses || clauses.length === 0) {
@@ -360,7 +361,7 @@ export function paginateContractClauses(
 
   const P1_BUDGET = 190;
   const PSUB_BUDGET = 140;
-  const FOOTER_MM = 48;
+  const FOOTER_MM = hasCertPage ? 0 : 48;
 
   function estimateClauseMm(clause: ContractClause): number {
     let mm = 8;
@@ -591,11 +592,11 @@ export function renderContractHtml(input: ContractHtmlInput): string {
         )
       : "";
 
-  const { pages: clausePages, separateFooterPage } = paginateContractClauses(snapshot);
   const hasCertPage = !!certificateHtml;
+  const { pages: clausePages, separateFooterPage } = paginateContractClauses(snapshot, hasCertPage);
   const totalPages =
     clausePages.length +
-    (separateFooterPage ? 1 : 0) +
+    (separateFooterPage && !hasCertPage ? 1 : 0) +
     (hasCertPage ? 1 : 0);
 
   const renderedPages: string[] = [];
@@ -619,7 +620,7 @@ export function renderContractHtml(input: ContractHtmlInput): string {
       )
       .join("");
 
-    const pageFooter = isLastClausePage && !separateFooterPage ? footerHtml : "";
+    const pageFooter = isLastClausePage && !separateFooterPage && !hasCertPage ? footerHtml : "";
     const noteHtml = isLastClausePage ? unsignedNote : "";
 
     renderedPages.push(`
@@ -640,7 +641,7 @@ export function renderContractHtml(input: ContractHtmlInput): string {
     `);
   });
 
-  if (separateFooterPage) {
+  if (separateFooterPage && !hasCertPage) {
     const footerPageIndex = clausePages.length;
     const headerHtml = renderSubsequentHeader(snapshot, lang, input.logoDataUri);
     renderedPages.push(`
@@ -669,6 +670,7 @@ export function renderContractHtml(input: ContractHtmlInput): string {
             ${certificateHtml}
           </div>
         </div>
+        ${footerHtml}
         <div class="bottom-red-bar">
           <span dir="ltr">Dossier</span>
           <span class="page-num-display" dir="ltr">${certPageIndex + 1} / ${totalPages}</span>
