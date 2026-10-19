@@ -1,6 +1,7 @@
 // Dossier - Templates Id Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { TemplateDetailView } from "@/components/forms/TemplateDetailView";
@@ -13,6 +14,20 @@ import { SAMPLE_SNAPSHOT } from "@/server/templating/sample-snapshot";
 import { renderTemplatePreviewHtml } from "@/server/templating/preview";
 import { getTemplate } from "@/server/services/templates";
 import { smoothLoading } from "@/lib/smooth-loader";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const data = getTemplate(id);
+    return { title: data.template.nameAr || data.template.nameEn || id };
+  } catch {
+    return { title: "Dossier" };
+  }
+}
 
 export default async function TemplateDetailPage({
   params,

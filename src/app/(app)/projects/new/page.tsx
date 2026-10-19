@@ -1,8 +1,16 @@
 // Dossier - Projects New Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("projects");
+  return {
+    title: t("new"),
+  };
+}
 import { ArrowLeft, FolderKanban } from "lucide-react";
 import {
   ProjectForm,

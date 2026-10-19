@@ -1,9 +1,17 @@
 // Dossier - Contracts Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { FileText, Plus, RotateCcw, Search } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("nav");
+  return {
+    title: t("contracts"),
+  };
+}
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Input, InputAdornment } from "@/components/ui/Input";

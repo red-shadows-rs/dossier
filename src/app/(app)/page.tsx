@@ -2,6 +2,7 @@
 // https://github.com/red-shadows-rs/dossier
 
 import Link from "next/link";
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import {
   Activity,
@@ -197,6 +198,13 @@ interface DashboardPageProps {
     from?: string;
     to?: string;
   }>;
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("nav");
+  return {
+    title: t("dashboard"),
+  };
 }
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {

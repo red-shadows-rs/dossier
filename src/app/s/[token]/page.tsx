@@ -25,6 +25,7 @@ import { env } from "@/lib/env";
 import { isLocale, LOCALE_COOKIE, resolveTheme, THEME_COOKIE } from "@/lib/i18n";
 import { getRequestMeta } from "@/server/services/audit";
 import { buildContractHtml } from "@/server/services/contract-documents";
+import { getTranslations } from "next-intl/server";
 import {
   assertSigningRateLimit,
   getSigningContext,
@@ -33,9 +34,13 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("signing");
+  return {
+    title: t("documentTitle"),
+    robots: { index: false, follow: false },
+  };
+}
 
 function pickLocale(
   requested: string | undefined,

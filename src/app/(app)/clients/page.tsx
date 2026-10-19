@@ -1,9 +1,17 @@
 // Dossier - Clients Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Plus, RotateCcw, Search, Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("nav");
+  return {
+    title: t("clients"),
+  };
+}
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";

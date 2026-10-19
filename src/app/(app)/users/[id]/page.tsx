@@ -1,9 +1,24 @@
 // Dossier - Users Id Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const user = getUser(id);
+    return { title: user.name || user.email || id };
+  } catch {
+    return { title: "Dossier" };
+  }
+}
 import { ArrowLeft, KeyRound, UserCheck, UserCog } from "lucide-react";
 import { UserForm } from "@/components/forms/UserForm";
 import { UserPasswordForm } from "@/components/forms/UserPasswordForm";

@@ -1,6 +1,7 @@
 // Dossier - Projects Id Edit Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -18,6 +19,24 @@ import { requireUserPage } from "@/server/auth/require-user";
 import { listClientOptions } from "@/server/services/clients";
 import { getProject } from "@/server/services/projects";
 import { smoothLoading } from "@/lib/smooth-loader";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const project = getProject(id);
+    const t = await getTranslations("projects");
+    const name = project.nameAr || project.nameEn || id;
+    return {
+      title: `${t("edit")} · ${project.code ? `${project.code} · ${name}` : name}`,
+    };
+  } catch {
+    return { title: "Dossier" };
+  }
+}
 
 export default async function EditProjectPage({
   params,

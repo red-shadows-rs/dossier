@@ -1,8 +1,16 @@
 // Dossier - Account Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("nav");
+  return {
+    title: t("account"),
+  };
+}
 import { KeyRound, Palette, User } from "lucide-react";
 import { AccountForm } from "@/components/forms/AccountForm";
 import { ChangePasswordForm } from "@/components/forms/ChangePasswordForm";

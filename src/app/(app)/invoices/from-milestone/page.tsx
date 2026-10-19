@@ -1,8 +1,16 @@
 // Dossier - Invoices From Milestone Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("invoices");
+  return {
+    title: t("new"),
+  };
+}
 import { Layers, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { NewMilestoneInvoiceForm } from "@/components/forms/NewMilestoneInvoiceForm";

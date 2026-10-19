@@ -1,9 +1,17 @@
 // Dossier - Templates Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { FileCode2, Plus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("nav");
+  return {
+    title: t("templates"),
+  };
+}
 import { Button } from "@/components/ui/Button";
 import { TemplatesGallery } from "@/components/tables/TemplatesGallery";
 import { archiveTemplateAction } from "@/server/actions/templates";

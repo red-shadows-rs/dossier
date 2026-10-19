@@ -1,6 +1,7 @@
 // Dossier - Invoices Id Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
@@ -18,6 +19,20 @@ import {
   getSettings,
 } from "@/server/services/settings";
 import { smoothLoading } from "@/lib/smooth-loader";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const detail = getInvoiceDetail(id);
+    return { title: detail.invoice.number || id };
+  } catch {
+    return { title: "Dossier" };
+  }
+}
 
 export default async function InvoiceDetailPage({
   params,

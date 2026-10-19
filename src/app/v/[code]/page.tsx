@@ -32,6 +32,7 @@ import type { Locale } from "@/lib/constants";
 import { formatInstant } from "@/lib/dates";
 import { env } from "@/lib/env";
 import { isLocale, LOCALE_COOKIE, resolveTheme, THEME_COOKIE } from "@/lib/i18n";
+import { getTranslations } from "next-intl/server";
 import { getRequestMeta } from "@/server/services/audit";
 import { renderCode39Svg } from "@/server/pdf/qr";
 import {
@@ -42,9 +43,18 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ code: string }>;
+}): Promise<Metadata> {
+  const { code } = await params;
+  const t = await getTranslations("verification");
+  return {
+    title: `${code} · ${t("title")}`,
+    robots: { index: false, follow: false },
+  };
+}
 
 function pickLocale(requested: string | undefined, cookie: string | undefined): Locale {
   if (isLocale(requested)) return requested;

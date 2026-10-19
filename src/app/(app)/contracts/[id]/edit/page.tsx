@@ -1,11 +1,29 @@
 // Dossier - Contracts Id Edit Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { ArrowLeft, Pencil } from "lucide-react";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const detail = getContractDetail(id);
+    const c = detail.contract;
+    const title = c.number || c.titleAr || c.titleEn || id;
+    const t = await getTranslations("common");
+    return { title: `${t("edit")} · ${title}` };
+  } catch {
+    return { title: "Dossier" };
+  }
+}
 import { Button } from "@/components/ui/Button";
 import { db } from "@/db";
 import { clients, projects, templates } from "@/db/schema";

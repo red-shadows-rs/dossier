@@ -1,7 +1,15 @@
 // Dossier - Settings Numbering Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("settings");
+  return {
+    title: t("numbering"),
+  };
+}
 import { FileText, Receipt } from "lucide-react";
 import {
   SettingsForm,

@@ -1,6 +1,7 @@
 // Dossier - Login Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -11,6 +12,13 @@ import { Logo } from "@/components/layout/Logo";
 import { ThemeSwitch } from "@/components/layout/ThemeSwitch";
 import { resolveTheme, THEME_COOKIE } from "@/lib/i18n";
 import { getCurrentUser } from "@/server/auth/require-user";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("auth");
+  return {
+    title: t("loginTitle"),
+  };
+}
 
 export default async function LoginPage() {
   const user = await getCurrentUser();

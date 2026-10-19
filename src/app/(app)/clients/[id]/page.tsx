@@ -1,6 +1,7 @@
 // Dossier - Clients Id Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { ClientDetailView } from "@/components/forms/ClientDetailView";
@@ -12,6 +13,22 @@ import { listContracts } from "@/server/services/contracts";
 import { listInvoices } from "@/server/services/invoices";
 import { listProjects } from "@/server/services/projects";
 import { smoothLoading } from "@/lib/smooth-loader";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const client = getClient(id);
+    return {
+      title: client.nameAr || client.nameEn || id,
+    };
+  } catch {
+    return { title: "Dossier" };
+  }
+}
 
 export default async function ClientDetailPage({
   params,

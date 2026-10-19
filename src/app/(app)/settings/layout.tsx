@@ -1,10 +1,18 @@
 // Dossier - Settings Layout
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { Settings } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("nav");
+  return {
+    title: t("settings"),
+  };
+}
 import { SettingsNav } from "@/components/layout/SettingsNav";
 import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";

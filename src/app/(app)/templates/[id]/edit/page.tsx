@@ -1,6 +1,7 @@
 // Dossier - Templates Id Edit Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Pencil } from "lucide-react";
@@ -14,6 +15,21 @@ import { templateDefaultsSchema } from "@/lib/validation/template";
 import { requireUserPage } from "@/server/auth/require-user";
 import { getTemplate } from "@/server/services/templates";
 import { smoothLoading } from "@/lib/smooth-loader";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const data = getTemplate(id);
+    const t = await getTranslations("common");
+    return { title: `${t("edit")} · ${data.template.nameAr || data.template.nameEn || id}` };
+  } catch {
+    return { title: "Dossier" };
+  }
+}
 
 export default async function EditTemplatePage({
   params,

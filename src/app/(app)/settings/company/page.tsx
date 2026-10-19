@@ -1,7 +1,15 @@
 // Dossier - Settings Company Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("settings");
+  return {
+    title: t("company"),
+  };
+}
 import { Palette } from "lucide-react";
 import { ImageUploadField } from "@/components/forms/ImageUploadField";
 import { BankAccountsManager } from "@/components/forms/BankAccountsManager";

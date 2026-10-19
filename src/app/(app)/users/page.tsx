@@ -1,9 +1,17 @@
 // Dossier - Users Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Plus, UserCog } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("nav");
+  return {
+    title: t("users"),
+  };
+}
 import { Button } from "@/components/ui/Button";
 import { UsersTable } from "@/components/tables/UsersTable";
 import { ROLES, type Locale } from "@/lib/constants";

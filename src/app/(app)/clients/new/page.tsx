@@ -1,8 +1,16 @@
 // Dossier - Clients New Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("clients");
+  return {
+    title: t("new"),
+  };
+}
 import { ArrowLeft, ChevronRight, UserPlus } from "lucide-react";
 import {
   ClientForm,

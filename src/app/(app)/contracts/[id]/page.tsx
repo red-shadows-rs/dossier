@@ -1,6 +1,7 @@
 // Dossier - Contracts Id Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -18,6 +19,22 @@ import {
   listContractVersions,
 } from "@/server/services/contracts";
 import { listContractSignatories } from "@/server/services/contracts-lifecycle";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const detail = getContractDetail(id);
+    const c = detail.contract;
+    const title = c.number || c.titleAr || c.titleEn || id;
+    return { title };
+  } catch {
+    return { title: "Dossier" };
+  }
+}
 
 export default async function ContractDetailPage({
   params,

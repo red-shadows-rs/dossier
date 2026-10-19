@@ -20,7 +20,10 @@ const cairo = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Dossier",
+  title: {
+    template: "%s | Dossier",
+    default: "Dossier",
+  },
   description: "Contracts & invoices platform",
   manifest: "/site.webmanifest",
   icons: {

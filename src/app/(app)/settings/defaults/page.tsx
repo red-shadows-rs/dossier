@@ -1,7 +1,15 @@
 // Dossier - Settings Defaults Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("settings");
+  return {
+    title: t("defaults"),
+  };
+}
 import {
   SettingsForm,
   type SettingsFieldDef,

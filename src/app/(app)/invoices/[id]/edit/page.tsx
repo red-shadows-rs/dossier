@@ -1,6 +1,7 @@
 // Dossier - Invoices Id Edit Page
 // https://github.com/red-shadows-rs/dossier
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -14,6 +15,21 @@ import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
 import { getInvoiceDetail } from "@/server/services/invoices";
 import { smoothLoading } from "@/lib/smooth-loader";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const detail = getInvoiceDetail(id);
+    const t = await getTranslations("common");
+    return { title: `${t("edit")} · ${detail.invoice.number || id}` };
+  } catch {
+    return { title: "Dossier" };
+  }
+}
 
 export default async function EditInvoicePage({
   params,
