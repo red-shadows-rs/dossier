@@ -88,8 +88,6 @@ export function TemplateDetailView({
     locale === "ar"
       ? (template.nameAr || template.nameEn)
       : (template.nameEn || template.nameAr);
-  const secondaryTitle =
-    locale === "ar" ? template.nameEn : template.nameAr;
 
   const milestones = defaults.milestonePreset?.rows as Array<{
     titleAr: string;
@@ -163,14 +161,6 @@ export function TemplateDetailView({
                   {t(`languageModes.${template.defaultLanguageMode}`)}
                 </Badge>
               </div>
-              {secondaryTitle ? (
-                <p
-                  className="text-xs font-medium text-muted-foreground font-sans"
-                  dir={locale === "ar" ? "ltr" : "rtl"}
-                >
-                  {secondaryTitle}
-                </p>
-              ) : null}
             </div>
           </div>
 

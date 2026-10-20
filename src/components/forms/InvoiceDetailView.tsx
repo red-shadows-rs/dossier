@@ -627,8 +627,8 @@ export function InvoiceDetailView({
                 target="_blank"
                 rel="noreferrer"
               >
-                <Button size="sm" variant="secondary" className="gap-1.5 text-xs">
-                  <Receipt className="h-3.5 w-3.5" />
+                <Button variant="secondary" className="gap-1.5 font-medium shadow-xs">
+                  <Receipt size={15} />
                   <span>{t("viewReceiptPdf")}</span>
                 </Button>
               </a>

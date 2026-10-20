@@ -430,8 +430,8 @@ export function ClientDetailView({
             </CardTitle>
             {canWrite && (
               <Link href={`/projects/new?clientId=${client.id}`}>
-                <Button size="sm" variant="secondary" className="gap-1 text-xs">
-                  <Plus size={14} />
+                <Button variant="secondary" className="gap-1.5 font-medium shadow-xs">
+                  <Plus size={15} />
                   <span>{t("projects.new")}</span>
                 </Button>
               </Link>
@@ -498,8 +498,8 @@ export function ClientDetailView({
             </CardTitle>
             {canWrite && (
               <Link href={`/contracts/new?clientId=${client.id}`}>
-                <Button size="sm" variant="secondary" className="gap-1 text-xs">
-                  <Plus size={14} />
+                <Button variant="secondary" className="gap-1.5 font-medium shadow-xs">
+                  <Plus size={15} />
                   <span>{t("contracts.new")}</span>
                 </Button>
               </Link>
@@ -569,8 +569,8 @@ export function ClientDetailView({
             </CardTitle>
             {canWrite && (
               <Link href={`/invoices/new?clientId=${client.id}`}>
-                <Button size="sm" variant="secondary" className="gap-1 text-xs">
-                  <Plus size={14} />
+                <Button variant="secondary" className="gap-1.5 font-medium shadow-xs">
+                  <Plus size={15} />
                   <span>{t("invoices.new")}</span>
                 </Button>
               </Link>

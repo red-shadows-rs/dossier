@@ -639,8 +639,8 @@ export function ProjectDetailView({
               <Link
                 href={`/contracts/new?projectId=${project.id}&clientId=${client.id}`}
               >
-                <Button size="sm" variant="secondary" className="gap-1 text-xs">
-                  <Plus size={14} />
+                <Button variant="secondary" className="gap-1.5 font-medium shadow-xs">
+                  <Plus size={15} />
                   <span>{tcontracts("new")}</span>
                 </Button>
               </Link>
@@ -765,8 +765,8 @@ export function ProjectDetailView({
               <Link
                 href={`/invoices/new?projectId=${project.id}&clientId=${client.id}`}
               >
-                <Button size="sm" variant="secondary" className="gap-1 text-xs">
-                  <Plus size={14} />
+                <Button variant="secondary" className="gap-1.5 font-medium shadow-xs">
+                  <Plus size={15} />
                   <span>{tinvoices("new")}</span>
                 </Button>
               </Link>

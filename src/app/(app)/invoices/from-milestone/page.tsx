@@ -80,13 +80,13 @@ export default async function NewMilestoneInvoicePage() {
 
       <div className="flex flex-wrap items-center gap-2 border-b border-border/60 pb-3">
         <Link href="/invoices/new">
-          <Button type="button" variant="secondary" size="sm" className="gap-1.5">
+          <Button type="button" variant="secondary" className="gap-1.5 shadow-xs">
             <Receipt size={16} aria-hidden="true" />
             <span>{t("directInvoice")}</span>
           </Button>
         </Link>
         <Link href="/invoices/from-milestone">
-          <Button type="button" variant="primary" size="sm" className="gap-1.5">
+          <Button type="button" variant="primary" className="gap-1.5 shadow-xs">
             <Layers size={16} aria-hidden="true" />
             <span>{t("fromMilestone")}</span>
             {milestones.length > 0 ? (

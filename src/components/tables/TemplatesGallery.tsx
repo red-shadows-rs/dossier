@@ -259,8 +259,6 @@ export function TemplatesGallery({
               locale === "ar"
                 ? (row.nameAr || row.nameEn)
                 : (row.nameEn || row.nameAr);
-            const secondaryTitle =
-              locale === "ar" ? row.nameEn : row.nameAr;
             const description =
               locale === "ar"
                 ? (row.descriptionAr || row.descriptionEn)
@@ -302,14 +300,6 @@ export function TemplatesGallery({
                     >
                       {primaryTitle}
                     </Link>
-                    {secondaryTitle ? (
-                      <p
-                        className="text-xs font-medium text-muted-foreground line-clamp-1 font-sans"
-                        dir={locale === "ar" ? "ltr" : "rtl"}
-                      >
-                        {secondaryTitle}
-                      </p>
-                    ) : null}
                   </div>
 
                   {description ? (
@@ -375,10 +365,9 @@ export function TemplatesGallery({
                     >
                       <Button
                         type="button"
-                        size="sm"
-                        className="w-full gap-1.5 text-xs font-medium shadow-xs"
+                        className="w-full gap-2 text-sm font-semibold shadow-xs"
                       >
-                        <FilePlus2 size={14} aria-hidden="true" />
+                        <FilePlus2 size={16} aria-hidden="true" />
                         <span>{labels.useTemplate ?? (locale === "ar" ? "استخدام القالب" : "Use template")}</span>
                       </Button>
                     </Link>
@@ -388,10 +377,9 @@ export function TemplatesGallery({
                     <Button
                       type="button"
                       variant="secondary"
-                      size="sm"
-                      className="w-full gap-1.5 text-xs font-medium border-border/80"
+                      className="w-full gap-2 text-sm font-semibold border-border/80"
                     >
-                      <Eye size={14} aria-hidden="true" />
+                      <Eye size={16} aria-hidden="true" />
                       <span>{labels.viewDetails ?? (locale === "ar" ? "المعاينة" : "Preview")}</span>
                     </Button>
                   </Link>
