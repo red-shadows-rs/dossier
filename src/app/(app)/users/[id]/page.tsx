@@ -26,12 +26,14 @@ import { UserStatusButton } from "@/components/forms/UserStatusButton";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { withDbInstance } from "@/db";
 import type { Locale } from "@/lib/constants";
 import { formatInstant } from "@/lib/dates";
 import { AppError } from "@/lib/errors";
 import { isLocale } from "@/lib/i18n";
 import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import { getSettings } from "@/server/services/settings";
 import { getUser } from "@/server/services/users";
 import { smoothLoading } from "@/lib/smooth-loader";
@@ -64,6 +66,7 @@ export default async function UserDetailPage({
   await smoothLoading();
   const actor = await requireUserPage();
   assertCan(actor, "users.manage");
+  const isDemo = isDemoUser(actor.email);
   const t = await getTranslations("users");
   const tc = await getTranslations("common");
   const rawLocale = await getLocale();
@@ -71,15 +74,16 @@ export default async function UserDetailPage({
   const timezone = getSettings("defaults").timezone;
   const { id } = await params;
 
-  let target;
-  try {
-    target = getUser(id);
-  } catch (error) {
-    if (error instanceof AppError && error.code === "NOT_FOUND") notFound();
-    throw error;
-  }
+  return withDbInstance(isDemo, async () => {
+    let target;
+    try {
+      target = getUser(id);
+    } catch (error) {
+      if (error instanceof AppError && error.code === "NOT_FOUND") notFound();
+      throw error;
+    }
 
-  return (
+    return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
         <nav
@@ -202,5 +206,6 @@ export default async function UserDetailPage({
         </CardContent>
       </Card>
     </div>
-  );
+    );
+  });
 }

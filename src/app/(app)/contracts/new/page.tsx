@@ -2,6 +2,7 @@
 // https://github.com/red-shadows-rs/dossier
 
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -10,10 +11,13 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t("new"),
   };
 }
-import { FilePlus2 } from "lucide-react";
+import { ArrowLeft, FilePlus2 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 import { NewContractForm } from "@/components/forms/NewContractForm";
+import { withDbInstance } from "@/db";
 import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import { listProjectOptions } from "@/server/services/projects";
 import { listTemplates } from "@/server/services/templates";
 import { smoothLoading } from "@/lib/smooth-loader";
@@ -26,10 +30,14 @@ export default async function NewContractPage({
   await smoothLoading();
   const user = await requireUserPage();
   assertCan(user, "contracts.write");
-  const t = await getTranslations("contracts");
-  const rawLocale = await getLocale();
-  const locale = rawLocale === "en" ? "en" : "ar";
-  const params = await searchParams;
+  const isDemo = isDemoUser(user.email);
+
+  return withDbInstance(isDemo, async () => {
+    const t = await getTranslations("contracts");
+    const tc = await getTranslations("common");
+    const rawLocale = await getLocale();
+    const locale = rawLocale === "en" ? "en" : "ar";
+    const params = await searchParams;
 
   const projects = listProjectOptions().map((project) => ({
     id: project.id,
@@ -41,15 +49,45 @@ export default async function NewContractPage({
   }));
 
   return (
-    <div className="flex flex-col gap-5 sm:gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
-        <div className="flex items-center gap-3.5">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
-            <FilePlus2 size={20} aria-hidden="true" />
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <nav
+          aria-label="Breadcrumb"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground"
+        >
+          <Link
+            href="/contracts"
+            className="hover:text-foreground transition-colors"
+          >
+            {t("title")}
+          </Link>
+          <span className="text-border">/</span>
+          <span className="text-foreground font-medium">{t("new")}</span>
+        </nav>
+
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+              <FilePlus2 size={20} aria-hidden="true" />
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                {t("new")}
+              </h1>
+            </div>
           </div>
-          <div className="flex flex-col gap-0.5">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">{t("new")}</h1>
-          </div>
+
+          <Link href="/contracts">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="gap-1.5 font-medium shadow-xs"
+            >
+              <ArrowLeft size={15} className="rtl:rotate-180" aria-hidden="true" />
+              <span>{tc("back")}</span>
+            </Button>
+          </Link>
         </div>
       </div>
       <NewContractForm
@@ -59,5 +97,6 @@ export default async function NewContractPage({
         defaultProjectId={params?.projectId}
       />
     </div>
-  );
+    );
+  });
 }

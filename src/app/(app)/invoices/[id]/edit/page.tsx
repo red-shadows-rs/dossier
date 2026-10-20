@@ -9,10 +9,12 @@ import { ArrowLeft, Pencil } from "lucide-react";
 import { InvoiceLinesEditor } from "@/components/forms/InvoiceLinesEditor";
 import { InvoiceMetaForm } from "@/components/forms/InvoiceMetaForm";
 import { Button } from "@/components/ui/Button";
+import { withDbInstance } from "@/db";
 import type { CurrencyCode } from "@/lib/constants";
 import { AppError } from "@/lib/errors";
 import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import { getInvoiceDetail } from "@/server/services/invoices";
 import { smoothLoading } from "@/lib/smooth-loader";
 
@@ -39,24 +41,26 @@ export default async function EditInvoicePage({
   await smoothLoading();
   const user = await requireUserPage();
   assertCan(user, "invoices.write");
+  const isDemo = isDemoUser(user.email);
   const t = await getTranslations("invoices");
   const { id } = await params;
 
-  let detail;
-  try {
-    detail = getInvoiceDetail(id);
-  } catch (error) {
-    if (error instanceof AppError && error.code === "NOT_FOUND") notFound();
-    throw error;
-  }
+  return withDbInstance(isDemo, async () => {
+    let detail;
+    try {
+      detail = getInvoiceDetail(id);
+    } catch (error) {
+      if (error instanceof AppError && error.code === "NOT_FOUND") notFound();
+      throw error;
+    }
 
-  if (detail.invoice.status !== "draft") {
-    redirect(`/invoices/${id}`);
-  }
+    if (detail.invoice.status !== "draft") {
+      redirect(`/invoices/${id}`);
+    }
 
-  const isMilestone = detail.invoice.milestoneId !== null;
+    const isMilestone = detail.invoice.milestoneId !== null;
 
-  return (
+    return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
         <nav
@@ -82,8 +86,8 @@ export default async function EditInvoicePage({
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
           <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary shadow-xs">
-              <Pencil size={22} aria-hidden="true" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+              <Pencil size={20} aria-hidden="true" />
             </div>
             <div className="flex flex-col gap-0.5">
               <div className="flex items-center gap-2.5">
@@ -148,5 +152,6 @@ export default async function EditInvoicePage({
         />
       )}
     </div>
-  );
+    );
+  });
 }

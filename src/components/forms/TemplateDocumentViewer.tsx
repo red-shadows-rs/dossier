@@ -83,25 +83,29 @@ export function TemplateDocumentViewer({
   return (
     <div className="flex flex-col gap-3.5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <span className="text-xs font-medium text-muted-foreground me-1">
             {tTemplates("previewLanguage")}:
           </span>
-          <div className="flex gap-1">
+          <div
+            role="tablist"
+            className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-muted/40 p-1"
+          >
             {langs.map((value) => (
               <button
                 key={value}
                 type="button"
-                aria-current={value === lang ? "true" : undefined}
+                role="tab"
+                aria-selected={value === lang}
                 onClick={() => setLang(value)}
                 className={cn(
-                  "rounded-md border px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer",
+                  "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer",
                   value === lang
-                    ? "border-primary bg-primary text-primary-foreground shadow-xs"
-                    : "border-border text-muted-foreground hover:text-foreground hover:bg-muted/40",
+                    ? "bg-primary text-primary-foreground shadow-xs"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
                 )}
               >
-                {t(`languageModes.${value}`)}
+                <span>{t(`languageModes.${value}`)}</span>
               </button>
             ))}
           </div>
@@ -111,7 +115,7 @@ export function TemplateDocumentViewer({
           type="button"
           variant="secondary"
           size="sm"
-          className="gap-1.5 h-8 text-xs"
+          className="gap-1.5 font-medium shadow-xs"
           onClick={refresh}
           disabled={loading}
         >
@@ -131,7 +135,7 @@ export function TemplateDocumentViewer({
       {loading ? (
         <DocumentSkeleton />
       ) : html ? (
-        <div className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin] rounded-lg border border-border bg-white shadow-2xs">
+        <div className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin] rounded-lg border border-border bg-white shadow-2xs overflow-hidden">
           <iframe
             title={tTemplates("previewTitle")}
             sandbox="allow-same-origin"

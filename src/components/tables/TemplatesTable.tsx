@@ -104,7 +104,7 @@ export function TemplatesTable({
       className: "whitespace-nowrap",
       render: (row) =>
         row.isSystem ? (
-          <Badge tone="blue">{labels.system}</Badge>
+          <Badge tone="green">{labels.system}</Badge>
         ) : (
           <Badge tone="gray">{labels.custom}</Badge>
         ),

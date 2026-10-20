@@ -25,7 +25,7 @@ export async function generateMetadata({
   }
 }
 import { Button } from "@/components/ui/Button";
-import { db } from "@/db";
+import { db, withDbInstance } from "@/db";
 import { clients, projects, templates } from "@/db/schema";
 import {
   ContractBuilder,
@@ -37,6 +37,7 @@ import { isLocale } from "@/lib/i18n";
 import { assertCan } from "@/lib/permissions";
 import { templateDefaultsSchema } from "@/lib/validation/template";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import { getContractDetail } from "@/server/services/contracts";
 import { listCompanySigners } from "@/server/services/contracts-send";
 import { validateContractForSend } from "@/server/services/contracts-validate";
@@ -49,19 +50,24 @@ export default async function ContractEditPage({
 }) {
   const user = await requireUserPage();
   assertCan(user, "contracts.write");
+  const isDemo = isDemoUser(user.email);
   const { id } = await params;
 
-  let detail;
-  try {
-    detail = getContractDetail(id);
-  } catch (error) {
-    if (error instanceof AppError && error.code === "NOT_FOUND") notFound();
-    throw error;
-  }
+  return withDbInstance(isDemo, async () => {
+    const t = await getTranslations("contracts");
+    const tc = await getTranslations("common");
 
-  if (detail.contract.status !== "draft") {
-    redirect(`/contracts/${id}`);
-  }
+    let detail;
+    try {
+      detail = getContractDetail(id);
+    } catch (error) {
+      if (error instanceof AppError && error.code === "NOT_FOUND") notFound();
+      throw error;
+    }
+
+    if (detail.contract.status !== "draft") {
+      redirect(`/contracts/${id}`);
+    }
 
   const project = db
     .select()
@@ -198,33 +204,59 @@ export default async function ContractEditPage({
     requireProviderSignature: signing.requireProviderSignatureBeforeSend,
   };
 
+  const contractDisplayTitle =
+    detail.contract.number ?? (builderDetail.basics.titleAr || builderDetail.basics.titleEn);
+
   return (
-    <div className="flex flex-col gap-5 sm:gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
-        <div className="flex items-center gap-3.5">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
-            <Pencil size={20} aria-hidden="true" />
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <div className="flex items-center gap-2.5">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                {builderDetail.basics.titleAr || builderDetail.basics.titleEn}
-              </h1>
-              {detail.contract.number ? (
-                <span className="inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground translate-y-0.5" dir="ltr">
-                  {detail.contract.number}
-                </span>
-              ) : null}
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <nav
+          aria-label="Breadcrumb"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground"
+        >
+          <Link
+            href="/contracts"
+            className="hover:text-foreground transition-colors"
+          >
+            {t("title")}
+          </Link>
+          <span className="text-border">/</span>
+          <Link
+            href={`/contracts/${id}`}
+            className="hover:text-foreground transition-colors font-mono truncate max-w-[200px]"
+          >
+            {contractDisplayTitle}
+          </Link>
+          <span className="text-border">/</span>
+          <span className="text-foreground font-medium">{tc("edit")}</span>
+        </nav>
+
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+              <Pencil size={20} aria-hidden="true" />
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                  {builderDetail.basics.titleAr || builderDetail.basics.titleEn}
+                </h1>
+                {detail.contract.number ? (
+                  <span className="inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground translate-y-0.5" dir="ltr">
+                    {detail.contract.number}
+                  </span>
+                ) : null}
+              </div>
             </div>
           </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Link href={`/contracts/${id}`}>
-            <Button type="button" variant="secondary" className="gap-1.5 font-medium shadow-xs">
-              <ArrowLeft size={15} className="rtl:rotate-180" aria-hidden="true" />
-              <span>{locale === "ar" ? "العودة للعقد" : "Back to contract"}</span>
-            </Button>
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href={`/contracts/${id}`}>
+              <Button type="button" variant="secondary" size="sm" className="gap-1.5 font-medium shadow-xs">
+                <ArrowLeft size={15} className="rtl:rotate-180" aria-hidden="true" />
+                <span>{locale === "ar" ? "العودة للعقد" : "Back to contract"}</span>
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
       <ContractBuilder
@@ -233,5 +265,6 @@ export default async function ContractEditPage({
         sendContext={sendContext}
       />
     </div>
-  );
+    );
+  });
 }

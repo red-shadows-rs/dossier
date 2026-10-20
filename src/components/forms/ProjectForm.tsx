@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import {
   Calendar,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   FileText,
@@ -164,10 +165,10 @@ export function ProjectForm({
 
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6 pb-28">
-      <div className="rounded border border-border bg-card p-1 shadow-xs">
+      <div className="relative sm:sticky sm:top-14 z-20 rounded border border-border bg-card p-1 shadow-xs">
         <nav
           aria-label="Form Steps"
-          className="flex items-center gap-1.5 text-xs sm:text-sm font-medium overflow-x-auto touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          className="flex items-center gap-1 overflow-x-auto touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:gap-1.5"
         >
           {STEPS.map((s, idx) => {
             const Icon = s.icon;
@@ -176,32 +177,38 @@ export function ProjectForm({
             return (
               <button
                 key={s.id}
+                id={`project-step-btn-${s.id}`}
                 type="button"
-                onClick={() => setStep(s.id)}
+                aria-current={active ? "step" : undefined}
+                onClick={() => {
+                  setStep(s.id);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded px-2.5 py-1.5 sm:px-3 sm:py-2 transition-all text-start shrink-0 cursor-pointer",
+                  "inline-flex items-center gap-2 rounded px-2.5 py-1.5 text-xs font-medium transition-all shrink-0 cursor-pointer sm:px-3 sm:py-2 sm:text-sm",
                   active
                     ? "bg-primary text-primary-foreground shadow-xs font-semibold"
                     : completed
-                      ? "bg-primary/10 text-primary hover:bg-primary/15 font-medium"
-                      : "text-muted-foreground hover:bg-muted/60",
+                      ? "text-foreground hover:bg-muted/60 font-medium"
+                      : "text-muted-foreground hover:bg-muted/40 hover:text-foreground",
                 )}
               >
-                <span
+                <div
                   className={cn(
-                    "flex h-5 w-5 sm:h-6 sm:w-6 shrink-0 items-center justify-center rounded-full text-[10px] sm:text-xs font-mono font-bold",
+                    "flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold shrink-0",
                     active
                       ? "bg-primary-foreground/20 text-primary-foreground"
                       : completed
-                        ? "bg-primary text-primary-foreground"
+                        ? "bg-primary/10 text-primary"
                         : "bg-muted text-muted-foreground",
                   )}
                 >
-                  {idx + 1}
-                </span>
-                <span className={cn("items-center gap-1.5 truncate", active ? "inline-flex" : "hidden sm:inline-flex")}>
-                  <Icon className="h-4 w-4 shrink-0" />
-                  <span>{t(s.labelKey)}</span>
+                  {completed ? <CheckCircle2 className="h-3.5 w-3.5" /> : idx + 1}
+                </div>
+
+                <Icon className="h-4 w-4 shrink-0" />
+                <span className={cn(active ? "inline" : "hidden sm:inline")}>
+                  {t(s.labelKey)}
                 </span>
               </button>
             );

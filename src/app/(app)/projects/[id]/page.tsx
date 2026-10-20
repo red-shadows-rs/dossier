@@ -5,10 +5,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { ProjectDetailView } from "@/components/forms/ProjectDetailView";
+import { withDbInstance } from "@/db";
 import { AppError } from "@/lib/errors";
 import { isLocale } from "@/lib/i18n";
 import { can } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import { listProjectContracts } from "@/server/services/contracts";
 import {
   listInvoiceableMilestones,
@@ -46,39 +48,42 @@ export default async function ProjectDetailPage({
 }) {
   await smoothLoading();
   const user = await requireUserPage();
+  const isDemo = isDemoUser(user.email);
   const rawLocale = await getLocale();
   const locale = isLocale(rawLocale) ? rawLocale : "ar";
   const { id } = await params;
 
-  let data;
-  try {
-    data = getProjectWithClient(id);
-  } catch (error) {
-    if (error instanceof AppError && error.code === "NOT_FOUND") notFound();
-    throw error;
-  }
+  return withDbInstance(isDemo, async () => {
+    let data;
+    try {
+      data = getProjectWithClient(id);
+    } catch (error) {
+      if (error instanceof AppError && error.code === "NOT_FOUND") notFound();
+      throw error;
+    }
 
-  const { project, client } = data;
-  const canWrite = can(user, "projects.write");
-  const contracts = listProjectContracts(id);
-  const summary = getProjectSummary(id);
-  const milestones = listInvoiceableMilestones(id, locale);
-  const projectInvoices = listInvoices({ projectId: id, page: 1 }).rows;
-  const attachments = listProjectAttachments(id);
-  const activity = listProjectActivity(id);
+    const { project, client } = data;
+    const canWrite = can(user, "projects.write");
+    const contracts = listProjectContracts(id);
+    const summary = getProjectSummary(id);
+    const milestones = listInvoiceableMilestones(id, locale);
+    const projectInvoices = listInvoices({ projectId: id, page: 1 }).rows;
+    const attachments = listProjectAttachments(id);
+    const activity = listProjectActivity(id);
 
-  return (
-    <ProjectDetailView
-      project={project}
-      client={client}
-      contracts={contracts}
-      invoices={projectInvoices}
-      milestones={milestones}
-      summary={summary}
-      attachments={attachments}
-      activity={activity}
-      canWrite={canWrite}
-      locale={locale}
-    />
-  );
+    return (
+      <ProjectDetailView
+        project={project}
+        client={client}
+        contracts={contracts}
+        invoices={projectInvoices}
+        milestones={milestones}
+        summary={summary}
+        attachments={attachments}
+        activity={activity}
+        canWrite={canWrite}
+        locale={locale}
+      />
+    );
+  });
 }

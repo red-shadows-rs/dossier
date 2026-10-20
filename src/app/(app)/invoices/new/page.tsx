@@ -14,8 +14,10 @@ export async function generateMetadata(): Promise<Metadata> {
 import { ArrowLeft, Layers, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { NewInvoiceForm } from "@/components/forms/NewInvoiceForm";
+import { withDbInstance } from "@/db";
 import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import { listInvoiceableMilestones } from "@/server/services/invoices";
 import { listProjectOptions } from "@/server/services/projects";
 import { getSettings } from "@/server/services/settings";
@@ -25,11 +27,14 @@ export default async function NewInvoicePage() {
   await smoothLoading();
   const user = await requireUserPage();
   assertCan(user, "invoices.write");
-  const t = await getTranslations("invoices");
-  const tc = await getTranslations("common");
-  const defaults = getSettings("defaults");
-  const rawLocale = await getLocale();
-  const locale = rawLocale === "en" ? "en" : "ar";
+  const isDemo = isDemoUser(user.email);
+
+  return withDbInstance(isDemo, async () => {
+    const t = await getTranslations("invoices");
+    const tc = await getTranslations("common");
+    const defaults = getSettings("defaults");
+    const rawLocale = await getLocale();
+    const locale = rawLocale === "en" ? "en" : "ar";
 
   const projects = listProjectOptions().map((project) => ({
     id: project.id,
@@ -56,8 +61,8 @@ export default async function NewInvoicePage() {
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
           <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary shadow-xs">
-              <Receipt size={22} aria-hidden="true" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+              <Receipt size={20} aria-hidden="true" />
             </div>
             <div className="flex flex-col gap-0.5">
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
@@ -108,5 +113,6 @@ export default async function NewInvoicePage() {
         defaultLanguageMode={defaults.languageMode ?? "ar"}
       />
     </div>
-  );
+    );
+  });
 }

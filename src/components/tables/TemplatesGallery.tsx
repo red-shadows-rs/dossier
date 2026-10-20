@@ -28,8 +28,10 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
 import { Input, InputAdornment } from "@/components/ui/Input";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { cn } from "@/components/ui/cn";
 import { TemplatesTable, type TemplateTableLabels } from "@/components/tables/TemplatesTable";
 import type { ActionResult } from "@/lib/result";
 
@@ -108,103 +110,119 @@ export function TemplatesGallery({
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="rounded border border-border bg-card p-3 sm:p-4 shadow-xs">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <div className="flex flex-1 items-center gap-2">
-            <div className="relative flex-1 min-w-[200px]">
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={labels.searchPlaceholder ?? (locale === "ar" ? "ابحث في القوالب بالاسم أو التخصص..." : "Search templates by name or description...")}
-                startAdornment={
-                  <InputAdornment position="start">
-                    <Search size={16} className="text-muted-foreground" aria-hidden="true" />
-                  </InputAdornment>
-                }
-              />
-            </div>
-            {query ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setQuery("")}
-                className="shrink-0 h-10 px-2.5 text-muted-foreground hover:text-foreground"
-              >
-                <RotateCcw size={14} className="me-1" />
-                <span>{locale === "ar" ? "مسح" : "Clear"}</span>
-              </Button>
-            ) : null}
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-            <div className="flex items-center rounded border border-border/70 bg-muted/30 p-0.5 text-xs font-medium">
-              <button
-                type="button"
-                onClick={() => setSelectedFilter("all")}
-                className={`rounded px-2.5 py-1.5 transition-colors ${
-                  selectedFilter === "all"
-                    ? "bg-background text-foreground shadow-xs font-semibold"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {locale === "ar" ? "الكل" : "All"} ({rows.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedFilter("contract")}
-                className={`rounded px-2.5 py-1.5 transition-colors ${
-                  selectedFilter === "contract"
-                    ? "bg-background text-foreground shadow-xs font-semibold"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {labels.typeValues["contract"] ?? (locale === "ar" ? "العقود" : "Contracts")}
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedFilter("nda")}
-                className={`rounded px-2.5 py-1.5 transition-colors ${
-                  selectedFilter === "nda"
-                    ? "bg-background text-foreground shadow-xs font-semibold"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {labels.typeValues["nda"] ?? (locale === "ar" ? "اتفاقيات سرية" : "NDAs")}
-              </button>
+      <Card className="overflow-visible">
+        <CardContent className="p-3 sm:p-4 overflow-visible">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="flex flex-1 items-center gap-2">
+              <div className="relative flex-1 min-w-[200px]">
+                <Input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={labels.searchPlaceholder ?? (locale === "ar" ? "ابحث في القوالب بالاسم أو التخصص..." : "Search templates by name or description...")}
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <Search size={16} className="text-muted-foreground" aria-hidden="true" />
+                    </InputAdornment>
+                  }
+                />
+              </div>
+              {query ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setQuery("")}
+                  className="shrink-0 h-10 px-2.5 text-muted-foreground hover:text-foreground"
+                >
+                  <RotateCcw size={14} className="me-1" />
+                  <span>{locale === "ar" ? "مسح" : "Clear"}</span>
+                </Button>
+              ) : null}
             </div>
 
-            <div className="flex items-center rounded border border-border/70 bg-muted/30 p-0.5">
-              <button
-                type="button"
-                onClick={() => setViewMode("cards")}
-                aria-label={labels.viewCards ?? "Cards"}
-                title={labels.viewCards ?? "Cards"}
-                className={`rounded p-1.5 transition-colors ${
-                  viewMode === "cards"
-                    ? "bg-background text-foreground shadow-xs"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
+            <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+              <div
+                role="tablist"
+                className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-muted/40 p-1 text-xs"
               >
-                <LayoutGrid size={16} />
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode("table")}
-                aria-label={labels.viewTable ?? "Table"}
-                title={labels.viewTable ?? "Table"}
-                className={`rounded p-1.5 transition-colors ${
-                  viewMode === "table"
-                    ? "bg-background text-foreground shadow-xs"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <List size={16} />
-              </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={selectedFilter === "all"}
+                  onClick={() => setSelectedFilter("all")}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 font-semibold transition-all cursor-pointer",
+                    selectedFilter === "all"
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+                  )}
+                >
+                  {locale === "ar" ? "الكل" : "All"} ({rows.length})
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={selectedFilter === "contract"}
+                  onClick={() => setSelectedFilter("contract")}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 font-semibold transition-all cursor-pointer",
+                    selectedFilter === "contract"
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+                  )}
+                >
+                  {labels.typeValues["contract"] ?? (locale === "ar" ? "العقود" : "Contracts")}
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={selectedFilter === "nda"}
+                  onClick={() => setSelectedFilter("nda")}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 font-semibold transition-all cursor-pointer",
+                    selectedFilter === "nda"
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+                  )}
+                >
+                  {labels.typeValues["nda"] ?? (locale === "ar" ? "اتفاقيات سرية" : "NDAs")}
+                </button>
+              </div>
+
+              <div className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-muted/40 p-1">
+                <button
+                  type="button"
+                  onClick={() => setViewMode("cards")}
+                  aria-label={labels.viewCards ?? "Cards"}
+                  title={labels.viewCards ?? "Cards"}
+                  className={cn(
+                    "rounded-md p-1.5 transition-all cursor-pointer",
+                    viewMode === "cards"
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+                  )}
+                >
+                  <LayoutGrid size={16} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode("table")}
+                  aria-label={labels.viewTable ?? "Table"}
+                  title={labels.viewTable ?? "Table"}
+                  className={cn(
+                    "rounded-md p-1.5 transition-all cursor-pointer",
+                    viewMode === "table"
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+                  )}
+                >
+                  <List size={16} />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {filtered.length === 0 ? (
         <EmptyState
@@ -329,16 +347,16 @@ export function TemplatesGallery({
                   </div>
 
                   {milestones && milestones.length > 0 ? (
-                    <div className="flex flex-col gap-1 rounded border border-border bg-muted/20 p-2.5 text-xs">
+                    <div className="flex flex-col gap-1.5 rounded border border-border/60 bg-muted/20 p-2.5 text-xs">
                       <div className="flex items-center justify-between text-muted-foreground font-medium">
                         <span>{locale === "ar" ? "دفعات الإنجاز المقترحة" : "Suggested milestones"}</span>
                         <span className="font-mono text-[11px]">{milestones.length} {locale === "ar" ? "دفعات" : "steps"}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 pt-1">
+                      <div className="flex items-center gap-1.5 pt-0.5">
                         {milestones.map((m, idx) => (
                           <div
                             key={idx}
-                            className="flex-1 rounded bg-muted/40 border border-border py-1 text-center font-mono text-[11px] text-foreground font-semibold"
+                            className="flex-1 rounded bg-card border border-border/60 py-1 text-center font-mono text-[11px] text-foreground font-semibold shadow-2xs"
                             title={`${locale === "ar" ? m.titleAr : m.titleEn} (${(m.percentBp ?? 0) / 100}%)`}
                           >
                             {(m.percentBp ?? 0) / 100}%

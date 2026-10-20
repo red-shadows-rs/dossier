@@ -3,15 +3,19 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { ArrowLeft, ChevronRight, Pencil } from "lucide-react";
+import { ArrowLeft, Pencil } from "lucide-react";
 import {
   ClientForm,
   type ClientFormValues,
 } from "@/components/forms/ClientForm";
 import { Button } from "@/components/ui/Button";
+import { withDbInstance } from "@/db";
+import { AppError } from "@/lib/errors";
 import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import { getClient } from "@/server/services/clients";
 import { smoothLoading } from "@/lib/smooth-loader";
 
@@ -40,11 +44,19 @@ export default async function EditClientPage({
   await smoothLoading();
   const user = await requireUserPage();
   assertCan(user, "clients.write");
+  const isDemo = isDemoUser(user.email);
   const t = await getTranslations("clients");
   const tc = await getTranslations("common");
-  const tNav = await getTranslations("nav");
   const { id } = await params;
-  const client = getClient(id);
+
+  return withDbInstance(isDemo, async () => {
+    let client;
+    try {
+      client = getClient(id);
+    } catch (error) {
+      if (error instanceof AppError && error.code === "NOT_FOUND") notFound();
+      throw error;
+    }
 
   const initial: ClientFormValues = {
     type: client.type,
@@ -71,48 +83,57 @@ export default async function EditClientPage({
   const clientName = client.nameAr || client.nameEn;
 
   return (
-    <div className="flex flex-col gap-5 sm:gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
-        <div className="flex items-center gap-3.5">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary shadow-xs">
-            <Pencil size={22} aria-hidden="true" />
-          </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Link href="/" className="hover:text-foreground transition-colors">
-                {tNav("dashboard")}
-              </Link>
-              <ChevronRight size={12} className="rtl:rotate-180" />
-              <Link href="/clients" className="hover:text-foreground transition-colors">
-                {t("title")}
-              </Link>
-              <ChevronRight size={12} className="rtl:rotate-180" />
-              <Link href={`/clients/${id}`} className="hover:text-foreground transition-colors">
-                {clientName}
-              </Link>
-              <ChevronRight size={12} className="rtl:rotate-180" />
-              <span className="text-foreground font-medium">{t("edit")}</span>
-            </div>
-            <div className="flex items-center gap-2.5">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                {t("edit")}
-              </h1>
-              <span className="inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                {clientName}
-              </span>
-            </div>
-          </div>
-        </div>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <nav
+          aria-label="Breadcrumb"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground"
+        >
+          <Link
+            href="/clients"
+            className="hover:text-foreground transition-colors"
+          >
+            {t("title")}
+          </Link>
+          <span className="text-border">/</span>
+          <Link
+            href={`/clients/${id}`}
+            className="hover:text-foreground transition-colors truncate max-w-[200px]"
+          >
+            {clientName}
+          </Link>
+          <span className="text-border">/</span>
+          <span className="text-foreground font-medium">{t("edit")}</span>
+        </nav>
 
-        <Link href={`/clients/${id}`}>
-          <Button type="button" variant="secondary" size="sm" className="gap-1.5 font-medium shadow-xs">
-            <ArrowLeft size={15} className="rtl:rotate-180" aria-hidden="true" />
-            <span>{tc("back")}</span>
-          </Button>
-        </Link>
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+              <Pencil size={20} aria-hidden="true" />
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                  {t("edit")}
+                </h1>
+                <span className="inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                  {clientName}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <Link href={`/clients/${id}`}>
+            <Button type="button" variant="secondary" size="sm" className="gap-1.5 font-medium shadow-xs">
+              <ArrowLeft size={15} className="rtl:rotate-180" aria-hidden="true" />
+              <span>{tc("back")}</span>
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <ClientForm mode="edit" clientId={id} initial={initial} />
     </div>
-  );
+    );
+  });
 }

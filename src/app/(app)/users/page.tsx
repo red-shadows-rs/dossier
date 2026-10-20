@@ -14,10 +14,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 import { Button } from "@/components/ui/Button";
 import { UsersTable } from "@/components/tables/UsersTable";
+import { withDbInstance } from "@/db";
 import { ROLES, type Locale } from "@/lib/constants";
 import { isLocale } from "@/lib/i18n";
 import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import { getSettings } from "@/server/services/settings";
 import { listUsers } from "@/server/services/users";
 import { smoothLoading } from "@/lib/smooth-loader";
@@ -26,12 +28,15 @@ export default async function UsersPage() {
   await smoothLoading();
   const user = await requireUserPage();
   assertCan(user, "users.manage");
-  const t = await getTranslations("users");
-  const tc = await getTranslations("common");
-  const rawLocale = await getLocale();
-  const locale: Locale = isLocale(rawLocale) ? rawLocale : user.locale;
-  const timezone = getSettings("defaults").timezone;
-  const rows = listUsers();
+  const isDemo = isDemoUser(user.email);
+
+  return withDbInstance(isDemo, async () => {
+    const t = await getTranslations("users");
+    const tc = await getTranslations("common");
+    const rawLocale = await getLocale();
+    const locale: Locale = isLocale(rawLocale) ? rawLocale : user.locale;
+    const timezone = getSettings("defaults").timezone;
+    const rows = listUsers();
 
   const labels = {
     name: t("name"),
@@ -86,5 +91,6 @@ export default async function UsersPage() {
         />
       </div>
     </div>
-  );
+    );
+  });
 }

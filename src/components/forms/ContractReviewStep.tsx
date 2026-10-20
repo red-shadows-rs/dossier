@@ -227,21 +227,25 @@ export function ContractReviewStep({
 
           <div className="flex items-center gap-2">
             {langs.length > 1 ? (
-              <div className="flex rounded border border-border/80 bg-muted/40 p-0.5">
+              <div
+                role="tablist"
+                className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-muted/40 p-1"
+              >
                 {langs.map((value) => (
                   <button
                     key={value}
                     type="button"
-                    aria-current={value === lang ? "true" : undefined}
+                    role="tab"
+                    aria-selected={value === lang}
                     onClick={() => setLang(value)}
                     className={cn(
-                      "rounded px-3 py-1 text-xs font-semibold transition-all select-none",
+                      "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer",
                       value === lang
-                        ? "bg-primary text-primary-foreground shadow-2xs"
-                        : "text-muted-foreground hover:text-foreground",
+                        ? "bg-primary text-primary-foreground shadow-xs"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
                     )}
                   >
-                    {t(`languageModes.${value}`)}
+                    <span>{t(`languageModes.${value}`)}</span>
                   </button>
                 ))}
               </div>
@@ -267,7 +271,7 @@ export function ContractReviewStep({
             {loading ? (
               <DocumentSkeleton className="min-h-[30rem] rounded" />
             ) : html ? (
-              <div className="overflow-hidden rounded border border-border/80 bg-white shadow-2xs dark:bg-card">
+              <div className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin] rounded-lg border border-border bg-white shadow-2xs overflow-hidden">
                 <iframe
                   title={t("review.previewTitle")}
                   sandbox="allow-same-origin"

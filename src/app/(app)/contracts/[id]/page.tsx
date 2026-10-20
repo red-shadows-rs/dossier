@@ -4,7 +4,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
-import { db } from "@/db";
+import { db, withDbInstance } from "@/db";
 import { clients, projects } from "@/db/schema";
 import { getLocale } from "next-intl/server";
 import { ContractDetailView } from "@/components/forms/ContractDetailView";
@@ -13,6 +13,7 @@ import { AppError } from "@/lib/errors";
 import { isLocale } from "@/lib/i18n";
 import { can } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import { listAuditEntries } from "@/server/services/audit";
 import {
   getContractDetail,
@@ -43,53 +44,56 @@ export default async function ContractDetailPage({
 }) {
   await smoothLoading();
   const user = await requireUserPage();
+  const isDemo = isDemoUser(user.email);
   const { id } = await params;
 
-  let detail;
-  try {
-    detail = getContractDetail(id);
-  } catch (error) {
-    if (error instanceof AppError && error.code === "NOT_FOUND") notFound();
-    throw error;
-  }
+  return withDbInstance(isDemo, async () => {
+    let detail;
+    try {
+      detail = getContractDetail(id);
+    } catch (error) {
+      if (error instanceof AppError && error.code === "NOT_FOUND") notFound();
+      throw error;
+    }
 
-  const { contract, items, milestones, clauses } = detail;
-  const project = db
-    .select()
-    .from(projects)
-    .where(eq(projects.id, contract.projectId))
-    .get();
-  const client = project
-    ? db.select().from(clients).where(eq(clients.id, project.clientId)).get()
-    : undefined;
-  const rawLocale = await getLocale();
-  const locale = isLocale(rawLocale) ? rawLocale : "ar";
+    const { contract, items, milestones, clauses } = detail;
+    const project = db
+      .select()
+      .from(projects)
+      .where(eq(projects.id, contract.projectId))
+      .get();
+    const client = project
+      ? db.select().from(clients).where(eq(clients.id, project.clientId)).get()
+      : undefined;
+    const rawLocale = await getLocale();
+    const locale = isLocale(rawLocale) ? rawLocale : "ar";
 
-  const versions = listContractVersions(id);
-  const signatories = listContractSignatories(id);
-  const history = listAuditEntries({
-    entityType: "contract",
-    entityId: id,
-    page: 1,
+    const versions = listContractVersions(id);
+    const signatories = listContractSignatories(id);
+    const history = listAuditEntries({
+      entityType: "contract",
+      entityId: id,
+      page: 1,
+    });
+
+    return (
+      <ContractDetailView
+        contract={contract}
+        items={items}
+        milestones={milestones}
+        clauses={clauses}
+        project={project}
+        client={client}
+        versions={versions}
+        signatories={signatories}
+        history={history}
+        canWrite={can(user, "contracts.write")}
+        canSend={can(user, "contracts.send")}
+        canCancel={can(user, "contracts.cancel")}
+        canTerminate={can(user, "contracts.terminate")}
+        canRead={can(user, "contracts.read")}
+        locale={locale}
+      />
+    );
   });
-
-  return (
-    <ContractDetailView
-      contract={contract}
-      items={items}
-      milestones={milestones}
-      clauses={clauses}
-      project={project}
-      client={client}
-      versions={versions}
-      signatories={signatories}
-      history={history}
-      canWrite={can(user, "contracts.write")}
-      canSend={can(user, "contracts.send")}
-      canCancel={can(user, "contracts.cancel")}
-      canTerminate={can(user, "contracts.terminate")}
-      canRead={can(user, "contracts.read")}
-      locale={locale}
-    />
-  );
 }

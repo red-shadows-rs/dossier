@@ -19,10 +19,12 @@ import { Input, InputAdornment } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { AuditTable } from "@/components/tables/AuditTable";
 import { FilterDropdown } from "@/components/tables/FilterDropdown";
+import { withDbInstance } from "@/db";
 import { AUDIT_ACTIONS } from "@/lib/constants";
 import { isLocale } from "@/lib/i18n";
 import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import { listAuditEntries } from "@/server/services/audit";
 import { smoothLoading } from "@/lib/smooth-loader";
 
@@ -42,15 +44,17 @@ export default async function AuditPage({
   await smoothLoading();
   const user = await requireUserPage();
   assertCan(user, "audit.read");
+  const isDemo = isDemoUser(user.email);
 
-  const t = await getTranslations("audit");
-  const tc = await getTranslations("common");
-  const rawLocale = await getLocale();
-  const locale = isLocale(rawLocale) ? rawLocale : user.locale;
-  const params = await searchParams;
+  return withDbInstance(isDemo, async () => {
+    const t = await getTranslations("audit");
+    const tc = await getTranslations("common");
+    const rawLocale = await getLocale();
+    const locale = isLocale(rawLocale) ? rawLocale : user.locale;
+    const params = await searchParams;
 
-  const q = readParam(params.q);
-  const entityType = readParam(params.entityType);
+    const q = readParam(params.q);
+    const entityType = readParam(params.entityType);
   const entityId = readParam(params.entityId);
   const action = readParam(params.action);
   const from = readParam(params.from);
@@ -324,5 +328,6 @@ export default async function AuditPage({
         />
       </div>
     </div>
-  );
+    );
+  });
 }

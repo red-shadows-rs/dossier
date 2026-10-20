@@ -17,8 +17,10 @@ import {
   type ProjectFormValues,
 } from "@/components/forms/ProjectForm";
 import { Button } from "@/components/ui/Button";
+import { withDbInstance } from "@/db";
 import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import { listClientOptions } from "@/server/services/clients";
 import { getSettings } from "@/server/services/settings";
 import { smoothLoading } from "@/lib/smooth-loader";
@@ -31,16 +33,19 @@ export default async function NewProjectPage({
   await smoothLoading();
   const user = await requireUserPage();
   assertCan(user, "projects.write");
-  const t = await getTranslations("projects");
-  const tc = await getTranslations("common");
-  const defaults = getSettings("defaults");
-  const resolvedSearchParams = searchParams ? await searchParams : {};
-  const preselectedClientId = resolvedSearchParams.clientId ?? "";
+  const isDemo = isDemoUser(user.email);
 
-  const clients = listClientOptions().map((client) => ({
-    id: client.id,
-    label: client.nameAr ?? client.nameEn ?? client.id,
-  }));
+  return withDbInstance(isDemo, async () => {
+    const t = await getTranslations("projects");
+    const tc = await getTranslations("common");
+    const defaults = getSettings("defaults");
+    const resolvedSearchParams = searchParams ? await searchParams : {};
+    const preselectedClientId = resolvedSearchParams.clientId ?? "";
+
+    const clients = listClientOptions().map((client) => ({
+      id: client.id,
+      label: client.nameAr ?? client.nameEn ?? client.id,
+    }));
 
   const initial: ProjectFormValues = {
     clientId: preselectedClientId,
@@ -74,8 +79,8 @@ export default async function NewProjectPage({
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
           <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary shadow-xs">
-              <FolderKanban size={22} aria-hidden="true" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+              <FolderKanban size={20} aria-hidden="true" />
             </div>
             <div className="flex flex-col gap-0.5">
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
@@ -104,5 +109,6 @@ export default async function NewProjectPage({
 
       <ProjectForm mode="create" initial={initial} clients={clients} />
     </div>
-  );
+    );
+  });
 }

@@ -82,13 +82,13 @@ export function ContractDocumentViewer({
         {canDownload ? (
           <div className="flex gap-2">
             <a href={previewUrl} target="_blank" rel="noreferrer">
-              <Button type="button" variant="secondary" size="sm" className="gap-1.5">
+              <Button type="button" variant="secondary" size="sm" className="gap-1.5 font-medium shadow-xs">
                 <Eye className="h-4 w-4" />
                 <span>{t("previewPdf")}</span>
               </Button>
             </a>
             <a href={downloadUrl}>
-              <Button type="button" variant="secondary" size="sm" className="gap-1.5">
+              <Button type="button" variant="secondary" size="sm" className="gap-1.5 font-medium shadow-xs">
                 <Download className="h-4 w-4" />
                 <span>{t("downloadPdf")}</span>
               </Button>
@@ -100,7 +100,7 @@ export function ContractDocumentViewer({
       {loading ? (
         <DocumentSkeleton />
       ) : html ? (
-        <div className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin] rounded-md border border-border bg-white shadow-2xs overflow-hidden">
+        <div className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin] rounded-lg border border-border bg-white shadow-2xs overflow-hidden">
           <iframe
             title={t("document")}
             sandbox="allow-same-origin"

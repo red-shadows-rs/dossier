@@ -350,7 +350,7 @@ export function TemplateDetailView({
                   <Badge tone="gray">{t(`type.${template.type}`)}</Badge>
                 </div>
                 <div className="flex items-center justify-between px-1">
-                  <span className="text-muted-foreground">{t("defaultLanguage")}</span>
+                  <span className="text-muted-foreground">{t("languageMode")}</span>
                   <span className="font-semibold text-foreground">
                     {t(`languageModes.${template.defaultLanguageMode}`)}
                   </span>
@@ -369,7 +369,7 @@ export function TemplateDetailView({
                 </div>
                 {template.descriptionAr ? (
                   <div className="flex flex-col gap-1 border-t border-border pt-2">
-                    <span className="text-muted-foreground font-medium">{t("scopeNote")}</span>
+                    <span className="text-muted-foreground font-medium">{tc("description")}</span>
                     <p className="text-foreground leading-relaxed">
                       {locale === "ar" ? template.descriptionAr : (template.descriptionEn || template.descriptionAr)}
                     </p>

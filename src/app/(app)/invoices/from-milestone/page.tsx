@@ -11,11 +11,13 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t("new"),
   };
 }
-import { Layers, Receipt } from "lucide-react";
+import { ArrowLeft, Layers, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { NewMilestoneInvoiceForm } from "@/components/forms/NewMilestoneInvoiceForm";
+import { withDbInstance } from "@/db";
 import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import { listInvoiceableMilestones } from "@/server/services/invoices";
 import { smoothLoading } from "@/lib/smooth-loader";
 
@@ -23,28 +25,60 @@ export default async function NewMilestoneInvoicePage() {
   await smoothLoading();
   const user = await requireUserPage();
   assertCan(user, "invoices.write");
-  const t = await getTranslations("invoices");
-  const rawLocale = await getLocale();
-  const locale = rawLocale === "en" ? "en" : "ar";
+  const isDemo = isDemoUser(user.email);
 
-  const milestones = listInvoiceableMilestones(undefined, locale);
+  return withDbInstance(isDemo, async () => {
+    const t = await getTranslations("invoices");
+    const tc = await getTranslations("common");
+    const rawLocale = await getLocale();
+    const locale = rawLocale === "en" ? "en" : "ar";
 
-  return (
-    <div className="flex flex-col gap-5 sm:gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
-        <div className="flex items-center gap-3.5">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
-            <Layers size={20} aria-hidden="true" />
+    const milestones = listInvoiceableMilestones(undefined, locale);
+
+    return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <nav
+          aria-label="Breadcrumb"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground"
+        >
+          <Link
+            href="/invoices"
+            className="hover:text-foreground transition-colors"
+          >
+            {t("title")}
+          </Link>
+          <span className="text-border">/</span>
+          <span className="text-foreground font-medium">{t("new")}</span>
+        </nav>
+
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+              <Layers size={20} aria-hidden="true" />
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                {t("fromMilestoneTitle")}
+              </h1>
+            </div>
           </div>
-          <div className="flex flex-col gap-0.5">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-              {t("fromMilestoneTitle")}
-            </h1>
-          </div>
+
+          <Link href="/invoices">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="gap-1.5 font-medium shadow-xs"
+            >
+              <ArrowLeft size={15} className="rtl:rotate-180" aria-hidden="true" />
+              <span>{tc("back")}</span>
+            </Button>
+          </Link>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 border-b border-border pb-3">
+      <div className="flex flex-wrap items-center gap-2 border-b border-border/60 pb-3">
         <Link href="/invoices/new">
           <Button type="button" variant="secondary" size="sm" className="gap-1.5">
             <Receipt size={16} aria-hidden="true" />
@@ -66,6 +100,7 @@ export default async function NewMilestoneInvoicePage() {
 
       <NewMilestoneInvoiceForm milestones={milestones} />
     </div>
-  );
+    );
+  });
 }
 

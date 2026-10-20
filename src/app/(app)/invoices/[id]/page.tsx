@@ -5,13 +5,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
-import { db } from "@/db";
+import { db, withDbInstance } from "@/db";
 import { clients, projects } from "@/db/schema";
 import { InvoiceDetailView } from "@/components/forms/InvoiceDetailView";
 import { todayInTz } from "@/lib/dates";
 import { AppError } from "@/lib/errors";
 import { can } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
+import { isDemoUser } from "@/server/services/demo";
 import { getInvoiceDetail, isOverdue } from "@/server/services/invoices";
 import { listPayments } from "@/server/services/payments";
 import {
@@ -41,56 +42,59 @@ export default async function InvoiceDetailPage({
 }) {
   await smoothLoading();
   const user = await requireUserPage();
+  const isDemo = isDemoUser(user.email);
   const rawLocale = await getLocale();
   const locale = rawLocale === "en" ? "en" : "ar";
   const { id } = await params;
 
-  let detail;
-  try {
-    detail = getInvoiceDetail(id);
-  } catch (error) {
-    if (error instanceof AppError && error.code === "NOT_FOUND") notFound();
-    throw error;
-  }
+  return withDbInstance(isDemo, async () => {
+    let detail;
+    try {
+      detail = getInvoiceDetail(id);
+    } catch (error) {
+      if (error instanceof AppError && error.code === "NOT_FOUND") notFound();
+      throw error;
+    }
 
-  const { invoice, lines } = detail;
-  const project = db
-    .select()
-    .from(projects)
-    .where(eq(projects.id, invoice.projectId))
-    .get();
-  const client = db
-    .select()
-    .from(clients)
-    .where(eq(clients.id, invoice.clientId))
-    .get();
-  const payments = listPayments(id);
-  const today = todayInTz(getSettings("defaults").timezone);
-  const overdue = isOverdue(invoice, today);
-  const company = getSettings("company");
-  const fallbackInstructions = buildPaymentInstructions(company, locale);
-  const paymentInstructions =
-    (locale === "ar"
-      ? invoice.paymentInstructionsAr || invoice.paymentInstructionsEn
-      : invoice.paymentInstructionsEn || invoice.paymentInstructionsAr) ||
-    fallbackInstructions;
+    const { invoice, lines } = detail;
+    const project = db
+      .select()
+      .from(projects)
+      .where(eq(projects.id, invoice.projectId))
+      .get();
+    const client = db
+      .select()
+      .from(clients)
+      .where(eq(clients.id, invoice.clientId))
+      .get();
+    const payments = listPayments(id);
+    const today = todayInTz(getSettings("defaults").timezone);
+    const overdue = isOverdue(invoice, today);
+    const company = getSettings("company");
+    const fallbackInstructions = buildPaymentInstructions(company, locale);
+    const paymentInstructions =
+      (locale === "ar"
+        ? invoice.paymentInstructionsAr || invoice.paymentInstructionsEn
+        : invoice.paymentInstructionsEn || invoice.paymentInstructionsAr) ||
+      fallbackInstructions;
 
-  return (
-    <InvoiceDetailView
-      invoice={invoice}
-      lines={lines}
-      payments={payments}
-      project={project}
-      client={client}
-      canWrite={can(user, "invoices.write")}
-      canIssue={can(user, "invoices.issue")}
-      canVoid={can(user, "invoices.void")}
-      canPay={can(user, "payments.write")}
-      canRead={can(user, "invoices.read")}
-      canVoidPayment={can(user, "payments.void")}
-      paymentInstructions={paymentInstructions}
-      overdue={overdue}
-      locale={locale}
-    />
-  );
+    return (
+      <InvoiceDetailView
+        invoice={invoice}
+        lines={lines}
+        payments={payments}
+        project={project}
+        client={client}
+        canWrite={can(user, "invoices.write")}
+        canIssue={can(user, "invoices.issue")}
+        canVoid={can(user, "invoices.void")}
+        canPay={can(user, "payments.write")}
+        canRead={can(user, "invoices.read")}
+        canVoidPayment={can(user, "payments.void")}
+        paymentInstructions={paymentInstructions}
+        overdue={overdue}
+        locale={locale}
+      />
+    );
+  });
 }

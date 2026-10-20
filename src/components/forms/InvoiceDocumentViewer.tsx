@@ -111,21 +111,25 @@ export function InvoiceDocumentViewer({
           ) : null}
 
           {langs.length > 1 ? (
-            <div className="flex gap-1">
+            <div
+              role="tablist"
+              className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-muted/40 p-1"
+            >
               {langs.map((value) => (
                 <button
                   key={value}
                   type="button"
-                  aria-current={value === lang ? "true" : undefined}
+                  role="tab"
+                  aria-selected={value === lang}
                   onClick={() => setLang(value)}
                   className={cn(
-                    "rounded border px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer",
+                    "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer",
                     value === lang
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border text-muted-foreground hover:text-foreground",
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
                   )}
                 >
-                  {t(`languageModes.${value}`)}
+                  <span>{t(`languageModes.${value}`)}</span>
                 </button>
               ))}
             </div>
@@ -135,15 +139,15 @@ export function InvoiceDocumentViewer({
         {canDownload ? (
           <div className="flex gap-2">
             <a href={previewUrl} target="_blank" rel="noreferrer">
-              <Button type="button" variant="secondary" size="sm" className="gap-1.5">
+              <Button type="button" variant="secondary" size="sm" className="gap-1.5 font-medium shadow-xs">
                 <Eye className="h-4 w-4" />
-                {t("previewPdf")}
+                <span>{t("previewPdf")}</span>
               </Button>
             </a>
             <a href={downloadUrl}>
-              <Button type="button" variant="secondary" size="sm" className="gap-1.5">
+              <Button type="button" variant="secondary" size="sm" className="gap-1.5 font-medium shadow-xs">
                 <Download className="h-4 w-4" />
-                {t("downloadPdf")}
+                <span>{t("downloadPdf")}</span>
               </Button>
             </a>
           </div>
@@ -153,7 +157,7 @@ export function InvoiceDocumentViewer({
       {loading ? (
         <DocumentSkeleton />
       ) : html ? (
-        <div className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin] rounded-md border border-border bg-white shadow-2xs">
+        <div className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin] rounded-lg border border-border bg-white shadow-2xs overflow-hidden">
           <iframe
             title={t("summary")}
             sandbox="allow-same-origin"
