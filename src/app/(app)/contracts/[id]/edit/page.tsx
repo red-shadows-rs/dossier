@@ -25,6 +25,7 @@ export async function generateMetadata({
   }
 }
 import { Button } from "@/components/ui/Button";
+import { cn } from "@/components/ui/cn";
 import { db, withDbInstance } from "@/db";
 import { clients, projects, templates } from "@/db/schema";
 import {
@@ -223,7 +224,7 @@ export default async function ContractEditPage({
           <span className="text-border">/</span>
           <Link
             href={`/contracts/${id}`}
-            className="hover:text-foreground transition-colors font-mono truncate max-w-[200px]"
+            className={cn("hover:text-foreground transition-colors truncate max-w-[200px]", detail.contract.number ? "font-mono" : "font-sans")}
           >
             {contractDisplayTitle}
           </Link>

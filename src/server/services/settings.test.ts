@@ -204,6 +204,47 @@ describe("buildPaymentInstructions", () => {
     expect(text).toContain("بايبال | المستفيد: Red Shadows | حساب PayPal: billing@red-shadows-rs.com");
     expect(text).not.toContain("باينانس");
   });
+
+  it("omits SWIFT for non-bank payment providers even if swift field is present", () => {
+    const company = getSettings("company");
+    const text = buildPaymentInstructions(
+      {
+        ...company,
+        bankAccounts: [
+          {
+            id: "1",
+            provider: "binance",
+            bankNameAr: "باينانس",
+            bankNameEn: "Binance",
+            accountHolder: "shadow-trader",
+            iban: "888999111",
+            swift: "BINUSXXXX",
+            currency: "USDT",
+            isActive: true,
+            isPrimary: false,
+          },
+          {
+            id: "2",
+            provider: "stcpay",
+            bankNameAr: "STC Pay",
+            bankNameEn: "STC Pay",
+            accountHolder: "Yaseen",
+            iban: "0501234567",
+            swift: "STCPAYSA",
+            currency: "SAR",
+            isActive: true,
+            isPrimary: false,
+          },
+        ],
+      },
+      "ar",
+    );
+    expect(text).not.toContain("BINUSXXXX");
+    expect(text).not.toContain("STCPAYSA");
+    expect(text).not.toContain("سويفت");
+    expect(text).toContain("باينانس | المستفيد: shadow-trader | معرف باينانس / المحفظة: 888999111");
+    expect(text).toContain("STC Pay | المستفيد: Yaseen | رقم المحفظة / الجوال: 0501234567");
+  });
 });
 
 describe("internal settings", () => {

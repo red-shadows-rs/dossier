@@ -59,6 +59,11 @@ export const BANK_PROVIDERS = [
     identifierLabelAr: "رقم الآيبان (IBAN)",
     identifierLabelEn: "IBAN",
     placeholder: "SA0000000000000000000000",
+    accountHolderLabelAr: "اسم المستفيد لدى البنك",
+    accountHolderLabelEn: "Beneficiary Name",
+    accountHolderPlaceholderAr: "اسم المستفيد أو المنشأة لدى البنك",
+    accountHolderPlaceholderEn: "Beneficiary or entity name with the bank",
+    swiftPlaceholder: "RJHISARI",
   },
   {
     id: "snb",
@@ -70,6 +75,11 @@ export const BANK_PROVIDERS = [
     identifierLabelAr: "رقم الآيبان (IBAN)",
     identifierLabelEn: "IBAN",
     placeholder: "SA0000000000000000000000",
+    accountHolderLabelAr: "اسم المستفيد لدى البنك",
+    accountHolderLabelEn: "Beneficiary Name",
+    accountHolderPlaceholderAr: "اسم المستفيد أو المنشأة لدى البنك",
+    accountHolderPlaceholderEn: "Beneficiary or entity name with the bank",
+    swiftPlaceholder: "NCBKSARI",
   },
   {
     id: "barq",
@@ -81,17 +91,27 @@ export const BANK_PROVIDERS = [
     identifierLabelAr: "رقم المحفظة / الآيبان",
     identifierLabelEn: "Wallet ID / IBAN",
     placeholder: "رقم المحفظة أو الآيبان",
+    accountHolderLabelAr: "اسم صاحب المحفظة (اختياري)",
+    accountHolderLabelEn: "Wallet Holder Name (Optional)",
+    accountHolderPlaceholderAr: "الاسم المسجل في محفظة برق",
+    accountHolderPlaceholderEn: "Registered wallet name",
+    swiftPlaceholder: null,
   },
   {
     id: "stcpay",
-    nameAr: "stc pay",
-    nameEn: "stc pay",
+    nameAr: "STC Pay",
+    nameEn: "STC Pay",
     icon: "/assets/banks/stcpay.svg",
     color: "#4F008C",
     type: "wallet",
     identifierLabelAr: "رقم الجوال / الآيبان",
     identifierLabelEn: "Mobile / IBAN",
     placeholder: "05xxxxxxxx أو SA...",
+    accountHolderLabelAr: "اسم صاحب المحفظة (اختياري)",
+    accountHolderLabelEn: "Wallet Holder Name (Optional)",
+    accountHolderPlaceholderAr: "الاسم المسجل في STC Pay",
+    accountHolderPlaceholderEn: "Registered STC Pay name",
+    swiftPlaceholder: null,
   },
   {
     id: "paypal",
@@ -103,6 +123,11 @@ export const BANK_PROVIDERS = [
     identifierLabelAr: "بريد PayPal الإلكتروني",
     identifierLabelEn: "PayPal Email",
     placeholder: "billing@red-shadows-rs.com",
+    accountHolderLabelAr: "اسم صاحب الحساب (اختياري)",
+    accountHolderLabelEn: "Account Holder Name (Optional)",
+    accountHolderPlaceholderAr: "الاسم المسجل في بايبال",
+    accountHolderPlaceholderEn: "Name registered on PayPal",
+    swiftPlaceholder: null,
   },
   {
     id: "binance",
@@ -111,9 +136,14 @@ export const BANK_PROVIDERS = [
     icon: "/assets/banks/binance.svg",
     color: "#F3BA2F",
     type: "crypto",
-    identifierLabelAr: "Binance Pay ID / عنوان المحفظة (USDT)",
-    identifierLabelEn: "Binance Pay ID / USDT Address",
+    identifierLabelAr: "Binance Pay ID / عنوان المحفظة",
+    identifierLabelEn: "Binance Pay ID / Wallet Address",
     placeholder: "Pay ID أو عنوان المحفظة TRC20/BEP20",
+    accountHolderLabelAr: "اسم الحساب أو اللقب التعريفي (اختياري)",
+    accountHolderLabelEn: "Account Name / Nickname (Optional)",
+    accountHolderPlaceholderAr: "اسم الحساب في باينانس أو المعرف",
+    accountHolderPlaceholderEn: "Binance account name or handle",
+    swiftPlaceholder: null,
   },
   {
     id: "other",
@@ -125,6 +155,11 @@ export const BANK_PROVIDERS = [
     identifierLabelAr: "رقم الحساب / الآيبان",
     identifierLabelEn: "Account / IBAN",
     placeholder: "رقم الحساب أو الآيبان",
+    accountHolderLabelAr: "اسم المستفيد",
+    accountHolderLabelEn: "Beneficiary Name",
+    accountHolderPlaceholderAr: "اسم المستفيد أو المنشأة لدى البنك",
+    accountHolderPlaceholderEn: "Beneficiary or entity name with the bank",
+    swiftPlaceholder: "SWIFT / BIC",
   },
 ] as const;
 
@@ -196,6 +231,21 @@ export const AUDIT_ACTIONS = [
 ] as const;
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 
+export const SUPPORTED_CURRENCIES = [
+  { code: "SAR", symbol: "ر.س", nameAr: "ريال سعودي", nameEn: "Saudi Riyal", decimals: 2 },
+  { code: "USD", symbol: "$", nameAr: "دولار أمريكي", nameEn: "US Dollar", decimals: 2 },
+  { code: "EUR", symbol: "€", nameAr: "يورو", nameEn: "Euro", decimals: 2 },
+  { code: "USDT", symbol: "₮", nameAr: "تيثر", nameEn: "Tether (USDT)", decimals: 2 },
+  { code: "AED", symbol: "د.إ", nameAr: "درهم إماراتي", nameEn: "UAE Dirham", decimals: 2 },
+  { code: "QAR", symbol: "ر.ق", nameAr: "ريال قطري", nameEn: "Qatari Riyal", decimals: 2 },
+  { code: "KWD", symbol: "د.ك", nameAr: "دينار كويتي", nameEn: "Kuwaiti Dinar", decimals: 3 },
+  { code: "BHD", symbol: "د.ب", nameAr: "دينار بحريني", nameEn: "Bahraini Dinar", decimals: 3 },
+  { code: "OMR", symbol: "ر.ع", nameAr: "ريال عماني", nameEn: "Omani Rial", decimals: 3 },
+  { code: "JOD", symbol: "د.أ", nameAr: "دينار أردني", nameEn: "Jordanian Dinar", decimals: 3 },
+  { code: "EGP", symbol: "ج.م", nameAr: "جنيه مصري", nameEn: "Egyptian Pound", decimals: 2 },
+  { code: "GBP", symbol: "£", nameAr: "جنيه إسترليني", nameEn: "British Pound", decimals: 2 },
+] as const;
+
 export const CURRENCIES = {
   SAR: 2,
   AED: 2,
@@ -208,7 +258,20 @@ export const CURRENCIES = {
   BHD: 3,
   OMR: 3,
   JOD: 3,
+  USDT: 2,
 } as const;
 export type CurrencyCode = keyof typeof CURRENCIES;
 
 export const MAX_MINOR = 10_000_000_000;
+
+export const CRYPTO_NETWORKS = [
+  { id: "TRC20", name: "TRC20 (Tron)", note: "Fastest / Low fee" },
+  { id: "BEP20", name: "BEP20 (BNB Smart Chain)", note: "Low fee" },
+  { id: "ERC20", name: "ERC20 (Ethereum)", note: "High fee" },
+  { id: "SOL", name: "SOL (Solana)", note: "Fast / Low fee" },
+  { id: "POLYGON", name: "Polygon (MATIC)", note: "Low fee" },
+  { id: "BTC", name: "BTC (Bitcoin Network)", note: "Standard" },
+  { id: "TON", name: "TON (The Open Network)", note: "Low fee" },
+  { id: "ARBITRUM", name: "Arbitrum One", note: "Low fee" },
+] as const;
+

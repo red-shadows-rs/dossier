@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { useToast } from "@/components/ui/Toast";
-import { CURRENCIES, PROJECT_STATUSES } from "@/lib/constants";
+import { SUPPORTED_CURRENCIES, PROJECT_STATUSES } from "@/lib/constants";
 import {
   createProjectAction,
   updateProjectAction,
@@ -318,9 +318,9 @@ export function ProjectForm({
                   onChange={(e) => patch({ currency: e.target.value })}
                   disabled={pending}
                 >
-                  {Object.keys(CURRENCIES).map((code) => (
-                    <option key={code} value={code}>
-                      {code}
+                  {SUPPORTED_CURRENCIES.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.symbol} {c.code} - {isAr ? c.nameAr : c.nameEn}
                     </option>
                   ))}
                 </Select>

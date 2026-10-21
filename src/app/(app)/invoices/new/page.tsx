@@ -20,7 +20,7 @@ import { requireUserPage } from "@/server/auth/require-user";
 import { isDemoUser } from "@/server/services/demo";
 import { listInvoiceableMilestones } from "@/server/services/invoices";
 import { listProjectOptions } from "@/server/services/projects";
-import { getSettings } from "@/server/services/settings";
+import { getSettings, getCompanyBankAccounts } from "@/server/services/settings";
 import { smoothLoading } from "@/lib/smooth-loader";
 
 export default async function NewInvoicePage() {
@@ -33,6 +33,8 @@ export default async function NewInvoicePage() {
     const t = await getTranslations("invoices");
     const tc = await getTranslations("common");
     const defaults = getSettings("defaults");
+    const company = getSettings("company");
+    const bankAccounts = getCompanyBankAccounts(company);
     const rawLocale = await getLocale();
     const locale = rawLocale === "en" ? "en" : "ar";
 
@@ -111,6 +113,8 @@ export default async function NewInvoicePage() {
       <NewInvoiceForm
         projects={projects}
         defaultLanguageMode={defaults.languageMode ?? "ar"}
+        defaultCurrency={defaults.currency ?? "SAR"}
+        bankAccounts={bankAccounts}
       />
     </div>
     );

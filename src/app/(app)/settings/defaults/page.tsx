@@ -69,6 +69,7 @@ export default async function DefaultsSettingsPage() {
         { value: "AED", label: "AED - درهم إماراتي" },
         { value: "USD", label: "USD - دولار أمريكي" },
         { value: "EUR", label: "EUR - يورو" },
+        { value: "USDT", label: "USDT - تيثر (USDT)" },
         { value: "QAR", label: "QAR - ريال قطري" },
         { value: "KWD", label: "KWD - دينار كويتي" },
         { value: "BHD", label: "BHD - دينار بحريني" },

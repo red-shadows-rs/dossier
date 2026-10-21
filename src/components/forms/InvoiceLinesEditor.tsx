@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { useToast } from "@/components/ui/Toast";
 import { CURRENCIES, DISCOUNT_TYPES, type CurrencyCode } from "@/lib/constants";
-import { formatMoney, parseMajorToMinor } from "@/lib/money";
+import { formatMoney } from "@/lib/money";
 import {
   previewInvoiceTotalsAction,
   saveInvoiceLinesAction,
@@ -49,11 +49,13 @@ function toRows(items: BuilderItem[], currency: string): Row[] {
 }
 
 function parseSafe(value: string, currency: string): number | null {
-  try {
-    return parseMajorToMinor(value, currency as CurrencyCode);
-  } catch {
-    return null;
-  }
+  const trimmed = value.trim();
+  if (trimmed === "") return 0;
+  const num = Number(trimmed);
+  if (!Number.isFinite(num) || num < 0) return null;
+  const exp = CURRENCIES[currency as CurrencyCode] ?? 2;
+  const factor = 10 ** exp;
+  return Math.round(num * factor * 100) / 100;
 }
 
 export function InvoiceLinesEditor({
@@ -243,6 +245,22 @@ export function InvoiceLinesEditor({
                   onChange={(event) =>
                     updateRow(index, { unit: event.target.value })
                   }
+                  onBlur={() => {
+                    const trimmed = row.unit.trim();
+                    if (trimmed !== "") {
+                      const num = Number(trimmed);
+                      if (Number.isFinite(num) && num >= 0) {
+                        const decimals = (trimmed.split(".")[1] || "").length;
+                        const exp = CURRENCIES[currencyCode] ?? 2;
+                        if (decimals <= exp) {
+                          updateRow(index, { unit: num.toFixed(exp) });
+                        } else {
+                          const precision = Math.min(decimals, 4);
+                          updateRow(index, { unit: num.toFixed(precision) });
+                        }
+                      }
+                    }
+                  }}
                   className="text-start"
                 />
               </Field>
@@ -318,6 +336,18 @@ export function InvoiceLinesEditor({
               dir="ltr"
               value={discountValue}
               onChange={(event) => setDiscountValue(event.target.value)}
+              onBlur={() => {
+                if (discountType === "fixed") {
+                  const trimmed = discountValue.trim();
+                  if (trimmed !== "") {
+                    const num = Number(trimmed);
+                    if (Number.isFinite(num) && num >= 0) {
+                      const exp = CURRENCIES[currencyCode] ?? 2;
+                      setDiscountValue(num.toFixed(exp));
+                    }
+                  }
+                }
+              }}
               disabled={discountType === "none"}
               className="text-start"
             />

@@ -72,10 +72,21 @@ export function formatMinor(
 ): string {
   const exponent = CURRENCIES[currency];
   const factor = 10 ** exponent;
-  const intPart = Math.floor(minor / factor);
-  const grouped = new Intl.NumberFormat("en-US").format(intPart);
-  const fracPart = String(minor % factor).padStart(exponent, "0");
-  return `${grouped}.${fracPart}`;
+  if (Number.isInteger(minor)) {
+    const intPart = Math.floor(minor / factor);
+    const grouped = new Intl.NumberFormat("en-US").format(intPart);
+    const fracPart = String(minor % factor).padStart(exponent, "0");
+    return `${grouped}.${fracPart}`;
+  }
+  const major = minor / factor;
+  const parts = major
+    .toFixed(4)
+    .replace(/0+$/, "")
+    .replace(/\.$/, "")
+    .split(".");
+  const intPart = new Intl.NumberFormat("en-US").format(Number(parts[0]));
+  const fracPart = (parts[1] || "").padEnd(exponent, "0");
+  return `${intPart}.${fracPart}`;
 }
 
 export function formatMoney(
@@ -90,7 +101,8 @@ export function mulDivRound(a: number, b: number, d: number): number {
   if (d <= 0) {
     throw new AppError("INTERNAL", "mulDivRound: divisor must be positive");
   }
-  const product = a * b;
+  const rawProduct = a * b;
+  const product = Math.round(rawProduct);
   if (!Number.isSafeInteger(product)) {
     throw new AppError(
       "INTERNAL",

@@ -1,6 +1,8 @@
 // Dossier - Settings Service
 // https://github.com/red-shadows-rs/dossier
 
+import fs from "node:fs";
+import path from "node:path";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db, withTx } from "@/db";
@@ -152,11 +154,17 @@ export function getCompanyBankAccounts(company: CompanySettings): BankAccount[] 
 export function buildPaymentInstructions(
   company: CompanySettings,
   lang: Locale,
+  accountIds?: string[],
 ): string {
-  const accounts = (company.bankAccounts ?? []).filter((a) => a.isActive);
+  const allAccounts = company.bankAccounts ?? [];
+  const accounts =
+    accountIds && accountIds.length > 0
+      ? allAccounts.filter((a) => accountIds.includes(a.id))
+      : allAccounts.filter((a) => a.isActive);
 
   if (accounts.length > 0) {
-    return accounts
+    const metaTag = `<!--dossier:accounts:${accounts.map((a) => a.id).join(",")}-->\n`;
+    const lines = accounts
       .map((acc) => {
         const bankName =
           lang === "ar"
@@ -172,6 +180,12 @@ export function buildPaymentInstructions(
           idLabel = lang === "ar" ? "رقم المحفظة / الجوال" : "Wallet / Mobile";
         }
 
+        const isBank =
+          !acc.provider ||
+          acc.provider === "alrajhi" ||
+          acc.provider === "snb" ||
+          acc.provider === "other";
+
         const parts: Array<string | null> = [
           bankName ? bankName : null,
           acc.accountHolder
@@ -179,8 +193,33 @@ export function buildPaymentInstructions(
               ? `المستفيد: ${acc.accountHolder}`
               : `Beneficiary: ${acc.accountHolder}`
             : null,
-          acc.iban ? `${idLabel}: ${acc.iban}` : null,
-          acc.swift
+          acc.provider === "binance" && acc.binanceUid
+            ? `UID: ${acc.binanceUid}`
+            : null,
+          acc.provider === "binance" && acc.binancePayId
+            ? `Pay ID: ${acc.binancePayId}`
+            : null,
+          acc.provider === "binance" && acc.username
+            ? lang === "ar"
+              ? `المستخدم: ${acc.username}`
+              : `User: ${acc.username}`
+            : null,
+          acc.provider === "paypal" && acc.username
+            ? lang === "ar"
+              ? `المستخدم: ${acc.username}`
+              : `User: ${acc.username}`
+            : null,
+          acc.provider === "paypal" && acc.paymentUrl
+            ? lang === "ar"
+              ? `رابط الدفع: ${acc.paymentUrl}`
+              : `Pay Link: ${acc.paymentUrl}`
+            : null,
+          acc.iban
+            ? acc.provider === "binance" && acc.network
+              ? `${idLabel} (${acc.network}): ${acc.iban}`
+              : `${idLabel}: ${acc.iban}`
+            : null,
+          isBank && acc.swift
             ? lang === "ar"
               ? `سويفت: ${acc.swift}`
               : `SWIFT: ${acc.swift}`
@@ -190,6 +229,7 @@ export function buildPaymentInstructions(
       })
       .filter((line) => line.length > 0)
       .join("\n");
+    return `${metaTag}${lines}`;
   }
 
   const bank = company.bank;
@@ -212,4 +252,30 @@ export function buildPaymentInstructions(
     bank.swift ? `SWIFT: ${bank.swift}` : null,
   ];
   return parts.filter((part): part is string => part !== null).join(" | ");
+}
+
+const BANK_LOGO_DATA_URIS: Record<string, string> = {};
+
+export function getBankLogoDataUri(provider: string): string | null {
+  if (BANK_LOGO_DATA_URIS[provider]) {
+    return BANK_LOGO_DATA_URIS[provider];
+  }
+  try {
+    const filePath = path.join(
+      process.cwd(),
+      "public",
+      "assets",
+      "banks",
+      `${provider}.svg`,
+    );
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath);
+      const uri = `data:image/svg+xml;base64,${content.toString("base64")}`;
+      BANK_LOGO_DATA_URIS[provider] = uri;
+      return uri;
+    }
+  } catch {
+    return null;
+  }
+  return null;
 }

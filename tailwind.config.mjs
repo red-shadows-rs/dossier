@@ -59,6 +59,9 @@ const config = {
       maxWidth: {
         content: "80rem",
       },
+      fontFamily: {
+        sans: ["var(--font-cairo)", "ui-sans-serif", "system-ui", "sans-serif"],
+      },
     },
   },
 };

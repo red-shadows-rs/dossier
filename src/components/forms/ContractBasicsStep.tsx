@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { useToast } from "@/components/ui/Toast";
-import { CURRENCIES, LANG_MODES } from "@/lib/constants";
+import { SUPPORTED_CURRENCIES, LANG_MODES } from "@/lib/constants";
 import { updateContractBasicsAction } from "@/server/actions/contracts";
 import type { BuilderBasics } from "./ContractBuilder";
 
@@ -159,9 +159,9 @@ export function ContractBasicsStep({
               defaultValue={initial.currency || currency || "SAR"}
               disabled={pending}
             >
-              {Object.keys(CURRENCIES).map((code) => (
-                <option key={code} value={code}>
-                  {code}
+              {SUPPORTED_CURRENCIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.symbol} {c.code} - {isAr ? c.nameAr : c.nameEn}
                 </option>
               ))}
             </Select>

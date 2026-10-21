@@ -9,6 +9,7 @@ import { ArrowLeft, Pencil } from "lucide-react";
 import { InvoiceLinesEditor } from "@/components/forms/InvoiceLinesEditor";
 import { InvoiceMetaForm } from "@/components/forms/InvoiceMetaForm";
 import { Button } from "@/components/ui/Button";
+import { cn } from "@/components/ui/cn";
 import { withDbInstance } from "@/db";
 import type { CurrencyCode } from "@/lib/constants";
 import { AppError } from "@/lib/errors";
@@ -16,6 +17,8 @@ import { assertCan } from "@/lib/permissions";
 import { requireUserPage } from "@/server/auth/require-user";
 import { isDemoUser } from "@/server/services/demo";
 import { getInvoiceDetail } from "@/server/services/invoices";
+import { getSettings, getCompanyBankAccounts } from "@/server/services/settings";
+import { extractAccountIdsFromInstructions } from "@/lib/payment-methods";
 import { smoothLoading } from "@/lib/smooth-loader";
 
 export async function generateMetadata({
@@ -59,6 +62,11 @@ export default async function EditInvoicePage({
     }
 
     const isMilestone = detail.invoice.milestoneId !== null;
+    const company = getSettings("company");
+    const bankAccounts = getCompanyBankAccounts(company);
+    const initialSelectedAccountIds = extractAccountIdsFromInstructions(
+      detail.invoice.paymentInstructionsAr || detail.invoice.paymentInstructionsEn,
+    );
 
     return (
     <div className="flex flex-col gap-6">
@@ -76,7 +84,7 @@ export default async function EditInvoicePage({
           <span className="text-border">/</span>
           <Link
             href={`/invoices/${id}`}
-            className="hover:text-foreground transition-colors font-mono"
+            className={cn("hover:text-foreground transition-colors", detail.invoice.number ? "font-mono" : "font-sans")}
           >
             {detail.invoice.number ?? t("draftTitle")}
           </Link>
@@ -95,8 +103,8 @@ export default async function EditInvoicePage({
                   {t("edit")}
                 </h1>
                 <span
-                  className="inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground"
-                  dir="ltr"
+                  className={cn("inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-medium text-muted-foreground", detail.invoice.number ? "font-mono" : "font-sans")}
+                  dir={detail.invoice.number ? "ltr" : undefined}
                 >
                   {detail.invoice.number ?? t("draftTitle")}
                 </span>
@@ -128,6 +136,12 @@ export default async function EditInvoicePage({
           notesAr: detail.invoice.notesAr ?? "",
           notesEn: detail.invoice.notesEn ?? "",
         }}
+        bankAccounts={bankAccounts}
+        initialSelectedAccountIds={
+          initialSelectedAccountIds.length > 0
+            ? initialSelectedAccountIds
+            : undefined
+        }
       />
 
       {isMilestone ? (

@@ -88,6 +88,38 @@ describe("calcTotals (16.1 vectors)", () => {
     });
   });
 
+  it("handles fractional unit price (10.435 SAR x 1.15 = 12.00 SAR)", () => {
+    const out = calcTotals({
+      items: [{ unitPriceMinor: 1043.5, qtyMilli: 1000 }],
+      discount: { type: "none", value: 0 },
+      taxRateBp: 1500,
+    });
+    expect(out).toEqual({
+      lineTotals: [1043],
+      subtotal: 1043,
+      discount: 0,
+      net: 1043,
+      tax: 157,
+      total: 1200,
+    });
+  });
+
+  it("handles fractional unit price for 50 SAR target (43.478 SAR x 1.15 = 50.00 SAR)", () => {
+    const out = calcTotals({
+      items: [{ unitPriceMinor: 4347.8, qtyMilli: 1000 }],
+      discount: { type: "none", value: 0 },
+      taxRateBp: 1500,
+    });
+    expect(out).toEqual({
+      lineTotals: [4348],
+      subtotal: 4348,
+      discount: 0,
+      net: 4348,
+      tax: 652,
+      total: 5000,
+    });
+  });
+
   it("throws when a fixed discount exceeds the subtotal", () => {
     try {
       calcTotals({

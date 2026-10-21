@@ -5,7 +5,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { FilePlus2, Receipt, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -13,21 +13,35 @@ import { Field } from "@/components/ui/Field";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { useToast } from "@/components/ui/Toast";
-import { CURRENCIES, INVOICE_LANG_MODES } from "@/lib/constants";
+import { PaymentMethodsSelector } from "@/components/forms/PaymentMethodsSelector";
+import { SUPPORTED_CURRENCIES, INVOICE_LANG_MODES } from "@/lib/constants";
+import type { BankAccount } from "@/lib/validation/settings";
 import { createInvoiceAction } from "@/server/actions/invoices";
 
 export function NewInvoiceForm({
   projects,
   defaultLanguageMode = "ar",
+  defaultCurrency = "SAR",
+  bankAccounts = [],
 }: {
   projects: { id: string; label: string }[];
   defaultLanguageMode?: string;
+  defaultCurrency?: string;
+  bankAccounts?: BankAccount[];
 }) {
   const t = useTranslations();
+  const locale = useLocale();
   const toast = useToast();
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [statusError, setStatusError] = useState<string | null>(null);
+  const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>(() => {
+    const primary = bankAccounts.find((a) => a.isActive && a.isPrimary);
+    if (primary) return [primary.id];
+    const active = bankAccounts.filter((a) => a.isActive).map((a) => a.id);
+    if (active.length > 0) return [active[0]];
+    return bankAccounts.length > 0 ? [bankAccounts[0].id] : [];
+  });
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,6 +49,14 @@ export function NewInvoiceForm({
     const projectId = String(data.get("projectId") ?? "");
     if (!projectId) {
       setStatusError(t("auth.requiredFields"));
+      return;
+    }
+    if (bankAccounts.length > 0 && selectedAccountIds.length === 0) {
+      setStatusError(
+        locale === "ar"
+          ? "يجب اختيار طريقة دفع واحدة على الأقل"
+          : "At least one payment method must be selected",
+      );
       return;
     }
     setPending(true);
@@ -45,6 +67,7 @@ export function NewInvoiceForm({
       languageMode: String(data.get("languageMode") ?? "ar"),
       notesAr: String(data.get("notesAr") ?? ""),
       notesEn: String(data.get("notesEn") ?? ""),
+      bankAccountIds: selectedAccountIds,
     });
     setPending(false);
     if (result.ok) {
@@ -119,16 +142,27 @@ export function NewInvoiceForm({
               <Select
                 id="ni-currency"
                 name="currency"
-                defaultValue="SAR"
+                defaultValue={defaultCurrency}
                 disabled={pending}
               >
-                {Object.keys(CURRENCIES).map((code) => (
-                  <option key={code} value={code}>
-                    {code}
+                {SUPPORTED_CURRENCIES.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.symbol} {c.code} - {locale === "ar" ? c.nameAr : c.nameEn}
                   </option>
                 ))}
               </Select>
             </Field>
+
+            {bankAccounts.length > 0 ? (
+              <div className="md:col-span-2">
+                <PaymentMethodsSelector
+                  accounts={bankAccounts}
+                  selectedIds={selectedAccountIds}
+                  onChange={setSelectedAccountIds}
+                  disabled={pending}
+                />
+              </div>
+            ) : null}
 
             <Field
               label={t("invoices.notesAr")}

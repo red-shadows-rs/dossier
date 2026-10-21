@@ -43,6 +43,11 @@ export const bankAccountSchema = z.object({
   currency: z.string().default("SAR"),
   isActive: z.boolean().default(true),
   isPrimary: z.boolean().default(false),
+  username: text(100).optional(),
+  paymentUrl: text(255).optional(),
+  binanceUid: text(50).optional(),
+  binancePayId: text(50).optional(),
+  network: text(50).optional(),
 });
 
 export type BankAccount = z.infer<typeof bankAccountSchema>;

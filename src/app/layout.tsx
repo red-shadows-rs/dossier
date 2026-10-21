@@ -16,6 +16,7 @@ import "./globals.css";
 const cairo = localFont({
   src: "../../assets/fonts/Cairo.ttf",
   variable: "--font-cairo",
+  weight: "100 900",
   display: "swap",
 });
 

@@ -410,7 +410,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
             disabled={disabled}
             placeholder={placeholder ?? (isRtl ? "سنة-شهر-يوم" : "YYYY-MM-DD")}
             className={cn(
-              "h-full w-full bg-transparent text-foreground placeholder:text-muted-foreground/50 focus:outline-none disabled:cursor-not-allowed font-mono text-xs md:text-sm",
+              "h-full w-full bg-transparent text-foreground placeholder:text-muted-foreground/50 focus:outline-none disabled:cursor-not-allowed font-sans placeholder:font-sans tabular-nums text-xs md:text-sm",
               inputClassName,
             )}
           />

@@ -17,6 +17,7 @@ import { getInvoiceDetail, isOverdue } from "@/server/services/invoices";
 import { listPayments } from "@/server/services/payments";
 import {
   buildPaymentInstructions,
+  getCompanyBankAccounts,
   getSettings,
 } from "@/server/services/settings";
 import { smoothLoading } from "@/lib/smooth-loader";
@@ -92,6 +93,7 @@ export default async function InvoiceDetailPage({
         canRead={can(user, "invoices.read")}
         canVoidPayment={can(user, "payments.void")}
         paymentInstructions={paymentInstructions}
+        companyAccounts={getCompanyBankAccounts(company)}
         overdue={overdue}
         locale={locale}
       />

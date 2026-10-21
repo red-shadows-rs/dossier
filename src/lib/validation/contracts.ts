@@ -83,7 +83,7 @@ export const contractItemSchema = z.object({
   descriptionAr: optText(400),
   descriptionEn: optText(400),
   qtyMilli: z.number().int().min(1).max(1_000_000_000),
-  unitPriceMinor: z.number().int().min(0).max(MAX_MINOR),
+  unitPriceMinor: z.number().min(0).max(MAX_MINOR),
 });
 export type ContractItemInput = z.infer<typeof contractItemSchema>;
 

@@ -39,6 +39,7 @@ import {
   TableRow,
 } from "@/components/ui/Table";
 import { UrlTabs } from "@/components/ui/UrlTabs";
+import { cn } from "@/components/ui/cn";
 import type { CurrencyCode } from "@/lib/constants";
 import { formatInstant } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
@@ -174,7 +175,7 @@ export function ContractDetailView({
             {t("title")}
           </Link>
           <span className="text-border">/</span>
-          <span className="text-foreground font-mono font-medium">
+          <span className={cn("text-foreground font-medium", contract.number ? "font-mono" : "font-sans")}>
             {contract.number ?? (contractTitle !== "-" ? contractTitle : t("new"))}
           </span>
         </nav>
@@ -186,7 +187,7 @@ export function ContractDetailView({
             </div>
             <div className="flex flex-col gap-0.5">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground font-mono">
+                <h1 className={cn("text-xl sm:text-2xl font-bold tracking-tight text-foreground", contract.number ? "font-mono" : "font-sans")}>
                   {contract.number ?? (contractTitle !== "-" ? contractTitle : t("new"))}
                 </h1>
                 <Badge tone={contractStatusTone(contract.status)} className="translate-y-0.5">

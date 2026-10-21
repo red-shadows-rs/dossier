@@ -10,6 +10,7 @@ import {
   Check,
   Copy,
   Edit2,
+  ExternalLink,
   Landmark,
   Plus,
   Power,
@@ -26,8 +27,14 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Dialog } from "@/components/ui/Dialog";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { useToast } from "@/components/ui/Toast";
-import { BANK_PROVIDERS, type BankProviderId } from "@/lib/constants";
+import {
+  BANK_PROVIDERS,
+  CRYPTO_NETWORKS,
+  SUPPORTED_CURRENCIES,
+  type BankProviderId,
+} from "@/lib/constants";
 import type { BankAccount } from "@/lib/validation/settings";
 import { updateBankAccountsAction } from "@/server/actions/settings";
 
@@ -64,6 +71,11 @@ export function BankAccountsManager({
   const [currency, setCurrency] = useState("SAR");
   const [isActive, setIsActive] = useState(true);
   const [isPrimary, setIsPrimary] = useState(false);
+  const [username, setUsername] = useState("");
+  const [paymentUrl, setPaymentUrl] = useState("");
+  const [binanceUid, setBinanceUid] = useState("");
+  const [binancePayId, setBinancePayId] = useState("");
+  const [network, setNetwork] = useState("TRC20");
 
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
@@ -87,6 +99,11 @@ export function BankAccountsManager({
     setIban("");
     setSwift("");
     setCurrency("SAR");
+    setUsername("");
+    setPaymentUrl("");
+    setBinanceUid("");
+    setBinancePayId("");
+    setNetwork("TRC20");
     setIsActive(true);
     setIsPrimary(accounts.length === 0);
     setIsDialogOpen(true);
@@ -97,13 +114,20 @@ export function BankAccountsManager({
     const validProvider = PROVIDER_MAP.has(acc.provider as BankProviderId)
       ? (acc.provider as BankProviderId)
       : "other";
+    const provDef = PROVIDER_MAP.get(validProvider);
+    const isBank = provDef?.type === "bank" || provDef?.type === "custom";
     setProvider(validProvider);
     setBankNameAr(acc.bankNameAr);
     setBankNameEn(acc.bankNameEn);
     setAccountHolder(acc.accountHolder);
     setIban(acc.iban);
-    setSwift(acc.swift ?? "");
+    setSwift(isBank ? (acc.swift ?? "") : "");
     setCurrency(acc.currency || "SAR");
+    setUsername(acc.username ?? "");
+    setPaymentUrl(acc.paymentUrl ?? "");
+    setBinanceUid(acc.binanceUid ?? "");
+    setBinancePayId(acc.binancePayId ?? "");
+    setNetwork(acc.network ?? "TRC20");
     setIsActive(acc.isActive);
     setIsPrimary(acc.isPrimary);
     setIsDialogOpen(true);
@@ -117,11 +141,29 @@ export function BankAccountsManager({
       setBankNameEn(p.nameEn);
       if (provId === "binance") {
         setCurrency("USDT");
+        setSwift("");
+        setNetwork("TRC20");
       } else if (provId === "paypal") {
         setCurrency("USD");
+        setSwift("");
+      } else if (provId === "barq" || provId === "stcpay") {
+        setCurrency("SAR");
+        setSwift("");
+      } else if (provId === "alrajhi") {
+        setCurrency("SAR");
+        setSwift(p.swiftPlaceholder ?? "RJHISARI");
+      } else if (provId === "snb") {
+        setCurrency("SAR");
+        setSwift(p.swiftPlaceholder ?? "NCBKSARI");
       } else {
         setCurrency("SAR");
+        setSwift("");
       }
+    } else if (provId === "other") {
+      setBankNameAr("");
+      setBankNameEn("");
+      setCurrency("SAR");
+      setSwift("");
     }
   }
 
@@ -141,14 +183,45 @@ export function BankAccountsManager({
 
   async function handleFormSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!iban.trim()) {
-      toast({ title: t("ibanRequired"), tone: "error" });
-      return;
+    if (provider === "binance") {
+      if (!binanceUid.trim() && !binancePayId.trim() && !iban.trim() && !username.trim()) {
+        toast({
+          title: isAr
+            ? "يرجى إدخال معرف باينانس (UID) أو معرف Pay ID أو عنوان المحفظة"
+            : "Please provide Binance UID, Pay ID, or Wallet Address",
+          tone: "error",
+        });
+        return;
+      }
+    } else if (provider === "paypal") {
+      if (!iban.trim() && !paymentUrl.trim() && !username.trim()) {
+        toast({
+          title: isAr
+            ? "يرجى إدخال البريد الإلكتروني أو اسم المستخدم أو رابط PayPal"
+            : "Please provide PayPal email, username, or payment link",
+          tone: "error",
+        });
+        return;
+      }
+    } else {
+      if (!iban.trim()) {
+        toast({ title: t("ibanRequired"), tone: "error" });
+        return;
+      }
     }
 
-    const currentProviderDef = PROVIDER_MAP.get(provider);
+    const currentProviderDef = PROVIDER_MAP.get(provider) ?? PROVIDER_MAP.get("other") ?? BANK_PROVIDERS[0];
+    const isBankType = currentProviderDef.type === "bank" || currentProviderDef.type === "custom";
     const finalBankNameAr = bankNameAr.trim() || currentProviderDef?.nameAr || "حساب بنكي";
     const finalBankNameEn = bankNameEn.trim() || currentProviderDef?.nameEn || "Bank Account";
+
+    const defaultCurrency = provider === "binance" ? "USDT" : provider === "paypal" ? "USD" : "SAR";
+
+    const finalIban =
+      iban.trim() ||
+      (provider === "binance"
+        ? (binanceUid.trim() || binancePayId.trim() || username.trim())
+        : (username.trim() || paymentUrl.trim()));
 
     const updatedAccount: BankAccount = {
       id: editingAccount ? editingAccount.id : generateAccountId(),
@@ -156,11 +229,16 @@ export function BankAccountsManager({
       bankNameAr: finalBankNameAr,
       bankNameEn: finalBankNameEn,
       accountHolder: accountHolder.trim(),
-      iban: iban.trim(),
-      swift: swift.trim(),
-      currency: currency.trim() || "SAR",
+      iban: finalIban,
+      swift: isBankType ? swift.trim() : "",
+      currency: currency.trim() || defaultCurrency,
       isActive,
       isPrimary,
+      username: username.trim(),
+      paymentUrl: paymentUrl.trim(),
+      binanceUid: binanceUid.trim(),
+      binancePayId: binancePayId.trim(),
+      network: provider === "binance" ? network : "",
     };
 
     let nextAccounts: BankAccount[];
@@ -214,6 +292,7 @@ export function BankAccountsManager({
   }
 
   const selectedProviderDef = PROVIDER_MAP.get(provider) ?? PROVIDER_MAP.get("other") ?? BANK_PROVIDERS[0];
+  const isBankType = selectedProviderDef.type === "bank" || selectedProviderDef.type === "custom";
 
   return (
     <Card>
@@ -329,52 +408,232 @@ export function BankAccountsManager({
                     <div className="space-y-1.5 py-2.5 border-y border-border/50 text-xs">
                       {acc.accountHolder ? (
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground shrink-0">{t("beneficiary")}:</span>
+                          <span className="text-muted-foreground shrink-0">
+                            {isAr
+                              ? (prov.type === "bank" || prov.type === "custom"
+                                  ? t("beneficiary")
+                                  : "صاحب الحساب")
+                              : (prov.type === "bank" || prov.type === "custom"
+                                  ? t("beneficiary")
+                                  : "Account Holder")}
+                            :
+                          </span>
                           <span className="font-medium text-foreground truncate">
                             {acc.accountHolder}
                           </span>
                         </div>
                       ) : null}
 
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-muted-foreground shrink-0">
-                          {isAr ? prov.identifierLabelAr : prov.identifierLabelEn}:
-                        </span>
-                        <div className="flex items-center gap-1 min-w-0">
-                          <span
-                            className="font-mono text-[11px] font-semibold text-foreground truncate select-all"
-                            dir="ltr"
-                          >
-                            {acc.iban}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => handleCopy(acc.id, acc.iban)}
-                            className="text-muted-foreground hover:text-foreground p-0.5 rounded transition-colors"
-                            title={t("copy")}
-                          >
-                            {isCopied ? (
-                              <Check size={12} className="text-emerald-500" />
-                            ) : (
-                              <Copy size={12} />
-                            )}
-                          </button>
-                        </div>
-                      </div>
+                      {acc.provider === "binance" ? (
+                        <>
+                          {acc.binanceUid ? (
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-muted-foreground shrink-0">
+                                {isAr ? "معرف باينانس (UID):" : "Binance UID:"}
+                              </span>
+                              <div className="flex items-center gap-1 min-w-0">
+                                <span
+                                  className="font-mono text-[11px] font-semibold text-foreground truncate select-all"
+                                  dir="ltr"
+                                >
+                                  {acc.binanceUid}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopy(acc.id + "-uid", acc.binanceUid ?? "")}
+                                  className="text-muted-foreground hover:text-foreground p-0.5 rounded transition-colors"
+                                  title={t("copy")}
+                                >
+                                  {copiedId === acc.id + "-uid" ? (
+                                    <Check size={12} className="text-emerald-500" />
+                                  ) : (
+                                    <Copy size={12} />
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          ) : null}
 
-                      {acc.swift ? (
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground shrink-0">{t("swift")}:</span>
-                          <span className="font-mono text-[11px] text-foreground" dir="ltr">
-                            {acc.swift}
-                          </span>
-                        </div>
-                      ) : null}
+                          {acc.binancePayId ? (
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-muted-foreground shrink-0">
+                                {isAr ? "معرف الدفع (Pay ID):" : "Pay ID:"}
+                              </span>
+                              <div className="flex items-center gap-1 min-w-0">
+                                <span
+                                  className="font-mono text-[11px] font-semibold text-foreground truncate select-all"
+                                  dir="ltr"
+                                >
+                                  {acc.binancePayId}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopy(acc.id + "-payid", acc.binancePayId ?? "")}
+                                  className="text-muted-foreground hover:text-foreground p-0.5 rounded transition-colors"
+                                  title={t("copy")}
+                                >
+                                  {copiedId === acc.id + "-payid" ? (
+                                    <Check size={12} className="text-emerald-500" />
+                                  ) : (
+                                    <Copy size={12} />
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          ) : null}
+
+                          {acc.username ? (
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-muted-foreground shrink-0">
+                                {isAr ? "اسم المستخدم:" : "Username:"}
+                              </span>
+                              <span className="font-mono text-[11px] text-foreground truncate" dir="ltr">
+                                {acc.username.startsWith("@") ? acc.username : `@${acc.username}`}
+                              </span>
+                            </div>
+                          ) : null}
+
+                          {acc.iban && acc.iban !== acc.binanceUid && acc.iban !== acc.binancePayId ? (
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-muted-foreground shrink-0">
+                                {acc.network
+                                  ? (isAr ? `المحفظة (${acc.network}):` : `Wallet (${acc.network}):`)
+                                  : (isAr ? "عنوان المحفظة:" : "Wallet Address:")}
+                              </span>
+                              <div className="flex items-center gap-1 min-w-0">
+                                <span
+                                  className="font-mono text-[11px] font-semibold text-foreground truncate select-all"
+                                  dir="ltr"
+                                >
+                                  {acc.iban}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopy(acc.id + "-wallet", acc.iban)}
+                                  className="text-muted-foreground hover:text-foreground p-0.5 rounded transition-colors"
+                                  title={t("copy")}
+                                >
+                                  {copiedId === acc.id + "-wallet" ? (
+                                    <Check size={12} className="text-emerald-500" />
+                                  ) : (
+                                    <Copy size={12} />
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          ) : null}
+                        </>
+                      ) : acc.provider === "paypal" ? (
+                        <>
+                          {acc.iban ? (
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-muted-foreground shrink-0">
+                                {isAr ? "البريد الإلكتروني:" : "Email:"}
+                              </span>
+                              <div className="flex items-center gap-1 min-w-0">
+                                <span
+                                  className="font-mono text-[11px] font-semibold text-foreground truncate select-all"
+                                  dir="ltr"
+                                >
+                                  {acc.iban}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopy(acc.id + "-email", acc.iban)}
+                                  className="text-muted-foreground hover:text-foreground p-0.5 rounded transition-colors"
+                                  title={t("copy")}
+                                >
+                                  {copiedId === acc.id + "-email" ? (
+                                    <Check size={12} className="text-emerald-500" />
+                                  ) : (
+                                    <Copy size={12} />
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          ) : null}
+
+                          {acc.username ? (
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-muted-foreground shrink-0">
+                                {isAr ? "اسم المستخدم:" : "Username:"}
+                              </span>
+                              <span className="font-mono text-[11px] text-foreground truncate" dir="ltr">
+                                {acc.username.startsWith("@") ? acc.username : `@${acc.username}`}
+                              </span>
+                            </div>
+                          ) : null}
+
+                          {acc.paymentUrl ? (
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-muted-foreground shrink-0">
+                                {isAr ? "رابط الدفع:" : "Payment Link:"}
+                              </span>
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <a
+                                  href={
+                                    acc.paymentUrl.startsWith("http://") || acc.paymentUrl.startsWith("https://")
+                                      ? acc.paymentUrl
+                                      : `https://${acc.paymentUrl}`
+                                  }
+                                  target="_blank"
+                                  rel="noreferrer noopener"
+                                  className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-mono truncate"
+                                  dir="ltr"
+                                >
+                                  <span className="truncate">{acc.paymentUrl}</span>
+                                  <ExternalLink size={11} className="shrink-0" />
+                                </a>
+                              </div>
+                            </div>
+                          ) : null}
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-muted-foreground shrink-0">
+                              {isAr ? prov.identifierLabelAr : prov.identifierLabelEn}:
+                            </span>
+                            <div className="flex items-center gap-1 min-w-0">
+                              <span
+                                className="font-mono text-[11px] font-semibold text-foreground truncate select-all"
+                                dir="ltr"
+                              >
+                                {acc.iban}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleCopy(acc.id, acc.iban)}
+                                className="text-muted-foreground hover:text-foreground p-0.5 rounded transition-colors"
+                                title={t("copy")}
+                              >
+                                {isCopied ? (
+                                  <Check size={12} className="text-emerald-500" />
+                                ) : (
+                                  <Copy size={12} />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+
+                          {(prov.type === "bank" || prov.type === "custom") && acc.swift ? (
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-muted-foreground shrink-0">{t("swift")}:</span>
+                              <span className="font-mono text-[11px] text-foreground" dir="ltr">
+                                {acc.swift}
+                              </span>
+                            </div>
+                          ) : null}
+                        </>
+                      )}
 
                       <div className="flex items-center justify-between gap-2 pt-0.5">
                         <span className="text-muted-foreground shrink-0">{t("currency")}:</span>
-                        <span className="font-mono text-[11px] font-bold text-foreground">
-                          {acc.currency}
+                        <span className="font-mono text-[11px] font-bold text-foreground flex items-center gap-1">
+                          <span className="text-muted-foreground font-normal">
+                            {SUPPORTED_CURRENCIES.find((c) => c.code === acc.currency)?.symbol ?? ""}
+                          </span>
+                          <span>{acc.currency}</span>
                         </span>
                       </div>
                     </div>
@@ -515,75 +774,338 @@ export function BankAccountsManager({
             })()}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label={t("bankNameAr")} htmlFor="acc-bank-name-ar" required>
-              <Input
-                id="acc-bank-name-ar"
-                value={bankNameAr}
-                onChange={(e) => setBankNameAr(e.target.value)}
-                placeholder={selectedProviderDef.nameAr}
-                dir="rtl"
+          {provider === "binance" ? (
+            <>
+              <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-xs text-muted-foreground flex flex-col gap-1">
+                <span className="font-semibold text-foreground flex items-center gap-1.5">
+                  <Landmark size={14} className="text-amber-500" />
+                  <span>{isAr ? "خيارات التحويل عبر باينانس" : "Binance Transfer Options"}</span>
+                </span>
+                <span>{t("binanceInfo")}</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Field label={t("binanceUidLabel")} htmlFor="acc-binance-uid">
+                  <Input
+                    id="acc-binance-uid"
+                    value={binanceUid}
+                    onChange={(e) => setBinanceUid(e.target.value.trim())}
+                    placeholder={t("binanceUidPlaceholder")}
+                    dir="ltr"
+                    className="font-mono text-xs text-start"
+                  />
+                </Field>
+
+                <Field label={t("binancePayIdLabel")} htmlFor="acc-binance-pay-id">
+                  <Input
+                    id="acc-binance-pay-id"
+                    value={binancePayId}
+                    onChange={(e) => setBinancePayId(e.target.value.trim())}
+                    placeholder={t("binancePayIdPlaceholder")}
+                    dir="ltr"
+                    className="font-mono text-xs text-start"
+                  />
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Field label={t("binanceUsernameLabel")} htmlFor="acc-username">
+                  <Input
+                    id="acc-username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value.trim())}
+                    placeholder={t("binanceUsernamePlaceholder")}
+                    dir="ltr"
+                    className="text-start"
+                  />
+                </Field>
+
+                <Field label={t("currencyLabel")} htmlFor="acc-currency" required>
+                  <Select
+                    id="acc-currency"
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                  >
+                    {SUPPORTED_CURRENCIES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.symbol} {c.code} - {isAr ? c.nameAr : c.nameEn}
+                      </option>
+                    ))}
+                    {currency &&
+                    !SUPPORTED_CURRENCIES.some((c) => c.code === currency) ? (
+                      <option value={currency}>{currency}</option>
+                    ) : null}
+                  </Select>
+                </Field>
+              </div>
+
+              <div className="rounded-lg border border-border/80 bg-muted/10 p-3.5 space-y-3">
+                <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                  <span>
+                    {isAr
+                      ? "عنوان المحفظة وشبكة الإيداع (اختياري)"
+                      : "Deposit Wallet Address & Network (Optional)"}
+                  </span>
+                </span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="sm:col-span-1">
+                    <Field label={t("networkLabel")} htmlFor="acc-network">
+                      <Select
+                        id="acc-network"
+                        value={network}
+                        onChange={(e) => setNetwork(e.target.value)}
+                      >
+                        {CRYPTO_NETWORKS.map((net) => (
+                          <option key={net.id} value={net.id}>
+                            {net.name}
+                          </option>
+                        ))}
+                      </Select>
+                    </Field>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <Field label={t("walletAddressLabel")} htmlFor="acc-iban">
+                      <Input
+                        id="acc-iban"
+                        value={iban}
+                        onChange={(e) => setIban(e.target.value.trim())}
+                        placeholder={t("walletAddressPlaceholder")}
+                        dir="ltr"
+                        className="font-mono text-xs text-start"
+                      />
+                    </Field>
+                  </div>
+                </div>
+              </div>
+
+              <Field
+                label={
+                  isAr
+                    ? "اسم الحساب أو اللقب التعريفي (اختياري)"
+                    : "Account Name / Nickname (Optional)"
+                }
+                htmlFor="acc-holder"
+              >
+                <Input
+                  id="acc-holder"
+                  value={accountHolder}
+                  onChange={(e) => setAccountHolder(e.target.value)}
+                  placeholder={
+                    isAr
+                      ? "الاسم المسجل في باينانس أو المعرف"
+                      : "Binance account name or handle"
+                  }
+                />
+              </Field>
+            </>
+          ) : provider === "paypal" ? (
+            <>
+              <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-3 text-xs text-muted-foreground flex flex-col gap-1">
+                <span className="font-semibold text-foreground flex items-center gap-1.5">
+                  <Landmark size={14} className="text-blue-500" />
+                  <span>{isAr ? "خيارات التحويل عبر PayPal" : "PayPal Transfer Options"}</span>
+                </span>
+                <span>{t("paypalInfo")}</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Field label={t("paypalEmailLabel")} htmlFor="acc-iban" required>
+                  <Input
+                    id="acc-iban"
+                    type="email"
+                    value={iban}
+                    onChange={(e) => setIban(e.target.value.trim())}
+                    placeholder={t("paypalEmailPlaceholder")}
+                    dir="ltr"
+                    className="font-mono text-xs text-start"
+                    required
+                  />
+                </Field>
+
+                <Field label={t("paypalUsernameLabel")} htmlFor="acc-username">
+                  <Input
+                    id="acc-username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value.trim())}
+                    placeholder={t("paypalUsernamePlaceholder")}
+                    dir="ltr"
+                    className="text-start"
+                  />
+                </Field>
+              </div>
+
+              <Field label={t("paypalUrlLabel")} htmlFor="acc-payment-url">
+                <Input
+                  id="acc-payment-url"
+                  type="url"
+                  value={paymentUrl}
+                  onChange={(e) => setPaymentUrl(e.target.value.trim())}
+                  placeholder={t("paypalUrlPlaceholder")}
+                  dir="ltr"
+                  className="font-mono text-xs text-start"
+                />
+              </Field>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Field
+                  label={
+                    isAr
+                      ? "اسم صاحب الحساب أو المنشأة (اختياري)"
+                      : "Account Holder / Business Name (Optional)"
+                  }
+                  htmlFor="acc-holder"
+                >
+                  <Input
+                    id="acc-holder"
+                    value={accountHolder}
+                    onChange={(e) => setAccountHolder(e.target.value)}
+                    placeholder={
+                      isAr
+                        ? "الاسم المسجل في حساب بايبال"
+                        : "Name registered on PayPal"
+                    }
+                  />
+                </Field>
+
+                <Field label={t("currencyLabel")} htmlFor="acc-currency" required>
+                  <Select
+                    id="acc-currency"
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                  >
+                    {SUPPORTED_CURRENCIES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.symbol} {c.code} - {isAr ? c.nameAr : c.nameEn}
+                      </option>
+                    ))}
+                    {currency &&
+                    !SUPPORTED_CURRENCIES.some((c) => c.code === currency) ? (
+                      <option value={currency}>{currency}</option>
+                    ) : null}
+                  </Select>
+                </Field>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Field label={t("bankNameAr")} htmlFor="acc-bank-name-ar" required>
+                  <Input
+                    id="acc-bank-name-ar"
+                    value={bankNameAr}
+                    onChange={(e) => setBankNameAr(e.target.value)}
+                    placeholder={selectedProviderDef.nameAr}
+                    dir="rtl"
+                    required
+                  />
+                </Field>
+
+                <Field label={t("bankNameEn")} htmlFor="acc-bank-name-en">
+                  <Input
+                    id="acc-bank-name-en"
+                    value={bankNameEn}
+                    onChange={(e) => setBankNameEn(e.target.value)}
+                    placeholder={selectedProviderDef.nameEn}
+                    dir="ltr"
+                    className="text-start"
+                  />
+                </Field>
+              </div>
+
+              <Field
+                label={
+                  isAr
+                    ? selectedProviderDef.accountHolderLabelAr
+                    : selectedProviderDef.accountHolderLabelEn
+                }
+                htmlFor="acc-holder"
+              >
+                <Input
+                  id="acc-holder"
+                  value={accountHolder}
+                  onChange={(e) => setAccountHolder(e.target.value)}
+                  placeholder={
+                    isAr
+                      ? selectedProviderDef.accountHolderPlaceholderAr
+                      : selectedProviderDef.accountHolderPlaceholderEn
+                  }
+                />
+              </Field>
+
+              <Field
+                label={
+                  isAr
+                    ? selectedProviderDef.identifierLabelAr
+                    : selectedProviderDef.identifierLabelEn
+                }
+                htmlFor="acc-iban"
                 required
-              />
-            </Field>
+              >
+                <Input
+                  id="acc-iban"
+                  value={iban}
+                  onChange={(e) => setIban(e.target.value)}
+                  placeholder={selectedProviderDef.placeholder}
+                  dir="ltr"
+                  className="font-mono text-xs text-start"
+                  required
+                />
+              </Field>
 
-            <Field label={t("bankNameEn")} htmlFor="acc-bank-name-en">
-              <Input
-                id="acc-bank-name-en"
-                value={bankNameEn}
-                onChange={(e) => setBankNameEn(e.target.value)}
-                placeholder={selectedProviderDef.nameEn}
-                dir="ltr"
-                className="text-start"
-              />
-            </Field>
-          </div>
+              {isBankType ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Field label={t("swiftLabel")} htmlFor="acc-swift">
+                    <Input
+                      id="acc-swift"
+                      value={swift}
+                      onChange={(e) => setSwift(e.target.value.toUpperCase())}
+                      placeholder={selectedProviderDef.swiftPlaceholder ?? "RJHISARI"}
+                      dir="ltr"
+                      className="font-mono text-xs uppercase text-start"
+                    />
+                  </Field>
 
-          <Field label={t("accountHolder")} htmlFor="acc-holder">
-            <Input
-              id="acc-holder"
-              value={accountHolder}
-              onChange={(e) => setAccountHolder(e.target.value)}
-              placeholder={t("accountHolderPlaceholder")}
-            />
-          </Field>
-
-          <Field label={isAr ? selectedProviderDef.identifierLabelAr : selectedProviderDef.identifierLabelEn} htmlFor="acc-iban" required>
-            <Input
-              id="acc-iban"
-              value={iban}
-              onChange={(e) => setIban(e.target.value)}
-              placeholder={selectedProviderDef.placeholder}
-              dir="ltr"
-              className="font-mono text-xs text-start"
-              required
-            />
-          </Field>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label={t("swiftLabel")} htmlFor="acc-swift">
-              <Input
-                id="acc-swift"
-                value={swift}
-                onChange={(e) => setSwift(e.target.value.toUpperCase())}
-                placeholder="RJHISARI"
-                dir="ltr"
-                className="font-mono text-xs uppercase text-start"
-              />
-            </Field>
-
-            <Field label={t("currencyLabel")} htmlFor="acc-currency" required>
-              <Input
-                id="acc-currency"
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value.toUpperCase())}
-                placeholder="SAR"
-                dir="ltr"
-                className="font-mono text-xs uppercase text-start"
-                required
-              />
-            </Field>
-          </div>
+                  <Field label={t("currencyLabel")} htmlFor="acc-currency" required>
+                    <Select
+                      id="acc-currency"
+                      value={currency}
+                      onChange={(e) => setCurrency(e.target.value)}
+                    >
+                      {SUPPORTED_CURRENCIES.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.symbol} {c.code} - {locale === "ar" ? c.nameAr : c.nameEn}
+                        </option>
+                      ))}
+                      {currency &&
+                      !SUPPORTED_CURRENCIES.some((c) => c.code === currency) ? (
+                        <option value={currency}>{currency}</option>
+                      ) : null}
+                    </Select>
+                  </Field>
+                </div>
+              ) : (
+                <Field label={t("currencyLabel")} htmlFor="acc-currency" required>
+                  <Select
+                    id="acc-currency"
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                  >
+                    {SUPPORTED_CURRENCIES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.symbol} {c.code} - {locale === "ar" ? c.nameAr : c.nameEn}
+                      </option>
+                    ))}
+                    {currency &&
+                    !SUPPORTED_CURRENCIES.some((c) => c.code === currency) ? (
+                      <option value={currency}>{currency}</option>
+                    ) : null}
+                  </Select>
+                </Field>
+              )}
+            </>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <label className="flex h-11 cursor-pointer items-center justify-between rounded-lg border border-border/80 bg-muted/20 px-3.5 text-xs text-foreground transition-colors hover:bg-muted/30 select-none">

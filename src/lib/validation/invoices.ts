@@ -53,6 +53,7 @@ export const createInvoiceSchema = z.object({
   dueDate: nullableOptDate.optional(),
   notesAr: nullableOptText(),
   notesEn: nullableOptText(),
+  bankAccountIds: z.array(z.string()).optional(),
 });
 export type CreateInvoiceInput = z.infer<typeof createInvoiceSchema>;
 
@@ -63,6 +64,7 @@ export const updateInvoiceDraftSchema = z.object({
   dueDate: nullableOptDate,
   notesAr: nullableOptText(),
   notesEn: nullableOptText(),
+  bankAccountIds: z.array(z.string()).optional(),
 });
 export type UpdateInvoiceDraftInput = z.infer<typeof updateInvoiceDraftSchema>;
 
@@ -70,7 +72,7 @@ export const invoiceLineSchema = z.object({
   descriptionAr: optText(400),
   descriptionEn: optText(400),
   qtyMilli: z.number().int().min(1).max(1_000_000_000),
-  unitPriceMinor: z.number().int().min(0).max(MAX_MINOR),
+  unitPriceMinor: z.number().min(0).max(MAX_MINOR),
 });
 export type InvoiceLineInput = z.infer<typeof invoiceLineSchema>;
 

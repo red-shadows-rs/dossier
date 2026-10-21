@@ -3,15 +3,19 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   Building2,
   Calendar,
+  Check,
   Clock,
+  Copy,
   CreditCard,
+  ExternalLink,
   FileText,
   FolderKanban,
   ListOrdered,
@@ -37,8 +41,15 @@ import {
   TableRow,
 } from "@/components/ui/Table";
 import { UrlTabs } from "@/components/ui/UrlTabs";
+import { cn } from "@/components/ui/cn";
 import type { CurrencyCode } from "@/lib/constants";
 import { formatMoney } from "@/lib/money";
+import {
+  parsePaymentInstructionsToCards,
+  stripPaymentMetadata,
+  type PaymentCardData,
+} from "@/lib/payment-methods";
+import type { BankAccount } from "@/lib/validation/settings";
 import type {
   clients,
   invoiceLines,
@@ -85,6 +96,7 @@ interface InvoiceDetailViewProps {
   canRead: boolean;
   canVoidPayment: boolean;
   paymentInstructions: string;
+  companyAccounts?: BankAccount[];
   overdue: boolean;
   locale: "ar" | "en";
 }
@@ -102,10 +114,21 @@ export function InvoiceDetailView({
   canRead,
   canVoidPayment,
   paymentInstructions,
+  companyAccounts,
   overdue,
   locale,
 }: InvoiceDetailViewProps) {
   const t = useTranslations("invoices");
+
+  const paymentCards = useMemo(
+    () =>
+      parsePaymentInstructionsToCards(
+        paymentInstructions,
+        companyAccounts,
+        locale,
+      ),
+    [paymentInstructions, companyAccounts, locale],
+  );
 
   const searchParams = useSearchParams();
   const currentTab = searchParams.get("tab") || "preview";
@@ -161,7 +184,7 @@ export function InvoiceDetailView({
             {t("title")}
           </Link>
           <span className="text-border">/</span>
-          <span className="text-foreground font-mono font-medium">
+          <span className={cn("text-foreground font-medium", invoice.number ? "font-mono" : "font-sans")}>
             {invoice.number ?? t("draftTitle")}
           </span>
         </nav>
@@ -173,7 +196,7 @@ export function InvoiceDetailView({
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground font-mono">
+                <h1 className={cn("text-xl sm:text-2xl font-bold tracking-tight text-foreground", invoice.number ? "font-mono" : "font-sans")}>
                   {invoice.number ?? t("draftTitle")}
                 </h1>
                 <Badge
@@ -414,13 +437,22 @@ export function InvoiceDetailView({
                     </div>
                   )}
                   {paymentInstructions && (
-                    <div className="flex flex-col gap-1 border-t border-border/40 pt-3">
-                      <span className="text-xs font-medium text-muted-foreground">
-                        {t("paymentInstructions")}
+                    <div className="flex flex-col gap-2.5 border-t border-border/40 pt-3">
+                      <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                        <CreditCard className="h-3.5 w-3.5 text-primary" />
+                        <span>{t("paymentInstructions")}</span>
                       </span>
-                      <p className="rounded border border-border/60 bg-muted/20 p-3 text-sm text-foreground whitespace-pre-wrap leading-relaxed">
-                        {paymentInstructions}
-                      </p>
+                      {paymentCards.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
+                          {paymentCards.map((card, idx) => (
+                            <PaymentCardItem key={idx} card={card} />
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="rounded border border-border/60 bg-muted/20 p-3 text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+                          {stripPaymentMetadata(paymentInstructions)}
+                        </p>
+                      )}
                     </div>
                   )}
                 </CardContent>
@@ -684,6 +716,265 @@ export function InvoiceDetailView({
           </CardContent>
         </Card>
       </div>
+    </div>
+  );
+}
+
+function PaymentCardItem({ card }: { card: PaymentCardData }) {
+  const t = useTranslations("invoices");
+  const [copied, setCopied] = useState<string | null>(null);
+
+  function copy(val: string, key: string) {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(val);
+      setCopied(key);
+      setTimeout(() => setCopied(null), 2000);
+    }
+  }
+
+  const isBinance = card.provider === "binance";
+  const isPaypal = card.provider === "paypal";
+
+  return (
+    <div className="flex flex-col rounded-lg border border-border/70 bg-surface/50 p-3.5 gap-2.5 shadow-2xs transition-all hover:border-border">
+      <div className="flex items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border/60 bg-card p-1 shadow-2xs">
+            {card.icon ? (
+              <Image
+                src={card.icon}
+                alt={card.bankName}
+                width={26}
+                height={26}
+                unoptimized
+                className="max-h-6 max-w-6 object-contain"
+              />
+            ) : (
+              <Building2 className="h-4 w-4 text-muted-foreground" />
+            )}
+          </div>
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className="text-xs font-bold text-foreground truncate">
+              {card.bankName}
+            </span>
+            {card.accountHolder ? (
+              <span className="text-[11px] text-muted-foreground truncate">
+                <span className="text-muted-foreground/70">{t("beneficiary")}:</span> {card.accountHolder}
+              </span>
+            ) : null}
+          </div>
+        </div>
+
+        {card.currency ? (
+          <Badge tone="gray" className="text-[10px] px-2 py-0.5 font-mono shrink-0">
+            {card.currency}
+          </Badge>
+        ) : null}
+      </div>
+
+      {isBinance ? (
+        <div className="flex flex-col gap-1.5">
+          {card.binanceUid ? (
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-background/50 px-2.5 py-1.5 text-xs">
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-[10px] text-muted-foreground font-medium">
+                  Binance UID
+                </span>
+                <span className="font-mono font-semibold text-foreground truncate" dir="ltr">
+                  {card.binanceUid}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => copy(card.binanceUid ?? "", "uid")}
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-border/60 bg-card hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                title={copied === "uid" ? t("copiedToClipboard") : t("copy")}
+              >
+                {copied === "uid" ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+              </button>
+            </div>
+          ) : null}
+
+          {card.binancePayId ? (
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-background/50 px-2.5 py-1.5 text-xs">
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-[10px] text-muted-foreground font-medium">
+                  Binance Pay ID
+                </span>
+                <span className="font-mono font-semibold text-foreground truncate" dir="ltr">
+                  {card.binancePayId}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => copy(card.binancePayId ?? "", "payid")}
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-border/60 bg-card hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                title={copied === "payid" ? t("copiedToClipboard") : t("copy")}
+              >
+                {copied === "payid" ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+              </button>
+            </div>
+          ) : null}
+
+          {card.username ? (
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border/40 bg-background/30 px-2.5 py-1 text-xs">
+              <span className="text-[10px] text-muted-foreground font-medium">
+                Handle:
+              </span>
+              <span className="font-mono text-xs font-semibold text-foreground" dir="ltr">
+                {card.username.startsWith("@") ? card.username : `@${card.username}`}
+              </span>
+            </div>
+          ) : null}
+
+          {card.identifierValue && card.identifierValue !== card.binanceUid && card.identifierValue !== card.binancePayId ? (
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-background/50 px-2.5 py-1.5 text-xs">
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-[10px] text-muted-foreground font-medium">
+                  {card.network ? `Wallet (${card.network})` : card.identifierLabel}
+                </span>
+                <span className="font-mono font-semibold text-foreground truncate" dir="ltr">
+                  {card.identifierValue}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => copy(card.identifierValue, "wallet")}
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-border/60 bg-card hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                title={copied === "wallet" ? t("copiedToClipboard") : t("copy")}
+              >
+                {copied === "wallet" ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+              </button>
+            </div>
+          ) : null}
+        </div>
+      ) : isPaypal ? (
+        <div className="flex flex-col gap-1.5">
+          {card.identifierValue ? (
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-background/50 px-2.5 py-1.5 text-xs">
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-[10px] text-muted-foreground font-medium">
+                  PayPal Email
+                </span>
+                <span className="font-mono font-semibold text-foreground truncate" dir="ltr">
+                  {card.identifierValue}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => copy(card.identifierValue, "email")}
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-border/60 bg-card hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                title={copied === "email" ? t("copiedToClipboard") : t("copy")}
+              >
+                {copied === "email" ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+              </button>
+            </div>
+          ) : null}
+
+          {card.username ? (
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border/40 bg-background/30 px-2.5 py-1 text-xs">
+              <span className="text-[10px] text-muted-foreground font-medium">
+                Username:
+              </span>
+              <span className="font-mono text-xs font-semibold text-foreground" dir="ltr">
+                {card.username.startsWith("@") ? card.username : `@${card.username}`}
+              </span>
+            </div>
+          ) : null}
+
+          {card.paymentUrl ? (
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-primary/5 px-2.5 py-1.5 text-xs">
+              <span className="text-[10px] text-primary font-medium">
+                PayPal.Me
+              </span>
+              <a
+                href={
+                  card.paymentUrl.startsWith("http://") || card.paymentUrl.startsWith("https://")
+                    ? card.paymentUrl
+                    : `https://${card.paymentUrl}`
+                }
+                target="_blank"
+                rel="noreferrer noopener"
+                className="inline-flex items-center gap-1 font-mono text-xs text-primary font-semibold hover:underline"
+                dir="ltr"
+              >
+                <span>{card.paymentUrl}</span>
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            </div>
+          ) : null}
+        </div>
+      ) : (
+        <>
+          {card.identifierValue ? (
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-background/50 px-2.5 py-1.5 text-xs">
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-[10px] text-muted-foreground font-medium">
+                  {card.identifierLabel}
+                </span>
+                <span className="font-mono font-semibold text-foreground truncate" dir="ltr">
+                  {card.identifierValue}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => copy(card.identifierValue, "id")}
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-border/60 bg-card hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                title={copied === "id" ? t("copiedToClipboard") : t("copy")}
+              >
+                {copied === "id" ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+              </button>
+            </div>
+          ) : null}
+
+          {card.swift ? (
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border/40 bg-background/30 px-2.5 py-1 text-xs">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-muted-foreground font-medium">
+                  {t("swiftLabel")}:
+                </span>
+                <span className="font-mono text-xs font-semibold text-foreground" dir="ltr">
+                  {card.swift}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (card.swift) copy(card.swift, "swift");
+                }}
+                className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                title={copied === "swift" ? t("copiedToClipboard") : t("copy")}
+              >
+                {copied === "swift" ? (
+                  <Check className="h-3 w-3 text-emerald-500" />
+                ) : (
+                  <Copy className="h-3 w-3" />
+                )}
+              </button>
+            </div>
+          ) : null}
+        </>
+      )}
     </div>
   );
 }

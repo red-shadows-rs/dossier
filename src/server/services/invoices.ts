@@ -316,6 +316,17 @@ export function createInvoice(
     }
   }
   const defaults = getSettings("defaults");
+  const company = getSettings("company");
+  const paymentInstructionsAr = buildPaymentInstructions(
+    company,
+    "ar",
+    input.bankAccountIds,
+  );
+  const paymentInstructionsEn = buildPaymentInstructions(
+    company,
+    "en",
+    input.bankAccountIds,
+  );
   const id = newId();
   const now = nowMs();
   withTx((tx) => {
@@ -335,6 +346,8 @@ export function createInvoice(
         discountType: "none",
         notesAr: input.notesAr,
         notesEn: input.notesEn,
+        paymentInstructionsAr,
+        paymentInstructionsEn,
         createdBy: user.id,
         createdAt: now,
         updatedAt: now,
@@ -401,6 +414,7 @@ export function createInvoiceFromMilestone(
     fixedTaxMinor: milestone.taxMinor,
   });
 
+  const company = getSettings("company");
   withTx((tx) => {
     tx.insert(invoices)
       .values({
@@ -419,6 +433,8 @@ export function createInvoiceFromMilestone(
         taxRateBp: contract.taxRateBp,
         taxMinor: result.tax,
         totalMinor: result.total,
+        paymentInstructionsAr: buildPaymentInstructions(company, "ar"),
+        paymentInstructionsEn: buildPaymentInstructions(company, "en"),
         createdBy: user.id,
         createdAt: now,
         updatedAt: now,
@@ -469,6 +485,19 @@ export function updateInvoiceDraft(
     };
     if (input.currency) {
       updateValues.currency = input.currency;
+    }
+    if (input.bankAccountIds !== undefined) {
+      const company = getSettings("company");
+      updateValues.paymentInstructionsAr = buildPaymentInstructions(
+        company,
+        "ar",
+        input.bankAccountIds,
+      );
+      updateValues.paymentInstructionsEn = buildPaymentInstructions(
+        company,
+        "en",
+        input.bankAccountIds,
+      );
     }
     tx.update(invoices)
       .set(updateValues)

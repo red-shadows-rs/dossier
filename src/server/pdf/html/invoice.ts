@@ -7,6 +7,11 @@ import type { CurrencyCode, Locale } from "@/lib/constants";
 import type { DocLang } from "@/lib/doc-lang";
 import type { InvoiceStatus } from "@/server/services/invoices";
 import { renderCode39Svg } from "@/server/pdf/qr";
+import { getBankLogoDataUri } from "@/server/services/settings";
+import {
+  parsePaymentInstructionsToCards,
+  stripPaymentMetadata,
+} from "@/lib/payment-methods";
 import {
   documentShell,
   esc,
@@ -145,13 +150,19 @@ body {
   max-height: 284mm;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   position: relative;
   background: #ffffff;
   box-sizing: border-box;
   page-break-after: always;
   break-after: page;
   overflow: hidden;
+}
+.invoice-page-main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 .invoice-page:last-child {
   page-break-after: auto;
@@ -572,6 +583,7 @@ table.inv-items-table tbody tr:last-child td {
   border-top: 0.35mm solid #cbd5e1;
   break-inside: avoid;
   page-break-inside: avoid;
+  flex-shrink: 0;
 }
 .inv-footer {
   display: flex;
@@ -610,6 +622,71 @@ table.inv-items-table tbody tr:last-child td {
   font-size: 7.8pt;
   color: #334155;
   line-height: 1.45;
+}
+.payment-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2mm;
+  margin-top: 1.2mm;
+}
+.payment-cards-grid.single-card {
+  grid-template-columns: 1fr;
+}
+.payment-card {
+  background: #f8fafc;
+  border: 0.25mm solid #cbd5e1;
+  border-radius: 1.5mm;
+  padding: 2mm 2.5mm;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2mm;
+  page-break-inside: avoid;
+}
+.payment-card-header {
+  display: flex;
+  align-items: center;
+  gap: 2mm;
+}
+.payment-card-logo {
+  width: 5.5mm;
+  height: 5.5mm;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.payment-card-title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+.payment-card-title {
+  font-size: 7.8pt;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+.payment-card-holder {
+  font-size: 6.8pt;
+  color: #64748b;
+  margin-top: 0.3mm;
+}
+.payment-card-id-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5mm;
+  font-size: 7pt;
+  padding-top: 0.8mm;
+  border-top: 0.15mm solid #e2e8f0;
+}
+.payment-card-label {
+  color: #64748b;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.payment-card-mono {
+  font-family: monospace;
+  font-weight: 600;
+  color: #1e293b;
+  word-break: break-all;
 }
 .thank-you {
   font-size: 10.5pt;
@@ -728,7 +805,7 @@ table.inv-items-table tbody tr:last-child td {
     break-after: page !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: flex-start !important;
     overflow: hidden !important;
     background: #ffffff !important;
   }
@@ -1166,57 +1243,105 @@ function splitInstructionLines(rawText: string | null | undefined): string[] {
 function instructionsBlock(input: InvoiceHtmlInput): string {
   const arRaw = input.invoice.paymentInstructionsAr?.trim();
   const enRaw = input.invoice.paymentInstructionsEn?.trim();
+  const raw =
+    input.lang === "ar"
+      ? arRaw || enRaw
+      : input.lang === "en"
+        ? enRaw || arRaw
+        : arRaw || enRaw;
+
+  if (!raw) return "";
+
+  const langCode = input.lang === "en" ? "en" : "ar";
+  const cards = parsePaymentInstructionsToCards(raw, undefined, langCode);
 
   let contentHtml = "";
 
-  if (input.lang === "ar") {
-    const raw = arRaw || enRaw;
-    if (!raw) return "";
-    const lines = splitInstructionLines(raw);
-    contentHtml = lines
-      .map((line) => `<div class="instruction-line">${esc(line)}</div>`)
+  if (cards.length > 0) {
+    const beneficiaryLabel = langCode === "ar" ? "المستفيد" : "Beneficiary";
+    const swiftLabel = langCode === "ar" ? "سويفت" : "SWIFT";
+
+    const cardsHtml = cards
+      .map((card) => {
+        const logoUri = getBankLogoDataUri(card.provider);
+        const logoHtml = logoUri
+          ? `<img class="payment-card-logo" src="${esc(logoUri)}" alt="" />`
+          : `<svg class="payment-card-logo" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v4"/><path d="M12 14v4"/><path d="M16 14v4"/></svg>`;
+
+        return `
+        <div class="payment-card">
+          <div class="payment-card-header">
+            ${logoHtml}
+            <div class="payment-card-title-wrap">
+              <div class="payment-card-title">${esc(card.bankName)}</div>
+              ${
+                card.accountHolder
+                  ? `<div class="payment-card-holder">${esc(beneficiaryLabel)}: ${esc(card.accountHolder)}</div>`
+                  : ""
+              }
+            </div>
+          </div>
+          ${
+            card.binanceUid && card.binanceUid !== card.identifierValue
+              ? `
+            <div class="payment-card-id-row">
+              <span class="payment-card-label">${esc(langCode === "ar" ? "معرف باينانس (UID)" : "Binance UID")}:</span>
+              <span class="payment-card-mono" dir="ltr">${esc(card.binanceUid)}</span>
+            </div>
+          `
+              : ""
+          }
+          ${
+            card.binancePayId && card.binancePayId !== card.identifierValue
+              ? `
+            <div class="payment-card-id-row">
+              <span class="payment-card-label">Pay ID:</span>
+              <span class="payment-card-mono" dir="ltr">${esc(card.binancePayId)}</span>
+            </div>
+          `
+              : ""
+          }
+          ${
+            card.paymentUrl
+              ? `
+            <div class="payment-card-id-row">
+              <span class="payment-card-label">${esc(langCode === "ar" ? "رابط الدفع" : "Pay Link")}:</span>
+              <span class="payment-card-mono" dir="ltr">${esc(card.paymentUrl)}</span>
+            </div>
+          `
+              : ""
+          }
+          ${
+            card.identifierValue
+              ? `
+            <div class="payment-card-id-row">
+              <span class="payment-card-label">${esc(card.identifierLabel)}:</span>
+              <span class="payment-card-mono" dir="ltr">${esc(card.identifierValue)}</span>
+            </div>
+          `
+              : ""
+          }
+          ${
+            card.swift
+              ? `
+            <div class="payment-card-id-row">
+              <span class="payment-card-label">${esc(swiftLabel)}:</span>
+              <span class="payment-card-mono" dir="ltr">${esc(card.swift)}</span>
+            </div>
+          `
+              : ""
+          }
+        </div>
+        `;
+      })
       .join("");
-  } else if (input.lang === "en") {
-    const raw = enRaw || arRaw;
-    if (!raw) return "";
-    const lines = splitInstructionLines(raw);
-    contentHtml = lines
-      .map((line) => `<div class="instruction-line">${esc(line)}</div>`)
-      .join("");
+
+    contentHtml = `<div class="payment-cards-grid${cards.length === 1 ? " single-card" : ""}">${cardsHtml}</div>`;
   } else {
-    if (!arRaw && !enRaw) return "";
-    if (arRaw && !enRaw) {
-      const lines = splitInstructionLines(arRaw);
-      contentHtml = lines
-        .map((line) => `<div class="instruction-line" dir="rtl">${esc(line)}</div>`)
-        .join("");
-    } else if (enRaw && !arRaw) {
-      const lines = splitInstructionLines(enRaw);
-      contentHtml = lines
-        .map((line) => `<div class="instruction-line" dir="ltr">${esc(line)}</div>`)
-        .join("");
-    } else {
-      const enLines = splitInstructionLines(enRaw);
-      const arLines = splitInstructionLines(arRaw);
-      if (enLines.length === arLines.length) {
-        contentHtml = enLines
-          .map(
-            (en, idx) =>
-              `<div class="instruction-line"><span dir="ltr">${esc(en)}</span> / <span dir="rtl">${esc(
-                arLines[idx],
-              )}</span></div>`,
-          )
-          .join("");
-      } else {
-        const enBlock = enLines
-          .map((line) => `<div class="instruction-line" dir="ltr">${esc(line)}</div>`)
-          .join("");
-        const arBlock = arLines
-          .map((line) => `<div class="instruction-line" dir="rtl">${esc(line)}</div>`)
-          .join("");
-        contentHtml = `${enBlock}${arBlock}`;
-      }
-    }
+    const lines = splitInstructionLines(stripPaymentMetadata(raw));
+    contentHtml = `<div class="instructions-list">${lines
+      .map((line) => `<div class="instruction-line">${esc(line)}</div>`)
+      .join("")}</div>`;
   }
 
   if (!contentHtml) return "";
@@ -1231,7 +1356,7 @@ function instructionsBlock(input: InvoiceHtmlInput): string {
   return `
   <div class="info-block">
     <h4>${heading}</h4>
-    <div class="instructions-list">${contentHtml}</div>
+    ${contentHtml}
   </div>
   `;
 }
