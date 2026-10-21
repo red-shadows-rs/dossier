@@ -1129,7 +1129,7 @@
     "downloadReceiptPdf": "Download Receipt (PDF)"
   },
   "subscriptions": {
-    "title": "Subscriptions & Recurring",
+    "title": "Subscriptions",
     "new": "New Subscription",
     "edit": "Edit Subscription",
     "empty": "No recurring subscriptions yet",

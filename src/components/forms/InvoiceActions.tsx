@@ -60,7 +60,9 @@ export function InvoiceActions({
   const toast = useToast();
   const router = useRouter();
   const [pending, setPending] = useState(false);
-  const [confirm, setConfirm] = useState<"delete" | "void" | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [voidOpen, setVoidOpen] = useState(false);
+  const [voidReason, setVoidReason] = useState("");
   const [payOpen, setPayOpen] = useState(false);
 
   async function run(
@@ -91,26 +93,23 @@ export function InvoiceActions({
     }
   }
 
-  async function onConfirm() {
-    if (confirm === "delete") {
-      const ok = await run(() => deleteDraftInvoiceAction({ id: invoiceId }));
-      setConfirm(null);
-      if (ok) {
-        toast({ title: t("invoices.deleted"), tone: "success" });
-        router.push("/invoices");
-      }
-      return;
-    }
-    const reason = window.prompt(t("invoices.voidReasonPrompt")) ?? "";
-    if (!reason.trim()) {
-      setConfirm(null);
-      return;
-    }
-    const ok = await run(() =>
-      voidInvoiceAction({ id: invoiceId, reason: reason.trim() }),
-    );
-    setConfirm(null);
+  async function onDeleteConfirm() {
+    const ok = await run(() => deleteDraftInvoiceAction({ id: invoiceId }));
+    setConfirmDelete(false);
     if (ok) {
+      toast({ title: t("invoices.deleted"), tone: "success" });
+      router.push("/invoices");
+    }
+  }
+
+  async function onVoidSubmit() {
+    if (!voidReason.trim()) return;
+    const ok = await run(() =>
+      voidInvoiceAction({ id: invoiceId, reason: voidReason.trim() }),
+    );
+    if (ok) {
+      setVoidOpen(false);
+      setVoidReason("");
       toast({ title: t("invoices.voided"), tone: "success" });
       router.refresh();
     }
@@ -131,7 +130,7 @@ export function InvoiceActions({
               <Button
                 type="button"
                 variant="danger"
-                onClick={() => setConfirm("delete")}
+                onClick={() => setConfirmDelete(true)}
                 className="gap-2"
               >
                 <Trash2 className="h-4 w-4" />
@@ -175,7 +174,7 @@ export function InvoiceActions({
           <Button
             type="button"
             variant="danger"
-            onClick={() => setConfirm("void")}
+            onClick={() => setVoidOpen(true)}
             className="gap-2"
           >
             <Ban className="h-4 w-4" />
@@ -196,22 +195,70 @@ export function InvoiceActions({
       />
 
       <ConfirmDialog
-        open={confirm !== null}
-        onClose={() => setConfirm(null)}
-        onConfirm={onConfirm}
-        title={t(
-          confirm === "delete" ? "invoices.deleteTitle" : "invoices.voidTitle",
-        )}
-        message={t(
-          confirm === "delete"
-            ? "invoices.deleteMessage"
-            : "invoices.voidMessage",
-        )}
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={onDeleteConfirm}
+        title={t("invoices.deleteTitle")}
+        message={t("invoices.deleteMessage")}
         confirmLabel={t("common.confirm")}
         cancelLabel={t("common.cancel")}
         pending={pending}
         tone="danger"
       />
+
+      <Dialog
+        open={voidOpen}
+        onClose={() => {
+          setVoidOpen(false);
+          setVoidReason("");
+        }}
+        title={t("invoices.voidTitle")}
+        description={t("invoices.voidMessage")}
+        footer={
+          <>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setVoidOpen(false);
+                setVoidReason("");
+              }}
+              disabled={pending}
+              className="gap-1.5"
+            >
+              <X size={15} aria-hidden="true" />
+              <span>{t("common.cancel")}</span>
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              onClick={onVoidSubmit}
+              loading={pending}
+              disabled={!voidReason.trim()}
+              className="gap-1.5"
+            >
+              <Trash2 size={15} aria-hidden="true" />
+              <span>{t("invoices.voidConfirm")}</span>
+            </Button>
+          </>
+        }
+      >
+        <div className="pt-2">
+          <Field
+            label={t("invoices.voidReasonPrompt")}
+            htmlFor="void-invoice-reason"
+            required
+          >
+            <Input
+              id="void-invoice-reason"
+              value={voidReason}
+              onChange={(e) => setVoidReason(e.target.value)}
+              placeholder={t("invoices.voidReasonPrompt")}
+              autoFocus
+            />
+          </Field>
+        </div>
+      </Dialog>
     </>
   );
 }
@@ -374,13 +421,10 @@ export function VoidPaymentButton({
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
+  const [reason, setReason] = useState("");
 
-  async function onConfirm() {
-    const reason = window.prompt(t("invoices.voidReasonPrompt")) ?? "";
-    if (!reason.trim()) {
-      setOpen(false);
-      return;
-    }
+  async function onVoidSubmit() {
+    if (!reason.trim()) return;
     setPending(true);
     const result = await voidPaymentAction({
       id: paymentId,
@@ -388,8 +432,9 @@ export function VoidPaymentButton({
       reason: reason.trim(),
     });
     setPending(false);
-    setOpen(false);
     if (result.ok) {
+      setOpen(false);
+      setReason("");
       toast({ title: t("invoices.paymentVoided"), tone: "success" });
       router.refresh();
       return;
@@ -409,17 +454,59 @@ export function VoidPaymentButton({
           amount: formatMoney(amountMinor, currency as CurrencyCode, "en"),
         })}
       </button>
-      <ConfirmDialog
+      <Dialog
         open={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onConfirm}
+        onClose={() => {
+          setOpen(false);
+          setReason("");
+        }}
         title={t("invoices.voidPaymentTitle")}
-        message={t("invoices.voidPaymentMessage")}
-        confirmLabel={t("common.confirm")}
-        cancelLabel={t("common.cancel")}
-        pending={pending}
-        tone="danger"
-      />
+        description={t("invoices.voidPaymentMessage")}
+        footer={
+          <>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setOpen(false);
+                setReason("");
+              }}
+              disabled={pending}
+              className="gap-1.5"
+            >
+              <X size={15} aria-hidden="true" />
+              <span>{t("common.cancel")}</span>
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              onClick={onVoidSubmit}
+              loading={pending}
+              disabled={!reason.trim()}
+              className="gap-1.5"
+            >
+              <Trash2 size={15} aria-hidden="true" />
+              <span>{t("common.confirm")}</span>
+            </Button>
+          </>
+        }
+      >
+        <div className="pt-2">
+          <Field
+            label={t("invoices.voidReasonPrompt")}
+            htmlFor={`void-payment-reason-${paymentId}`}
+            required
+          >
+            <Input
+              id={`void-payment-reason-${paymentId}`}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder={t("invoices.voidReasonPrompt")}
+              autoFocus
+            />
+          </Field>
+        </div>
+      </Dialog>
     </>
   );
 }
