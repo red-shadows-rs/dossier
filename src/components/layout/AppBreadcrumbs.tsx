@@ -16,6 +16,7 @@ const SECTIONS = new Set([
   "projects",
   "contracts",
   "invoices",
+  "subscriptions",
   "templates",
   "settings",
   "users",

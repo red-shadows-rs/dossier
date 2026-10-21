@@ -13,6 +13,7 @@ import { audit } from "@/server/services/audit";
 import { runBackup } from "@/server/services/backups";
 import { enqueueEmail } from "@/server/services/email";
 import { localeForInvoice } from "@/server/services/invoices";
+import { processScheduledSubscriptions } from "@/server/services/subscriptions";
 import {
   getInternalSetting,
   getSettings,
@@ -146,5 +147,10 @@ export async function runDailyJobs(atMs: number = nowMs()): Promise<void> {
     await runBackup(atMs);
     setInternalSetting("worker_state", { ...state, lastBackupDate: today });
     logger.info("daily_backup", { date: today });
+  }
+
+  const generatedSubs = processScheduledSubscriptions(today, atMs);
+  if (generatedSubs > 0) {
+    logger.info("scheduled_subscriptions_processed", { generated: generatedSubs, date: today });
   }
 }

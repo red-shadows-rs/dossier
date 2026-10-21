@@ -17,6 +17,7 @@ const READ_ALL: Permission[] = [
   "templates.read",
   "contracts.read",
   "invoices.read",
+  "subscriptions.read",
 ];
 const MEMBER_WRITE: Permission[] = [
   "clients.write",
@@ -27,6 +28,9 @@ const MEMBER_WRITE: Permission[] = [
   "contracts.cancel",
   "invoices.write",
   "invoices.issue",
+  "subscriptions.write",
+  "subscriptions.pause",
+  "subscriptions.cancel",
   "payments.write",
 ];
 const OWNER_ONLY: Permission[] = [

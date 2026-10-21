@@ -19,7 +19,7 @@ export function formatProjectCode(n: number): string {
 
 export function formatDocNumber(
   prefix: string,
-  kind: "C" | "I",
+  kind: "C" | "I" | "S",
   year: number,
   n: number,
 ): string {

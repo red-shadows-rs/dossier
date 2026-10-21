@@ -2,6 +2,7 @@
 // https://github.com/red-shadows-rs/dossier
 
 import {
+  CalendarClock,
   FileText,
   FolderKanban,
   Gauge,
@@ -63,6 +64,13 @@ export const NAV: NavEntry[] = [
     href: "/invoices",
     icon: Receipt,
     permission: "invoices.read",
+    section: "main",
+  },
+  {
+    key: "subscriptions",
+    href: "/subscriptions",
+    icon: CalendarClock,
+    permission: "subscriptions.read",
     section: "main",
   },
   {

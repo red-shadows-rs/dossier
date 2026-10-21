@@ -38,7 +38,26 @@ export const INVOICE_STATUSES = [
   "paid",
   "void",
 ] as const;
+export const SUBSCRIPTION_STATUSES = [
+  "active",
+  "paused",
+  "canceled",
+  "completed",
+] as const;
+export type SubscriptionStatus = (typeof SUBSCRIPTION_STATUSES)[number];
+
+export const SUBSCRIPTION_FREQUENCIES = [
+  "monthly",
+  "quarterly",
+  "semi_annual",
+  "annual",
+  "weekly",
+  "custom",
+] as const;
+export type SubscriptionFrequency = (typeof SUBSCRIPTION_FREQUENCIES)[number];
+
 export const DISCOUNT_TYPES = ["none", "percent", "fixed"] as const;
+export type DiscountType = (typeof DISCOUNT_TYPES)[number];
 export const MILESTONE_MODES = ["percent", "fixed"] as const;
 export const PAYMENT_METHODS = [
   "bank_transfer",
@@ -176,7 +195,7 @@ export const FILE_KINDS = [
   "attachment",
 ] as const;
 export const EMAIL_STATUSES = ["pending", "sending", "sent", "failed"] as const;
-export const SEQ_KEYS = ["contract", "invoice", "project"] as const;
+export const SEQ_KEYS = ["contract", "invoice", "project", "subscription"] as const;
 
 export const AUDIT_ACTIONS = [
   "auth.login",
@@ -222,6 +241,12 @@ export const AUDIT_ACTIONS = [
   "invoice.payment_recorded",
   "invoice.payment_voided",
   "invoice.reminder_sent",
+  "subscription.created",
+  "subscription.updated",
+  "subscription.paused",
+  "subscription.resumed",
+  "subscription.cancelled",
+  "subscription.invoice_generated",
   "settings.updated",
   "file.uploaded",
   "file.deleted",

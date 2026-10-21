@@ -484,6 +484,114 @@ export const contractSignatories = sqliteTable(
     uniqueIndex("signatories_token_uq").on(t.tokenHash),
   ],
 );
+
+export const subscriptions = sqliteTable(
+  "subscriptions",
+  {
+    id: pk(),
+    number: text("number"),
+    clientId: text("client_id")
+      .notNull()
+      .references(() => clients.id, { onDelete: "restrict" }),
+    projectId: text("project_id").references(() => projects.id, {
+      onDelete: "set null",
+    }),
+    contractId: text("contract_id").references(() => contracts.id, {
+      onDelete: "set null",
+    }),
+    titleAr: text("title_ar").notNull(),
+    titleEn: text("title_en"),
+    description: text("description"),
+    status: text("status", { enum: C.SUBSCRIPTION_STATUSES })
+      .notNull()
+      .default("active"),
+    frequency: text("frequency", { enum: C.SUBSCRIPTION_FREQUENCIES })
+      .notNull()
+      .default("monthly"),
+    intervalCount: integer("interval_count").notNull().default(1),
+    startDate: text("start_date").notNull(),
+    nextRunDate: text("next_run_date").notNull(),
+    endDate: text("end_date"),
+    languageMode: text("language_mode", { enum: C.INVOICE_LANG_MODES })
+      .notNull()
+      .default("ar"),
+    currency: text("currency").notNull().default("SAR"),
+    taxRateBp: integer("tax_rate_bp").notNull().default(0),
+    discountType: text("discount_type", { enum: C.DISCOUNT_TYPES })
+      .notNull()
+      .default("none"),
+    discountValue: integer("discount_value").notNull().default(0),
+    subtotalMinor: money("subtotal_minor"),
+    discountMinor: money("discount_minor"),
+    netMinor: money("net_minor"),
+    taxMinor: money("tax_minor"),
+    totalMinor: money("total_minor"),
+    paymentInstructionsAr: text("payment_instructions_ar"),
+    paymentInstructionsEn: text("payment_instructions_en"),
+    paymentTermsDays: integer("payment_terms_days").notNull().default(14),
+    autoIssueInvoice: integer("auto_issue_invoice", { mode: "boolean" })
+      .notNull()
+      .default(true),
+    autoSendEmail: integer("auto_send_email", { mode: "boolean" })
+      .notNull()
+      .default(true),
+    lastRunDate: text("last_run_date"),
+    lastInvoiceId: text("last_invoice_id"),
+    invoicesCount: integer("invoices_count").notNull().default(0),
+    notesAr: text("notes_ar"),
+    notesEn: text("notes_en"),
+    createdBy: text("created_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    uniqueIndex("subscriptions_number_uq").on(t.number),
+    index("subscriptions_client_idx").on(t.clientId),
+    index("subscriptions_project_idx").on(t.projectId),
+    index("subscriptions_status_idx").on(t.status),
+    index("subscriptions_next_run_idx").on(t.nextRunDate),
+    check("subscriptions_currency_len", sql`length(${t.currency}) = 3`),
+    check(
+      "subscriptions_money_nonneg",
+      sql`${t.subtotalMinor} >= 0 AND ${t.discountMinor} >= 0 AND ${t.netMinor} >= 0 AND ${t.taxMinor} >= 0 AND ${t.totalMinor} >= 0`,
+    ),
+    check(
+      "subscriptions_tax_rate_range",
+      sql`${t.taxRateBp} BETWEEN 0 AND 10000`,
+    ),
+  ],
+);
+
+export const subscriptionItems = sqliteTable(
+  "subscription_items",
+  {
+    id: pk(),
+    subscriptionId: text("subscription_id")
+      .notNull()
+      .references(() => subscriptions.id, { onDelete: "cascade" }),
+    position: integer("position").notNull(),
+    descriptionAr: text("description_ar").notNull(),
+    descriptionEn: text("description_en"),
+    quantity: integer("quantity").notNull().default(1),
+    unitPriceMinor: money("unit_price_minor"),
+    taxRateBp: integer("tax_rate_bp").notNull().default(0),
+    subtotalMinor: money("subtotal_minor"),
+    taxMinor: money("tax_minor"),
+    totalMinor: money("total_minor"),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index("sub_items_subscription_idx").on(t.subscriptionId),
+    check("sub_items_qty_positive", sql`${t.quantity} > 0`),
+    check(
+      "sub_items_money_nonneg",
+      sql`${t.unitPriceMinor} >= 0 AND ${t.subtotalMinor} >= 0 AND ${t.taxMinor} >= 0 AND ${t.totalMinor} >= 0`,
+    ),
+    check("sub_items_tax_rate_range", sql`${t.taxRateBp} BETWEEN 0 AND 10000`),
+  ],
+);
 export const invoices = sqliteTable(
   "invoices",
   {
@@ -501,6 +609,9 @@ export const invoices = sqliteTable(
     }),
     milestoneId: text("milestone_id").references(() => paymentMilestones.id, {
       onDelete: "restrict",
+    }),
+    subscriptionId: text("subscription_id").references(() => subscriptions.id, {
+      onDelete: "set null",
     }),
     status: text("status", { enum: C.INVOICE_STATUSES })
       .notNull()
@@ -548,6 +659,7 @@ export const invoices = sqliteTable(
     index("invoices_project_idx").on(t.projectId),
     index("invoices_client_idx").on(t.clientId),
     index("invoices_contract_idx").on(t.contractId),
+    index("invoices_subscription_idx").on(t.subscriptionId),
     index("invoices_status_idx").on(t.status),
     index("invoices_due_idx").on(t.dueDate),
     check("invoices_currency_len", sql`length(${t.currency}) = 3`),
@@ -654,6 +766,8 @@ export const schema = {
   paymentMilestones,
   contractVersions,
   contractSignatories,
+  subscriptions,
+  subscriptionItems,
   invoices,
   invoiceLines,
   payments,
