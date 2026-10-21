@@ -8,7 +8,7 @@
 
 Contracts & invoices platform with cryptographic verification, automated milestone billing, and bidirectional Arabic/English PDF rendering.
 
-[![Version](https://img.shields.io/badge/version-1.2.0-2563eb?style=for-the-badge)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.3.0-2563eb?style=for-the-badge)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-GPL--3.0-dc2626?style=for-the-badge)](LICENSE)
 ![TypeScript](https://img.shields.io/badge/typescript-5.9%2B-3178c6?style=for-the-badge&logo=typescript)
 ![Next.js](https://img.shields.io/badge/next.js-16.3-000000?style=for-the-badge&logo=next.js)
@@ -89,6 +89,8 @@ Built from the ground up with **zero external SaaS dependencies**, Dossier runs 
 - **Contract Builder & Lifecycle:** Draft contracts with dynamic variables (`{{client.name}}`, `{{contract.total}}`), counter-parties, payment schedules, and version control.
 - **Bilingual Side-by-Side Layout:** Export contracts in Arabic, English, or synchronized bilingual columns with mirrored Cairo typography.
 - **Milestone-Driven Invoicing:** Automatically generate tax invoices from contract milestones with a single click, eliminating billing errors.
+- **Subscriptions & Scheduled Services:** Manage recurring client services (hosting, maintenance, retainers) with customizable billing intervals, automated invoice generation via background cron worker, and full lifecycle controls (pause/resume/cancel).
+- **Multi-Currency & Dedicated Payment Accounts:** Support for multiple fiat and crypto payment rails (Binance networks/wallet/memo, PayPal merchant email/links, Saudi local banks) with localized currency selector (SAR, USD, EUR, etc.).
 - **Cryptographic Tamper-Evidence:** Generates deterministic canonical JSON digests (SHA-256) upon signature; signed agreements are sealed with embedded vector Code39 barcodes and QR codes.
 - **Public Verification Engine:** Anyone holding a document code or barcode can verify its historical authenticity at `/v/:code` or `/verify` without logging in.
 - **Autonomous Background Worker:** Built-in queue worker dispatches outbox emails via SMTP with automatic exponential retries.

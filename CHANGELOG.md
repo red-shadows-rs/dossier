@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.3.0] - 2026-10-22
+
+### Added
+- **Subscriptions & Scheduled Services Management:** Complete recurring service billing module allowing organizations to schedule, provision, and track recurring services (such as cloud hosting, maintenance contracts, retainer agreements, and recurring domain renewals). Features include custom billing frequencies (daily, weekly, monthly, quarterly, yearly), customizable interval counts, automatic scheduled invoice generation via daily worker cron jobs, manual invoice generation on demand, pause/resume/cancel lifecycle workflows, and automated next-run date progression.
+- **Dedicated Crypto & Digital Wallet Payment Accounts:** Integrated provider-specific transfer configurations for Binance (custom blockchain networks, deposit wallet address, memo/tag) and PayPal (merchant email, direct payment links), seamlessly rendering dedicated payment instruction cards in both the web app and PDF invoice documents.
+- **Dynamic Multi-Currency Support:** Introduced currency selector with localized currency symbols and English currency names (SAR, USD, EUR, GBP, AED, QAR, KWD, BHD, OMR) across invoice and subscription creation workflows.
+- **Automated Recurring Billing Cron Worker:** Background queue worker integration (`processScheduledSubscriptions`) running inside `daily-jobs.ts` to automatically query due subscriptions, generate sequential draft invoices, attach line items, and advance execution dates atomically.
+
+### Changed
+- **Fractional Pricing & Subunit Handling:** Support for fractional item pricing and exact minor unit rounding preventing subtotal mismatches in multi-item invoices.
+- **Invoice Payment Methods Selector:** Redesigned invoice payment method card picker with bank logos, status indicators, and clean form layout alignment.
+- **PDF Layout Polish:** Sticky footer alignment, optimized Cairo font typography, and refined payment method card layouts across printed invoice documents.
+
 ## [v1.2.1] - 2026-10-19
 
 ### Security & Privacy
