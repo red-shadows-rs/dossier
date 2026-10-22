@@ -280,20 +280,7 @@
     "workerStale": "The background worker is offline. Scheduled tasks are paused.",
     "monthlyTitle": "Monthly activity",
     "seriesIssued": "Invoices issued",
-    "seriesSigned": "Contracts signed",
-    "currencyConverter": "Currency Converter",
-    "currencyConverterDesc": "Instant conversion between currencies based on live rates",
-    "convertedToDefault": "Converted to {currency}",
-    "allCurrenciesUnified": "Financial metrics unified in default currency ({currency})",
-    "autoConvertedNotice": "Automatically converted based on live exchange rates",
-    "includesOriginal": "Includes: {original}",
-    "fromCurrency": "From",
-    "toCurrency": "To",
-    "amountLabel": "Amount",
-    "swap": "Swap",
-    "liveRatesBadge": "Live rates updated automatically",
-    "rateUnit": "1 {from} = {rate} {to}",
-    "quickRates": "Exchange rates vs {currency}"
+    "seriesSigned": "Contracts signed"
   },
   "audit": {
     "title": "Audit log",

@@ -44,7 +44,6 @@ import { formatInstant, nowMs } from "@/lib/dates";
 import { isLocale } from "@/lib/i18n";
 import { formatMoney } from "@/lib/money";
 import { convertCurrency, type ConvertedAggregate } from "@/lib/currency";
-import { CurrencyConverterWidget } from "@/components/dashboard/CurrencyConverterWidget";
 import { workerHeartbeatSchema } from "@/lib/validation/settings";
 import { requireUserPage } from "@/server/auth/require-user";
 import {
@@ -402,12 +401,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       ) : null}
 
       <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <SectionHeading icon={Wallet}>{t("finance")}</SectionHeading>
-          <span className="text-[11px] font-medium text-muted-foreground">
-            {t("allCurrenciesUnified", { currency: defaultCurrency })}
-          </span>
-        </div>
+        <SectionHeading icon={Wallet}>{t("finance")}</SectionHeading>
         <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
           {financial.map((item) => (
             <Kpi
@@ -420,13 +414,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             />
           ))}
         </div>
-
-        <CurrencyConverterWidget
-          defaultCurrency={defaultCurrency}
-          rates={data.currencyRates.rates}
-          locale={locale}
-          updatedAt={data.currencyRates.updatedAt}
-        />
       </div>
 
       <div className="flex flex-col gap-3">

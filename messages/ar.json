@@ -280,20 +280,7 @@
     "workerStale": "خادم المهام المجدولة متوقف حالياً.",
     "monthlyTitle": "النشاط الشهري",
     "seriesIssued": "فواتير صادرة",
-    "seriesSigned": "عقود موقعة",
-    "currencyConverter": "محول العملات",
-    "currencyConverterDesc": "تحويل فوري بين العملات بناءً على أسعار الصرف الحية",
-    "convertedToDefault": "محول إلى {currency}",
-    "allCurrenciesUnified": "الأرقام المالية موحدة بالعملة الافتراضية ({currency})",
-    "autoConvertedNotice": "تم التحويل تلقائياً بناءً على أسعار الصرف الحالية",
-    "includesOriginal": "تشمل: {original}",
-    "fromCurrency": "من",
-    "toCurrency": "إلى",
-    "amountLabel": "المبلغ",
-    "swap": "تبديل",
-    "liveRatesBadge": "أسعار حية ومحدثة تلقائياً",
-    "rateUnit": "1 {from} = {rate} {to}",
-    "quickRates": "أسعار الصرف مقابل {currency}"
+    "seriesSigned": "عقود موقعة"
   },
   "audit": {
     "title": "سجل النشاط",
