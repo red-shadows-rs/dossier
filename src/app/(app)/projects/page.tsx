@@ -102,6 +102,8 @@ export default async function ProjectsPage({
     archiveConfirm: t("archiveConfirm"),
     archivedToast: t("archivedToast"),
     empty: t("empty"),
+    emptyHint: t("emptyHint"),
+    newProject: t("new"),
     statusValues: Object.fromEntries(
       PROJECT_STATUSES.map((value) => [value, t(`status.${value}`)]),
     ),

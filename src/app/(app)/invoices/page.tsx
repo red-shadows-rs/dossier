@@ -126,6 +126,8 @@ export default async function InvoicesPage({
     deleted: t("deleted"),
     overdue: t("overdue"),
     empty: t("empty"),
+    emptyHint: t("emptyHint"),
+    newInvoice: t("new"),
     statusValues: Object.fromEntries(
       INVOICE_STATUSES.map((value) => [value, t(`status.${value}`)]),
     ),

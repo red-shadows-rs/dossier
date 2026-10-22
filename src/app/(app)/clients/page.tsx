@@ -83,6 +83,8 @@ export default async function ClientsPage({
     deleteConfirm: t("deleteConfirm"),
     deletedToast: t("deletedToast"),
     empty: t("empty"),
+    emptyHint: t("emptyHint"),
+    newClient: t("new"),
     typeValues: Object.fromEntries(
       CLIENT_TYPES.map((type) => [type, t(`type.${type}`)]),
     ),

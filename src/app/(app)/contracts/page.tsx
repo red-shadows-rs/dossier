@@ -102,6 +102,8 @@ export default async function ContractsPage({
     deleteMessage: t("deleteConfirm"),
     deleted: t("deleted"),
     empty: t("empty"),
+    emptyHint: t("emptyHint"),
+    newContract: t("new"),
     statusValues: Object.fromEntries(
       CONTRACT_STATUSES.map((value) => [value, t(`status.${value}`)]),
     ),

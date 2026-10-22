@@ -226,7 +226,7 @@ export function TemplatesGallery({
 
       {filtered.length === 0 ? (
         <EmptyState
-          icon={<FileCode2 size={40} className="text-muted-foreground" aria-hidden="true" />}
+          icon={<FileCode2 size={32} aria-hidden="true" />}
           title={locale === "ar" ? "لا توجد قوالب مطابقة" : "No matching templates"}
           description={
             locale === "ar"

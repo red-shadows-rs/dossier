@@ -138,7 +138,7 @@ export function UsersTable({
       rows={rows}
       columns={columns}
       noRowsLabel={labels.empty}
-      emptyIcon={<UserCog size={36} className="text-muted-foreground" aria-hidden="true" />}
+      emptyIcon={<UserCog size={32} aria-hidden="true" />}
       renderMobileCard={(row) => {
         return (
           <div className="flex flex-col gap-3 rounded-lg border border-border/70 bg-card/70 p-3.5 shadow-xs">

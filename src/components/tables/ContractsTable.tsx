@@ -5,9 +5,10 @@
 
 import Link from "next/link";
 import { useLocale } from "next-intl";
-import { FileText } from "lucide-react";
+import { FileText, Plus } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge, contractStatusTone } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { RowActionButton } from "@/components/forms/RowActionButton";
 import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
 import type { ActionResult } from "@/lib/result";
@@ -31,6 +32,8 @@ export type ContractTableLabels = {
   deleteMessage: string;
   deleted: string;
   empty: string;
+  emptyHint?: string;
+  newContract?: string;
   statusValues: Record<string, string>;
 };
 
@@ -136,6 +139,20 @@ export function ContractsTable({
     },
   ];
 
+  const emptyAction = canWrite ? (
+    <Link href="/contracts/new">
+      <Button
+        type="button"
+        variant="primary"
+        size="sm"
+        className="gap-1.5 font-medium shadow-xs cursor-pointer"
+      >
+        <Plus size={15} aria-hidden="true" />
+        <span>{labels.newContract ?? "عقد جديد"}</span>
+      </Button>
+    </Link>
+  ) : null;
+
   return (
     <ServerDataTable
       rows={rows}
@@ -146,7 +163,9 @@ export function ContractsTable({
       basePath="/contracts"
       query={query}
       noRowsLabel={labels.empty}
-      emptyIcon={<FileText size={36} className="text-muted-foreground" aria-hidden="true" />}
+      emptyDescription={labels.emptyHint}
+      emptyAction={emptyAction}
+      emptyIcon={<FileText size={32} aria-hidden="true" />}
       minWidth="min-w-[420px] sm:min-w-full"
       renderMobileCard={(row) => {
         const title =

@@ -143,7 +143,7 @@ export function TemplatesTable({
       rows={rows}
       columns={columns}
       noRowsLabel={labels.empty}
-      emptyIcon={<FileCode2 size={36} className="text-muted-foreground" aria-hidden="true" />}
+      emptyIcon={<FileCode2 size={32} aria-hidden="true" />}
       renderMobileCard={(row) => {
         const name =
           locale === "ar"

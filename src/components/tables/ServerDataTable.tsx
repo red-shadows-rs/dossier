@@ -4,9 +4,11 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import Link from "next/link";
 import clsx from "clsx";
 import { useLocale } from "next-intl";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Pagination } from "@/components/ui/Pagination";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -95,13 +97,49 @@ export function ServerDataTable<R extends { id: string | number }>({
   }, [updateScrollIndicators, displayRows]);
 
   if (effectiveTotal === 0 && !externalLoading) {
+    const hasActiveFilters = Boolean(
+      query.q ||
+        query.status ||
+        query.clientId ||
+        query.projectId ||
+        query.frequency ||
+        query.overdue ||
+        query.archived,
+    );
+
+    const fallbackTitle = hasActiveFilters
+      ? (isAr ? "لا توجد نتائج مطابقة للبحث" : "No matching results found")
+      : (noRowsLabel ?? (isAr ? "لا توجد بيانات" : "No data available"));
+
+    const fallbackDescription = hasActiveFilters
+      ? (isAr
+          ? "جرّب تغيير كلمات البحث أو إعادة ضبط خيارات التصفية."
+          : "Try adjusting your search terms or filters.")
+      : emptyDescription;
+
+    const fallbackAction =
+      emptyAction ??
+      (hasActiveFilters && basePath ? (
+        <Link href={basePath}>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="gap-1.5 font-medium cursor-pointer"
+          >
+            <RotateCcw size={14} aria-hidden="true" />
+            <span>{isAr ? "إعادة ضبط الفلاتر" : "Clear filters"}</span>
+          </Button>
+        </Link>
+      ) : null);
+
     return (
       <EmptyState
         icon={emptyIcon}
-        title={noRowsLabel ?? (isAr ? "لا توجد بيانات" : "No data available")}
-        description={emptyDescription}
-        action={emptyAction}
-        className="border-0 bg-transparent py-14"
+        title={noRowsLabel && !hasActiveFilters ? noRowsLabel : fallbackTitle}
+        description={emptyDescription ?? fallbackDescription}
+        action={fallbackAction}
+        className="border-0 bg-transparent py-12 sm:py-16"
       />
     );
   }

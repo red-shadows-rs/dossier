@@ -120,6 +120,9 @@ export default async function SubscriptionsPage({
       preview: tc("preview"),
       edit: tc("edit"),
       empty: t("empty"),
+      emptyHint: t("emptyHint"),
+      newSubscription: t("new"),
+      clearFilters: tc("clearFilters"),
       statusValues: {
         active: t("statuses.active"),
         paused: t("statuses.paused"),
@@ -276,15 +279,17 @@ export default async function SubscriptionsPage({
           </CardContent>
         </Card>
 
-        <SubscriptionsTable
-          rows={rows}
-          total={total}
-          page={page}
-          pageSize={pageSize}
-          query={query}
-          canWrite={canWrite}
-          labels={labels}
-        />
+        <div className="rounded border border-border bg-card overflow-hidden">
+          <SubscriptionsTable
+            rows={rows}
+            total={total}
+            page={page}
+            pageSize={pageSize}
+            query={query}
+            canWrite={canWrite}
+            labels={labels}
+          />
+        </div>
       </div>
     );
   });

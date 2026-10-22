@@ -4,9 +4,10 @@
 "use client";
 
 import Link from "next/link";
-import { Receipt } from "lucide-react";
+import { Plus, Receipt } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge, invoiceStatusTone } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { RowActionButton } from "@/components/forms/RowActionButton";
 import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
 import { formatMoney } from "@/lib/money";
@@ -38,6 +39,8 @@ export type InvoiceTableLabels = {
   deleted: string;
   overdue: string;
   empty: string;
+  emptyHint?: string;
+  newInvoice?: string;
   statusValues: Record<string, string>;
 };
 
@@ -158,6 +161,20 @@ export function InvoicesTable({
     },
   ];
 
+  const emptyAction = canWrite ? (
+    <Link href="/invoices/new">
+      <Button
+        type="button"
+        variant="primary"
+        size="sm"
+        className="gap-1.5 font-medium shadow-xs cursor-pointer"
+      >
+        <Plus size={15} aria-hidden="true" />
+        <span>{labels.newInvoice ?? "فاتورة جديدة"}</span>
+      </Button>
+    </Link>
+  ) : null;
+
   return (
     <ServerDataTable
       rows={rows}
@@ -168,7 +185,9 @@ export function InvoicesTable({
       basePath="/invoices"
       query={query}
       noRowsLabel={labels.empty}
-      emptyIcon={<Receipt size={36} className="text-muted-foreground" aria-hidden="true" />}
+      emptyDescription={labels.emptyHint}
+      emptyAction={emptyAction}
+      emptyIcon={<Receipt size={32} aria-hidden="true" />}
       renderMobileCard={(row) => {
         const proj = projectNames[row.projectId ?? ""] ?? "-";
         return (

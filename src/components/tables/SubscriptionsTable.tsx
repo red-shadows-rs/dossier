@@ -4,9 +4,10 @@
 "use client";
 
 import Link from "next/link";
-import { CalendarClock } from "lucide-react";
+import { CalendarClock, Plus } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
 import type { SubscriptionRow } from "@/server/services/subscriptions";
 import { subscriptionStatusTone } from "@/lib/subscriptions";
@@ -23,6 +24,9 @@ export type SubscriptionsTableLabels = {
   preview: string;
   edit: string;
   empty: string;
+  emptyHint?: string;
+  newSubscription?: string;
+  clearFilters?: string;
   statusValues: Record<string, string>;
   frequencyValues: Record<string, string>;
 };
@@ -149,6 +153,20 @@ export function SubscriptionsTable({
     },
   ];
 
+  const emptyAction = canWrite ? (
+    <Link href="/subscriptions/new">
+      <Button
+        type="button"
+        variant="primary"
+        size="sm"
+        className="gap-1.5 font-medium shadow-xs cursor-pointer"
+      >
+        <Plus size={15} aria-hidden="true" />
+        <span>{labels.newSubscription ?? "اشتراك جديد"}</span>
+      </Button>
+    </Link>
+  ) : null;
+
   return (
     <ServerDataTable
       columns={columns}
@@ -159,10 +177,11 @@ export function SubscriptionsTable({
       basePath="/subscriptions"
       query={query}
       noRowsLabel={labels.empty}
+      emptyDescription={labels.emptyHint}
+      emptyAction={emptyAction}
       emptyIcon={
         <CalendarClock
-          size={36}
-          className="text-muted-foreground"
+          size={32}
           aria-hidden="true"
         />
       }

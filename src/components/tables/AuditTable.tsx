@@ -118,7 +118,7 @@ export function AuditTable({
       basePath={basePath}
       query={query}
       noRowsLabel={labels.empty}
-      emptyIcon={<ShieldCheck size={36} className="text-muted-foreground" aria-hidden="true" />}
+      emptyIcon={<ShieldCheck size={32} aria-hidden="true" />}
       renderMobileCard={(row) => (
         <div className="flex flex-col gap-2 rounded-lg border border-border/70 bg-card/70 p-3.5 shadow-xs">
           <div className="flex items-center justify-between gap-2">
