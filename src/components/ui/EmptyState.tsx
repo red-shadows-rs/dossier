@@ -26,27 +26,27 @@ export function EmptyState({
       className={cn(
         "flex flex-col items-center justify-center text-center select-none",
         isBorderless
-          ? "py-10 sm:py-12 px-4"
-          : "rounded-lg border border-dashed border-border/70 bg-card/40 py-8 sm:py-10 px-4",
+          ? "py-10 sm:py-14 px-4"
+          : "rounded-lg border border-dashed border-border/80 bg-muted/10 py-10 sm:py-14 px-4 text-center",
         className,
       )}
     >
       <div
-        className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg border border-border/70 bg-muted/40 text-muted-foreground mb-2.5 [&>svg]:h-5 [&>svg]:w-5 [&>svg]:stroke-[1.75]"
+        className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-3.5 [&>svg]:h-6 [&>svg]:w-6 [&>svg]:stroke-[1.75]"
         aria-hidden="true"
       >
-        {icon ?? <Inbox size={20} strokeWidth={1.5} />}
+        {icon ?? <Inbox size={24} strokeWidth={1.75} />}
       </div>
-      <p className="text-sm font-semibold text-foreground tracking-tight">
+      <h4 className="text-sm sm:text-base font-semibold text-foreground tracking-tight mb-1">
         {title}
-      </p>
+      </h4>
       {description ? (
-        <p className="mt-1 text-xs text-muted-foreground max-w-sm leading-relaxed text-center">
+        <p className="text-xs sm:text-sm text-muted-foreground max-w-md leading-relaxed text-center mb-4">
           {description}
         </p>
       ) : null}
       {action ? (
-        <div className="mt-3.5 flex flex-wrap items-center justify-center gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           {action}
         </div>
       ) : null}

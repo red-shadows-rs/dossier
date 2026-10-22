@@ -191,11 +191,11 @@ export function ClientsTable({
     <Link href="/clients/new">
       <Button
         type="button"
-        variant="secondary"
+        variant="outline"
         size="sm"
         className="gap-1.5 font-medium cursor-pointer"
       >
-        <Plus size={14} aria-hidden="true" />
+        <Plus size={15} aria-hidden="true" />
         <span>{labels.newClient ?? "عميل جديد"}</span>
       </Button>
     </Link>

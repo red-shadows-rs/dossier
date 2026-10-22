@@ -123,7 +123,7 @@ export function ServerDataTable<R extends { id: string | number }>({
         <Link href={basePath}>
           <Button
             type="button"
-            variant="secondary"
+            variant="outline"
             size="sm"
             className="gap-1.5 font-medium cursor-pointer"
           >
@@ -133,59 +133,15 @@ export function ServerDataTable<R extends { id: string | number }>({
         </Link>
       ) : null);
 
-    const emptyNode = (
-      <EmptyState
-        icon={emptyIcon}
-        title={noRowsLabel && !hasActiveFilters ? noRowsLabel : fallbackTitle}
-        description={emptyDescription ?? fallbackDescription}
-        action={fallbackAction}
-        className="border-0 bg-transparent py-10 sm:py-12"
-      />
-    );
-
     return (
-      <div className="relative w-full">
-        <div className="md:hidden">
-          {emptyNode}
-        </div>
-
-        <div className="hidden md:block relative w-full">
-          <div
-            ref={scrollContainerRef}
-            className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin]"
-          >
-            <table className={clsx("w-full text-start text-sm border-collapse", minWidth)}>
-              <thead>
-                <tr className="border-b border-border bg-muted/40 text-xs font-semibold text-muted-foreground">
-                  {columns.map((col) => (
-                    <th
-                      key={col.id}
-                      scope="col"
-                      className={clsx(
-                        "py-3 px-3.5 sm:px-4 select-none whitespace-nowrap",
-                        col.align === "end"
-                          ? "text-end"
-                          : col.align === "center"
-                            ? "text-center"
-                            : "text-start",
-                        col.headerClassName,
-                      )}
-                    >
-                      {col.header}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td colSpan={columns.length} className="p-0">
-                    {emptyNode}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+      <div className="p-4 sm:p-6">
+        <EmptyState
+          icon={emptyIcon}
+          title={noRowsLabel && !hasActiveFilters ? noRowsLabel : fallbackTitle}
+          description={emptyDescription ?? fallbackDescription}
+          action={fallbackAction}
+          bordered={true}
+        />
       </div>
     );
   }
