@@ -289,4 +289,12 @@ describe("getDashboard (7.12)", () => {
       "payment.recorded",
     ]);
   });
+
+  it("automatically aggregates financial totals to default currency", () => {
+    const res = data();
+    expect(res.currencyRates).toBeDefined();
+    expect(res.currencyRates.targetCurrency).toBe("SAR");
+    expect(res.currencyRates.totals.outstanding.isConverted).toBe(true);
+    expect(res.currencyRates.totals.outstanding.totalMinor).toBeGreaterThan(950_000);
+  });
 });

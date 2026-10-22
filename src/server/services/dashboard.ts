@@ -12,6 +12,13 @@ import {
   projects,
 } from "@/db/schema";
 import { addDays, nowMs, todayInTz, utcEndOfDayMs, utcStartOfDayMs } from "@/lib/dates";
+import type { CurrencyCode } from "@/lib/constants";
+import {
+  aggregateAmountsToCurrency,
+  type ConvertedAggregate,
+  type ExchangeRates,
+} from "@/lib/currency";
+import { getCachedExchangeRates } from "@/server/services/currency";
 import { getSettings } from "@/server/services/settings";
 
 const MS_PER_DAY = 86_400_000;
@@ -109,6 +116,19 @@ export type DashboardData = {
   invoicesByStatus: Record<string, number>;
   issuedThisMonth: { count: number; amounts: CurrencyAmount[] };
   monthlyActivity: MonthlyPoint[];
+  currencyRates: {
+    targetCurrency: CurrencyCode;
+    rates: ExchangeRates;
+    updatedAt: number;
+    totals: {
+      outstanding: ConvertedAggregate;
+      overdue: ConvertedAggregate;
+      revenueInPeriod: ConvertedAggregate;
+      issuedInPeriod: ConvertedAggregate;
+      revenueCurrentMonth: ConvertedAggregate;
+      revenuePreviousMonth: ConvertedAggregate;
+    };
+  };
 };
 
 function addAmount(
@@ -533,6 +553,25 @@ export function getDashboard(
   const activityStartMs = isFiltered ? utcStartOfDayMs(periodStart) : undefined;
   const activityEndMs = isFiltered ? utcEndOfDayMs(periodEnd) : undefined;
 
+  const targetCurrency = getSettings("defaults").currency as CurrencyCode;
+  const { rates, updatedAt: ratesUpdatedAt } = getCachedExchangeRates();
+  const revenueCurrentMonth = revenueInRange(currentStart, currentEnd);
+  const revenuePreviousMonth = revenueInRange(previousStart, previousEnd);
+
+  const currencyRates = {
+    targetCurrency,
+    rates,
+    updatedAt: ratesUpdatedAt,
+    totals: {
+      outstanding: aggregateAmountsToCurrency(totals.outstanding, targetCurrency, rates),
+      overdue: aggregateAmountsToCurrency(totals.overdue.amounts, targetCurrency, rates),
+      revenueInPeriod: aggregateAmountsToCurrency(revenueInPeriod, targetCurrency, rates),
+      issuedInPeriod: aggregateAmountsToCurrency(issuedInPeriod.amounts, targetCurrency, rates),
+      revenueCurrentMonth: aggregateAmountsToCurrency(revenueCurrentMonth, targetCurrency, rates),
+      revenuePreviousMonth: aggregateAmountsToCurrency(revenuePreviousMonth, targetCurrency, rates),
+    },
+  };
+
   return {
     filter: {
       range,
@@ -560,8 +599,8 @@ export function getDashboard(
     overdue: totals.overdue,
     dueSoon: dueSoon(today),
     revenue: {
-      currentMonth: revenueInRange(currentStart, currentEnd),
-      previousMonth: revenueInRange(previousStart, previousEnd),
+      currentMonth: revenueCurrentMonth,
+      previousMonth: revenuePreviousMonth,
     },
     endingSoon: endingSoon(today),
     recentActivity: recentActivity(activityStartMs, activityEndMs),
@@ -573,5 +612,6 @@ export function getDashboard(
     invoicesByStatus: invoiceStatusCounts(),
     issuedThisMonth: issued,
     monthlyActivity: monthlyActivity(today),
+    currencyRates,
   };
 }

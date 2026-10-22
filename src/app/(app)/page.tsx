@@ -43,11 +43,12 @@ import { CONTRACT_STATUSES, INVOICE_STATUSES } from "@/lib/constants";
 import { formatInstant, nowMs } from "@/lib/dates";
 import { isLocale } from "@/lib/i18n";
 import { formatMoney } from "@/lib/money";
+import { convertCurrency, type ConvertedAggregate } from "@/lib/currency";
+import { CurrencyConverterWidget } from "@/components/dashboard/CurrencyConverterWidget";
 import { workerHeartbeatSchema } from "@/lib/validation/settings";
 import { requireUserPage } from "@/server/auth/require-user";
 import {
   getDashboard,
-  type CurrencyAmount,
   type DashboardRange,
 } from "@/server/services/dashboard";
 import { getInternalSetting, getSettings } from "@/server/services/settings";
@@ -94,23 +95,42 @@ function CardHeading({
   );
 }
 
-function AmountList({
-  amounts,
+function UnifiedAmountDisplay({
+  aggregate,
   locale,
 }: {
-  amounts: CurrencyAmount[];
+  aggregate: ConvertedAggregate;
   locale: Locale;
 }) {
-  if (amounts.length === 0) {
+  if (aggregate.totalMinor === 0 && aggregate.originalAmounts.length === 0) {
     return <span className="font-bold">0</span>;
   }
+
+  const formattedTotal = formatMoney(
+    aggregate.totalMinor,
+    aggregate.targetCurrency,
+    locale,
+  );
+
+  if (!aggregate.isConverted) {
+    return <span className="font-bold">{formattedTotal}</span>;
+  }
+
+  const originalStr = aggregate.originalAmounts
+    .map((entry) =>
+      formatMoney(entry.amountMinor, entry.currency as CurrencyCode, locale),
+    )
+    .join(" + ");
+
   return (
-    <div className="flex flex-wrap items-baseline gap-2 font-mono tabular-nums">
-      {amounts.map((entry) => (
-        <span key={entry.currency} className="font-bold">
-          {formatMoney(entry.amountMinor, entry.currency as CurrencyCode, locale)}
-        </span>
-      ))}
+    <div className="flex flex-col gap-0.5">
+      <span className="font-bold">{formattedTotal}</span>
+      <span
+        className="text-[10px] font-normal text-muted-foreground truncate"
+        title={originalStr}
+      >
+        ≈ {originalStr}
+      </span>
     </div>
   );
 }
@@ -242,19 +262,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       user.role === "owner" &&
       (heartbeat === null || nowMs() - heartbeat.ts > HEARTBEAT_STALE_MS);
 
-    const currencyLines = (amounts: CurrencyAmount[]) =>
-      amounts.length === 0
-        ? null
-        : amounts
-            .map((entry) =>
-              formatMoney(
-                entry.amountMinor,
-                entry.currency as CurrencyCode,
-                locale,
-              ),
-            )
-            .join(" · ");
-
     const collectedLabel =
       activeRange === "this_month"
         ? t("collectedThisMonth")
@@ -269,10 +276,17 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           ? t("issuedAllTime")
           : t("issuedPeriod");
 
+    const defaultCurrency = data.currencyRates.targetCurrency;
+
     const financial = [
       {
         label: t("outstanding"),
-        value: <AmountList amounts={data.outstanding} locale={locale} />,
+        value: (
+          <UnifiedAmountDisplay
+            aggregate={data.currencyRates.totals.outstanding}
+            locale={locale}
+          />
+        ),
         hint: t("outstandingHint"),
         icon: Wallet,
         accent: "primary" as const,
@@ -283,7 +297,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           data.overdue.count === 0 ? (
             "0"
           ) : (
-            <AmountList amounts={data.overdue.amounts} locale={locale} />
+            <UnifiedAmountDisplay
+              aggregate={data.currencyRates.totals.overdue}
+              locale={locale}
+            />
           ),
         hint:
           data.overdue.count === 0
@@ -292,23 +309,35 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         icon: AlertTriangle,
         accent: "danger" as const,
       },
-    {
-      label: collectedLabel,
-      value: <AmountList amounts={data.revenueInPeriod} locale={locale} />,
-      hint: `${t("lastMonth")}: ${currencyLines(data.revenue.previousMonth) ?? "-"}`,
-      icon: TrendingUp,
-      accent: "success" as const,
-    },
-    {
-      label: issuedLabel,
-      value: (
-        <AmountList amounts={data.issuedInPeriod.amounts} locale={locale} />
-      ),
-      hint: t("invoicesCount", { count: data.issuedInPeriod.count }),
-      icon: Receipt,
-      accent: "info" as const,
-    },
-  ];
+      {
+        label: collectedLabel,
+        value: (
+          <UnifiedAmountDisplay
+            aggregate={data.currencyRates.totals.revenueInPeriod}
+            locale={locale}
+          />
+        ),
+        hint: `${t("lastMonth")}: ${formatMoney(
+          data.currencyRates.totals.revenuePreviousMonth.totalMinor,
+          defaultCurrency,
+          locale,
+        )}`,
+        icon: TrendingUp,
+        accent: "success" as const,
+      },
+      {
+        label: issuedLabel,
+        value: (
+          <UnifiedAmountDisplay
+            aggregate={data.currencyRates.totals.issuedInPeriod}
+            locale={locale}
+          />
+        ),
+        hint: t("invoicesCount", { count: data.issuedInPeriod.count }),
+        icon: Receipt,
+        accent: "info" as const,
+      },
+    ];
 
   const operations = [
     {
@@ -373,7 +402,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       ) : null}
 
       <div className="flex flex-col gap-3">
-        <SectionHeading icon={Wallet}>{t("finance")}</SectionHeading>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <SectionHeading icon={Wallet}>{t("finance")}</SectionHeading>
+          <span className="text-[11px] font-medium text-muted-foreground">
+            {t("allCurrenciesUnified", { currency: defaultCurrency })}
+          </span>
+        </div>
         <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
           {financial.map((item) => (
             <Kpi
@@ -387,6 +421,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           ))}
         </div>
 
+        <CurrencyConverterWidget
+          defaultCurrency={defaultCurrency}
+          rates={data.currencyRates.rates}
+          locale={locale}
+          updatedAt={data.currencyRates.updatedAt}
+        />
       </div>
 
       <div className="flex flex-col gap-3">
@@ -593,13 +633,29 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                     </TableCell>
                     <TableCell className="tabular-nums font-mono text-xs">{row.dueDate}</TableCell>
                     <TableCell className="text-end">
-                      <span className="tabular-nums font-semibold font-mono">
-                        {formatMoney(
-                          row.outstandingMinor,
-                          row.currency as CurrencyCode,
-                          locale,
-                        )}
-                      </span>
+                      <div className="flex flex-col items-end gap-0.5">
+                        <span className="tabular-nums font-semibold font-mono">
+                          {formatMoney(
+                            row.outstandingMinor,
+                            row.currency as CurrencyCode,
+                            locale,
+                          )}
+                        </span>
+                        {row.currency !== defaultCurrency ? (
+                          <span className="text-[10px] text-muted-foreground font-mono">
+                            ≈ {formatMoney(
+                              convertCurrency(
+                                row.outstandingMinor,
+                                row.currency,
+                                defaultCurrency,
+                                data.currencyRates.rates,
+                              ),
+                              defaultCurrency,
+                              locale,
+                            )}
+                          </span>
+                        ) : null}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
