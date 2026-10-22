@@ -143,11 +143,11 @@ export function ContractsTable({
     <Link href="/contracts/new">
       <Button
         type="button"
-        variant="primary"
+        variant="secondary"
         size="sm"
-        className="gap-1.5 font-medium shadow-xs cursor-pointer"
+        className="gap-1.5 font-medium cursor-pointer"
       >
-        <Plus size={15} aria-hidden="true" />
+        <Plus size={14} aria-hidden="true" />
         <span>{labels.newContract ?? "عقد جديد"}</span>
       </Button>
     </Link>
@@ -165,7 +165,7 @@ export function ContractsTable({
       noRowsLabel={labels.empty}
       emptyDescription={labels.emptyHint}
       emptyAction={emptyAction}
-      emptyIcon={<FileText size={32} aria-hidden="true" />}
+      emptyIcon={<FileText size={20} aria-hidden="true" />}
       minWidth="min-w-[420px] sm:min-w-full"
       renderMobileCard={(row) => {
         const title =
