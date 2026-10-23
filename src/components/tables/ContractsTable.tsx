@@ -5,10 +5,9 @@
 
 import Link from "next/link";
 import { useLocale } from "next-intl";
-import { FileText, Plus } from "lucide-react";
+import { FileText } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge, contractStatusTone } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 import { RowActionButton } from "@/components/forms/RowActionButton";
 import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
 import type { ActionResult } from "@/lib/result";
@@ -139,20 +138,6 @@ export function ContractsTable({
     },
   ];
 
-  const emptyAction = canWrite ? (
-    <Link href="/contracts/new">
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="gap-1.5 font-medium cursor-pointer"
-      >
-        <Plus size={15} aria-hidden="true" />
-        <span>{labels.newContract ?? "عقد جديد"}</span>
-      </Button>
-    </Link>
-  ) : null;
-
   return (
     <ServerDataTable
       rows={rows}
@@ -164,7 +149,6 @@ export function ContractsTable({
       query={query}
       noRowsLabel={labels.empty}
       emptyDescription={labels.emptyHint}
-      emptyAction={emptyAction}
       emptyIcon={<FileText size={20} aria-hidden="true" />}
       minWidth="min-w-[420px] sm:min-w-full"
       renderMobileCard={(row) => {

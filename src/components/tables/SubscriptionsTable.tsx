@@ -4,10 +4,9 @@
 "use client";
 
 import Link from "next/link";
-import { CalendarClock, Plus } from "lucide-react";
+import { CalendarClock } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
 import type { SubscriptionRow } from "@/server/services/subscriptions";
 import { subscriptionStatusTone } from "@/lib/subscriptions";
@@ -153,20 +152,6 @@ export function SubscriptionsTable({
     },
   ];
 
-  const emptyAction = canWrite ? (
-    <Link href="/subscriptions/new">
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="gap-1.5 font-medium cursor-pointer"
-      >
-        <Plus size={15} aria-hidden="true" />
-        <span>{labels.newSubscription ?? "اشتراك جديد"}</span>
-      </Button>
-    </Link>
-  ) : null;
-
   return (
     <ServerDataTable
       columns={columns}
@@ -178,7 +163,6 @@ export function SubscriptionsTable({
       query={query}
       noRowsLabel={labels.empty}
       emptyDescription={labels.emptyHint}
-      emptyAction={emptyAction}
       emptyIcon={
         <CalendarClock
           size={20}

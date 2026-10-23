@@ -5,10 +5,9 @@
 
 import Link from "next/link";
 import { useLocale } from "next-intl";
-import { Plus, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 import { RowActionButton } from "@/components/forms/RowActionButton";
 import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
 import type { ActionResult } from "@/lib/result";
@@ -187,20 +186,6 @@ export function ClientsTable({
     },
   ];
 
-  const emptyAction = canWrite ? (
-    <Link href="/clients/new">
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="gap-1.5 font-medium cursor-pointer"
-      >
-        <Plus size={15} aria-hidden="true" />
-        <span>{labels.newClient ?? "عميل جديد"}</span>
-      </Button>
-    </Link>
-  ) : null;
-
   return (
     <ServerDataTable
       rows={rows}
@@ -212,7 +197,6 @@ export function ClientsTable({
       query={query}
       noRowsLabel={labels.empty}
       emptyDescription={labels.emptyHint}
-      emptyAction={emptyAction}
       emptyIcon={<Users size={20} aria-hidden="true" />}
       renderMobileCard={(row) => {
         const name =

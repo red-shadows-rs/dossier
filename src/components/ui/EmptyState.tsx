@@ -41,7 +41,12 @@ export function EmptyState({
         {title}
       </h4>
       {description ? (
-        <p className="text-xs sm:text-sm text-muted-foreground max-w-md leading-relaxed text-center mb-4">
+        <p
+          className={cn(
+            "text-xs sm:text-sm text-muted-foreground max-w-md leading-relaxed text-center",
+            action ? "mb-4" : "mb-0",
+          )}
+        >
           {description}
         </p>
       ) : null}

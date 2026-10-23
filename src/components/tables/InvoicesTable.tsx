@@ -4,10 +4,9 @@
 "use client";
 
 import Link from "next/link";
-import { Plus, Receipt } from "lucide-react";
+import { Receipt } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge, invoiceStatusTone } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 import { RowActionButton } from "@/components/forms/RowActionButton";
 import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
 import { formatMoney } from "@/lib/money";
@@ -161,20 +160,6 @@ export function InvoicesTable({
     },
   ];
 
-  const emptyAction = canWrite ? (
-    <Link href="/invoices/new">
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="gap-1.5 font-medium cursor-pointer"
-      >
-        <Plus size={15} aria-hidden="true" />
-        <span>{labels.newInvoice ?? "فاتورة جديدة"}</span>
-      </Button>
-    </Link>
-  ) : null;
-
   return (
     <ServerDataTable
       rows={rows}
@@ -186,7 +171,6 @@ export function InvoicesTable({
       query={query}
       noRowsLabel={labels.empty}
       emptyDescription={labels.emptyHint}
-      emptyAction={emptyAction}
       emptyIcon={<Receipt size={20} aria-hidden="true" />}
       renderMobileCard={(row) => {
         const proj = projectNames[row.projectId ?? ""] ?? "-";
