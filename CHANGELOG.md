@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.3.1] - 2026-10-23
+
+### Added
+- **Automatic Financial Currency Consolidation:** Automatically converts all dashboard financial KPI metrics (Outstanding, Overdue, Revenue Collected, and Invoices Issued) from foreign currencies (USD, EUR, AED, etc.) to the company's default currency (e.g. SAR) using live exchange rates with resilient local caching and offline fallback rates.
+- **Due Invoices Currency Conversion:** Integrated real-time equivalent currency calculation into the dashboard's "Due Soon" table for foreign currency invoices.
+
+### Changed
+- **Unified Empty States Design System:** Redesigned table empty states with clean dashed borders, centered crimson icon badges, and eliminated table headers on empty states across all modules (Clients, Contracts, Invoices, Projects, and Subscriptions).
+- **Concise Empty State Translations:** Replaced verbose descriptions and concrete examples in the Subscriptions empty state with concise, standardized copy aligned with the rest of the application ("لا توجد اشتراكات بعد" / "No subscriptions yet").
+- **Removed Duplicate Empty State Action Buttons:** Removed redundant CTA buttons inside empty state cards to preserve a single, clear primary creation action in the page header.
+- **Accessible Modal Dialogs for Invoices:** Replaced native browser `prompt` and `confirm` dialogs with unified, accessible modal dialogs for invoice void actions (`voidConfirm`).
+
+### Fixed
+- **Immutable Contract Integrity Safeguard:** Hardened seed bootstrapping to prevent updating signed immutable contracts and preserve legal integrity.
+- **Missing Translation Keys:** Added missing translation strings for invoice copy and void confirmation actions in both Arabic and English locales.
+
 ## [v1.3.0] - 2026-10-22
 
 ### Added
