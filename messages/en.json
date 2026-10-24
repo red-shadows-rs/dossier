@@ -1099,6 +1099,8 @@
       "cash": "Cash",
       "card": "Card",
       "cheque": "Cheque",
+      "binance": "Binance",
+      "paypal": "PayPal",
       "other": "Other"
     },
     "noLines": "No lines yet",

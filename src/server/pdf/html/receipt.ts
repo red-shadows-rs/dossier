@@ -30,6 +30,8 @@ function localizePaymentMethod(method: string, lang: DocLang): string {
     cash: { ar: "نقدا", en: "Cash" },
     card: { ar: "بطاقة دفع / مدى", en: "Card / Mada" },
     cheque: { ar: "شيك مصدق", en: "Cheque" },
+    binance: { ar: "باينانس", en: "Binance" },
+    paypal: { ar: "بايبال", en: "PayPal" },
     other: { ar: "أخرى", en: "Other" },
   };
   const m = methodMap[method] ?? { ar: method, en: method };

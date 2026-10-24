@@ -24,6 +24,7 @@ import {
 import {
   buildInvoiceHtml,
   invoiceSafePdfFilename,
+  receiptSafePdfFilename,
   resolveInvoiceDocLang,
   resolveInvoicePdf,
 } from "./invoice-documents";
@@ -153,6 +154,18 @@ describe("invoiceSafePdfFilename", () => {
     );
     expect(invoiceSafePdfFilename({ number: 'x/../y z"' }, "ar")).toBe(
       "x..yz-ar.pdf",
+    );
+  });
+});
+
+describe("receiptSafePdfFilename", () => {
+  it("matches site naming pattern with REC prefix", () => {
+    expect(receiptSafePdfFilename({ number: null }, "ar")).toBe("REC-DRAFT-ar.pdf");
+    expect(receiptSafePdfFilename({ number: "DOS-I-2026-0006" }, "ar")).toBe(
+      "REC-DOS-I-2026-0006-ar.pdf",
+    );
+    expect(receiptSafePdfFilename({ number: "DOS-I-2026-0006" }, "en")).toBe(
+      "REC-DOS-I-2026-0006-en.pdf",
     );
   });
 });

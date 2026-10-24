@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.3.5] - 2026-10-24
+
+### Added
+- **Binance & PayPal in Payment Methods:** Added native options for Binance (`باينانس`) and PayPal (`بايبال`) directly to the payment recording modal (`تسجيل دفعة`), invoice payment history, schema validation, and PDF receipts, eliminating the need to record crypto or gateway transactions under "Other".
+
+### Fixed
+- **Standardized Receipt PDF File Naming:** Aligned receipt PDF download filename with the platform-wide naming convention to use uppercase document identifier `REC-${invoice.number}-${lang}.pdf` (e.g. `REC-DOS-I-2026-0006-ar.pdf`) instead of legacy lowercase `receipt-DOS-I-...`.
+
 ## [v1.3.4] - 2026-10-24
 
 ### Fixed

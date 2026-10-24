@@ -64,6 +64,8 @@ export const PAYMENT_METHODS = [
   "cash",
   "card",
   "cheque",
+  "binance",
+  "paypal",
   "other",
 ] as const;
 

@@ -247,7 +247,7 @@ export function receiptSafePdfFilename(
   invoice: Pick<InvoiceRow, "number">,
   lang: DocLang,
 ): string {
-  const base = invoice.number ? `receipt-${invoice.number}` : "draft-receipt";
+  const base = invoice.number ? `REC-${invoice.number}` : "REC-DRAFT";
   return `${base}-${lang}.pdf`.replace(/[^A-Za-z0-9._-]/g, "");
 }
 
