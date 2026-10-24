@@ -111,26 +111,23 @@ function UnifiedAmountDisplay({
     locale,
   );
 
-  if (!aggregate.isConverted) {
+  if (!aggregate.isConverted || aggregate.originalAmounts.length <= 1) {
     return <span className="font-bold">{formattedTotal}</span>;
   }
 
   const originalStr = aggregate.originalAmounts
     .map((entry) =>
-      formatMoney(entry.amountMinor, entry.currency as CurrencyCode, locale),
+      formatMoney(entry.amountMinor, entry.currency as CurrencyCode, "en"),
     )
     .join(" + ");
 
   return (
-    <div className="flex flex-col gap-0.5">
-      <span className="font-bold">{formattedTotal}</span>
-      <span
-        className="text-[10px] font-normal text-muted-foreground truncate"
-        title={originalStr}
-      >
-        ≈ {originalStr}
-      </span>
-    </div>
+    <span
+      className="font-bold"
+      title={`≈ ${originalStr}`}
+    >
+      {formattedTotal}
+    </span>
   );
 }
 
@@ -170,12 +167,12 @@ function Kpi({
           </span>
         ) : null}
       </div>
-      <div className="mt-2 sm:mt-3">
+      <div className="mt-2 sm:mt-3 flex flex-col justify-end">
         <div className="text-xl sm:text-2xl font-bold tracking-tight font-mono tabular-nums text-foreground truncate">
           {value}
         </div>
         {hint ? (
-          <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-xs text-muted-foreground leading-normal truncate">{hint}</p>
+          <p className="mt-1 text-[10px] sm:text-xs text-muted-foreground leading-normal truncate">{hint}</p>
         ) : null}
       </div>
     </div>

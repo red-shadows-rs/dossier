@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.3.6] - 2026-10-24
+
+### Fixed
+- **Dashboard Financial KPI Cards Layout & BiDi Reordering:** Resolved text collision and Bidirectional (BiDi) reversed characters in dashboard KPI metrics by rendering unified currency totals as clean single-line values, removing inline mathematical equations that were reordered by RTL algorithms, and storing the conversion breakdown cleanly in native hover tooltips.
+- **Database Cleanup:** Permanently purged test invoices `DOS-I-2026-0005` and `DOS-I-2026-0006`, their line items, payments, and audit entries from production storage, and reset the 2026 numbering sequence cleanly to 4.
+
 ## [v1.3.5] - 2026-10-24
 
 ### Added
