@@ -115,12 +115,24 @@ export function ContractDocumentViewer({
                     if (doc.body) {
                       doc.body.style.overflow = "hidden";
                     }
-                    const h = Math.max(
-                      doc.documentElement.scrollHeight,
-                      doc.body?.scrollHeight ?? 0,
-                      doc.documentElement.offsetHeight,
-                    );
-                    if (h > 400) {
+                    const pages = Array.from(doc.querySelectorAll<HTMLElement>(".contract-page, .invoice-page"));
+                    let h = 0;
+                    if (pages.length > 0) {
+                      const lastPage = pages[pages.length - 1];
+                      const lastBar = lastPage?.querySelector<HTMLElement>(".bottom-red-bar");
+                      const target = lastBar || lastPage;
+                      if (target) {
+                        h = Math.ceil(target.getBoundingClientRect().bottom + (doc.defaultView?.scrollY ?? 0));
+                      }
+                    }
+                    if (!h || h < 200) {
+                      h = Math.max(
+                        doc.documentElement.scrollHeight,
+                        doc.body?.scrollHeight ?? 0,
+                        doc.documentElement.offsetHeight,
+                      );
+                    }
+                    if (h > 200) {
                       setIframeHeight(h);
                     }
                   }

@@ -56,7 +56,7 @@ export function InvoiceDocumentViewer({
     };
   }, [id, lang, docType]);
 
-  const [iframeHeight, setIframeHeight] = useState<number>(1125);
+  const [iframeHeight, setIframeHeight] = useState<number>(1074);
 
   const previewUrl =
     docType === "receipt"
@@ -164,24 +164,41 @@ export function InvoiceDocumentViewer({
             srcDoc={html}
             scrolling="no"
             onLoad={(e) => {
-              try {
-                const frame = e.currentTarget;
-                if (frame.contentDocument?.documentElement) {
-                  const doc = frame.contentDocument;
-                  if (doc.body) {
-                    doc.body.style.overflow = "hidden";
+              const frame = e.currentTarget;
+              const updateHeight = () => {
+                try {
+                  if (frame.contentDocument?.documentElement) {
+                    const doc = frame.contentDocument;
+                    if (doc.body) {
+                      doc.body.style.overflow = "hidden";
+                    }
+                    const pages = Array.from(doc.querySelectorAll<HTMLElement>(".invoice-page, .contract-page"));
+                    let h = 0;
+                    if (pages.length > 0) {
+                      const lastPage = pages[pages.length - 1];
+                      const lastBar = lastPage?.querySelector<HTMLElement>(".bottom-red-bar");
+                      const target = lastBar || lastPage;
+                      if (target) {
+                        h = Math.ceil(target.getBoundingClientRect().bottom + (doc.defaultView?.scrollY ?? 0));
+                      }
+                    }
+                    if (!h || h < 200) {
+                      h = Math.max(
+                        doc.documentElement.scrollHeight,
+                        doc.body?.scrollHeight ?? 0,
+                        doc.documentElement.offsetHeight,
+                      );
+                    }
+                    if (h > 200) {
+                      setIframeHeight(h);
+                    }
                   }
-                  const h = Math.max(
-                    doc.documentElement.scrollHeight,
-                    doc.body?.scrollHeight ?? 0,
-                    doc.documentElement.offsetHeight,
-                  );
-                  if (h > 400) {
-                    setIframeHeight(h);
-                  }
-                }
-              } catch {
-              }
+                } catch {}
+              };
+              updateHeight();
+              frame.contentDocument?.fonts?.ready?.then(updateHeight);
+              setTimeout(updateHeight, 200);
+              setTimeout(updateHeight, 800);
             }}
             style={{ height: `${iframeHeight}px` }}
             className="w-full min-w-[620px] sm:min-w-full border-0 bg-white transition-all duration-200 block"

@@ -408,11 +408,13 @@ export function renderReceiptHtml(input: ReceiptHtmlInput): string {
 
   const body = `
 <div class="invoice-page">
-  ${heroHeader(input)}
-  <div class="invoice-body">
-    ${receivedFromSection(input)}
-    ${paymentsTable(input)}
-    ${totalsBlock(input)}
+  <div class="invoice-page-main">
+    ${heroHeader(input)}
+    <div class="invoice-body">
+      ${receivedFromSection(input)}
+      ${paymentsTable(input)}
+      ${totalsBlock(input)}
+    </div>
   </div>
 
   <div class="inv-footer-wrap">

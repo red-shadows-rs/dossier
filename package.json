@@ -1,6 +1,6 @@
 {
   "name": "dossier",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "private": true,
   "description": "Self-hosted bilingual contracts and invoices platform with cryptographic verification, milestone billing, and PDF rendering",
   "author": "RED SHADOWS | RS",

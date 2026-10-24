@@ -2,7 +2,7 @@
 
 # دليل النشر والتشغيل في بيئة الإنتاج - Dossier
 
-[![الإصدار](https://img.shields.io/badge/version-1.3.2-2563eb?style=flat-square&logo=semver)](../CHANGELOG.md)
+[![الإصدار](https://img.shields.io/badge/version-1.3.3-2563eb?style=flat-square&logo=semver)](../CHANGELOG.md)
 [![الرخصة](https://img.shields.io/badge/license-GPL--3.0-dc2626?style=flat-square)](../LICENSE)
 ![Docker](https://img.shields.io/badge/docker-ready-2496ed?style=flat-square&logo=docker)
 ![المنصة](https://img.shields.io/badge/platform-Linux%20%7C%20Self--Hosted-9333ea?style=flat-square&logo=linux)
