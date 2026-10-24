@@ -201,7 +201,7 @@ function paymentsTable(input: ReceiptHtmlInput): string {
         <td class="col-num">${num(String(idx + 1))}</td>
         <td class="col-desc" style="white-space: nowrap;">${esc(formatDateLong(p.paidOn, lang))}</td>
         <td class="col-desc"><div class="item-title">${methodText}</div></td>
-        <td class="col-desc num" dir="ltr">${refText}</td>
+        <td class="col-desc"><span class="num" dir="ltr">${refText}</span></td>
         <td class="col-total">${num(formatMoney(p.amountMinor, currency, lang))}</td>
       </tr>`;
     })
@@ -218,10 +218,10 @@ function paymentsTable(input: ReceiptHtmlInput): string {
     <thead>
       <tr>
         <th class="col-num">#</th>
-        <th class="col-desc" style="width: 25%;">${thDate}</th>
-        <th class="col-desc" style="width: 25%;">${thMethod}</th>
-        <th class="col-desc" style="width: 25%;">${thRef}</th>
-        <th class="col-total" style="width: 25%;">${thAmount}</th>
+        <th class="col-desc" style="width: 34mm;">${thDate}</th>
+        <th class="col-desc" style="width: 35mm;">${thMethod}</th>
+        <th class="col-desc">${thRef}</th>
+        <th class="col-total" style="width: 36mm;">${thAmount}</th>
       </tr>
     </thead>
     <tbody>${rows.length > 0 ? rows : `<tr><td colspan="5" style="text-align: center; padding: 6mm; color: #64748b;">${emptyText}</td></tr>`}</tbody>
@@ -271,15 +271,17 @@ function totalsBlock(input: ReceiptHtmlInput): string {
     `;
   }
 
+  const checkIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
   const stamp =
     remainingMinor === 0
-      ? `<div class="paid-stamp">${
+      ? `<div class="paid-stamp">${checkIcon}<span>${
           input.lang === "ar"
             ? "مكتمل السداد"
             : input.lang === "en"
               ? "FULLY PAID"
               : "FULLY PAID / مكتمل السداد"
-        }</div>`
+        }</span></div>`
       : "";
 
   return `

@@ -142,6 +142,9 @@ li {
   unicode-bidi: isolate;
   display: inline-block;
 }
+td.num {
+  display: table-cell;
+}
 .watermark {
   position: fixed;
   inset: 0;

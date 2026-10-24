@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.3.4] - 2026-10-24
+
+### Fixed
+- **Seamless Receipt Table Borders:** Resolved table row bottom border severing caused by `num` class applying `display: inline-block` directly to the transaction reference `<td>`, by wrapping the reference text in an inline `span.num` and enforcing `display: table-cell` on `td.num`.
+- **Balanced Receipt Column Widths:** Adjusted receipt payment voucher table column proportions to give date, payment method, and amount explicit balanced widths while allowing the reference column to expand smoothly across available table width.
+
+### Changed
+- **Modernized Paid Status Card Design:** Replaced the rotated rubber-stamp style with an executive, modern full-width status badge in both receipts (`مكتمل السداد` / `FULLY PAID`) and invoices (`مدفوعة بالكامل` / `PAID IN FULL`), featuring soft emerald tints, subtle borders, crisp typography, and an aligned checkmark icon matching Dossier's design language.
+
 ## [v1.3.3] - 2026-10-24
 
 ### Fixed

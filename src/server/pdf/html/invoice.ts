@@ -563,17 +563,22 @@ table.inv-items-table tbody tr:last-child td {
   color: #ffffff;
 }
 .paid-stamp {
-  border: 0.8mm solid #16a34a;
-  background: rgba(22, 163, 74, 0.07);
-  color: #15803d;
-  padding: 1.8mm 4.5mm;
-  font-weight: 900;
-  font-size: 11pt;
-  letter-spacing: 0.06em;
-  display: inline-block;
-  border-radius: 4px;
-  transform: rotate(-5deg);
-  margin-top: 2mm;
+  width: 100%;
+  box-sizing: border-box;
+  background: #ecfdf5;
+  border: 0.35mm solid #86efac;
+  color: #166534;
+  padding: 2.2mm 3.5mm;
+  font-weight: 800;
+  font-size: 8.5pt;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2mm;
+  border-radius: 3px;
+  margin-top: 2.5mm;
+  text-transform: uppercase;
 }
 
 .inv-footer-wrap {
@@ -1204,15 +1209,17 @@ function totalsBlock(input: InvoiceHtmlInput): string {
         ? "TOTAL DUE"
         : "TOTAL DUE / الإجمالي";
 
+  const checkIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
   const stamp =
     inv.status === "paid"
-      ? `<div class="paid-stamp">${
+      ? `<div class="paid-stamp">${checkIcon}<span>${
           input.lang === "ar"
-            ? "مدفوعة"
+            ? "مدفوعة بالكامل"
             : input.lang === "en"
-              ? "PAID"
-              : "PAID / مدفوعة"
-        }</div>`
+              ? "PAID IN FULL"
+              : "PAID IN FULL / مدفوعة بالكامل"
+        }</span></div>`
       : "";
 
   return `
