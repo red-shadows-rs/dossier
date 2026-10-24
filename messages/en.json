@@ -438,8 +438,6 @@
       "deleteConfirmMsg": "Are you sure you want to delete this bank account?",
       "binanceUidLabel": "Binance UID",
       "binanceUidPlaceholder": "e.g. 82716354 (zero-fee internal transfer)",
-      "binancePayIdLabel": "Binance Pay ID",
-      "binancePayIdPlaceholder": "e.g. 198273645",
       "binanceUsernameLabel": "Binance Username / Handle",
       "binanceUsernamePlaceholder": "e.g. @username",
       "networkLabel": "Deposit Network",
@@ -451,7 +449,7 @@
       "paypalUsernamePlaceholder": "e.g. username",
       "paypalUrlLabel": "Direct PayPal.Me Link",
       "paypalUrlPlaceholder": "https://paypal.me/username",
-      "binanceInfo": "Binance transfer options (zero-fee internal transfer via UID / Pay ID, or blockchain deposit address)",
+      "binanceInfo": "Binance transfer options (zero-fee internal transfer via UID, or blockchain deposit address)",
       "paypalInfo": "PayPal transfer details (email, PayPal.Me link, and username)"
     }
   },

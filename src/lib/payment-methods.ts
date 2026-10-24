@@ -68,9 +68,6 @@ export function formatAccountToCard(
     if (acc.binanceUid) {
       identifierLabel = lang === "ar" ? "معرف باينانس (UID)" : "Binance UID";
       identifierValue = acc.binanceUid;
-    } else if (acc.binancePayId) {
-      identifierLabel = lang === "ar" ? "معرف الدفع (Pay ID)" : "Binance Pay ID";
-      identifierValue = acc.binancePayId;
     } else if (acc.iban) {
       identifierLabel = acc.network
         ? (lang === "ar" ? `المحفظة (${acc.network})` : `Wallet (${acc.network})`)
@@ -227,7 +224,7 @@ export function parsePaymentInstructionsToCards(
         seg.includes("معرف باينانس") ||
         seg.toLowerCase().includes("binance")
       ) {
-        identifierLabel = lang === "ar" ? "معرف باينانس / المحفظة" : "Binance Pay ID / Wallet";
+        identifierLabel = lang === "ar" ? "معرف باينانس / المحفظة" : "Binance UID / Wallet";
         identifierValue = seg.split(":")[1]?.trim() || "";
       } else if (
         seg.includes("رقم المحفظة") ||

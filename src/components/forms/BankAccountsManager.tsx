@@ -74,7 +74,6 @@ export function BankAccountsManager({
   const [username, setUsername] = useState("");
   const [paymentUrl, setPaymentUrl] = useState("");
   const [binanceUid, setBinanceUid] = useState("");
-  const [binancePayId, setBinancePayId] = useState("");
   const [network, setNetwork] = useState("TRC20");
 
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
@@ -102,7 +101,6 @@ export function BankAccountsManager({
     setUsername("");
     setPaymentUrl("");
     setBinanceUid("");
-    setBinancePayId("");
     setNetwork("TRC20");
     setIsActive(true);
     setIsPrimary(accounts.length === 0);
@@ -126,7 +124,6 @@ export function BankAccountsManager({
     setUsername(acc.username ?? "");
     setPaymentUrl(acc.paymentUrl ?? "");
     setBinanceUid(acc.binanceUid ?? "");
-    setBinancePayId(acc.binancePayId ?? "");
     setNetwork(acc.network ?? "TRC20");
     setIsActive(acc.isActive);
     setIsPrimary(acc.isPrimary);
@@ -184,11 +181,11 @@ export function BankAccountsManager({
   async function handleFormSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (provider === "binance") {
-      if (!binanceUid.trim() && !binancePayId.trim() && !iban.trim() && !username.trim()) {
+      if (!binanceUid.trim() && !iban.trim() && !username.trim()) {
         toast({
           title: isAr
-            ? "يرجى إدخال معرف باينانس (UID) أو معرف Pay ID أو عنوان المحفظة"
-            : "Please provide Binance UID, Pay ID, or Wallet Address",
+            ? "يرجى إدخال معرف باينانس (UID) أو اسم المستخدم أو عنوان المحفظة"
+            : "Please provide Binance UID, Username, or Wallet Address",
           tone: "error",
         });
         return;
@@ -220,7 +217,7 @@ export function BankAccountsManager({
     const finalIban =
       iban.trim() ||
       (provider === "binance"
-        ? (binanceUid.trim() || binancePayId.trim() || username.trim())
+        ? (binanceUid.trim() || username.trim())
         : (username.trim() || paymentUrl.trim()));
 
     const updatedAccount: BankAccount = {
@@ -237,7 +234,6 @@ export function BankAccountsManager({
       username: username.trim(),
       paymentUrl: paymentUrl.trim(),
       binanceUid: binanceUid.trim(),
-      binancePayId: binancePayId.trim(),
       network: provider === "binance" ? network : "",
     };
 
@@ -454,34 +450,6 @@ export function BankAccountsManager({
                             </div>
                           ) : null}
 
-                          {acc.binancePayId ? (
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-muted-foreground shrink-0">
-                                {isAr ? "معرف الدفع (Pay ID):" : "Pay ID:"}
-                              </span>
-                              <div className="flex items-center gap-1 min-w-0">
-                                <span
-                                  className="font-mono text-[11px] font-semibold text-foreground truncate select-all"
-                                  dir="ltr"
-                                >
-                                  {acc.binancePayId}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => handleCopy(acc.id + "-payid", acc.binancePayId ?? "")}
-                                  className="text-muted-foreground hover:text-foreground p-0.5 rounded transition-colors"
-                                  title={t("copy")}
-                                >
-                                  {copiedId === acc.id + "-payid" ? (
-                                    <Check size={12} className="text-emerald-500" />
-                                  ) : (
-                                    <Copy size={12} />
-                                  )}
-                                </button>
-                              </div>
-                            </div>
-                          ) : null}
-
                           {acc.username ? (
                             <div className="flex items-center justify-between gap-2">
                               <span className="text-muted-foreground shrink-0">
@@ -493,7 +461,7 @@ export function BankAccountsManager({
                             </div>
                           ) : null}
 
-                          {acc.iban && acc.iban !== acc.binanceUid && acc.iban !== acc.binancePayId ? (
+                          {acc.iban && acc.iban !== acc.binanceUid ? (
                             <div className="flex items-center justify-between gap-2">
                               <span className="text-muted-foreground shrink-0">
                                 {acc.network
@@ -796,19 +764,6 @@ export function BankAccountsManager({
                   />
                 </Field>
 
-                <Field label={t("binancePayIdLabel")} htmlFor="acc-binance-pay-id">
-                  <Input
-                    id="acc-binance-pay-id"
-                    value={binancePayId}
-                    onChange={(e) => setBinancePayId(e.target.value.trim())}
-                    placeholder={t("binancePayIdPlaceholder")}
-                    dir="ltr"
-                    className="font-mono text-xs text-start"
-                  />
-                </Field>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field label={t("binanceUsernameLabel")} htmlFor="acc-username">
                   <Input
                     id="acc-username"
@@ -819,7 +774,9 @@ export function BankAccountsManager({
                     className="text-start"
                   />
                 </Field>
+              </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field label={t("currencyLabel")} htmlFor="acc-currency" required>
                   <Select
                     id="acc-currency"

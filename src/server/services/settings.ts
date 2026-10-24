@@ -175,7 +175,7 @@ export function buildPaymentInstructions(
         if (acc.provider === "paypal") {
           idLabel = lang === "ar" ? "حساب PayPal" : "PayPal Email";
         } else if (acc.provider === "binance") {
-          idLabel = lang === "ar" ? "معرف باينانس / المحفظة" : "Binance Pay ID / Wallet";
+          idLabel = lang === "ar" ? "معرف باينانس / المحفظة" : "Binance UID / Wallet";
         } else if (acc.provider === "barq" || acc.provider === "stcpay") {
           idLabel = lang === "ar" ? "رقم المحفظة / الجوال" : "Wallet / Mobile";
         }
@@ -195,9 +195,6 @@ export function buildPaymentInstructions(
             : null,
           acc.provider === "binance" && acc.binanceUid
             ? `UID: ${acc.binanceUid}`
-            : null,
-          acc.provider === "binance" && acc.binancePayId
-            ? `Pay ID: ${acc.binancePayId}`
             : null,
           acc.provider === "binance" && acc.username
             ? lang === "ar"

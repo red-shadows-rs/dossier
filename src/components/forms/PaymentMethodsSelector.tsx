@@ -92,9 +92,6 @@ export function PaymentMethodsSelector({
             if (acc.binanceUid) {
               idLabel = "UID";
               displayValue = acc.binanceUid;
-            } else if (acc.binancePayId) {
-              idLabel = "Pay ID";
-              displayValue = acc.binancePayId;
             } else if (acc.network && acc.iban) {
               idLabel = acc.network;
               displayValue = acc.iban;

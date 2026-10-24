@@ -1292,16 +1292,6 @@ function instructionsBlock(input: InvoiceHtmlInput): string {
               : ""
           }
           ${
-            card.binancePayId && card.binancePayId !== card.identifierValue
-              ? `
-            <div class="payment-card-id-row">
-              <span class="payment-card-label">Pay ID:</span>
-              <span class="payment-card-mono" dir="ltr">${esc(card.binancePayId)}</span>
-            </div>
-          `
-              : ""
-          }
-          ${
             card.paymentUrl
               ? `
             <div class="payment-card-id-row">

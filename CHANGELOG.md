@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.3.2] - 2026-10-24
+
+### Changed
+- **Streamlined Binance Payment Configuration:** Removed the redundant Binance Pay ID field across bank accounts management, invoice payment selector, invoice detail cards, payment instructions generator, and PDF invoices to prioritize Binance UID, username handle, and blockchain deposit wallets.
+- **Rebalanced Payment Account Dialog Form:** Reorganized Binance configuration inputs into a clean, balanced two-column grid with UID and handle side-by-side, followed by currency selection and optional network/wallet address.
+- **Updated Localization and Constants:** Updated Arabic and English payment instruction texts and provider placeholders to reflect the streamlined Binance workflow without Pay ID.
+
 ## [v1.3.1] - 2026-10-23
 
 ### Added

@@ -438,8 +438,6 @@
       "deleteConfirmMsg": "هل أنت متأكد من حذف هذا الحساب البنكي؟",
       "binanceUidLabel": "معرف باينانس (UID)",
       "binanceUidPlaceholder": "مثال: 82716354 (تحويل فوري بدون رسوم)",
-      "binancePayIdLabel": "معرف باينانس باي (Pay ID)",
-      "binancePayIdPlaceholder": "مثال: 198273645",
       "binanceUsernameLabel": "اسم المستخدم في باينانس",
       "binanceUsernamePlaceholder": "مثال: @username",
       "networkLabel": "شبكة الإيداع (Network)",
@@ -451,7 +449,7 @@
       "paypalUsernamePlaceholder": "مثال: username",
       "paypalUrlLabel": "رابط PayPal.Me المباشر",
       "paypalUrlPlaceholder": "https://paypal.me/username",
-      "binanceInfo": "بيانات التحويل عبر باينانس (التحويل الداخلي عبر UID أو Pay ID بدون رسوم، أو التحويل عبر شبكة البلوكشين)",
+      "binanceInfo": "بيانات التحويل عبر باينانس (التحويل الداخلي عبر معرف UID بدون رسوم، أو التحويل عبر شبكة البلوكشين)",
       "paypalInfo": "بيانات التحويل عبر PayPal (البريد الإلكتروني، رابط PayPal.Me، واسم المستخدم)"
     }
   },
