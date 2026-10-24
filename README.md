@@ -8,7 +8,7 @@
 
 Contracts & invoices platform with cryptographic verification, automated milestone billing, and bidirectional Arabic/English PDF rendering.
 
-[![Version](https://img.shields.io/badge/version-1.3.6-2563eb?style=for-the-badge)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.3.7-2563eb?style=for-the-badge)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-GPL--3.0-dc2626?style=for-the-badge)](LICENSE)
 ![TypeScript](https://img.shields.io/badge/typescript-5.9%2B-3178c6?style=for-the-badge&logo=typescript)
 ![Next.js](https://img.shields.io/badge/next.js-16.3-000000?style=for-the-badge&logo=next.js)

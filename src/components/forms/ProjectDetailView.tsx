@@ -461,9 +461,6 @@ export function ProjectDetailView({
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/40 pb-3">
                         <div className="flex items-center gap-2">
-                          <span className="flex h-7 w-7 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary font-mono text-xs font-bold">
-                            {currency}
-                          </span>
                           <span className="text-sm font-bold text-foreground">
                             {t("summary.contracted")}:{" "}
                             <span className="tabular-nums font-mono">
