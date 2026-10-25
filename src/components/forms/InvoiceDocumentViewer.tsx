@@ -160,7 +160,7 @@ export function InvoiceDocumentViewer({
         <div className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin] rounded-lg border border-border bg-white shadow-2xs overflow-hidden">
           <iframe
             title={t("summary")}
-            sandbox="allow-same-origin"
+            sandbox="allow-same-origin allow-scripts"
             srcDoc={html}
             scrolling="no"
             onLoad={(e) => {

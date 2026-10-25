@@ -42,6 +42,7 @@ import {
   completeContractAction,
   createContractAction,
   deleteDraftContractAction,
+  getContractCertificateHtmlAction,
   getContractPreviewHtmlAction,
   previewTotalsAction,
   regenerateSigningLinkAction,
@@ -68,6 +69,7 @@ import {
   previewInvoiceTotalsAction,
   saveInvoiceLinesAction,
   sendInvoiceEmailAction,
+  sendReceiptEmailAction,
   updateInvoiceDraftAction,
   voidInvoiceAction,
 } from "./invoices";
@@ -133,6 +135,7 @@ const TABLE: Entry[] = [
   { name: "regenerateSigningLinkAction", action: regenerateSigningLinkAction, viewerForbidden: true },
   { name: "terminateContractAction", action: terminateContractAction, viewerForbidden: true },
   { name: "getContractPreviewHtmlAction", action: getContractPreviewHtmlAction, viewerForbidden: false },
+  { name: "getContractCertificateHtmlAction", action: getContractCertificateHtmlAction, viewerForbidden: false },
 
   { name: "createInvoiceAction", action: createInvoiceAction, viewerForbidden: true },
   { name: "createInvoiceFromMilestoneAction", action: createInvoiceFromMilestoneAction, viewerForbidden: true },
@@ -142,6 +145,7 @@ const TABLE: Entry[] = [
   { name: "previewInvoiceTotalsAction", action: previewInvoiceTotalsAction, viewerForbidden: true },
   { name: "issueInvoiceAction", action: issueInvoiceAction, viewerForbidden: true },
   { name: "sendInvoiceEmailAction", action: sendInvoiceEmailAction, viewerForbidden: true },
+  { name: "sendReceiptEmailAction", action: sendReceiptEmailAction, viewerForbidden: true },
   { name: "voidInvoiceAction", action: voidInvoiceAction, viewerForbidden: true },
   { name: "getInvoicePreviewHtmlAction", action: getInvoicePreviewHtmlAction, viewerForbidden: false },
 

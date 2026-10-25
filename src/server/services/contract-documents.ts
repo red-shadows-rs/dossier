@@ -4,6 +4,9 @@
 import { and, asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { contractSignatories, contractVersions, users } from "@/db/schema";
+import { canonicalize } from "@/lib/canonical-json";
+import { sha256Hex } from "@/lib/crypto";
+import { nowMs } from "@/lib/dates";
 import { AppError } from "@/lib/errors";
 import {
   allowedDocLangs,
@@ -13,7 +16,11 @@ import {
 } from "@/lib/doc-lang";
 import { env } from "@/lib/env";
 import { makeQrDataUri, verificationUrl } from "@/server/pdf/qr";
-import { renderContractHtml } from "@/server/pdf/html/contract";
+import {
+  renderContractCertificateHtml,
+  renderContractHtml,
+} from "@/server/pdf/html/contract";
+import type { CertificateData } from "@/server/pdf/html/certificate";
 import type { SignatureRender } from "@/server/pdf/html/shared";
 import { getFontCss } from "@/server/pdf/fonts";
 import { findFileBySha256, getFileRow, readFile } from "@/server/services/files";
@@ -289,6 +296,174 @@ export async function resolveContractPdf(
     kind: "render",
     html,
     filename: safePdfFilename(contract, lang),
+    docNumber: contract.number ?? "DRAFT",
+    lang,
+  };
+}
+
+export async function buildContractCertificateHtml(
+  contractId: string,
+  lang: DocLang,
+): Promise<string> {
+  const contract = getContract(contractId);
+  const snapshot = snapshotForRendering(contract);
+  const company = getSettings("company");
+  const defaults = getSettings("defaults");
+  const logoDataUri =
+    imageBySha(snapshot.provider.logoSha256) ??
+    imageByFileId(company.logoFileId ?? null);
+  const stampDataUri =
+    imageBySha(snapshot.provider.stampSha256) ??
+    imageByFileId(company.stampFileId ?? null);
+
+  const verificationCode =
+    contract.verificationCode ??
+    contract.number ??
+    (contract.status === "draft" ? "DRAFT-PREVIEW" : null);
+
+  let verification: { code: string; url: string; qrDataUri: string } | null = null;
+  if (verificationCode) {
+    const url = verificationUrl(env.APP_URL, verificationCode);
+    verification = {
+      code: verificationCode,
+      url,
+      qrDataUri: await makeQrDataUri(url),
+    };
+  }
+
+  const signatoryRows = contract.currentVersionId
+    ? db
+        .select()
+        .from(contractSignatories)
+        .where(
+          and(
+            eq(contractSignatories.contractId, contractId),
+            eq(contractSignatories.versionId, contract.currentVersionId),
+          ),
+        )
+        .orderBy(asc(contractSignatories.sortOrder))
+        .all()
+    : db
+        .select()
+        .from(contractSignatories)
+        .where(eq(contractSignatories.contractId, contractId))
+        .orderBy(asc(contractSignatories.sortOrder))
+        .all();
+
+  const isArabic = lang === "ar";
+  const isIndividual =
+    snapshot.client.type === "individual" || !snapshot.client.repNameAr;
+
+  const defaultProviderName =
+    (isArabic ? snapshot.provider.nameAr : snapshot.provider.nameEn) ||
+    (isArabic ? "المفوض بالتوقيع" : "Authorized Signatory");
+
+  const defaultClientName =
+    (isArabic
+      ? snapshot.client.repNameAr || snapshot.client.nameAr
+      : snapshot.client.repNameEn || snapshot.client.nameEn) ||
+    (isArabic
+      ? isIndividual ? "العميل" : "ممثل العميل"
+      : isIndividual ? "Client" : "Client Representative");
+
+  const defaultClientTitle =
+    (isArabic ? snapshot.client.repTitleAr : snapshot.client.repTitleEn) ||
+    (isIndividual
+      ? isArabic ? "العميل" : "Client"
+      : isArabic ? "ممثل العميل" : "Client Representative");
+
+  const signatures: SignatureRender[] =
+    signatoryRows.length > 0
+      ? signatoryRows.map((s) => {
+          let resolvedTitle = s.title?.trim() || null;
+          if (!resolvedTitle && s.signerUserId) {
+            const u = db
+              .select({
+                titleAr: users.signerTitleAr,
+                titleEn: users.signerTitleEn,
+              })
+              .from(users)
+              .where(eq(users.id, s.signerUserId))
+              .get();
+            resolvedTitle = (isArabic ? u?.titleAr : u?.titleEn) || null;
+          }
+          if (!resolvedTitle) {
+            resolvedTitle =
+              s.role === "provider"
+                ? isArabic
+                  ? "المفوض بالتوقيع"
+                  : "Authorized Signatory"
+                : defaultClientTitle;
+          } else if (
+            s.role === "client" &&
+            isIndividual &&
+            (resolvedTitle === "ممثل العميل" || resolvedTitle === "Client Representative")
+          ) {
+            resolvedTitle = isArabic ? "العميل" : "Client";
+          }
+          return {
+            role: s.role,
+            name:
+              s.name ||
+              (s.role === "provider" ? defaultProviderName : defaultClientName),
+            title: resolvedTitle,
+            signedAtMs: s.signedAt,
+            method: s.signatureMethod,
+            imageDataUri: imageByFileId(s.signatureFileId),
+            typedName: s.typedName,
+          };
+        })
+      : [];
+
+  const contentHash =
+    contract.contentHash ?? sha256Hex(canonicalize(snapshot));
+
+  const certificate: CertificateData = {
+    contentHash,
+    generatedAtMs:
+      contract.signedAt ??
+      contract.completedAt ??
+      contract.updatedAt ??
+      nowMs(),
+    timezone: defaults.timezone,
+    signatories: signatoryRows.map((s) => ({
+      role: s.role,
+      name: s.name,
+      title: s.title,
+      email: s.email,
+      method: s.signatureMethod,
+      signedAtMs: s.signedAt,
+      ip: s.ip,
+      otpVerified: s.otpVerifiedAt !== null,
+      userAgent: s.userAgent,
+    })),
+  };
+
+  return renderContractCertificateHtml({
+    snapshot,
+    lang,
+    mode: "sealed",
+    fonts: getFontCss(),
+    logoDataUri,
+    stampDataUri,
+    signatures,
+    verification,
+    certificate,
+  });
+}
+
+export async function resolveCertificatePdf(
+  contractId: string,
+  requestedLang: string | undefined,
+): Promise<{ html: string; filename: string; docNumber: string; lang: DocLang }> {
+  const contract = getContract(contractId);
+  const lang = resolveDocLang(contract, requestedLang);
+  const html = await buildContractCertificateHtml(contractId, lang);
+  const base = contract.number ?? "draft";
+  const filename = `${base}-certificate-${lang}.pdf`.replace(/[^A-Za-z0-9._-]/g, "");
+  return {
+    html,
+    filename,
     docNumber: contract.number ?? "DRAFT",
     lang,
   };

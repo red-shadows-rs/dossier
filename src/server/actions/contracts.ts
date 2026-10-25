@@ -28,6 +28,7 @@ import {
 } from "@/server/services/contracts";
 import type { CalcInput, CalcOutput } from "@/server/services/contract-calc";
 import {
+  buildContractCertificateHtml,
   buildContractHtml,
   resolveDocLang,
 } from "@/server/services/contract-documents";
@@ -187,6 +188,24 @@ export async function getContractPreviewHtmlAction(
       data.lang ? String(data.lang) : undefined,
     );
     const html = await buildContractHtml(id, lang, "preview");
+    return { html };
+  });
+}
+
+export async function getContractCertificateHtmlAction(
+  raw: unknown,
+): Promise<ActionResult<{ html: string }>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "contracts.read");
+    const data = raw as { id?: unknown; lang?: unknown };
+    const id = String(data.id ?? "");
+    const contract = getContract(id);
+    const lang = resolveDocLang(
+      contract,
+      data.lang ? String(data.lang) : undefined,
+    );
+    const html = await buildContractCertificateHtml(id, lang);
     return { html };
   });
 }

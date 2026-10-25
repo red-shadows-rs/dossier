@@ -300,6 +300,11 @@ export function ContractDetailView({
               id={contract.id}
               languageMode={contract.languageMode}
               canDownload={canRead}
+              hasCertificate={Boolean(
+                contract.signedAt ||
+                contract.status === "signed" ||
+                contract.status === "completed",
+              )}
             />
           </CardContent>
         </Card>

@@ -6,7 +6,7 @@
 import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   Building2,
@@ -20,6 +20,7 @@ import {
   FolderKanban,
   ListOrdered,
   Receipt,
+  Send,
   Wallet,
 } from "lucide-react";
 import {
@@ -30,6 +31,8 @@ import { InvoiceDocumentViewer } from "@/components/forms/InvoiceDocumentViewer"
 import { Badge, invoiceStatusTone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { useToast } from "@/components/ui/Toast";
+import { sendReceiptEmailAction } from "@/server/actions/invoices";
 
 import { EmptyState } from "@/components/ui/EmptyState";
 import {
@@ -119,6 +122,25 @@ export function InvoiceDetailView({
   locale,
 }: InvoiceDetailViewProps) {
   const t = useTranslations("invoices");
+  const tErrors = useTranslations("errors");
+  const toast = useToast();
+  const router = useRouter();
+  const [sendingReceipt, setSendingReceipt] = useState(false);
+
+  async function handleSendReceiptEmail() {
+    setSendingReceipt(true);
+    const result = await sendReceiptEmailAction({ id: invoice.id });
+    setSendingReceipt(false);
+    if (result.ok) {
+      toast({ title: t("receiptEmailQueued"), tone: "success" });
+      router.refresh();
+      return;
+    }
+    toast({
+      title: tErrors((result.error?.code ?? "INTERNAL") as never),
+      tone: "error",
+    });
+  }
 
   const paymentCards = useMemo(
     () =>
@@ -249,6 +271,7 @@ export function InvoiceDetailView({
             canIssue={canIssue}
             canVoid={canVoid}
             canPay={canPay}
+            hasPayments={payments.some((p) => p.voidedAt === null)}
           />
         </div>
       </div>
@@ -653,17 +676,32 @@ export function InvoiceDetailView({
                 ({payments.length})
               </span>
             </CardTitle>
-            {payments.some((p) => p.voidedAt === null) && canRead && (
-              <a
-                href={`/api/invoices/${invoice.id}/receipt/pdf?inline=1`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <Button variant="secondary" className="gap-1.5 font-medium shadow-xs">
-                  <Receipt size={15} />
-                  <span>{t("viewReceiptPdf")}</span>
-                </Button>
-              </a>
+            {payments.some((p) => p.voidedAt === null) && (
+              <div className="flex flex-wrap items-center gap-2">
+                {canIssue && (
+                  <Button
+                    variant="secondary"
+                    onClick={handleSendReceiptEmail}
+                    loading={sendingReceipt}
+                    className="gap-1.5 font-medium shadow-xs"
+                  >
+                    <Send size={15} />
+                    <span>{t("sendReceiptEmail")}</span>
+                  </Button>
+                )}
+                {canRead && (
+                  <a
+                    href={`/api/invoices/${invoice.id}/receipt/pdf?inline=1`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <Button variant="secondary" className="gap-1.5 font-medium shadow-xs">
+                      <Receipt size={15} />
+                      <span>{t("viewReceiptPdf")}</span>
+                    </Button>
+                  </a>
+                )}
+              </div>
             )}
           </CardHeader>
           <CardContent>

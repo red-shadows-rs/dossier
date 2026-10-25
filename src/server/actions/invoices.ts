@@ -21,6 +21,7 @@ import {
   issueInvoice,
   saveInvoiceLines,
   sendInvoiceEmail,
+  sendReceiptEmail,
   updateInvoiceDraft,
   voidInvoice,
 } from "@/server/services/invoices";
@@ -125,6 +126,23 @@ export async function sendInvoiceEmailAction(
       typeof data.toEmail === "string" ? data.toEmail : undefined;
     const meta = await getRequestMeta();
     sendInvoiceEmail(user, id, { toEmail }, meta);
+    revalidateInvoice(id);
+    return null;
+  });
+}
+
+export async function sendReceiptEmailAction(
+  raw: unknown,
+): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "invoices.issue");
+    const data = raw as { id?: unknown; toEmail?: unknown };
+    const id = String(data.id ?? "");
+    const toEmail =
+      typeof data.toEmail === "string" ? data.toEmail : undefined;
+    const meta = await getRequestMeta();
+    sendReceiptEmail(user, id, { toEmail }, meta);
     revalidateInvoice(id);
     return null;
   });

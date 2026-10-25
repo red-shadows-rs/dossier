@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useLocale } from "next-intl";
 import { FolderKanban } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
-import { Badge } from "@/components/ui/Badge";
+import { Badge, projectStatusTone } from "@/components/ui/Badge";
 import { RowActionButton } from "@/components/forms/RowActionButton";
 import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
 import type { ActionResult } from "@/lib/result";
@@ -112,7 +112,7 @@ export function ProjectsTable({
       header: labels.statusLabel,
       className: "whitespace-nowrap",
       render: (row) => (
-        <Badge tone="blue">
+        <Badge tone={projectStatusTone(row.status)}>
           {labels.statusValues[row.status] ?? row.status}
         </Badge>
       ),
@@ -186,7 +186,7 @@ export function ProjectsTable({
               >
                 {name}
               </Link>
-              <Badge tone={row.status === "active" ? "green" : row.status === "draft" ? "amber" : "gray"} className="shrink-0 text-xs">
+              <Badge tone={projectStatusTone(row.status)} className="shrink-0 text-xs">
                 {labels.statusValues[row.status] ?? row.status}
               </Badge>
             </div>

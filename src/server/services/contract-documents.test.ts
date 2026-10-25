@@ -24,7 +24,9 @@ import { seedSystemTemplates } from "@/server/services/templates";
 import { updateSettings } from "@/server/services/settings";
 import { createContractFromTemplate, getContract } from "./contracts";
 import {
+  buildContractCertificateHtml,
   buildContractHtml,
+  resolveCertificatePdf,
   resolveContractPdf,
   resolveDocLang,
   safePdfFilename,
@@ -218,5 +220,29 @@ describe("resolveContractPdf", () => {
   it("throws VALIDATION_FAILED for an invalid language", async () => {
     const id = createContract("web-development");
     await expect(resolveContractPdf(id, "invalid" as unknown as "ar")).rejects.toThrow(AppError);
+  });
+});
+
+describe("buildContractCertificateHtml and resolveCertificatePdf", () => {
+  it("renders certificate HTML in Arabic with title and cert classes", async () => {
+    const id = createContract("web-development");
+    const html = await buildContractCertificateHtml(id, "ar");
+    expect(html).toContain("cert-page");
+    expect(html).toContain("شهادة إتمام التوقيع");
+  });
+
+  it("renders certificate HTML in English", async () => {
+    const id = createContract("web-development");
+    const html = await buildContractCertificateHtml(id, "en");
+    expect(html).toContain("cert-page");
+    expect(html).toContain("Certificate of Completion");
+  });
+
+  it("resolves certificate PDF source with proper filename", async () => {
+    const id = createContract("web-development");
+    const source = await resolveCertificatePdf(id, "ar");
+    expect(source.filename).toBe("draft-certificate-ar.pdf");
+    expect(source.html).toContain("cert-page");
+    expect(source.docNumber).toBe("DRAFT");
   });
 });

@@ -692,6 +692,58 @@ export function renderContractHtml(input: ContractHtmlInput): string {
   });
 }
 
+export function renderContractCertificateHtml(input: ContractHtmlInput): string {
+  const { snapshot, lang } = input;
+  const c = snapshot.contract;
+
+  const certificateHtml = input.certificate
+    ? renderCertificateSection(
+        {
+          number: c.number,
+          titleEn: c.titleEn,
+          titleAr: c.titleAr,
+          versionNo: c.versionNo,
+          projectCode: snapshot.project.code,
+          verification: input.verification,
+        },
+        input.certificate,
+        lang,
+      )
+    : "";
+
+  const headerHtml = renderSubsequentHeader(snapshot, lang, input.logoDataUri);
+  const footerHtml = renderContractFooter(input);
+
+  const page = `
+    <div class="contract-page cert-page">
+      <div class="contract-page-main">
+        ${headerHtml}
+        <div class="contract-body">
+          ${certificateHtml}
+        </div>
+      </div>
+      ${footerHtml}
+      <div class="bottom-red-bar">
+        <span dir="ltr">Dossier</span>
+        <span class="page-num-display" dir="ltr">1 / 1</span>
+      </div>
+    </div>
+  `;
+
+  const isAr = lang === "ar";
+  const title =
+    (isAr ? "شهادة إتمام التوقيع" : "Certificate of Completion") +
+    (c.number ? ` - ${c.number}` : "");
+
+  return documentShell({
+    lang,
+    title,
+    fonts: input.fonts,
+    watermark: null,
+    body: `<div class="contract-document">${page}</div>`,
+  });
+}
+
 export function localeForDoc(lang: DocLang): Locale {
   return lang === "ar" ? "ar" : "en";
 }

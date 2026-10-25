@@ -57,7 +57,7 @@ export function PublicContractViewer({
       <iframe
         ref={iframeRef}
         title={title}
-        sandbox="allow-same-origin"
+        sandbox="allow-same-origin allow-scripts"
         srcDoc={html}
         scrolling="no"
         onLoad={(e) => {

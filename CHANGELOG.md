@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.4.0] - 2026-10-25
+
+### Added
+- **Contract Signature Certificate Tabs & Standalone PDF:** Added interactive tabs in the contract document viewer to switch seamlessly between the contract document and the digital signature certificate (Certificate of Completion) for signed contracts, alongside dedicated standalone certificate PDF preview and download route (`/api/contracts/[id]/certificate/pdf`).
+
+### Fixed
+- **Dynamic Project Status Badge Colors in Table:** Fixed hardcoded blue badge tone in the projects table, linking it to `projectStatusTone` so active projects display in green (`نشط` = green) and leads display in blue (`فرصة` = blue), with distinct tones for on-hold (`amber`), completed (`teal`), and cancelled (`red`).
+- **Sandboxed Document Viewer Frame Permissions:** Added `allow-scripts` permission to sandboxed iframe document viewers across contracts, invoices, templates, and signing to eliminate browser extension script block warnings in console.
+
 ## [v1.3.9] - 2026-10-25
 
 ### Fixed

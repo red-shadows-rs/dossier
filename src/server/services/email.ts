@@ -15,6 +15,7 @@ export const EMAIL_TEMPLATE_KEYS = [
   "contract_expired_notice",
   "invoice_issued",
   "invoice_overdue_reminder",
+  "receipt_issued",
   "internal_notice",
   "test_email",
 ] as const;

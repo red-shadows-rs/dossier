@@ -949,6 +949,8 @@
     "downloadPdf": "Download PDF",
     "documentLoading": "Rendering document…",
     "documentUnavailable": "Document preview unavailable",
+    "tabContract": "Contract",
+    "tabCertificate": "Certificate of Completion",
     "signaturesPlaceholder": "Signatures appear here after signing.",
     "totalsTitle": "Financial summary",
     "tabs": {
@@ -1056,6 +1058,8 @@
     "issued": "Invoice issued",
     "sendEmail": "Email invoice",
     "emailQueued": "Invoice email queued",
+    "sendReceiptEmail": "Email receipt",
+    "receiptEmailQueued": "Receipt email queued",
     "recordPayment": "Record payment",
     "paymentRecorded": "Payment recorded",
     "voidAction": "Void invoice",

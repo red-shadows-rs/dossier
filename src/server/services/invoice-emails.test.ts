@@ -9,6 +9,7 @@ import {
   clients,
   emailOutbox,
   invoices,
+  payments,
   projects,
 } from "@/db/schema";
 import { nowMs } from "@/lib/dates";
@@ -23,7 +24,7 @@ import {
   type MailSender,
   type OutgoingMail,
 } from "./email-worker";
-import { sendInvoiceEmail } from "./invoices";
+import { sendInvoiceEmail, sendReceiptEmail } from "./invoices";
 
 const META = { ip: "1.2.3.4", userAgent: "vitest" };
 
@@ -108,6 +109,30 @@ function seedInvoice(
       paymentInstructionsAr: "رقم الآيبان: SA0000",
       createdAt: now,
       updatedAt: now,
+      ...overrides,
+    })
+    .run();
+  return id;
+}
+
+function seedPayment(
+  invoiceId: string,
+  amountMinor = 50_000,
+  overrides: Partial<typeof payments.$inferInsert> = {},
+): string {
+  const id = newId();
+  const now = nowMs();
+  db.insert(payments)
+    .values({
+      id,
+      invoiceId,
+      amountMinor,
+      paidOn: "2026-06-05",
+      method: "bank_transfer",
+      reference: "TRX-12345",
+      notes: null,
+      voidedAt: null,
+      createdAt: now,
       ...overrides,
     })
     .run();
@@ -238,6 +263,95 @@ describe("sendInvoiceEmail", () => {
       expect((error as AppError).code).toBe("VALIDATION_FAILED");
     }
   });
+
+  it("sets attachReceipt when invoice is fully paid", async () => {
+    const user = await ownerUser();
+    const clientId = seedClient();
+    const projectId = seedProject(clientId);
+    const id = seedInvoice(clientId, projectId, {
+      status: "paid",
+      paidMinor: 100_000,
+    });
+
+    sendInvoiceEmail(user, id, {}, META);
+
+    const rows = outboxRows();
+    expect(rows).toHaveLength(1);
+    const payload = JSON.parse(rows[0].payloadJson);
+    expect(payload.isPaid).toBe(true);
+    expect(payload.attachReceipt).toBe(true);
+  });
+});
+
+describe("sendReceiptEmail", () => {
+  it("enqueues receipt_issued with receipt payload and audit log", async () => {
+    const user = await ownerUser();
+    const clientId = seedClient({ preferredLanguage: "ar" });
+    const projectId = seedProject(clientId);
+    const id = seedInvoice(clientId, projectId, {
+      status: "partially_paid",
+      totalMinor: 100_000,
+      paidMinor: 50_000,
+    });
+    seedPayment(id, 50_000);
+
+    sendReceiptEmail(user, id, {}, META);
+
+    const rows = outboxRows();
+    expect(rows).toHaveLength(1);
+    const row = rows[0];
+    expect(row.templateKey).toBe("receipt_issued");
+    expect(row.toEmail).toBe("client@example.test");
+    expect(row.locale).toBe("ar");
+    expect(row.entityType).toBe("invoice");
+    expect(row.entityId).toBe(id);
+
+    const payload = JSON.parse(row.payloadJson);
+    expect(payload.invoiceId).toBe(id);
+    expect(payload.attachReceipt).toBe(true);
+    expect(payload.onlyReceipt).toBe(true);
+    expect(payload.isFullyPaid).toBe(false);
+    expect(payload.paidFormatted).toContain("500.00");
+
+    const auditRow = db
+      .select()
+      .from(auditLog)
+      .where(eq(auditLog.action, "invoice.sent"))
+      .all()
+      .find((entry) => entry.entityId === id);
+    expect(auditRow).toBeDefined();
+    expect(JSON.parse(auditRow?.metaJson ?? "{}").kind).toBe("receipt");
+  });
+
+  it("rejects when no active payments exist", async () => {
+    const user = await ownerUser();
+    const clientId = seedClient();
+    const projectId = seedProject(clientId);
+    const id = seedInvoice(clientId, projectId);
+
+    try {
+      sendReceiptEmail(user, id, {}, META);
+      throw new Error("expected INVALID_STATE");
+    } catch (error) {
+      expect(error).toBeInstanceOf(AppError);
+      expect((error as AppError).code).toBe("INVALID_STATE");
+    }
+  });
+
+  it("rejects a draft invoice", async () => {
+    const user = await ownerUser();
+    const clientId = seedClient();
+    const projectId = seedProject(clientId);
+    const id = seedInvoice(clientId, projectId, { status: "draft" });
+
+    try {
+      sendReceiptEmail(user, id, {}, META);
+      throw new Error("expected INVALID_STATE");
+    } catch (error) {
+      expect(error).toBeInstanceOf(AppError);
+      expect((error as AppError).code).toBe("INVALID_STATE");
+    }
+  });
 });
 
 describe("sendOverdueReminders", () => {
@@ -364,5 +478,67 @@ describe("processOutbox — invoice attachments", () => {
     expect(sent[0].attachments?.[0].filename).toBe(
       "DOS-I-2026-0001-ar.pdf",
     );
+  });
+
+  it("attaches both invoice and receipt PDF for a paid invoice", async () => {
+    const clientId = seedClient();
+    const projectId = seedProject(clientId);
+    const id = seedInvoice(clientId, projectId, {
+      status: "paid",
+      paidMinor: 100_000,
+    });
+    const user = await ownerUser();
+    sendInvoiceEmail(user, id, {}, META);
+
+    const { sender, sent } = recordingSender();
+    await processOutbox(sender, {
+      renderInvoiceAttachment: async () => ({
+        filename: "invoice.pdf",
+        content: Buffer.from("invoice"),
+        contentType: "application/pdf",
+      }),
+      renderReceiptAttachment: async () => ({
+        filename: "receipt.pdf",
+        content: Buffer.from("receipt"),
+        contentType: "application/pdf",
+      }),
+    });
+
+    expect(sent).toHaveLength(1);
+    expect(sent[0].attachments).toHaveLength(2);
+    expect(sent[0].attachments?.map((a) => a.filename)).toEqual([
+      "invoice.pdf",
+      "receipt.pdf",
+    ]);
+  });
+
+  it("attaches only receipt PDF when onlyReceipt is set", async () => {
+    const clientId = seedClient();
+    const projectId = seedProject(clientId);
+    const id = seedInvoice(clientId, projectId, {
+      status: "paid",
+      paidMinor: 100_000,
+    });
+    seedPayment(id, 100_000);
+    const user = await ownerUser();
+    sendReceiptEmail(user, id, {}, META);
+
+    const { sender, sent } = recordingSender();
+    await processOutbox(sender, {
+      renderInvoiceAttachment: async () => ({
+        filename: "invoice.pdf",
+        content: Buffer.from("invoice"),
+        contentType: "application/pdf",
+      }),
+      renderReceiptAttachment: async () => ({
+        filename: "receipt.pdf",
+        content: Buffer.from("receipt"),
+        contentType: "application/pdf",
+      }),
+    });
+
+    expect(sent).toHaveLength(1);
+    expect(sent[0].attachments).toHaveLength(1);
+    expect(sent[0].attachments?.[0].filename).toBe("receipt.pdf");
   });
 });

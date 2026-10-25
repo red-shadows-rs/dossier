@@ -195,6 +195,83 @@ describe("renderEmail — invoice_issued", () => {
     expect(email.html).not.toContain("<script>");
     expect(email.html).toContain("&lt;script&gt;");
   });
+
+  it("renders paid invoice notice and receipt attachment note when isPaid", () => {
+    const en = renderEmail(
+      "invoice_issued",
+      "en",
+      {
+        number: "DOS-I-2026-0001",
+        amountFormatted: "5,750.00 SAR",
+        isPaid: true,
+        attachReceipt: true,
+        recipientName: "Jane",
+      },
+      COMPANY,
+    );
+    expect(en.subject).toBe("Paid Invoice DOS-I-2026-0001 from RED SHADOWS");
+    expect(en.text).toContain("Fully Paid");
+    expect(en.html).toContain("invoice and payment receipt");
+
+    const ar = renderEmail(
+      "invoice_issued",
+      "ar",
+      {
+        number: "DOS-I-2026-0001",
+        amountFormatted: "5,750.00 SAR",
+        isPaid: true,
+        attachReceipt: true,
+        recipientName: "خالد",
+      },
+      COMPANY,
+    );
+    expect(ar.subject).toBe("فاتورة مسددة DOS-I-2026-0001 من RED SHADOWS");
+    expect(ar.html).toContain("مسددة بالكامل");
+  });
+});
+
+describe("renderEmail — receipt_issued", () => {
+  it("renders receipt details in both languages", () => {
+    const en = renderEmail(
+      "receipt_issued",
+      "en",
+      {
+        number: "DOS-I-2026-0001",
+        paidFormatted: "5,750.00 SAR",
+        totalAmountFormatted: "5,750.00 SAR",
+        balanceFormatted: "0.00 SAR",
+        isFullyPaid: true,
+        recipientName: "Jane",
+      },
+      COMPANY,
+    );
+    expect(en.subject).toBe(
+      "Payment Receipt for Invoice DOS-I-2026-0001 from RED SHADOWS",
+    );
+    expect(en.text).toContain("5,750.00 SAR");
+    expect(en.html).toContain("Fully Paid");
+    expect(en.html).toContain('dir="ltr"');
+
+    const ar = renderEmail(
+      "receipt_issued",
+      "ar",
+      {
+        number: "DOS-I-2026-0001",
+        paidFormatted: "2,500.00 SAR",
+        totalAmountFormatted: "5,000.00 SAR",
+        balanceFormatted: "2,500.00 SAR",
+        isFullyPaid: false,
+        recipientName: "خالد",
+      },
+      COMPANY,
+    );
+    expect(ar.subject).toBe(
+      "سند قبض للفاتورة DOS-I-2026-0001 من RED SHADOWS",
+    );
+    expect(ar.text).toContain("2,500.00 SAR");
+    expect(ar.html).toContain("سداد جزئي");
+    expect(ar.html).toContain('dir="rtl"');
+  });
 });
 
 describe("renderEmail — invoice_overdue_reminder", () => {

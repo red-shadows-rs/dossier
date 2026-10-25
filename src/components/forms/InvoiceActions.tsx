@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   CreditCard,
   Pencil,
+  Receipt,
   Send,
   Trash2,
   X,
@@ -30,6 +31,7 @@ import {
   deleteDraftInvoiceAction,
   issueInvoiceAction,
   sendInvoiceEmailAction,
+  sendReceiptEmailAction,
   voidInvoiceAction,
 } from "@/server/actions/invoices";
 import {
@@ -46,6 +48,7 @@ export function InvoiceActions({
   canIssue,
   canVoid,
   canPay,
+  hasPayments,
 }: {
   invoiceId: string;
   status: "draft" | "issued" | "partially_paid" | "paid" | "void";
@@ -55,6 +58,7 @@ export function InvoiceActions({
   canIssue: boolean;
   canVoid: boolean;
   canPay: boolean;
+  hasPayments?: boolean;
 }) {
   const t = useTranslations();
   const toast = useToast();
@@ -89,6 +93,13 @@ export function InvoiceActions({
   async function onSendEmail() {
     if (await run(() => sendInvoiceEmailAction({ id: invoiceId }))) {
       toast({ title: t("invoices.emailQueued"), tone: "success" });
+      router.refresh();
+    }
+  }
+
+  async function onSendReceiptEmail() {
+    if (await run(() => sendReceiptEmailAction({ id: invoiceId }))) {
+      toast({ title: t("invoices.receiptEmailQueued"), tone: "success" });
       router.refresh();
     }
   }
@@ -160,6 +171,19 @@ export function InvoiceActions({
           >
             <Send className="h-4 w-4" />
             {t("invoices.sendEmail")}
+          </Button>
+        ) : null}
+
+        {hasPayments && canIssue ? (
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onSendReceiptEmail}
+            loading={pending}
+            className="gap-2"
+          >
+            <Receipt className="h-4 w-4" />
+            {t("invoices.sendReceiptEmail")}
           </Button>
         ) : null}
 

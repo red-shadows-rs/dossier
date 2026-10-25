@@ -18,7 +18,10 @@ import {
 } from "@/server/services/email";
 import { renderEmail } from "@/server/services/email-templates";
 import { readFile } from "@/server/services/files";
-import { resolveInvoicePdf } from "@/server/services/invoice-documents";
+import {
+  resolveInvoicePdf,
+  resolveReceiptPdf,
+} from "@/server/services/invoice-documents";
 import { getSettings } from "@/server/services/settings";
 
 export type MailAttachment = {
@@ -44,6 +47,10 @@ export type OutboxRow = typeof emailOutbox.$inferSelect;
 
 export type OutboxDeps = {
   renderInvoiceAttachment?: (
+    invoiceId: string,
+    docLang: DocLang,
+  ) => Promise<MailAttachment>;
+  renderReceiptAttachment?: (
     invoiceId: string,
     docLang: DocLang,
   ) => Promise<MailAttachment>;
@@ -115,6 +122,24 @@ async function defaultRenderInvoiceAttachment(
   };
 }
 
+async function defaultRenderReceiptAttachment(
+  invoiceId: string,
+  docLang: DocLang,
+): Promise<MailAttachment> {
+  const source = await resolveReceiptPdf(invoiceId, docLang);
+  const pdf = await renderPdf(source.html, {
+    docNumber: source.docNumber,
+    code: null,
+    kind: "invoice",
+    lang: docLang,
+  });
+  return {
+    filename: source.filename,
+    content: pdf,
+    contentType: "application/pdf",
+  };
+}
+
 async function loadAttachments(
   payload: Record<string, unknown>,
   deps: OutboxDeps,
@@ -139,9 +164,16 @@ async function loadAttachments(
     const docLang: DocLang = isDocLang(payload.docLang)
       ? payload.docLang
       : "ar";
-    const render =
-      deps.renderInvoiceAttachment ?? defaultRenderInvoiceAttachment;
-    attachments.push(await render(invoiceId, docLang));
+    if (!payload.onlyReceipt) {
+      const render =
+        deps.renderInvoiceAttachment ?? defaultRenderInvoiceAttachment;
+      attachments.push(await render(invoiceId, docLang));
+    }
+    if (payload.attachReceipt || payload.onlyReceipt) {
+      const render =
+        deps.renderReceiptAttachment ?? defaultRenderReceiptAttachment;
+      attachments.push(await render(invoiceId, docLang));
+    }
   }
 
   return attachments;

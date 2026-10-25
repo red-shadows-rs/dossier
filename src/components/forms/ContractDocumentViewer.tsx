@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Download, Eye } from "lucide-react";
+import { Download, Eye, FileText, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { DocumentSkeleton } from "@/components/ui/Skeleton";
 import { cn } from "@/components/ui/cn";
@@ -15,20 +15,26 @@ import {
   type DocLang,
   type LanguageMode,
 } from "@/lib/doc-lang";
-import { getContractPreviewHtmlAction } from "@/server/actions/contracts";
+import {
+  getContractCertificateHtmlAction,
+  getContractPreviewHtmlAction,
+} from "@/server/actions/contracts";
 
 export function ContractDocumentViewer({
   id,
   languageMode,
   canDownload,
+  hasCertificate,
 }: {
   id: string;
   languageMode: LanguageMode;
   canDownload: boolean;
+  hasCertificate?: boolean;
 }) {
   const t = useTranslations("contracts");
   const langs = allowedDocLangs(languageMode);
   const [lang, setLang] = useState<DocLang>(defaultDocLang(languageMode));
+  const [docType, setDocType] = useState<"contract" | "certificate">("contract");
   const [html, setHtml] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [iframeHeight, setIframeHeight] = useState<number>(600);
@@ -36,7 +42,12 @@ export function ContractDocumentViewer({
   useEffect(() => {
     let active = true;
     setLoading(true);
-    getContractPreviewHtmlAction({ id, lang }).then((result) => {
+    const fetchHtml =
+      docType === "certificate"
+        ? getContractCertificateHtmlAction({ id, lang })
+        : getContractPreviewHtmlAction({ id, lang });
+
+    fetchHtml.then((result) => {
       if (!active) return;
       setLoading(false);
       setHtml(result.ok ? result.data.html : null);
@@ -44,40 +55,85 @@ export function ContractDocumentViewer({
     return () => {
       active = false;
     };
-  }, [id, lang]);
+  }, [id, lang, docType]);
 
-  const previewUrl = `/api/contracts/${id}/pdf?lang=${lang}&inline=1`;
-  const downloadUrl = `/api/contracts/${id}/pdf?lang=${lang}`;
+  const previewUrl =
+    docType === "certificate"
+      ? `/api/contracts/${id}/certificate/pdf?lang=${lang}&inline=1`
+      : `/api/contracts/${id}/pdf?lang=${lang}&inline=1`;
+
+  const downloadUrl =
+    docType === "certificate"
+      ? `/api/contracts/${id}/certificate/pdf?lang=${lang}`
+      : `/api/contracts/${id}/pdf?lang=${lang}`;
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        {langs.length > 1 ? (
-          <div
-            role="tablist"
-            className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-muted/40 p-1"
-          >
-            {langs.map((value) => (
+        <div className="flex flex-wrap items-center gap-2">
+          {hasCertificate ? (
+            <div
+              role="tablist"
+              className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-muted/40 p-1"
+            >
               <button
-                key={value}
                 type="button"
                 role="tab"
-                aria-selected={value === lang}
-                onClick={() => setLang(value)}
+                aria-selected={docType === "contract"}
+                onClick={() => setDocType("contract")}
                 className={cn(
                   "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer",
-                  value === lang
+                  docType === "contract"
                     ? "bg-primary text-primary-foreground shadow-xs"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
                 )}
               >
-                <span>{t(`languageModes.${value}`)}</span>
+                <FileText className="h-3.5 w-3.5" />
+                <span>{t("tabContract")}</span>
               </button>
-            ))}
-          </div>
-        ) : (
-          <span />
-        )}
+              <button
+                type="button"
+                role="tab"
+                aria-selected={docType === "certificate"}
+                onClick={() => setDocType("certificate")}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer",
+                  docType === "certificate"
+                    ? "bg-primary text-primary-foreground shadow-xs"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+                )}
+              >
+                <ShieldCheck className="h-3.5 w-3.5" />
+                <span>{t("tabCertificate")}</span>
+              </button>
+            </div>
+          ) : null}
+
+          {langs.length > 1 ? (
+            <div
+              role="tablist"
+              className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-muted/40 p-1"
+            >
+              {langs.map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  role="tab"
+                  aria-selected={value === lang}
+                  onClick={() => setLang(value)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer",
+                    value === lang
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+                  )}
+                >
+                  <span>{t(`languageModes.${value}`)}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
 
         {canDownload ? (
           <div className="flex gap-2">
@@ -102,8 +158,8 @@ export function ContractDocumentViewer({
       ) : html ? (
         <div className="w-full overflow-x-auto touch-pan-x [scrollbar-width:thin] rounded-lg border border-border bg-white shadow-2xs overflow-hidden">
           <iframe
-            title={t("document")}
-            sandbox="allow-same-origin"
+            title={docType === "certificate" ? t("tabCertificate") : t("document")}
+            sandbox="allow-same-origin allow-scripts"
             srcDoc={html}
             scrolling="no"
             onLoad={(e) => {
@@ -141,6 +197,8 @@ export function ContractDocumentViewer({
               };
               updateHeight();
               frame.contentDocument?.fonts?.ready?.then(updateHeight);
+              setTimeout(updateHeight, 200);
+              setTimeout(updateHeight, 800);
             }}
             style={{ height: `${iframeHeight}px` }}
             className="w-full min-w-[620px] sm:min-w-full border-0 bg-white transition-all duration-200 block"

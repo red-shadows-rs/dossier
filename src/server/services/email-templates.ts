@@ -477,30 +477,48 @@ function renderInvoiceIssued(
   const dueDate = readText(payload, "dueDate");
   const bankLine = readText(payload, "bankLine");
   const name = readText(payload, "recipientName");
+  const isPaid = Boolean(payload.isPaid);
+  const attachReceipt = Boolean(payload.attachReceipt);
 
-  const subject = ar
-    ? `فاتورة ${number} من ${companyName}`
-    : `Invoice ${number} from ${companyName}`;
+  const subject = isPaid
+    ? ar
+      ? `فاتورة مسددة ${number} من ${companyName}`
+      : `Paid Invoice ${number} from ${companyName}`
+    : ar
+      ? `فاتورة ${number} من ${companyName}`
+      : `Invoice ${number} from ${companyName}`;
 
   const greetingRaw = greeting(locale, name);
-  const leadRaw = ar
-    ? "تجد مرفقا فاتورة جديدة."
-    : "Please find your invoice attached.";
-  const amountRaw = amount
+  const leadRaw = isPaid
     ? ar
-      ? `المبلغ: ${amount}`
-      : `Amount: ${amount}`
+      ? "تجد مرفقاً فاتورة مسددة بالكامل مع سند القبض."
+      : "Please find your fully paid invoice along with the payment receipt attached."
+    : ar
+      ? "تجد مرفقا فاتورة جديدة."
+      : "Please find your invoice attached.";
+  const amountRaw = amount
+    ? isPaid
+      ? ar
+        ? `المبلغ المسدد: ${amount}`
+        : `Amount Paid: ${amount}`
+      : ar
+        ? `المبلغ: ${amount}`
+        : `Amount: ${amount}`
     : "";
-  const dueRaw = dueDate
+  const dueRaw = dueDate && !isPaid
     ? ar
       ? `تاريخ الاستحقاق: ${dueDate}`
       : `Due date: ${dueDate}`
     : "";
 
-  const bankCardHtml = renderBankCard(bankLine, locale);
-  const attachmentNote = ar
-    ? "تم إرفاق نسخة الفاتورة الرسمية (PDF) مع هذا البريد."
-    : "The official invoice (PDF) is attached to this email.";
+  const bankCardHtml = !isPaid ? renderBankCard(bankLine, locale) : "";
+  const attachmentNote = attachReceipt
+    ? ar
+      ? "تم إرفاق نسخة الفاتورة الرسمية وسند القبض (PDF) مع هذا البريد."
+      : "The official invoice and payment receipt (PDF) are attached to this email."
+    : ar
+      ? "تم إرفاق نسخة الفاتورة الرسمية (PDF) مع هذا البريد."
+      : "The official invoice (PDF) is attached to this email.";
 
   const html = shell(
     locale,
@@ -513,20 +531,24 @@ function renderInvoiceIssued(
       `      <td align="${ar ? "right" : "left"}" style="vertical-align:middle;">`,
       `        <span style="display:inline-block;background:#18181b;color:#ffffff;font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;padding:5px 12px;border-radius:6px;letter-spacing:0.5px;">${escapeHtml(number)}</span>`,
       `      </td>`,
-      dueDate
-        ? `      <td align="${ar ? "left" : "right"}" style="vertical-align:middle;font-size:13px;color:#71717a;">` +
-          `        <span style="color:#a1a1aa;">${ar ? "تاريخ الاستحقاق:" : "Due date:"}</span> <strong style="color:#18181b;">${escapeHtml(dueDate)}</strong>` +
+      isPaid
+        ? `      <td align="${ar ? "left" : "right"}" style="vertical-align:middle;font-size:13px;">` +
+          `        <span style="display:inline-block;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;font-size:12px;font-weight:700;padding:4px 10px;border-radius:6px;">${ar ? "مسددة بالكامل" : "Fully Paid"}</span>` +
           `      </td>`
-        : `      <td align="${ar ? "left" : "right"}" style="vertical-align:middle;font-size:13px;color:#71717a;">` +
-          `        <span style="color:#a1a1aa;">${ar ? "تاريخ الاستحقاق:" : "Due date:"}</span> <strong style="color:#18181b;">—</strong>` +
-          `      </td>`,
+        : dueDate
+          ? `      <td align="${ar ? "left" : "right"}" style="vertical-align:middle;font-size:13px;color:#71717a;">` +
+            `        <span style="color:#a1a1aa;">${ar ? "تاريخ الاستحقاق:" : "Due date:"}</span> <strong style="color:#18181b;">${escapeHtml(dueDate)}</strong>` +
+            `      </td>`
+          : `      <td align="${ar ? "left" : "right"}" style="vertical-align:middle;font-size:13px;color:#71717a;">` +
+            `        <span style="color:#a1a1aa;">${ar ? "تاريخ الاستحقاق:" : "Due date:"}</span> <strong style="color:#18181b;">—</strong>` +
+            `      </td>`,
       `    </tr>`,
       `  </table>`,
       amount
         ? [
-            `  <div style="background:#fff1f2;border:1px solid #ffe4e6;border-radius:8px;padding:16px;text-align:${ar ? "right" : "left"};">`,
-            `    <div style="font-size:12px;font-weight:700;color:#e11d48;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${ar ? "إجمالي المبلغ المستحق" : "Total Amount Due"}</div>`,
-            `    <div style="font-size:26px;font-weight:800;color:#be123c;line-height:1.2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${escapeHtml(amount)}</div>`,
+            `  <div style="background:${isPaid ? "#f0fdf4" : "#fff1f2"};border:1px solid ${isPaid ? "#bbf7d0" : "#ffe4e6"};border-radius:8px;padding:16px;text-align:${ar ? "right" : "left"};">`,
+            `    <div style="font-size:12px;font-weight:700;color:${isPaid ? "#16a34a" : "#e11d48"};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${ar ? (isPaid ? "إجمالي المبلغ المسدد" : "إجمالي المبلغ المستحق") : (isPaid ? "Total Paid Amount" : "Total Amount Due")}</div>`,
+            `    <div style="font-size:26px;font-weight:800;color:${isPaid ? "#15803d" : "#be123c"};line-height:1.2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${escapeHtml(amount)}</div>`,
             `  </div>`,
           ].join("\n")
         : "",
@@ -544,9 +566,123 @@ function renderInvoiceIssued(
     "",
     leadRaw,
     number,
+    isPaid ? (ar ? "مسددة بالكامل" : "Fully Paid") : "",
     amountRaw,
     dueRaw,
     bankLine,
+  ]
+    .filter((line) => line !== "")
+    .join("\n");
+
+  return { subject, html, text };
+}
+
+function renderReceiptIssued(
+  locale: Locale,
+  payload: Record<string, unknown>,
+  companyName: string,
+): RenderedEmail {
+  const ar = locale === "ar";
+  const number = readText(payload, "number");
+  const paid = readText(payload, "paidFormatted");
+  const total = readText(payload, "totalAmountFormatted");
+  const balance = readText(payload, "balanceFormatted");
+  const isFullyPaid = Boolean(payload.isFullyPaid);
+  const name = readText(payload, "recipientName");
+
+  const subject = ar
+    ? `سند قبض للفاتورة ${number} من ${companyName}`
+    : `Payment Receipt for Invoice ${number} from ${companyName}`;
+
+  const greetingRaw = greeting(locale, name);
+  const leadRaw = ar
+    ? "تجدون مرفقاً سند القبض الخاص بالدفعات المستلمة."
+    : "Please find attached your payment receipt for the received payments.";
+  const statusLabel = isFullyPaid
+    ? ar
+      ? "مسددة بالكامل"
+      : "Fully Paid"
+    : ar
+      ? "سداد جزئي"
+      : "Partially Paid";
+  const paidRaw = paid
+    ? ar
+      ? `المبلغ المقبوض: ${paid}`
+      : `Amount Received: ${paid}`
+    : "";
+  const totalRaw = total
+    ? ar
+      ? `إجمالي الفاتورة: ${total}`
+      : `Invoice Total: ${total}`
+    : "";
+  const balanceRaw =
+    !isFullyPaid && balance
+      ? ar
+        ? `الرصيد المتبقي: ${balance}`
+        : `Remaining Balance: ${balance}`
+      : "";
+
+  const attachmentNote = ar
+    ? "تم إرفاق سند القبض الرسمي (PDF) مع هذا البريد."
+    : "The official payment receipt (PDF) is attached to this email.";
+
+  const html = shell(
+    locale,
+    [
+      `<div style="font-size:16px;font-weight:600;color:#18181b;margin-bottom:12px;">${escapeHtml(greetingRaw)}</div>`,
+      `<div style="font-size:14px;color:#52525b;margin-bottom:20px;line-height:1.6;">${escapeHtml(leadRaw)}</div>`,
+      `<div style="background:#fcfcfc;border:1px solid #e4e4e7;border-radius:10px;padding:20px;margin-bottom:20px;">`,
+      `  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">`,
+      `    <tr>`,
+      `      <td align="${ar ? "right" : "left"}" style="vertical-align:middle;">`,
+      `        <span style="display:inline-block;background:#18181b;color:#ffffff;font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;padding:5px 12px;border-radius:6px;letter-spacing:0.5px;">${escapeHtml(number)}</span>`,
+      `      </td>`,
+      `      <td align="${ar ? "left" : "right"}" style="vertical-align:middle;font-size:13px;">`,
+      `        <span style="display:inline-block;background:${isFullyPaid ? "#ecfdf5" : "#eff6ff"};border:1px solid ${isFullyPaid ? "#a7f3d0" : "#bfdbfe"};color:${isFullyPaid ? "#065f46" : "#1e40af"};font-size:12px;font-weight:700;padding:4px 10px;border-radius:6px;">${escapeHtml(statusLabel)}</span>`,
+      `      </td>`,
+      `    </tr>`,
+      `  </table>`,
+      paid
+        ? [
+            `  <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px;text-align:${ar ? "right" : "left"};margin-bottom:12px;">`,
+            `    <div style="font-size:12px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${ar ? "إجمالي المبلغ المقبوض" : "Total Amount Received"}</div>`,
+            `    <div style="font-size:26px;font-weight:800;color:#15803d;line-height:1.2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${escapeHtml(paid)}</div>`,
+            `  </div>`,
+          ].join("\n")
+        : "",
+      total || balanceRaw
+        ? [
+            `  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;color:#71717a;border-top:1px solid #f4f4f5;padding-top:12px;">`,
+            `    <tr>`,
+            total
+              ? `      <td align="${ar ? "right" : "left"}"><span style="color:#a1a1aa;">${ar ? "إجمالي الفاتورة:" : "Invoice Total:"}</span> <strong style="color:#18181b;">${escapeHtml(total)}</strong></td>`
+              : "",
+            balanceRaw
+              ? `      <td align="${ar ? "left" : "right"}"><span style="color:#a1a1aa;">${ar ? "المتبقي:" : "Remaining:"}</span> <strong style="color:#b91c1c;">${escapeHtml(balance)}</strong></td>`
+              : "",
+            `    </tr>`,
+            `  </table>`,
+          ]
+            .filter(Boolean)
+            .join("\n")
+        : "",
+      `</div>`,
+      `<div style="background:#f4f4f5;border-radius:6px;padding:10px 14px;font-size:13px;color:#52525b;"><span style="display:inline-block;background:#e4e4e7;color:#27272a;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;margin-${ar ? "left" : "right"}:8px;">PDF</span>${escapeHtml(attachmentNote)}</div>`,
+    ]
+      .filter(Boolean)
+      .join("\n"),
+    companyName,
+  );
+
+  const text = [
+    greetingRaw,
+    "",
+    leadRaw,
+    number,
+    statusLabel,
+    paidRaw,
+    totalRaw,
+    balanceRaw,
   ]
     .filter((line) => line !== "")
     .join("\n");
@@ -687,6 +823,8 @@ export function renderEmail(
       return renderInvoiceIssued(locale, payload, companyName);
     case "invoice_overdue_reminder":
       return renderInvoiceOverdueReminder(locale, payload, companyName);
+    case "receipt_issued":
+      return renderReceiptIssued(locale, payload, companyName);
     case "test_email":
       return renderTestEmail(locale, payload, companyName);
     default:

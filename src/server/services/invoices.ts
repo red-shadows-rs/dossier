@@ -7,6 +7,7 @@ import {
   count,
   desc,
   eq,
+  isNull,
   ne,
   sql,
   type AnyColumn,
@@ -19,6 +20,7 @@ import {
   invoiceLines,
   invoices,
   paymentMilestones,
+  payments,
   projects,
 } from "@/db/schema";
 import { nowMs, todayInTz } from "@/lib/dates";
@@ -797,6 +799,7 @@ export function sendInvoiceEmail(
       ? invoice.paymentInstructionsAr
       : invoice.paymentInstructionsEn) ?? "";
   const recipientName = client.nameAr ?? client.nameEn ?? "";
+  const isPaid = invoice.status === "paid";
 
   withTx((tx) => {
     enqueueEmail(tx, {
@@ -812,6 +815,8 @@ export function sendInvoiceEmail(
         invoiceId: invoice.id,
         docLang: invoice.languageMode,
         recipientName,
+        isPaid,
+        attachReceipt: isPaid,
       },
       entityType: "invoice",
       entityId: id,
@@ -823,6 +828,101 @@ export function sendInvoiceEmail(
       entityType: "invoice",
       entityId: id,
       meta: { number: invoice.number },
+      ip: meta.ip,
+      userAgent: meta.userAgent,
+    });
+  });
+}
+
+export type SendReceiptEmailOptions = { toEmail?: string };
+
+export function sendReceiptEmail(
+  user: SessionUser,
+  id: string,
+  options: SendReceiptEmailOptions,
+  meta: RequestMeta,
+): void {
+  const invoice = db.select().from(invoices).where(eq(invoices.id, id)).get();
+  if (!invoice) {
+    throw new AppError("NOT_FOUND", "Invoice not found");
+  }
+  if (invoice.status === "draft" || invoice.status === "void") {
+    throw new AppError(
+      "INVALID_STATE",
+      "Only an issued or paid invoice can have a receipt emailed",
+    );
+  }
+  const client = db
+    .select()
+    .from(clients)
+    .where(eq(clients.id, invoice.clientId))
+    .get();
+  if (!client) {
+    throw new AppError("INTERNAL", "Invoice references a missing client");
+  }
+
+  const activePayments = db
+    .select()
+    .from(payments)
+    .where(and(eq(payments.invoiceId, id), isNull(payments.voidedAt)))
+    .all();
+  if (activePayments.length === 0) {
+    throw new AppError(
+      "INVALID_STATE",
+      "Invoice has no payments recorded",
+    );
+  }
+
+  const toEmail = (options.toEmail?.trim() || client.email || "").trim();
+  if (!toEmail) {
+    throw new AppError(
+      "VALIDATION_FAILED",
+      "The client has no email address",
+      { toEmail: "errors.required" },
+    );
+  }
+
+  const locale = localeForInvoice(
+    invoice.languageMode,
+    client.preferredLanguage,
+  );
+  const currency = invoice.currency as CurrencyCode;
+  const recipientName = client.nameAr ?? client.nameEn ?? "";
+  const totalPaidMinor = activePayments.reduce(
+    (sum, p) => sum + p.amountMinor,
+    0,
+  );
+
+  const remainingMinor = Math.max(0, invoice.totalMinor - invoice.paidMinor);
+
+  withTx((tx) => {
+    enqueueEmail(tx, {
+      toEmail,
+      toName: recipientName || null,
+      locale,
+      templateKey: "receipt_issued",
+      payload: {
+        number: invoice.number,
+        totalAmountFormatted: formatMoney(invoice.totalMinor, currency, locale),
+        paidFormatted: formatMoney(totalPaidMinor, currency, locale),
+        balanceFormatted: formatMoney(remainingMinor, currency, locale),
+        isFullyPaid: invoice.status === "paid",
+        invoiceId: invoice.id,
+        docLang: invoice.languageMode,
+        recipientName,
+        attachReceipt: true,
+        onlyReceipt: true,
+      },
+      entityType: "invoice",
+      entityId: id,
+    });
+    audit(tx, {
+      actorType: "user",
+      actorId: user.id,
+      action: "invoice.sent",
+      entityType: "invoice",
+      entityId: id,
+      meta: { number: invoice.number, kind: "receipt" },
       ip: meta.ip,
       userAgent: meta.userAgent,
     });
