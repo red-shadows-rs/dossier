@@ -50,7 +50,6 @@ export function InvoiceActions({
   canIssue,
   canVoid,
   canPay,
-  hasPayments,
 }: {
   invoiceId: string;
   status: "draft" | "issued" | "partially_paid" | "paid" | "void";
@@ -60,7 +59,6 @@ export function InvoiceActions({
   canIssue: boolean;
   canVoid: boolean;
   canPay: boolean;
-  hasPayments?: boolean;
 }) {
   const t = useTranslations();
   const toast = useToast();

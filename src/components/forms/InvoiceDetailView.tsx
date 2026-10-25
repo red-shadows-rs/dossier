@@ -10,9 +10,7 @@ import { useTranslations } from "next-intl";
 import {
   Building2,
   Calendar,
-  Check,
   Clock,
-  Copy,
   CreditCard,
   FileText,
   FolderKanban,
@@ -47,7 +45,6 @@ import { formatMoney } from "@/lib/money";
 import {
   parsePaymentInstructionsToCards,
   stripPaymentMetadata,
-  type PaymentCardData,
 } from "@/lib/payment-methods";
 import type { BankAccount } from "@/lib/validation/settings";
 import type {
@@ -256,7 +253,6 @@ export function InvoiceDetailView({
             canIssue={canIssue}
             canVoid={canVoid}
             canPay={canPay}
-            hasPayments={payments.some((p) => p.voidedAt === null)}
           />
         </div>
       </div>
