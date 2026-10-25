@@ -466,6 +466,7 @@ export function ContractClausesStep({
                             onChange={(event) =>
                               update(index, { titleAr: event.target.value })
                             }
+                            placeholder={t("contracts.placeholders.clauseTitleAr")}
                             className="text-start"
                           />
                         </Field>
@@ -481,6 +482,7 @@ export function ContractClausesStep({
                             onChange={(event) =>
                               update(index, { titleEn: event.target.value })
                             }
+                            placeholder={t("contracts.placeholders.clauseTitleEn")}
                             className="text-start"
                           />
                         </Field>
@@ -497,6 +499,7 @@ export function ContractClausesStep({
                             onChange={(event) =>
                               update(index, { bodyAr: event.target.value })
                             }
+                            placeholder={t("contracts.placeholders.clauseBodyAr")}
                             className="text-start font-normal leading-relaxed"
                           />
                         </Field>
@@ -513,6 +516,7 @@ export function ContractClausesStep({
                             onChange={(event) =>
                               update(index, { bodyEn: event.target.value })
                             }
+                            placeholder={t("contracts.placeholders.clauseBodyEn")}
                             className="text-start font-normal leading-relaxed"
                           />
                         </Field>

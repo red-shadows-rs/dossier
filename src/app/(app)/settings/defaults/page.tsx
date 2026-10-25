@@ -115,24 +115,28 @@ export default async function DefaultsSettingsPage() {
       name: "governingLawAr",
       label: t("fields.governingLawAr"),
       dir: "rtl",
+      placeholder: t("placeholders.governingLawAr"),
     },
     {
       kind: "text",
       name: "governingLawEn",
       label: t("fields.governingLawEn"),
       dir: "ltr",
+      placeholder: t("placeholders.governingLawEn"),
     },
     {
       kind: "text",
       name: "jurisdictionAr",
       label: t("fields.jurisdictionAr"),
       dir: "rtl",
+      placeholder: t("placeholders.jurisdictionAr"),
     },
     {
       kind: "text",
       name: "jurisdictionEn",
       label: t("fields.jurisdictionEn"),
       dir: "ltr",
+      placeholder: t("placeholders.jurisdictionEn"),
     },
   ];
 

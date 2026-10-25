@@ -164,15 +164,20 @@ async function loadAttachments(
     const docLang: DocLang = isDocLang(payload.docLang)
       ? payload.docLang
       : "ar";
+    const langs: DocLang[] = docLang === "en" ? ["en", "ar"] : ["ar", "en"];
     if (!payload.onlyReceipt) {
       const render =
         deps.renderInvoiceAttachment ?? defaultRenderInvoiceAttachment;
-      attachments.push(await render(invoiceId, docLang));
+      for (const lang of langs) {
+        attachments.push(await render(invoiceId, lang));
+      }
     }
     if (payload.attachReceipt || payload.onlyReceipt) {
       const render =
         deps.renderReceiptAttachment ?? defaultRenderReceiptAttachment;
-      attachments.push(await render(invoiceId, docLang));
+      for (const lang of langs) {
+        attachments.push(await render(invoiceId, lang));
+      }
     }
   }
 

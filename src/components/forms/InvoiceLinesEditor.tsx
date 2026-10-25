@@ -199,6 +199,7 @@ export function InvoiceLinesEditor({
                   onChange={(event) =>
                     updateRow(index, { descriptionAr: event.target.value })
                   }
+                  placeholder={t("invoices.placeholders.lineDescriptionAr")}
                   className="text-start"
                 />
               </Field>
@@ -215,6 +216,7 @@ export function InvoiceLinesEditor({
                   onChange={(event) =>
                     updateRow(index, { descriptionEn: event.target.value })
                   }
+                  placeholder={t("invoices.placeholders.lineDescriptionEn")}
                   className="text-start"
                 />
               </Field>
@@ -230,6 +232,7 @@ export function InvoiceLinesEditor({
                   onChange={(event) =>
                     updateRow(index, { qty: event.target.value })
                   }
+                  placeholder={t("invoices.placeholders.lineQty")}
                   className="text-start"
                 />
               </Field>
@@ -245,6 +248,7 @@ export function InvoiceLinesEditor({
                   onChange={(event) =>
                     updateRow(index, { unit: event.target.value })
                   }
+                  placeholder={t("invoices.placeholders.lineUnit")}
                   onBlur={() => {
                     const trimmed = row.unit.trim();
                     if (trimmed !== "") {
@@ -336,6 +340,7 @@ export function InvoiceLinesEditor({
               dir="ltr"
               value={discountValue}
               onChange={(event) => setDiscountValue(event.target.value)}
+              placeholder={t("invoices.placeholders.discount")}
               onBlur={() => {
                 if (discountType === "fixed") {
                   const trimmed = discountValue.trim();

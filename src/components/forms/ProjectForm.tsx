@@ -270,6 +270,7 @@ export function ProjectForm({
                   value={form.nameAr}
                   onChange={(e) => patch({ nameAr: e.target.value })}
                   disabled={pending}
+                  placeholder={t("projects.placeholders.nameAr")}
                   className="text-start"
                 />
               </Field>
@@ -286,6 +287,7 @@ export function ProjectForm({
                   value={form.nameEn}
                   onChange={(e) => patch({ nameEn: e.target.value })}
                   disabled={pending}
+                  placeholder={t("projects.placeholders.nameEn")}
                   className="text-start"
                 />
               </Field>
@@ -301,7 +303,7 @@ export function ProjectForm({
                   value={form.budget}
                   onChange={(e) => patch({ budget: e.target.value })}
                   disabled={pending}
-                  placeholder="0.00"
+                  placeholder={t("projects.placeholders.budget")}
                   className="text-start font-mono"
                 />
               </Field>
@@ -419,6 +421,7 @@ export function ProjectForm({
                   value={form.description}
                   onChange={(e) => patch({ description: e.target.value })}
                   disabled={pending}
+                  placeholder={t("projects.placeholders.description")}
                   className="text-start"
                 />
               </Field>
@@ -434,6 +437,7 @@ export function ProjectForm({
                   value={form.notes}
                   onChange={(e) => patch({ notes: e.target.value })}
                   disabled={pending}
+                  placeholder={t("projects.placeholders.notes")}
                   className="text-start"
                 />
               </Field>

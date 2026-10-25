@@ -332,6 +332,7 @@ export function ContractScheduleStep({
                       onChange={(event) =>
                         updateRow(index, { titleAr: event.target.value })
                       }
+                      placeholder={t("contracts.placeholders.milestoneTitleAr")}
                       className="text-start"
                     />
                   </Field>
@@ -347,6 +348,7 @@ export function ContractScheduleStep({
                       onChange={(event) =>
                         updateRow(index, { titleEn: event.target.value })
                       }
+                      placeholder={t("contracts.placeholders.milestoneTitleEn")}
                       className="text-start"
                     />
                   </Field>
@@ -366,6 +368,7 @@ export function ContractScheduleStep({
                         onChange={(event) =>
                           updateRow(index, { percent: event.target.value })
                         }
+                        placeholder={t("contracts.placeholders.milestonePercent")}
                         className="text-start font-mono"
                       />
                     </Field>
@@ -382,6 +385,7 @@ export function ContractScheduleStep({
                         onChange={(event) =>
                           updateRow(index, { amount: event.target.value })
                         }
+                        placeholder={t("contracts.placeholders.milestoneAmount")}
                         className="text-start font-mono"
                       />
                     </Field>
@@ -416,6 +420,7 @@ export function ContractScheduleStep({
                       onChange={(event) =>
                         updateRow(index, { triggerNoteAr: event.target.value })
                       }
+                      placeholder={t("contracts.placeholders.milestoneTriggerAr")}
                       className="text-start"
                     />
                   </Field>
@@ -433,6 +438,7 @@ export function ContractScheduleStep({
                       onChange={(event) =>
                         updateRow(index, { triggerNoteEn: event.target.value })
                       }
+                      placeholder={t("contracts.placeholders.milestoneTriggerEn")}
                       className="text-start"
                     />
                   </Field>

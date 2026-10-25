@@ -41,41 +41,46 @@ export default async function CompanySettingsPage() {
   const bankAccounts = getCompanyBankAccounts(company);
 
   const companyFields: SettingsFieldDef[] = [
-    { kind: "text", name: "nameAr", label: t("fields.nameAr"), dir: "rtl" },
-    { kind: "text", name: "nameEn", label: t("fields.nameEn"), dir: "ltr" },
+    { kind: "text", name: "nameAr", label: t("fields.nameAr"), dir: "rtl", placeholder: t("placeholders.nameAr") },
+    { kind: "text", name: "nameEn", label: t("fields.nameEn"), dir: "ltr", placeholder: t("placeholders.nameEn") },
     {
       kind: "text",
       name: "legalNameAr",
       label: t("fields.legalNameAr"),
       dir: "rtl",
+      placeholder: t("placeholders.legalNameAr"),
     },
     {
       kind: "text",
       name: "legalNameEn",
       label: t("fields.legalNameEn"),
       dir: "ltr",
+      placeholder: t("placeholders.legalNameEn"),
     },
-    { kind: "text", name: "crNumber", label: t("fields.crNumber"), dir: "ltr" },
+    { kind: "text", name: "crNumber", label: t("fields.crNumber"), dir: "ltr", placeholder: t("placeholders.crNumber") },
     {
       kind: "text",
       name: "taxNumber",
       label: t("fields.taxNumber"),
       dir: "ltr",
+      placeholder: t("placeholders.taxNumber"),
     },
-    { kind: "text", name: "email", label: t("fields.email"), dir: "ltr" },
-    { kind: "text", name: "phone", label: t("fields.phone"), dir: "ltr" },
-    { kind: "text", name: "website", label: t("fields.website"), dir: "ltr" },
+    { kind: "text", name: "email", label: t("fields.email"), dir: "ltr", placeholder: t("placeholders.email") },
+    { kind: "text", name: "phone", label: t("fields.phone"), dir: "ltr", placeholder: t("placeholders.phone") },
+    { kind: "text", name: "website", label: t("fields.website"), dir: "ltr", placeholder: t("placeholders.website") },
     {
       kind: "textarea",
       name: "addressAr",
       label: t("fields.addressAr"),
       dir: "rtl",
+      placeholder: t("placeholders.addressAr"),
     },
     {
       kind: "textarea",
       name: "addressEn",
       label: t("fields.addressEn"),
       dir: "ltr",
+      placeholder: t("placeholders.addressEn"),
     },
   ];
 

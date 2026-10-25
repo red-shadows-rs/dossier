@@ -228,7 +228,6 @@ export function SubscriptionDetailView({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Top Header Card */}
       <div className="flex flex-col gap-4 rounded-xl border border-border/80 bg-card p-5 sm:p-6 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex flex-col gap-1.5 min-w-0">
@@ -274,7 +273,6 @@ export function SubscriptionDetailView({
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex items-center gap-2 flex-wrap sm:justify-end">
             {canGenerateInvoice && subscription.status === "active" ? (
               <Button
@@ -338,7 +336,6 @@ export function SubscriptionDetailView({
         </div>
       </div>
 
-      {/* 4 Metric Stats Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="flex flex-col gap-1 rounded-xl border border-border/70 bg-card p-4 shadow-xs">
           <span className="text-xs font-medium text-muted-foreground">
@@ -394,7 +391,7 @@ export function SubscriptionDetailView({
                   subscription.autoIssueInvoice ? "text-emerald-500" : "text-muted-foreground/40"
                 }`}
               />
-              <span>{subscription.autoIssueInvoice ? t("autoIssue") : "مسودة"}</span>
+              <span>{subscription.autoIssueInvoice ? t("autoIssue") : t("autoIssueDraft")}</span>
             </span>
             <span className="flex items-center gap-1.5 text-[11px]">
               <Mail
@@ -402,14 +399,13 @@ export function SubscriptionDetailView({
                   subscription.autoSendEmail ? "text-emerald-500" : "text-muted-foreground/40"
                 }`}
               />
-              <span>{subscription.autoSendEmail ? "إشعار بريدي مفعّل" : "بدون إشعار تلقائي"}</span>
+              <span>{subscription.autoSendEmail ? t("emailEnabled") : t("emailDisabled")}</span>
             </span>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left 2 Columns: Subscribed Services & Pricing */}
         <div className="lg:col-span-2 flex flex-col gap-6">
           <Card>
             <CardHeader className="pb-3 border-b border-border/60">
@@ -458,7 +454,6 @@ export function SubscriptionDetailView({
                 </Table>
               </div>
 
-              {/* Totals Summary */}
               <div className="flex justify-end p-4 border-t border-border/60 bg-muted/20">
                 <div className="w-full max-w-xs space-y-2 text-sm">
                   <div className="flex justify-between text-muted-foreground">
@@ -492,7 +487,6 @@ export function SubscriptionDetailView({
             </CardContent>
           </Card>
 
-          {/* Invoices History Table */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border/60">
               <CardTitle className="inline-flex items-center gap-2 text-base font-semibold">
@@ -588,9 +582,7 @@ export function SubscriptionDetailView({
           </Card>
         </div>
 
-        {/* Right Column: Client Info & Payment Accounts */}
         <div className="flex flex-col gap-6">
-          {/* Client Info Card */}
           {client ? (
             <Card>
               <CardHeader className="pb-3 border-b border-border/60">
@@ -621,7 +613,7 @@ export function SubscriptionDetailView({
                   ) : null}
                   {client.taxNumber ? (
                     <span className="text-xs text-muted-foreground">
-                      الرقم الضريبي: <span className="font-mono">{client.taxNumber}</span>
+                      {client.taxNumber}
                     </span>
                   ) : null}
                 </div>
@@ -629,7 +621,6 @@ export function SubscriptionDetailView({
             </Card>
           ) : null}
 
-          {/* Configured Payment Methods Card */}
           <Card>
             <CardHeader className="pb-3 border-b border-border/60">
               <CardTitle className="inline-flex items-center gap-2 text-base font-semibold">
@@ -650,13 +641,12 @@ export function SubscriptionDetailView({
                 </p>
               ) : (
                 <p className="text-xs text-muted-foreground">
-                  لم يتم تحديد حسابات بنكية مخصصة لهذا الاشتراك، سيتم استخدام الحسابات الافتراضية للشركة في الفواتير.
+                  {t("noAccountsHint")}
                 </p>
               )}
             </CardContent>
           </Card>
 
-          {/* Notes Card */}
           {subscription.notesAr ? (
             <Card>
               <CardHeader className="pb-3 border-b border-border/60">
@@ -675,7 +665,6 @@ export function SubscriptionDetailView({
         </div>
       </div>
 
-      {/* Confirmation Dialogs */}
       <ConfirmDialog
         open={confirmDialog === "generate"}
         onClose={() => setConfirmDialog(null)}

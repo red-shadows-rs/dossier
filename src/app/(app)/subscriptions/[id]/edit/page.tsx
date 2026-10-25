@@ -4,7 +4,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarClock } from "lucide-react";
+import { ArrowLeft, Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/Button";
 import {
@@ -101,30 +101,58 @@ export default async function EditSubscriptionPage({
     return (
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <nav>
+          <nav
+            aria-label="Breadcrumb"
+            className="flex items-center gap-1.5 text-xs text-muted-foreground"
+          >
+            <Link
+              href="/subscriptions"
+              className="hover:text-foreground transition-colors"
+            >
+              {t("title")}
+            </Link>
+            <span className="text-border">/</span>
+            <Link
+              href={`/subscriptions/${id}`}
+              className="hover:text-foreground transition-colors truncate max-w-[200px]"
+            >
+              {sub.number}
+            </Link>
+            <span className="text-border">/</span>
+            <span className="text-foreground font-medium">{t("edit")}</span>
+          </nav>
+
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+                <Pencil size={20} aria-hidden="true" />
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <div className="flex items-center gap-2.5">
+                  <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                    {t("edit")}
+                  </h1>
+                  <span className="inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                    {sub.number}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {sub.titleAr}
+                </p>
+              </div>
+            </div>
+
             <Link href={`/subscriptions/${id}`}>
               <Button
-                variant="ghost"
+                type="button"
+                variant="secondary"
                 size="sm"
-                className="gap-1.5 text-muted-foreground hover:text-foreground"
+                className="gap-1.5 font-medium shadow-xs"
               >
-                <ArrowLeft size={16} className="rtl:rotate-180" aria-hidden="true" />
+                <ArrowLeft size={15} className="rtl:rotate-180" aria-hidden="true" />
                 <span>{tc("back")}</span>
               </Button>
             </Link>
-          </nav>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
-              <CalendarClock size={20} aria-hidden="true" />
-            </div>
-            <div className="flex flex-col">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                {t("edit")} - {sub.number}
-              </h1>
-              <p className="text-xs text-muted-foreground">
-                {sub.titleAr}
-              </p>
-            </div>
           </div>
         </div>
 

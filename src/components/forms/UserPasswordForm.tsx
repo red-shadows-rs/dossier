@@ -49,6 +49,7 @@ export function UserPasswordForm({ userId }: { userId: string }) {
           name="password"
           type="password"
           dir="ltr"
+          placeholder={t("users.placeholders.newPassword")}
           autoComplete="new-password"
           disabled={pending}
           className="text-start"

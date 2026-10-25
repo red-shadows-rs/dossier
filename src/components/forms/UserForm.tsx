@@ -122,6 +122,7 @@ export function UserForm({
                 dir="ltr"
                 autoComplete="off"
                 disabled={pending}
+                placeholder={t("users.placeholders.email")}
                 className="text-start"
               />
             </Field>
@@ -138,6 +139,7 @@ export function UserForm({
               name="name"
               defaultValue={initial.name}
               disabled={pending}
+              placeholder={t("users.placeholders.name")}
             />
           </Field>
 
@@ -172,6 +174,7 @@ export function UserForm({
                 dir="ltr"
                 autoComplete="new-password"
                 disabled={pending}
+                placeholder={t("users.placeholders.password")}
                 className="text-start"
               />
             </Field>

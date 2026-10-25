@@ -228,6 +228,7 @@ export function ContractBasicsStep({
               lang="ar"
               defaultValue={initial.titleAr}
               disabled={pending}
+              placeholder={t("contracts.placeholders.titleAr")}
               className="text-start font-medium"
             />
           </Field>
@@ -243,6 +244,7 @@ export function ContractBasicsStep({
               lang="en"
               defaultValue={initial.titleEn}
               disabled={pending}
+              placeholder={t("contracts.placeholders.titleEn")}
               className="text-start font-medium"
             />
           </Field>
@@ -259,6 +261,7 @@ export function ContractBasicsStep({
               rows={4}
               defaultValue={initial.scopeAr}
               disabled={pending}
+              placeholder={t("contracts.placeholders.scopeAr")}
               className="text-start text-xs leading-relaxed"
             />
           </Field>
@@ -275,6 +278,7 @@ export function ContractBasicsStep({
               rows={4}
               defaultValue={initial.scopeEn}
               disabled={pending}
+              placeholder={t("contracts.placeholders.scopeEn")}
               className="text-start text-xs leading-relaxed"
             />
           </Field>
@@ -371,6 +375,7 @@ export function ContractBasicsStep({
               lang="ar"
               defaultValue={initial.governingLawAr}
               disabled={pending}
+              placeholder={t("settings.placeholders.governingLawAr")}
               className="text-start"
             />
           </Field>
@@ -386,6 +391,7 @@ export function ContractBasicsStep({
               lang="en"
               defaultValue={initial.governingLawEn}
               disabled={pending}
+              placeholder={t("settings.placeholders.governingLawEn")}
               className="text-start"
             />
           </Field>
@@ -401,6 +407,7 @@ export function ContractBasicsStep({
               lang="ar"
               defaultValue={initial.jurisdictionAr}
               disabled={pending}
+              placeholder={t("settings.placeholders.jurisdictionAr")}
               className="text-start"
             />
           </Field>
@@ -416,6 +423,7 @@ export function ContractBasicsStep({
               lang="en"
               defaultValue={initial.jurisdictionEn}
               disabled={pending}
+              placeholder={t("settings.placeholders.jurisdictionEn")}
               className="text-start"
             />
           </Field>
@@ -431,6 +439,7 @@ export function ContractBasicsStep({
               rows={2}
               defaultValue={initial.internalNotes}
               disabled={pending}
+              placeholder={t("contracts.placeholders.notes")}
             />
           </Field>
         </CardContent>

@@ -91,7 +91,7 @@ const CLIENTS = [
 
 const PROJECTS = [
   { nameAr: "منصة التجارة الإلكترونية", nameEn: "E-commerce Platform", status: "active" },
-  { nameAr: "إعادة تصميم الموقع", nameEn: "Website Redesign", status: "active" },
+  { nameAr: "صدى (بوت)", nameEn: "Sada (Bot)", status: "active" },
   { nameAr: "نظام موارد المؤسسة ERP", nameEn: "ERP System", status: "on_hold" },
   { nameAr: "تطبيق الجوال", nameEn: "Mobile App", status: "completed" },
   { nameAr: "حملة تسويق رقمي", nameEn: "Digital Campaign", status: "lead" },

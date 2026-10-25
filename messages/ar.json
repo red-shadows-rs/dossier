@@ -91,7 +91,13 @@
     "changePassword": "تغيير كلمة المرور",
     "currentPassword": "كلمة المرور الحالية",
     "newPassword": "كلمة المرور الجديدة",
-    "passwordTooShort": "كلمة المرور قصيرة جدا"
+    "passwordTooShort": "كلمة المرور قصيرة جدا",
+    "placeholders": {
+      "email": "name@company.example",
+      "password": "••••••••",
+      "newPassword": "••••••••",
+      "currentPassword": "••••••••"
+    }
   },
   "signing": {
     "invalidTitle": "رابط غير صالح أو منتهي",
@@ -229,7 +235,12 @@
     "signerTitleEn": "المسمى عند التوقيع (بالإنجليزية)",
     "saved": "تم حفظ التغييرات",
     "password": "كلمة المرور",
-    "passwordChanged": "تم تغيير كلمة المرور"
+    "passwordChanged": "تم تغيير كلمة المرور",
+    "placeholders": {
+      "name": "محمد بن عبدالله العتيبي",
+      "signerTitleAr": "الرئيس التنفيذي",
+      "signerTitleEn": "Chief Executive Officer"
+    }
   },
   "dashboard": {
     "title": "لوحة المعلومات",
@@ -451,6 +462,27 @@
       "paypalUrlPlaceholder": "https://paypal.me/username",
       "binanceInfo": "بيانات التحويل عبر باينانس (التحويل الداخلي عبر معرف UID بدون رسوم، أو التحويل عبر شبكة البلوكشين)",
       "paypalInfo": "بيانات التحويل عبر PayPal (البريد الإلكتروني، رابط PayPal.Me، واسم المستخدم)"
+    },
+    "placeholders": {
+      "nameAr": "مثال: مؤسسة دوسييه لتقنية المعلومات",
+      "nameEn": "e.g. Dossier Information Technology",
+      "legalNameAr": "مثال: شركة دوسييه لتقنية المعلومات ذ.م.م",
+      "legalNameEn": "e.g. Dossier Information Technology LLC",
+      "crNumber": "1010000000",
+      "taxNumber": "300000000000003",
+      "email": "billing@company.example",
+      "phone": "+966 50 000 0000",
+      "website": "https://company.example",
+      "addressAr": "طريق الملك فهد، حي الصحافة، الرياض",
+      "addressEn": "King Fahd Road, Al-Sahafa District, Riyadh",
+      "governingLawAr": "أنظمة المملكة العربية السعودية",
+      "governingLawEn": "Laws of the Kingdom of Saudi Arabia",
+      "jurisdictionAr": "المحاكم المختصة بمدينة الرياض",
+      "jurisdictionEn": "Competent Courts of Riyadh",
+      "prefix": "DOS",
+      "fromName": "مؤسسة دوسييه لتقنية المعلومات",
+      "consentTextAr": "أقر أنا الموقع أدناه بصحة البيانات وبصفتي المفوضة للتوقيع والاعتماد.",
+      "consentTextEn": "I, the undersigned, certify that the information provided is accurate and that I am authorized to sign."
     }
   },
   "clients": {
@@ -517,6 +549,25 @@
       "basics": "البيانات الأساسية",
       "contact": "الاتصال",
       "legal": "البيانات القانونية"
+    },
+    "placeholders": {
+      "nameAr": "مثال: شركة الحلول الرقمية المتقدمة",
+      "nameEn": "e.g. Advanced Digital Solutions Co.",
+      "legalNameAr": "مثال: شركة الحلول الرقمية المتقدمة ذ.م.م",
+      "legalNameEn": "e.g. Advanced Digital Solutions IT LLC",
+      "crNumber": "1010000000",
+      "taxNumber": "300000000000003",
+      "email": "billing@company.example",
+      "phone": "+966 50 000 0000",
+      "country": "SA",
+      "city": "الرياض",
+      "addressAr": "طريق الملك فهد، حي الصحافة",
+      "addressEn": "King Fahd Road, Al-Sahafa District",
+      "repNameAr": "عبدالله بن محمد العتيبي",
+      "repNameEn": "Abdullah Al-Otaibi",
+      "repTitleAr": "الرئيس التنفيذي",
+      "repTitleEn": "Chief Executive Officer",
+      "notes": "ملاحظات داخلية حول العميل وحسابات الفوترة..."
     }
   },
   "projects": {
@@ -604,7 +655,14 @@
     "contractsTitle": "العقود",
     "invoiceableMilestones": "دفعات جاهزة للفوترة",
     "milestonesTitle": "الدفعات",
-    "invoicesTitle": "الفواتير"
+    "invoicesTitle": "الفواتير",
+    "placeholders": {
+      "nameAr": "مثال: منصة التجارة الإلكترونية وتطبيقات الجوال",
+      "nameEn": "e.g. E-Commerce Platform & Mobile Apps",
+      "budget": "0.00",
+      "description": "نطاق المشروع، أهدافه، ومخرجاته المتفق عليها...",
+      "notes": "ملاحظات داخلية حول إدارة المشروع والمواعيد..."
+    }
   },
   "templates": {
     "title": "القوالب",
@@ -718,7 +776,19 @@
     "clauseIncomplete": "أدخل عنوان ونص البند باللغتين.",
     "titleVariable": "عناوين البنود لا تقبل المتغيرات.",
     "blockSequenceMismatch": "ترتيب الكتل غير متطابق بين اللغتين.",
-    "signaturesBlockCount": "مسموح بكتلة توقيعات واحدة فقط (الموجود: {count})."
+    "signaturesBlockCount": "مسموح بكتلة توقيعات واحدة فقط (الموجود: {count}).",
+    "placeholders": {
+      "nameAr": "مثال: عقد تقديم خدمات برمجية وتقنية",
+      "nameEn": "e.g. Software & Technical Services Agreement",
+      "descriptionAr": "نموذج استرشادي شامل لمشاريع تطوير البرمجيات والحلول السحابية...",
+      "descriptionEn": "Standard master services agreement template for software development projects...",
+      "titleDefaultAr": "عقد تقديم خدمات تقنية",
+      "titleDefaultEn": "Technical Services Agreement",
+      "clauseTitleAr": "مثال: سرية المعلومات وعدم الإفصاح",
+      "clauseTitleEn": "e.g. Confidentiality & Non-Disclosure",
+      "clauseBodyAr": "يلتزم الطرفان بالحفاظ على سرية المعلومات المتبادلة...",
+      "clauseBodyEn": "Both parties agree to maintain strict confidentiality of exchanged information..."
+    }
   },
   "contracts": {
     "saved": "تم حفظ العقد",
@@ -998,6 +1068,27 @@
       "nameRequired": "اسم الموقع مطلوب للاعتماد",
       "submit": "إرسال",
       "sent": "تم إرسال العقد"
+    },
+    "placeholders": {
+      "titleAr": "مثال: عقد تقديم خدمات برمجية واستشارية",
+      "titleEn": "e.g. Software & Technical Consulting Agreement",
+      "scopeAr": "تطوير وتكامل الأنظمة البرمجية وتقديم الدعم الفني المعتمد وفق الشروط...",
+      "scopeEn": "Software systems development, integration, and approved support services...",
+      "itemDescriptionAr": "مثال: تصميم وتطوير واجهات المستخدم (UI/UX)",
+      "itemDescriptionEn": "e.g. UI/UX Design & Frontend Development",
+      "itemQty": "1",
+      "itemUnit": "0.00",
+      "milestoneTitleAr": "مثال: الدفعة الأولى عند توقيع العقد",
+      "milestoneTitleEn": "e.g. Upfront payment upon contract signing",
+      "milestoneTriggerAr": "مثال: عند اعتماد التصاميم والمخططات الأولية",
+      "milestoneTriggerEn": "e.g. Upon approval of preliminary wireframes and designs",
+      "milestonePercent": "25",
+      "milestoneAmount": "0.00",
+      "clauseTitleAr": "مثال: نطاق الخدمات والمسؤوليات",
+      "clauseTitleEn": "e.g. Scope of Services & Obligations",
+      "clauseBodyAr": "يلتزم الطرف الثاني بتقديم الخدمات الموضحة وفق المواصفات المعتمدة...",
+      "clauseBodyEn": "The second party undertakes to deliver the approved services as specified...",
+      "notes": "ملاحظات داخلية خاصة بإدارة العقد..."
     }
   },
   "invoices": {
@@ -1133,88 +1224,118 @@
     "tabInvoice": "الفاتورة",
     "tabReceipt": "سند القبض",
     "viewReceiptPdf": "عرض سند القبض (PDF)",
-    "downloadReceiptPdf": "تنزيل سند القبض (PDF)"
+    "downloadReceiptPdf": "تنزيل سند القبض (PDF)",
+    "placeholders": {
+      "notesAr": "نشكركم على تعاملكم معنا. يرجى تحويل المستحقات قبل موعد الاستحقاق.",
+      "notesEn": "Thank you for your business. Please settle payment by the due date.",
+      "lineDescriptionAr": "مثال: خدمات تطوير وبرمجة المرحلة الأولى",
+      "lineDescriptionEn": "e.g. Phase 1 Software Engineering & Implementation",
+      "lineQty": "1",
+      "lineUnit": "0.00",
+      "discount": "0.00",
+      "paymentAmount": "0.00",
+      "paymentReference": "مثال: TR-98421 أو رقم الحوالة البنكية",
+      "paymentNotes": "ملاحظات حول عملية السداد...",
+      "voidReason": "سبب إلغاء الفاتورة..."
+    }
   },
   "subscriptions": {
     "title": "الاشتراكات",
     "new": "اشتراك جديد",
     "edit": "تعديل الاشتراك",
+    "formSteps": {
+      "basics": "البيانات الأساسية",
+      "schedule": "الجدولة",
+      "pricing": "البنود والتسعير",
+      "settings": "الفوترة والملاحظات"
+    },
     "empty": "لا توجد اشتراكات بعد",
     "emptyHint": "أنشئ اشتراكاً لأتمتة الفواتير المتكررة.",
-    "searchPlaceholder": "بحث بالرقم أو العنوان أو اسم العميل...",
+    "searchPlaceholder": "بحث بالرقم أو العنوان أو العميل...",
     "subscriptionNumber": "رقم الاشتراك",
-    "subscriptionTitle": "عنوان الخدمة / الاشتراك",
-    "subscriptionTitlePlaceholder": "مثال: استضافة سحابية 20GB NVMe ودعم فني",
+    "subscriptionTitle": "عنوان الاشتراك",
     "client": "العميل",
     "selectClient": "اختر العميل...",
-    "project": "المشروع (اختياري)",
-    "selectProject": "اختر المشروع (اختياري)...",
+    "project": "المشروع",
+    "selectProject": "اختر المشروع...",
     "frequency": "دورة التكرار",
     "frequencies": {
       "monthly": "شهرياً",
-      "quarterly": "ربع سنوي (كل 3 أشهر)",
-      "semi_annual": "نصف سنوي (كل 6 أشهر)",
+      "quarterly": "ربع سنوي",
+      "semi_annual": "نصف سنوي",
       "annual": "سنوياً",
       "weekly": "أسبوعياً",
-      "custom": "فترة مخصصة (أيام)"
+      "custom": "مخصص"
     },
-    "intervalCount": "التكرار كل",
+    "intervalCount": "تكرار كل",
     "startDate": "تاريخ البدء",
-    "nextRunDate": "تاريخ الفاتورة القادمة",
-    "endDate": "تاريخ الانتهاء (اختياري)",
+    "nextRunDate": "الفاتورة القادمة",
+    "endDate": "تاريخ الانتهاء",
     "status": "الحالة",
     "statuses": {
       "active": "نشط",
-      "paused": "موقّف مؤقتاً",
+      "paused": "موقوف",
       "completed": "مكتمل",
-      "canceled": "ملغي"
+      "canceled": "ملغى"
     },
-    "amount": "المبلغ لكل دورة",
-    "invoicesCount": "الفواتير المصدرة",
+    "amount": "المبلغ",
+    "invoicesCount": "الفواتير",
     "lastRunDate": "آخر إصدار",
-    "settingsTitle": "إعدادات الفوترة والتحصيل",
-    "autoIssue": "إصدار الفاتورة تلقائياً كمعتمدة",
-    "autoIssueDesc": "عند حلول موعد الفاتورة، تصدر كفاتورة معتمدة (Issued) فوراً بدلاً من مسودة.",
-    "autoSendEmail": "إرسال إشعار الفاتورة عبر البريد تلقائياً للعميل",
-    "paymentTermsDays": "مهلة السداد بعد تاريخ الإصدار (أيام)",
-    "paymentMethods": "طرق الدفع المعتمدة لهذا الاشتراك",
-    "paymentMethodsDesc": "حدد الحسابات المتاحة للعميل لسداد فواتير هذا الاشتراك.",
-    "items": "بنود الخدمة والأسعار",
-    "addItem": "إضافة بند خدمة",
-    "description": "وصف الخدمة أو الباقة",
-    "descriptionPlaceholder": "مثال: خطة استضافة المواقع Pro السنوية",
+    "settingsTitle": "إعدادات الفوترة",
+    "autoIssue": "إصدار تلقائي كمعتمدة",
+    "autoIssueDraft": "مسودة",
+    "autoIssueDesc": "إصدار الفاتورة معتمدة فور حلول موعدها بدلاً من مسودة.",
+    "autoSendEmail": "إرسال الفاتورة تلقائياً بالبريد",
+    "emailEnabled": "إرسال تلقائي مفعّل",
+    "emailDisabled": "بدون إرسال تلقائي",
+    "paymentTermsDays": "مهلة السداد (أيام)",
+    "paymentMethods": "طرق الدفع",
+    "paymentMethodsDesc": "الحسابات المعتمدة لسداد هذا الاشتراك.",
+    "noAccountsHint": "تُستخدم الحسابات الافتراضية للشركة في الفواتير.",
+    "items": "بنود الاشتراك",
+    "addItem": "إضافة بند",
+    "description": "الوصف",
     "quantity": "الكمية",
     "unitPrice": "سعر الوحدة",
     "taxRate": "نسبة الضريبة",
     "subtotal": "المجموع الفرعي",
     "discount": "الخصم",
     "tax": "ضريبة القيمة المضافة",
-    "total": "الإجمالي لكل دورة",
-    "notes": "شروط وتفاصيل الخدمة (تظهر في الفواتير)",
-    "notesAr": "شروط الخدمة (عربي)",
-    "notesEn": "شروط الخدمة (إنجليزي)",
-    "actions": "إجراءات الاشتراك",
+    "total": "الإجمالي",
+    "notes": "الملاحظات والشروط",
+    "notesAr": "الملاحظات (بالعربية)",
+    "notesEn": "الملاحظات (بالإنجليزية)",
+    "actions": "الإجراءات",
     "generateNow": "إصدار فاتورة الآن",
-    "generateNowConfirmTitle": "إصدار فاتورة للدورة الحالية",
-    "generateNowConfirmMsg": "سيتم إنشاء فاتورة للدورة الحالية وتحديث موعد الفاتورة القادمة تلقائياً. هل ترغب بالاستمرار؟",
+    "generateNowConfirmTitle": "إصدار فاتورة للدورة",
+    "generateNowConfirmMsg": "سيتم إصدار فاتورة الدورة الحالية وتحديث موعد الاستحقاق القادم. متابعة؟",
     "pause": "إيقاف مؤقت",
-    "pauseConfirmTitle": "إيقاف الاشتراك مؤقتاً",
-    "pauseConfirmMsg": "هل أنت متأكد من إيقاف هذا الاشتراك مؤقتاً؟ لن يتم إنشاء فواتير جديدة حتى يتم استئنافه.",
+    "pauseConfirmTitle": "إيقاف الاشتراك",
+    "pauseConfirmMsg": "إيقاف هذا الاشتراك مؤقتاً؟ لن تُصدر فواتير جديدة حتى استئنافه.",
     "resume": "استئناف",
     "resumeConfirmTitle": "استئناف الاشتراك",
-    "resumeConfirmMsg": "هل ترغب باستئناف هذا الاشتراك وتفعيل الجدولة من جديد؟",
+    "resumeConfirmMsg": "استئناف هذا الاشتراك وتفعيل الجدولة من جديد؟",
     "cancel": "إلغاء الاشتراك",
-    "cancelConfirmTitle": "إلغاء الاشتراك نهائياً",
-    "cancelConfirmMsg": "هل أنت متأكد من إلغاء هذا الاشتراك؟ لن يتم إصدار أي فواتير مستقبلية.",
-    "saved": "تم حفظ الاشتراك بنجاح",
-    "pausedSuccess": "تم إيقاف الاشتراك مؤقتاً",
-    "resumedSuccess": "تم استئناف الاشتراك بنجاح",
-    "cancelledSuccess": "تم إلغاء الاشتراك بنجاح",
-    "invoiceGeneratedSuccess": "تم إصدار الفاتورة بنجاح",
-    "invoicesHistory": "سجل الفواتير الصادرة من هذا الاشتراك",
-    "noInvoicesYet": "لم يتم إصدار أي فواتير لهذا الاشتراك حتى الآن.",
+    "cancelConfirmTitle": "إلغاء الاشتراك",
+    "cancelConfirmMsg": "إلغاء هذا الاشتراك نهائياً؟ لن يتم إصدار أي فواتير مستقبلية.",
+    "saved": "تم حفظ الاشتراك",
+    "pausedSuccess": "تم إيقاف الاشتراك",
+    "resumedSuccess": "تم استئناف الاشتراك",
+    "cancelledSuccess": "تم إلغاء الاشتراك",
+    "invoiceGeneratedSuccess": "تم إصدار الفاتورة",
+    "invoicesHistory": "سجل الفواتير",
+    "noInvoicesYet": "لا توجد فواتير صادرة بعد.",
     "viewInvoice": "عرض الفاتورة",
-    "manageTitle": "الاشتراك والخدمة المجدولة"
+    "manageTitle": "تفاصيل الاشتراك",
+    "placeholders": {
+      "titleAr": "مثال: استضافة سحابية ودعم فني",
+      "titleEn": "e.g. Cloud Hosting & Technical Support",
+      "description": "صيانة دورية ودعم فني سحابي...",
+      "quantity": "1",
+      "unitPrice": "0.00",
+      "notesAr": "شروط الخدمة وفترات التجديد...",
+      "notesEn": "Service terms and renewal policy..."
+    }
   },
   "users": {
     "title": "المستخدمون",
@@ -1252,7 +1373,15 @@
     "savedToast": "تم حفظ المستخدم",
     "passwordResetToast": "تم تحديث كلمة المرور",
     "enabledToast": "تم تفعيل المستخدم",
-    "disabledToast": "تم تعطيل المستخدم"
+    "disabledToast": "تم تعطيل المستخدم",
+    "placeholders": {
+      "name": "محمد بن عبدالله العتيبي",
+      "email": "user@company.example",
+      "password": "••••••••",
+      "newPassword": "••••••••",
+      "signerTitleAr": "الرئيس التنفيذي",
+      "signerTitleEn": "Chief Executive Officer"
+    }
   },
   "demo": {
     "badge": "وضع الديمو",

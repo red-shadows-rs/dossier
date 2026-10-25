@@ -84,6 +84,7 @@ export type SettingsFieldDef =
       label: string;
       dir?: "ltr" | "rtl";
       rows?: number;
+      placeholder?: string;
     }
   | {
       kind: "number";
@@ -237,6 +238,7 @@ function renderField(
           name={field.name}
           dir={field.dir}
           rows={field.rows}
+          placeholder={field.placeholder}
           defaultValue={initialValue(field, values) as string}
           disabled={disabled}
           className={field.dir ? "text-start" : undefined}

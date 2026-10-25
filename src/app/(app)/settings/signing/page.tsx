@@ -55,6 +55,7 @@ export default async function SigningSettingsPage() {
       label: t("fields.consentTextAr"),
       dir: "rtl",
       rows: 3,
+      placeholder: t("placeholders.consentTextAr"),
     },
     {
       kind: "textarea",
@@ -62,6 +63,7 @@ export default async function SigningSettingsPage() {
       label: t("fields.consentTextEn"),
       dir: "ltr",
       rows: 3,
+      placeholder: t("placeholders.consentTextEn"),
     },
   ];
 

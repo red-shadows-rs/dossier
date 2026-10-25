@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.4.1] - 2026-10-25
+
+### Added
+- **Multi-Step Subscriptions Form Redesign:** Re-architected subscription creation and editing into an interactive 4-step stepper (`البيانات الأساسية`, `الجدولة`, `البنود والتسعير`, `الفوترة والملاحظات`) with step numbers, check icons, responsive service items grid, structured totals breakdown, and sticky navigation bar.
+- **Dual-Language Document Email Attachments:** Document delivery emails (invoices, payment receipts, and executed contracts) now automatically attach both Arabic and English PDFs (`[رقم_المستند]-ar.pdf` and `[رقم_المستند]-en.pdf`).
+- **Professional Localized Placeholders System:** Implemented realistic, field-specific placeholders across clients, projects, contracts, invoices, settings, and subscriptions in both Arabic and English.
+
+### Changed
+- **Concise Subscriptions Accounting Terminology:** Streamlined all subscription interface labels, dialog prompts, and table headers to be concise, professional, and aligned with standard billing and accounting systems.
+
+### Fixed
+- **Milestone Counter Badge Geometry:** Corrected invoice milestone selection badge geometry to render as a true circle (20px × 20px) with proper color contrast.
+- **Payment Receipt Acknowledgement Label:** Removed the word "السادة" from payment receipt vouchers and acknowledgements (`استلمنا من:`).
+
 ## [v1.4.0] - 2026-10-25
 
 ### Added

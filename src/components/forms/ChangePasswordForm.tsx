@@ -72,6 +72,7 @@ export function ChangePasswordForm() {
           id="current-password"
           name="currentPassword"
           type="password"
+          placeholder={t("auth.placeholders.currentPassword")}
           autoComplete="current-password"
           dir="ltr"
           className="text-start"
@@ -89,6 +90,7 @@ export function ChangePasswordForm() {
           id="new-password"
           name="newPassword"
           type="password"
+          placeholder={t("auth.placeholders.newPassword")}
           autoComplete="new-password"
           dir="ltr"
           minLength={12}

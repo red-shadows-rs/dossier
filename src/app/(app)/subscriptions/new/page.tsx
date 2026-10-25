@@ -44,30 +44,46 @@ export default async function NewSubscriptionPage() {
     return (
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <nav>
+          <nav
+            aria-label="Breadcrumb"
+            className="flex items-center gap-1.5 text-xs text-muted-foreground"
+          >
+            <Link
+              href="/subscriptions"
+              className="hover:text-foreground transition-colors"
+            >
+              {t("title")}
+            </Link>
+            <span className="text-border">/</span>
+            <span className="text-foreground font-medium">{t("new")}</span>
+          </nav>
+
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
+                <CalendarClock size={20} aria-hidden="true" />
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                  {t("new")}
+                </h1>
+                <p className="text-xs text-muted-foreground">
+                  {t("emptyHint")}
+                </p>
+              </div>
+            </div>
+
             <Link href="/subscriptions">
               <Button
-                variant="ghost"
+                type="button"
+                variant="secondary"
                 size="sm"
-                className="gap-1.5 text-muted-foreground hover:text-foreground"
+                className="gap-1.5 font-medium shadow-xs"
               >
-                <ArrowLeft size={16} className="rtl:rotate-180" aria-hidden="true" />
+                <ArrowLeft size={15} className="rtl:rotate-180" aria-hidden="true" />
                 <span>{tc("back")}</span>
               </Button>
             </Link>
-          </nav>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary shadow-xs">
-              <CalendarClock size={20} aria-hidden="true" />
-            </div>
-            <div className="flex flex-col">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                {t("new")}
-              </h1>
-              <p className="text-xs text-muted-foreground">
-                {t("emptyHint")}
-              </p>
-            </div>
           </div>
         </div>
 

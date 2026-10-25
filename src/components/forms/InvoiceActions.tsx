@@ -277,7 +277,7 @@ export function InvoiceActions({
               id="void-invoice-reason"
               value={voidReason}
               onChange={(e) => setVoidReason(e.target.value)}
-              placeholder={t("invoices.voidReasonPrompt")}
+              placeholder={t("invoices.placeholders.voidReason")}
               autoFocus
             />
           </Field>
@@ -375,6 +375,7 @@ export function PaymentDialog({
             id="pay-amount"
             name="amount"
             dir="ltr"
+            placeholder={t("invoices.placeholders.paymentAmount")}
             className="text-start"
           />
         </Field>
@@ -402,11 +403,16 @@ export function PaymentDialog({
             id="pay-ref"
             name="reference"
             dir="ltr"
+            placeholder={t("invoices.placeholders.paymentReference")}
             className="text-start"
           />
         </Field>
         <Field label={t("invoices.notes")} htmlFor="pay-notes">
-          <Textarea id="pay-notes" name="notes" />
+          <Textarea
+            id="pay-notes"
+            name="notes"
+            placeholder={t("invoices.placeholders.paymentNotes")}
+          />
         </Field>
         <div className="flex justify-end gap-2">
           <Button
@@ -525,7 +531,7 @@ export function VoidPaymentButton({
               id={`void-payment-reason-${paymentId}`}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder={t("invoices.voidReasonPrompt")}
+              placeholder={t("invoices.placeholders.voidReason")}
               autoFocus
             />
           </Field>

@@ -53,7 +53,7 @@ export default async function EmailSettingsPage() {
         : t("worker.never");
 
   const fields: SettingsFieldDef[] = [
-    { kind: "text", name: "fromName", label: t("fields.fromName") },
+    { kind: "text", name: "fromName", label: t("fields.fromName"), placeholder: t("placeholders.fromName") },
     {
       kind: "checkbox",
       name: "overdueRemindersEnabled",

@@ -85,6 +85,7 @@ export function AccountForm({
           id="account-name"
           name="name"
           defaultValue={name}
+          placeholder={t("account.placeholders.name")}
           maxLength={200}
         />
       </Field>
@@ -108,6 +109,7 @@ export function AccountForm({
               name="signerTitleAr"
               dir="rtl"
               lang="ar"
+              placeholder={t("account.placeholders.signerTitleAr")}
               defaultValue={signerTitleAr}
               className="text-start"
             />
@@ -122,6 +124,7 @@ export function AccountForm({
               name="signerTitleEn"
               dir="ltr"
               lang="en"
+              placeholder={t("account.placeholders.signerTitleEn")}
               defaultValue={signerTitleEn}
               className="text-start"
             />

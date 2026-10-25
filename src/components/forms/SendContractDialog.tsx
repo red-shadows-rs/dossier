@@ -256,7 +256,7 @@ export function SendContractDialog({
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
                 disabled={pending}
-                placeholder={languageMode === "ar" ? "اسم العميل أو ممثله" : "Client or representative name"}
+                placeholder={languageMode === "ar" ? t("clients.placeholders.repNameAr") : t("clients.placeholders.repNameEn")}
               />
             </Field>
 
@@ -271,7 +271,7 @@ export function SendContractDialog({
                 value={clientTitle}
                 onChange={(e) => setClientTitle(e.target.value)}
                 disabled={pending}
-                placeholder={tContracts("send.titlePlaceholder")}
+                placeholder={languageMode === "ar" ? t("clients.placeholders.repTitleAr") : t("clients.placeholders.repTitleEn")}
               />
             </Field>
 
@@ -290,7 +290,7 @@ export function SendContractDialog({
                 onChange={(e) => setClientEmail(e.target.value)}
                 disabled={pending}
                 className="text-start"
-                placeholder="client@example.com"
+                placeholder={t("clients.placeholders.email")}
               />
             </Field>
           </div>

@@ -91,7 +91,13 @@
     "changePassword": "Change password",
     "currentPassword": "Current password",
     "newPassword": "New password",
-    "passwordTooShort": "Password is too short"
+    "passwordTooShort": "Password is too short",
+    "placeholders": {
+      "email": "name@company.example",
+      "password": "••••••••",
+      "newPassword": "••••••••",
+      "currentPassword": "••••••••"
+    }
   },
   "signing": {
     "invalidTitle": "Invalid or expired link",
@@ -229,7 +235,12 @@
     "signerTitleEn": "Signature title (English)",
     "saved": "Changes saved",
     "password": "Password",
-    "passwordChanged": "Password changed"
+    "passwordChanged": "Password changed",
+    "placeholders": {
+      "name": "Mohammed Al-Otaibi",
+      "signerTitleAr": "الرئيس التنفيذي",
+      "signerTitleEn": "Chief Executive Officer"
+    }
   },
   "dashboard": {
     "title": "Dashboard",
@@ -451,6 +462,27 @@
       "paypalUrlPlaceholder": "https://paypal.me/username",
       "binanceInfo": "Binance transfer options (zero-fee internal transfer via UID, or blockchain deposit address)",
       "paypalInfo": "PayPal transfer details (email, PayPal.Me link, and username)"
+    },
+    "placeholders": {
+      "nameAr": "مثال: مؤسسة دوسييه لتقنية المعلومات",
+      "nameEn": "e.g. Dossier Information Technology",
+      "legalNameAr": "مثال: شركة دوسييه لتقنية المعلومات ذ.م.م",
+      "legalNameEn": "e.g. Dossier Information Technology LLC",
+      "crNumber": "1010000000",
+      "taxNumber": "300000000000003",
+      "email": "billing@company.example",
+      "phone": "+966 50 000 0000",
+      "website": "https://company.example",
+      "addressAr": "طريق الملك فهد، حي الصحافة، الرياض",
+      "addressEn": "King Fahd Road, Al-Sahafa District, Riyadh",
+      "governingLawAr": "أنظمة المملكة العربية السعودية",
+      "governingLawEn": "Laws of the Kingdom of Saudi Arabia",
+      "jurisdictionAr": "المحاكم المختصة بمدينة الرياض",
+      "jurisdictionEn": "Competent Courts of Riyadh",
+      "prefix": "DOS",
+      "fromName": "Dossier Information Technology",
+      "consentTextAr": "أقر أنا الموقع أدناه بصحة البيانات وبصفتي المفوضة للتوقيع والاعتماد.",
+      "consentTextEn": "I, the undersigned, certify that the information provided is accurate and that I am authorized to sign."
     }
   },
   "clients": {
@@ -517,6 +549,25 @@
       "basics": "Basics",
       "contact": "Contact",
       "legal": "Legal"
+    },
+    "placeholders": {
+      "nameAr": "مثال: شركة الحلول الرقمية المتقدمة",
+      "nameEn": "e.g. Advanced Digital Solutions Co.",
+      "legalNameAr": "مثال: شركة الحلول الرقمية المتقدمة ذ.م.م",
+      "legalNameEn": "e.g. Advanced Digital Solutions IT LLC",
+      "crNumber": "1010000000",
+      "taxNumber": "300000000000003",
+      "email": "billing@company.example",
+      "phone": "+966 50 000 0000",
+      "country": "SA",
+      "city": "Riyadh",
+      "addressAr": "طريق الملك فهد، حي الصحافة",
+      "addressEn": "King Fahd Road, Al-Sahafa District",
+      "repNameAr": "عبدالله بن محمد العتيبي",
+      "repNameEn": "Abdullah Al-Otaibi",
+      "repTitleAr": "الرئيس التنفيذي",
+      "repTitleEn": "Chief Executive Officer",
+      "notes": "Internal notes regarding client terms and account..."
     }
   },
   "projects": {
@@ -604,7 +655,14 @@
     "contractsTitle": "Contracts",
     "invoiceableMilestones": "Milestones to invoice",
     "milestonesTitle": "Milestones",
-    "invoicesTitle": "Invoices"
+    "invoicesTitle": "Invoices",
+    "placeholders": {
+      "nameAr": "مثال: منصة التجارة الإلكترونية وتطبيقات الجوال",
+      "nameEn": "e.g. E-Commerce Platform & Mobile Apps",
+      "budget": "0.00",
+      "description": "Project scope, objectives, and deliverables...",
+      "notes": "Internal notes on project milestones and schedule..."
+    }
   },
   "templates": {
     "title": "Templates",
@@ -718,7 +776,19 @@
     "clauseIncomplete": "Each clause needs title and body in Arabic and English.",
     "titleVariable": "Clause titles cannot contain variables.",
     "blockSequenceMismatch": "Block sequence must match across languages.",
-    "signaturesBlockCount": "Exactly one signatures block required (found {count})."
+    "signaturesBlockCount": "Exactly one signatures block required (found {count}).",
+    "placeholders": {
+      "nameAr": "مثال: عقد تقديم خدمات برمجية وتقنية",
+      "nameEn": "e.g. Software & Technical Services Agreement",
+      "descriptionAr": "نموذج استرشادي شامل لمشاريع تطوير البرمجيات والحلول السحابية...",
+      "descriptionEn": "Standard master services agreement template for software development projects...",
+      "titleDefaultAr": "عقد تقديم خدمات تقنية",
+      "titleDefaultEn": "Technical Services Agreement",
+      "clauseTitleAr": "مثال: سرية المعلومات وعدم الإفصاح",
+      "clauseTitleEn": "e.g. Confidentiality & Non-Disclosure",
+      "clauseBodyAr": "يلتزم الطرفان بالحفاظ على سرية المعلومات المتبادلة...",
+      "clauseBodyEn": "Both parties agree to maintain strict confidentiality of exchanged information..."
+    }
   },
   "contracts": {
     "saved": "Contract saved",
@@ -998,6 +1068,27 @@
       "nameRequired": "Signatory name is required",
       "submit": "Send",
       "sent": "Contract sent"
+    },
+    "placeholders": {
+      "titleAr": "مثال: عقد تقديم خدمات برمجية واستشارية",
+      "titleEn": "e.g. Software & Technical Consulting Agreement",
+      "scopeAr": "تطوير وتكامل الأنظمة البرمجية وتقديم الدعم الفني المعتمد وفق الشروط...",
+      "scopeEn": "Software systems development, integration, and approved support services...",
+      "itemDescriptionAr": "مثال: تصميم وتطوير واجهات المستخدم (UI/UX)",
+      "itemDescriptionEn": "e.g. UI/UX Design & Frontend Development",
+      "itemQty": "1",
+      "itemUnit": "0.00",
+      "milestoneTitleAr": "مثال: الدفعة الأولى عند توقيع العقد",
+      "milestoneTitleEn": "e.g. Upfront payment upon contract signing",
+      "milestoneTriggerAr": "مثال: عند اعتماد التصاميم والمخططات الأولية",
+      "milestoneTriggerEn": "e.g. Upon approval of preliminary wireframes and designs",
+      "milestonePercent": "25",
+      "milestoneAmount": "0.00",
+      "clauseTitleAr": "مثال: نطاق الخدمات والمسؤوليات",
+      "clauseTitleEn": "e.g. Scope of Services & Obligations",
+      "clauseBodyAr": "يلتزم الطرف الثاني بتقديم الخدمات الموضحة وفق المواصفات المعتمدة...",
+      "clauseBodyEn": "The second party undertakes to deliver the approved services as specified...",
+      "notes": "Internal contract management notes..."
     }
   },
   "invoices": {
@@ -1133,35 +1224,53 @@
     "tabInvoice": "Invoice",
     "tabReceipt": "Receipt",
     "viewReceiptPdf": "View Receipt (PDF)",
-    "downloadReceiptPdf": "Download Receipt (PDF)"
+    "downloadReceiptPdf": "Download Receipt (PDF)",
+    "placeholders": {
+      "notesAr": "نشكركم على تعاملكم معنا. يرجى تحويل المستحقات قبل موعد الاستحقاق.",
+      "notesEn": "Thank you for your business. Please settle payment by the due date.",
+      "lineDescriptionAr": "مثال: خدمات تطوير وبرمجة المرحلة الأولى",
+      "lineDescriptionEn": "e.g. Phase 1 Software Engineering & Implementation",
+      "lineQty": "1",
+      "lineUnit": "0.00",
+      "discount": "0.00",
+      "paymentAmount": "0.00",
+      "paymentReference": "e.g. TR-98421 or bank wire reference",
+      "paymentNotes": "Payment transaction notes...",
+      "voidReason": "Reason for voiding invoice..."
+    }
   },
   "subscriptions": {
     "title": "Subscriptions",
     "new": "New Subscription",
     "edit": "Edit Subscription",
+    "formSteps": {
+      "basics": "Basic Info",
+      "schedule": "Schedule",
+      "pricing": "Items & Pricing",
+      "settings": "Billing & Notes"
+    },
     "empty": "No subscriptions yet",
     "emptyHint": "Create a subscription to automate recurring invoices.",
     "searchPlaceholder": "Search by number, title, or client...",
     "subscriptionNumber": "Subscription #",
-    "subscriptionTitle": "Service / Subscription Title",
-    "subscriptionTitlePlaceholder": "e.g. Cloud Hosting 20GB NVMe & Maintenance",
+    "subscriptionTitle": "Subscription Title",
     "client": "Client",
     "selectClient": "Select client...",
-    "project": "Project (Optional)",
-    "selectProject": "Select project (optional)...",
+    "project": "Project",
+    "selectProject": "Select project...",
     "frequency": "Billing Frequency",
     "frequencies": {
       "monthly": "Monthly",
-      "quarterly": "Quarterly (Every 3 months)",
-      "semi_annual": "Semi-Annual (Every 6 months)",
-      "annual": "Annually",
+      "quarterly": "Quarterly",
+      "semi_annual": "Semi-Annual",
+      "annual": "Annual",
       "weekly": "Weekly",
-      "custom": "Custom Interval (Days)"
+      "custom": "Custom"
     },
     "intervalCount": "Repeat Every",
     "startDate": "Start Date",
-    "nextRunDate": "Next Due Date",
-    "endDate": "End Date (Optional)",
+    "nextRunDate": "Next Invoice",
+    "endDate": "End Date",
     "status": "Status",
     "statuses": {
       "active": "Active",
@@ -1169,52 +1278,64 @@
       "completed": "Completed",
       "canceled": "Canceled"
     },
-    "amount": "Amount Per Cycle",
-    "invoicesCount": "Issued Invoices",
+    "amount": "Amount",
+    "invoicesCount": "Invoices",
     "lastRunDate": "Last Invoiced",
-    "settingsTitle": "Billing & Invoicing Preferences",
-    "autoIssue": "Auto-issue invoice as issued",
-    "autoIssueDesc": "When the due date arrives, create invoice in 'Issued' status directly instead of 'Draft'.",
-    "autoSendEmail": "Automatically email invoice to client",
-    "paymentTermsDays": "Payment Terms (Days after issue)",
-    "paymentMethods": "Allowed Payment Methods",
-    "paymentMethodsDesc": "Select which accounts client can use to pay for this recurring service.",
-    "items": "Service Items & Pricing",
-    "addItem": "Add Service Item",
-    "description": "Item Description",
-    "descriptionPlaceholder": "e.g. Web Hosting Pro Plan (Annual)",
+    "settingsTitle": "Billing Settings",
+    "autoIssue": "Auto-issue as approved",
+    "autoIssueDraft": "Draft",
+    "autoIssueDesc": "Automatically issue approved invoice on due date instead of draft.",
+    "autoSendEmail": "Automatically email invoice",
+    "emailEnabled": "Auto-send enabled",
+    "emailDisabled": "Auto-send disabled",
+    "paymentTermsDays": "Payment Terms (Days)",
+    "paymentMethods": "Payment Methods",
+    "paymentMethodsDesc": "Accounts allowed for settling this subscription.",
+    "noAccountsHint": "Default company accounts will be used on invoices.",
+    "items": "Items",
+    "addItem": "Add Item",
+    "description": "Description",
     "quantity": "Quantity",
     "unitPrice": "Unit Price",
     "taxRate": "Tax Rate",
     "subtotal": "Subtotal",
     "discount": "Discount",
     "tax": "VAT",
-    "total": "Cycle Total",
-    "notes": "Service Notes & Terms (Shown on invoices)",
-    "notesAr": "Terms (Arabic)",
-    "notesEn": "Terms (English)",
-    "actions": "Subscription Actions",
+    "total": "Total",
+    "notes": "Notes & Terms",
+    "notesAr": "Notes (Arabic)",
+    "notesEn": "Notes (English)",
+    "actions": "Actions",
     "generateNow": "Generate Invoice Now",
-    "generateNowConfirmTitle": "Generate Invoice Now",
-    "generateNowConfirmMsg": "An invoice will be generated for the current cycle and the next due date will advance. Continue?",
+    "generateNowConfirmTitle": "Issue Invoice Now",
+    "generateNowConfirmMsg": "An invoice will be generated for the current cycle and due date updated. Continue?",
     "pause": "Pause",
     "pauseConfirmTitle": "Pause Subscription",
-    "pauseConfirmMsg": "Are you sure you want to pause this subscription? No new invoices will be generated until resumed.",
+    "pauseConfirmMsg": "Pause this subscription? No new invoices will be generated until resumed.",
     "resume": "Resume",
     "resumeConfirmTitle": "Resume Subscription",
-    "resumeConfirmMsg": "Are you sure you want to resume this subscription and reactivate billing?",
+    "resumeConfirmMsg": "Resume this subscription and re-enable automated billing?",
     "cancel": "Cancel Subscription",
     "cancelConfirmTitle": "Cancel Subscription",
-    "cancelConfirmMsg": "Are you sure you want to cancel this subscription? No further invoices will be scheduled.",
-    "saved": "Subscription saved successfully",
+    "cancelConfirmMsg": "Cancel this subscription? No further invoices will be scheduled.",
+    "saved": "Subscription saved",
     "pausedSuccess": "Subscription paused",
     "resumedSuccess": "Subscription resumed",
     "cancelledSuccess": "Subscription canceled",
-    "invoiceGeneratedSuccess": "Invoice generated successfully",
-    "invoicesHistory": "Invoices History",
-    "noInvoicesYet": "No invoices generated yet for this subscription.",
+    "invoiceGeneratedSuccess": "Invoice generated",
+    "invoicesHistory": "Invoices",
+    "noInvoicesYet": "No invoices generated yet.",
     "viewInvoice": "View Invoice",
-    "manageTitle": "Scheduled Subscription & Service"
+    "manageTitle": "Subscription Details",
+    "placeholders": {
+      "titleAr": "مثال: استضافة سحابية ودعم فني",
+      "titleEn": "e.g. Cloud Hosting & Technical Support",
+      "description": "Periodic maintenance and cloud backup...",
+      "quantity": "1",
+      "unitPrice": "0.00",
+      "notesAr": "شروط الخدمة وفترات التجديد...",
+      "notesEn": "Service terms and renewal policy..."
+    }
   },
   "users": {
     "title": "Users",
@@ -1252,7 +1373,15 @@
     "savedToast": "User saved",
     "passwordResetToast": "Password updated",
     "enabledToast": "User enabled",
-    "disabledToast": "User disabled"
+    "disabledToast": "User disabled",
+    "placeholders": {
+      "name": "Mohammed Al-Otaibi",
+      "email": "user@company.example",
+      "password": "••••••••",
+      "newPassword": "••••••••",
+      "signerTitleAr": "الرئيس التنفيذي",
+      "signerTitleEn": "Chief Executive Officer"
+    }
   },
   "demo": {
     "badge": "Demo Mode",

@@ -541,6 +541,7 @@ export function TemplateForm({
                 value={form.nameAr}
                 onChange={(event) => patch({ nameAr: event.target.value })}
                 disabled={pending}
+                placeholder={t("templates.placeholders.nameAr")}
                 className="text-start"
               />
             </Field>
@@ -558,6 +559,7 @@ export function TemplateForm({
                 value={form.nameEn}
                 onChange={(event) => patch({ nameEn: event.target.value })}
                 disabled={pending}
+                placeholder={t("templates.placeholders.nameEn")}
                 className="text-start"
               />
             </Field>
@@ -575,6 +577,7 @@ export function TemplateForm({
                 value={form.descriptionAr}
                 onChange={(event) => patch({ descriptionAr: event.target.value })}
                 disabled={pending}
+                placeholder={t("templates.placeholders.descriptionAr")}
                 className="text-start"
               />
             </Field>
@@ -592,6 +595,7 @@ export function TemplateForm({
                 value={form.descriptionEn}
                 onChange={(event) => patch({ descriptionEn: event.target.value })}
                 disabled={pending}
+                placeholder={t("templates.placeholders.descriptionEn")}
                 className="text-start"
               />
             </Field>
@@ -759,6 +763,7 @@ export function TemplateForm({
                             updateClause(index, { titleAr: event.target.value })
                           }
                           disabled={pending}
+                          placeholder={t("templates.placeholders.clauseTitleAr")}
                           className="text-start"
                         />
                       </Field>
@@ -778,6 +783,7 @@ export function TemplateForm({
                             updateClause(index, { titleEn: event.target.value })
                           }
                           disabled={pending}
+                          placeholder={t("templates.placeholders.clauseTitleEn")}
                           className="text-start"
                         />
                       </Field>
@@ -858,6 +864,7 @@ export function TemplateForm({
                             updateClause(index, { bodyAr: event.target.value })
                           }
                           disabled={pending}
+                          placeholder={t("templates.placeholders.clauseBodyAr")}
                           className="text-start font-sans leading-relaxed"
                         />
                       </Field>
@@ -878,6 +885,7 @@ export function TemplateForm({
                             updateClause(index, { bodyEn: event.target.value })
                           }
                           disabled={pending}
+                          placeholder={t("templates.placeholders.clauseBodyEn")}
                           className="text-start font-sans leading-relaxed"
                         />
                       </Field>
@@ -952,6 +960,7 @@ export function TemplateForm({
                     value={form.titleAr}
                     onChange={(event) => patch({ titleAr: event.target.value })}
                     disabled={pending}
+                    placeholder={t("templates.placeholders.titleDefaultAr")}
                     className="text-start"
                   />
                 </Field>
@@ -964,6 +973,7 @@ export function TemplateForm({
                     value={form.titleEn}
                     onChange={(event) => patch({ titleEn: event.target.value })}
                     disabled={pending}
+                    placeholder={t("templates.placeholders.titleDefaultEn")}
                     className="text-start"
                   />
                 </Field>

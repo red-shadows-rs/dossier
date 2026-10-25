@@ -174,6 +174,7 @@ export function InvoiceMetaForm({
               lang="ar"
               defaultValue={initial.notesAr}
               disabled={pending}
+              placeholder={t("invoices.placeholders.notesAr")}
               className="text-start"
             />
           </Field>
@@ -185,6 +186,7 @@ export function InvoiceMetaForm({
               lang="en"
               defaultValue={initial.notesEn}
               disabled={pending}
+              placeholder={t("invoices.placeholders.notesEn")}
               className="text-start"
             />
           </Field>

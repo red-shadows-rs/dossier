@@ -177,7 +177,7 @@ function receivedFromSection(input: ReceiptHtmlInput): string {
   if (b.crNumber) buyerDetails.push(lang === "ar" ? `س.ت: ${esc(b.crNumber)}` : `CR: ${esc(b.crNumber)}`);
   if (b.taxNumber) buyerDetails.push(lang === "ar" ? `ض.ر: ${esc(b.taxNumber)}` : `VAT: ${esc(b.taxNumber)}`);
 
-  const billToLabel = lang === "en" ? "RECEIVED FROM:" : "استلمنا من السادة:";
+  const billToLabel = lang === "en" ? "RECEIVED FROM:" : "استلمنا من:";
 
   return `
   <section class="bill-to-strip">
@@ -321,11 +321,11 @@ function acknowledgementBlock(input: ReceiptHtmlInput): string {
 
   let text = "";
   if (input.lang === "ar") {
-    text = `نشهد بأننا استلمنا من السادة الموضح بياناتهم أعلاه المبالغ المبيّنة في هذا السند كسداد لحساب الفاتورة رقم <span dir="ltr">${esc(invNo)}</span>&rlm;.`;
+    text = `نشهد بأننا استلمنا من الموضح بياناتهم أعلاه المبالغ المبيّنة في هذا السند كسداد لحساب الفاتورة رقم <span dir="ltr">${esc(invNo)}</span>&rlm;.`;
   } else if (input.lang === "en") {
     text = `We acknowledge receipt of the payment(s) detailed in this voucher as settlement against invoice <span dir="ltr">${esc(invNo)}</span>.`;
   } else {
-    text = `<span dir="ltr">We acknowledge receipt of the payment(s) detailed in this voucher as settlement against invoice <span dir="ltr">${esc(invNo)}</span>.</span><br><span dir="rtl" class="ar">نشهد بأننا استلمنا من السادة الموضح بياناتهم أعلاه المبالغ المبيّنة في هذا السند كسداد لحساب الفاتورة رقم <span dir="ltr">${esc(invNo)}</span>&rlm;.</span>`;
+    text = `<span dir="ltr">We acknowledge receipt of the payment(s) detailed in this voucher as settlement against invoice <span dir="ltr">${esc(invNo)}</span>.</span><br><span dir="rtl" class="ar">نشهد بأننا استلمنا من الموضح بياناتهم أعلاه المبالغ المبيّنة في هذا السند كسداد لحساب الفاتورة رقم <span dir="ltr">${esc(invNo)}</span>&rlm;.</span>`;
   }
 
   return `

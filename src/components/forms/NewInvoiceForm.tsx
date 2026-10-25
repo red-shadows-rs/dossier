@@ -176,6 +176,7 @@ export function NewInvoiceForm({
                 lang="ar"
                 rows={3}
                 disabled={pending}
+                placeholder={t("invoices.placeholders.notesAr")}
                 className="text-start"
               />
             </Field>
@@ -192,6 +193,7 @@ export function NewInvoiceForm({
                 lang="en"
                 rows={3}
                 disabled={pending}
+                placeholder={t("invoices.placeholders.notesEn")}
                 className="text-start"
               />
             </Field>

@@ -90,7 +90,7 @@ export default async function NewMilestoneInvoicePage() {
             <Layers size={16} aria-hidden="true" />
             <span>{t("fromMilestone")}</span>
             {milestones.length > 0 ? (
-              <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[11px] font-semibold text-primary">
+              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white/20 px-1 text-[11px] font-mono font-bold text-white leading-none">
                 {milestones.length}
               </span>
             ) : null}

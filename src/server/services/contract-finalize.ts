@@ -18,6 +18,7 @@ import { AppError } from "@/lib/errors";
 import { generateCode } from "@/lib/ids";
 import { logger } from "@/lib/logger";
 import type { Locale } from "@/lib/constants";
+import type { DocLang } from "@/lib/doc-lang";
 import { getFontCss } from "@/server/pdf/fonts";
 import { renderContractHtml } from "@/server/pdf/html/contract";
 import type { SignatureRender } from "@/server/pdf/html/shared";
@@ -28,6 +29,7 @@ import type {
 import { makeQrDataUri, verificationUrl } from "@/server/pdf/qr";
 import { renderPdf, type FooterMeta } from "@/server/pdf/render";
 import { audit } from "@/server/services/audit";
+import { safePdfFilename } from "@/server/services/contract-documents";
 import { enqueueEmail } from "@/server/services/email";
 import { findFileBySha256, readFile, saveFile } from "@/server/services/files";
 import { getSettings } from "@/server/services/settings";
@@ -195,6 +197,7 @@ async function buildSealedHtml(
   contract: ContractRow,
   versionJson: string,
   signatories: SignatoryRow[],
+  targetLang?: DocLang,
 ): Promise<{ html: string; code: string }> {
   const code = contract.verificationCode;
   if (!code) throw new AppError("INTERNAL", "Contract has no verification code");
@@ -211,9 +214,12 @@ async function buildSealedHtml(
     signatories: signatories.map(toCertificateSignatory),
   };
 
+  const lang: DocLang =
+    targetLang ?? (contract.languageMode === "en" ? "en" : "ar");
+
   const html = renderContractHtml({
     snapshot,
-    lang: contract.languageMode,
+    lang,
     mode: "sealed",
     fonts: getFontCss(),
     logoDataUri: imageBySha(snapshot.provider.logoSha256),
@@ -229,7 +235,7 @@ async function buildSealedHtml(
 function enqueueSignedCopyEmails(
   tx: DbTx,
   contract: ContractRow,
-  pdfFileId: string,
+  pdfFileIds: string[],
   code: string,
 ): void {
   const url = verificationUrl(env.APP_URL, code);
@@ -239,7 +245,7 @@ function enqueueSignedCopyEmails(
     titleEn: contract.titleEn,
     code,
     url,
-    attachmentFileIds: [pdfFileId],
+    attachmentFileIds: pdfFileIds,
   };
 
   const clientSignatory = tx
@@ -390,30 +396,56 @@ export async function generateSealedPdf(
       )
       .all();
 
-    const { html, code } = await buildSealedHtml(
+    const primaryLang: DocLang = contract.languageMode === "en" ? "en" : "ar";
+    const secondaryLang: DocLang = primaryLang === "ar" ? "en" : "ar";
+
+    const { html: htmlPrimary, code } = await buildSealedHtml(
       contract,
       version.snapshotJson,
       signatories,
+      primaryLang,
     );
-    const buffer = await render(html, {
+    const bufferPrimary = await render(htmlPrimary, {
       docNumber: contract.number ?? "DRAFT",
       code,
-      lang: contract.languageMode,
+      lang: primaryLang,
       kind: "contract",
     });
 
-    const file = saveFile({
+    const filePrimary = saveFile({
       kind: "contract_pdf",
-      buffer,
-      originalName: `${contract.number ?? "contract"}.pdf`,
+      buffer: bufferPrimary,
+      originalName: safePdfFilename(contract, primaryLang),
       ownerType: "contract",
       ownerId: contractId,
     });
-    const pdfSha256 = sha256Hex(buffer);
+
+    const { html: htmlSecondary } = await buildSealedHtml(
+      contract,
+      version.snapshotJson,
+      signatories,
+      secondaryLang,
+    );
+    const bufferSecondary = await render(htmlSecondary, {
+      docNumber: contract.number ?? "DRAFT",
+      code,
+      lang: secondaryLang,
+      kind: "contract",
+    });
+
+    const fileSecondary = saveFile({
+      kind: "contract_pdf",
+      buffer: bufferSecondary,
+      originalName: safePdfFilename(contract, secondaryLang),
+      ownerType: "contract",
+      ownerId: contractId,
+    });
+
+    const pdfSha256 = sha256Hex(bufferPrimary);
 
     withTx((tx) => {
       tx.update(contracts)
-        .set({ finalPdfFileId: file.id, pdfSha256, updatedAt: nowMs() })
+        .set({ finalPdfFileId: filePrimary.id, pdfSha256, updatedAt: nowMs() })
         .where(eq(contracts.id, contractId))
         .run();
       audit(tx, {
@@ -421,9 +453,18 @@ export async function generateSealedPdf(
         action: "contract.finalized",
         entityType: "contract",
         entityId: contractId,
-        meta: { fileId: file.id, pdfSha256 },
+        meta: {
+          fileId: filePrimary.id,
+          secondaryFileId: fileSecondary.id,
+          pdfSha256,
+        },
       });
-      enqueueSignedCopyEmails(tx, contract, file.id, code);
+      enqueueSignedCopyEmails(
+        tx,
+        contract,
+        [filePrimary.id, fileSecondary.id],
+        code,
+      );
     });
   } catch (error) {
     const attempts = recordPdfFailure(contractId);

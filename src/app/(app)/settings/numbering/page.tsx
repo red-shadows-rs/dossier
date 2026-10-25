@@ -38,7 +38,7 @@ export default async function NumberingSettingsPage() {
       label: t("fields.prefix"),
       dir: "ltr",
       maxLength: 6,
-      placeholder: "DOS",
+      placeholder: t("placeholders.prefix"),
     },
   ];
 

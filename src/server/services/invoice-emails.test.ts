@@ -472,8 +472,11 @@ describe("processOutbox — invoice attachments", () => {
     });
 
     expect(sent).toHaveLength(1);
-    expect(calls).toEqual([{ invoiceId: id, docLang: "ar" }]);
-    expect(sent[0].attachments).toHaveLength(1);
+    expect(calls).toEqual([
+      { invoiceId: id, docLang: "ar" },
+      { invoiceId: id, docLang: "en" },
+    ]);
+    expect(sent[0].attachments).toHaveLength(2);
     expect(sent[0].attachments?.[0].contentType).toBe("application/pdf");
     expect(sent[0].attachments?.[0].filename).toBe(
       "DOS-I-2026-0001-ar.pdf",
@@ -505,9 +508,11 @@ describe("processOutbox — invoice attachments", () => {
     });
 
     expect(sent).toHaveLength(1);
-    expect(sent[0].attachments).toHaveLength(2);
+    expect(sent[0].attachments).toHaveLength(4);
     expect(sent[0].attachments?.map((a) => a.filename)).toEqual([
       "invoice.pdf",
+      "invoice.pdf",
+      "receipt.pdf",
       "receipt.pdf",
     ]);
   });
@@ -538,7 +543,10 @@ describe("processOutbox — invoice attachments", () => {
     });
 
     expect(sent).toHaveLength(1);
-    expect(sent[0].attachments).toHaveLength(1);
-    expect(sent[0].attachments?.[0].filename).toBe("receipt.pdf");
+    expect(sent[0].attachments).toHaveLength(2);
+    expect(sent[0].attachments?.map((a) => a.filename)).toEqual([
+      "receipt.pdf",
+      "receipt.pdf",
+    ]);
   });
 });

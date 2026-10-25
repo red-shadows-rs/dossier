@@ -240,6 +240,7 @@ export function ContractPricingStep({
                     onChange={(event) =>
                       updateRow(index, { descriptionAr: event.target.value })
                     }
+                    placeholder={t("contracts.placeholders.itemDescriptionAr")}
                     className="text-start"
                   />
                 </Field>
@@ -257,6 +258,7 @@ export function ContractPricingStep({
                     onChange={(event) =>
                       updateRow(index, { descriptionEn: event.target.value })
                     }
+                    placeholder={t("contracts.placeholders.itemDescriptionEn")}
                     className="text-start"
                   />
                 </Field>
@@ -273,6 +275,7 @@ export function ContractPricingStep({
                     onChange={(event) =>
                       updateRow(index, { qty: event.target.value })
                     }
+                    placeholder={t("contracts.placeholders.itemQty")}
                     className="text-start font-mono"
                   />
                 </Field>
@@ -289,6 +292,7 @@ export function ContractPricingStep({
                     onChange={(event) =>
                       updateRow(index, { unit: event.target.value })
                     }
+                    placeholder={t("contracts.placeholders.itemUnit")}
                     onBlur={() => {
                       const trimmed = row.unit.trim();
                       if (trimmed !== "") {

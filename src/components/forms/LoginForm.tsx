@@ -82,6 +82,7 @@ export function LoginForm() {
           name="email"
           type="email"
           autoComplete="email"
+          placeholder={t("auth.placeholders.email")}
           startAdornment={
             <InputAdornment position="start">
               <Mail size={16} aria-hidden="true" />
@@ -98,6 +99,7 @@ export function LoginForm() {
           id="password"
           name="password"
           type={showPassword ? "text" : "password"}
+          placeholder={t("auth.placeholders.password")}
           autoComplete="current-password"
           startAdornment={
             <InputAdornment position="start">

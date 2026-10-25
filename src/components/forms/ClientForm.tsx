@@ -266,6 +266,7 @@ export function ClientForm({
                   value={form.nameAr}
                   onChange={(e) => patch({ nameAr: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.nameAr")}
                   className="text-start"
                 />
               </Field>
@@ -283,6 +284,7 @@ export function ClientForm({
                   value={form.nameEn}
                   onChange={(e) => patch({ nameEn: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.nameEn")}
                   className="text-start"
                 />
               </Field>
@@ -299,6 +301,7 @@ export function ClientForm({
                   value={form.legalNameAr}
                   onChange={(e) => patch({ legalNameAr: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.legalNameAr")}
                   className="text-start"
                 />
               </Field>
@@ -315,6 +318,7 @@ export function ClientForm({
                   value={form.legalNameEn}
                   onChange={(e) => patch({ legalNameEn: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.legalNameEn")}
                   className="text-start"
                 />
               </Field>
@@ -341,6 +345,7 @@ export function ClientForm({
                   value={form.repNameAr}
                   onChange={(e) => patch({ repNameAr: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.repNameAr")}
                   className="text-start"
                 />
               </Field>
@@ -357,6 +362,7 @@ export function ClientForm({
                   value={form.repNameEn}
                   onChange={(e) => patch({ repNameEn: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.repNameEn")}
                   className="text-start"
                 />
               </Field>
@@ -373,6 +379,7 @@ export function ClientForm({
                   value={form.repTitleAr}
                   onChange={(e) => patch({ repTitleAr: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.repTitleAr")}
                   className="text-start"
                 />
               </Field>
@@ -389,6 +396,7 @@ export function ClientForm({
                   value={form.repTitleEn}
                   onChange={(e) => patch({ repTitleEn: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.repTitleEn")}
                   className="text-start"
                 />
               </Field>
@@ -419,6 +427,7 @@ export function ClientForm({
                   value={form.email}
                   onChange={(e) => patch({ email: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.email")}
                   className="text-start"
                 />
               </Field>
@@ -435,6 +444,7 @@ export function ClientForm({
                   value={form.phone}
                   onChange={(e) => patch({ phone: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.phone")}
                   className="text-start"
                 />
               </Field>
@@ -451,6 +461,7 @@ export function ClientForm({
                   value={form.country}
                   onChange={(e) => patch({ country: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.country")}
                   className="text-start uppercase font-mono"
                 />
               </Field>
@@ -465,6 +476,7 @@ export function ClientForm({
                   value={form.city}
                   onChange={(e) => patch({ city: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.city")}
                   className="text-start"
                 />
               </Field>
@@ -493,6 +505,7 @@ export function ClientForm({
                   value={form.addressAr}
                   onChange={(e) => patch({ addressAr: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.addressAr")}
                   className="text-start"
                 />
               </Field>
@@ -511,6 +524,7 @@ export function ClientForm({
                   value={form.addressEn}
                   onChange={(e) => patch({ addressEn: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.addressEn")}
                   className="text-start"
                 />
               </Field>
@@ -527,6 +541,7 @@ export function ClientForm({
                   value={form.notes}
                   onChange={(e) => patch({ notes: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.notes")}
                   className="text-start"
                 />
               </Field>
@@ -556,6 +571,7 @@ export function ClientForm({
                   value={form.taxNumber}
                   onChange={(e) => patch({ taxNumber: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.taxNumber")}
                   className="text-start font-mono"
                 />
               </Field>
@@ -571,6 +587,7 @@ export function ClientForm({
                   value={form.crNumber}
                   onChange={(e) => patch({ crNumber: e.target.value })}
                   disabled={pending}
+                  placeholder={t("clients.placeholders.crNumber")}
                   className="text-start font-mono"
                 />
               </Field>
