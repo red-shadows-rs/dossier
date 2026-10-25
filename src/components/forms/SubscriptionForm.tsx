@@ -148,7 +148,10 @@ export function SubscriptionForm({
   const [languageMode] = useState<"ar" | "en">(initialData?.languageMode ?? "ar");
   const [currency, setCurrency] = useState(initialData?.currency ?? "SAR");
 
-  const [taxRateBp, setTaxRateBp] = useState<number>(initialData?.taxRateBp ?? 1500);
+  const [taxPercent, setTaxPercent] = useState<string>(
+    String((initialData?.taxRateBp ?? 1500) / 100),
+  );
+  const taxRateBp = Math.max(0, Math.round((Number(taxPercent) || 0) * 100));
   const [discountType, setDiscountType] = useState<DiscountType>(initialData?.discountType ?? "none");
   const [discountValue, setDiscountValue] = useState<number>(initialData?.discountValue ?? 0);
   const [paymentTermsDays, setPaymentTermsDays] = useState<number>(initialData?.paymentTermsDays ?? 14);
@@ -790,16 +793,14 @@ export function SubscriptionForm({
                 />
               </Field>
 
-              <Field label={t("taxRate")} htmlFor="sub-tax-rate">
-                <Select
+              <Field label={tContracts("taxRate")} htmlFor="sub-tax-rate">
+                <Input
                   id="sub-tax-rate"
-                  value={taxRateBp}
-                  onChange={(e) => setTaxRateBp(Number(e.target.value))}
-                >
-                  <option value={1500}>15% (VAT)</option>
-                  <option value={500}>5%</option>
-                  <option value={0}>0%</option>
-                </Select>
+                  dir="ltr"
+                  value={taxPercent}
+                  onChange={(e) => setTaxPercent(e.target.value)}
+                  className="text-start font-mono"
+                />
               </Field>
 
               <dl className="flex flex-col gap-1.5 md:col-span-3 pt-3 border-t border-border/60">
@@ -821,7 +822,7 @@ export function SubscriptionForm({
 
                 {taxMinor > 0 ? (
                   <div className="flex items-center justify-between gap-4 text-sm">
-                    <dt className="text-muted-foreground">{t("tax")} ({taxRateBp / 100}%)</dt>
+                    <dt className="text-muted-foreground">{t("tax")} ({taxPercent || "0"}%)</dt>
                     <dd dir="ltr" className="tabular-nums font-mono">
                       {formatMoney(taxMinor, currency as CurrencyCode, locale)}
                     </dd>

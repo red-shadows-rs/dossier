@@ -1309,7 +1309,7 @@
     "description": "Description",
     "quantity": "Quantity",
     "unitPrice": "Unit Price",
-    "taxRate": "Tax Rate",
+    "taxRate": "Tax rate (%)",
     "subtotal": "Subtotal",
     "discount": "Discount",
     "tax": "VAT",
