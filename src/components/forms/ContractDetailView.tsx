@@ -208,17 +208,17 @@ export function ContractDetailView({
             </div>
             <div className="flex flex-col gap-0.5">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className={cn("text-xl sm:text-2xl font-bold tracking-tight text-foreground", contract.number ? "font-mono" : "font-sans")}>
-                  {contract.number ?? (contractTitle !== "-" ? contractTitle : t("new"))}
+                <h1 className={cn("text-xl sm:text-2xl font-bold tracking-tight text-foreground inline-flex items-center gap-2 flex-wrap", contract.number ? "font-mono" : "font-sans")}>
+                  <span>{contract.number ?? (contractTitle !== "-" ? contractTitle : t("new"))}</span>
+                  {contract.number && contractTitle && contractTitle !== "-" ? (
+                    <span className="text-sm font-medium font-sans text-muted-foreground">
+                      · <span dir={contractDir}>{contractTitle}</span>
+                    </span>
+                  ) : null}
                 </h1>
-                <Badge tone={contractStatusTone(contract.status)} className="translate-y-0.5">
+                <Badge tone={contractStatusTone(contract.status)}>
                   {t(`status.${contract.status}`)}
                 </Badge>
-                {contract.number && contractTitle && contractTitle !== "-" ? (
-                  <span className="text-sm font-medium text-muted-foreground translate-y-0.5">
-                    · <span dir={contractDir}>{contractTitle}</span>
-                  </span>
-                ) : null}
               </div>
               <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                 {contract.startDate ? (

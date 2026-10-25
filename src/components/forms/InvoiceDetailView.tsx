@@ -209,7 +209,6 @@ export function InvoiceDetailView({
                 </h1>
                 <Badge
                   tone={invoiceStatusTone(invoice.status, overdue)}
-                  className="translate-y-0.5"
                 >
                   {overdue ? t("overdue") : t(`status.${invoice.status}`)}
                 </Badge>

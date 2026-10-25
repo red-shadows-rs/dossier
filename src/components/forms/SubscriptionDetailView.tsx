@@ -308,29 +308,28 @@ export function SubscriptionDetailView({
               <div className="flex flex-wrap items-center gap-2">
                 <h1
                   className={cn(
-                    "text-xl sm:text-2xl font-bold tracking-tight text-foreground",
+                    "text-xl sm:text-2xl font-bold tracking-tight text-foreground inline-flex items-center gap-2 flex-wrap",
                     subscription.number ? "font-mono" : "font-sans",
                   )}
                 >
-                  {subscription.number ?? title}
+                  <span>{subscription.number ?? title}</span>
+                  {subscription.number && title ? (
+                    <span className="text-sm font-medium font-sans text-muted-foreground">
+                      · <span>{title}</span>
+                    </span>
+                  ) : null}
                 </h1>
                 <Badge
                   tone={subscriptionStatusTone(subscription.status)}
-                  className="translate-y-0.5"
                 >
                   {t(`statuses.${subscription.status}`)}
                 </Badge>
                 <Badge
                   tone="gray"
-                  className="font-mono text-xs translate-y-0.5"
+                  className="font-mono text-xs"
                 >
                   {frequencyLabel}
                 </Badge>
-                {subscription.number && title ? (
-                  <span className="text-sm font-medium text-muted-foreground translate-y-0.5">
-                    · <span>{title}</span>
-                  </span>
-                ) : null}
               </div>
               <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                 {client ? (

@@ -243,7 +243,7 @@ export default async function ContractEditPage({
                   {builderDetail.basics.titleAr || builderDetail.basics.titleEn}
                 </h1>
                 {detail.contract.number ? (
-                  <span className="inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground translate-y-0.5" dir="ltr">
+                  <span className="inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground" dir="ltr">
                     {detail.contract.number}
                   </span>
                 ) : null}

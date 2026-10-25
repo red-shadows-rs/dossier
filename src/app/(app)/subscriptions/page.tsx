@@ -155,7 +155,7 @@ export default async function SubscriptionsPage({
                 <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
                   {t("title")}
                 </h1>
-                <span className="inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground translate-y-0.5">
+                <span className="inline-flex items-center rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground">
                   {total}
                 </span>
               </div>
