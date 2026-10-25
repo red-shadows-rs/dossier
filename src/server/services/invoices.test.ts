@@ -21,6 +21,7 @@ import {
   createInvoice,
   createInvoiceFromMilestone,
   deleteDraftInvoice,
+  duplicateInvoice,
   getInvoiceDetail,
   isOverdue,
   issueInvoice,
@@ -450,5 +451,47 @@ describe("listInvoiceableMilestones", () => {
     createInvoiceFromMilestone(user, milestoneIds[0], META);
     const after = listInvoiceableMilestones();
     expect(after).toHaveLength(before.length - 1);
+  });
+});
+
+describe("duplicateInvoice", () => {
+  it("duplicates an invoice and its lines as a fresh draft", () => {
+    const invId = createInvoice(
+      user,
+      { projectId, languageMode: "ar", notesAr: "Test note", notesEn: null },
+      META,
+    );
+    saveInvoiceLines(
+      user,
+      invId,
+      {
+        lines: [
+          {
+            descriptionAr: "Item 1",
+            descriptionEn: null,
+            qtyMilli: 2000,
+            unitPriceMinor: 5000,
+          },
+        ],
+        discount: { type: "none", value: 0 },
+        taxRateBp: 0,
+      },
+      META,
+    );
+    const newId = duplicateInvoice(user, invId, META);
+    expect(newId).not.toBe(invId);
+
+    const dup = getInvoiceDetail(newId);
+    expect(dup.invoice.status).toBe("draft");
+    expect(dup.invoice.number).toBeNull();
+    expect(dup.invoice.notesAr).toBe("Test note");
+    expect(dup.lines).toHaveLength(1);
+    expect(dup.lines[0].descriptionAr).toBe("Item 1");
+    expect(dup.lines[0].qtyMilli).toBe(2000);
+    expect(dup.lines[0].unitPriceMinor).toBe(5000);
+  });
+
+  it("throws NOT_FOUND when duplicating a non-existent invoice", () => {
+    expect(() => duplicateInvoice(user, "missing-id", META)).toThrow(AppError);
   });
 });

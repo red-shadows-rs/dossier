@@ -10,6 +10,7 @@ import {
   Ban,
   Check,
   CheckCircle2,
+  Copy,
   CreditCard,
   Pencil,
   Receipt,
@@ -29,6 +30,7 @@ import { PAYMENT_METHODS, type CurrencyCode } from "@/lib/constants";
 import { formatMoney, parseMajorToMinor } from "@/lib/money";
 import {
   deleteDraftInvoiceAction,
+  duplicateInvoiceAction,
   issueInvoiceAction,
   sendInvoiceEmailAction,
   sendReceiptEmailAction,
@@ -65,6 +67,7 @@ export function InvoiceActions({
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmDuplicate, setConfirmDuplicate] = useState(false);
   const [voidOpen, setVoidOpen] = useState(false);
   const [voidReason, setVoidReason] = useState("");
   const [payOpen, setPayOpen] = useState(false);
@@ -124,6 +127,22 @@ export function InvoiceActions({
       toast({ title: t("invoices.voided"), tone: "success" });
       router.refresh();
     }
+  }
+
+  async function onDuplicate() {
+    setPending(true);
+    const result = await duplicateInvoiceAction({ id: invoiceId });
+    setPending(false);
+    setConfirmDuplicate(false);
+    if (result.ok) {
+      toast({ title: t("invoices.duplicatedToast"), tone: "success" });
+      router.push(`/invoices/${result.data.id}/edit`);
+      return;
+    }
+    toast({
+      title: t(`errors.${result.error?.code ?? "INTERNAL"}`),
+      tone: "error",
+    });
   }
 
   return (
@@ -205,6 +224,18 @@ export function InvoiceActions({
             {t("invoices.voidAction")}
           </Button>
         ) : null}
+
+        {canWrite ? (
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => setConfirmDuplicate(true)}
+            className="gap-2"
+          >
+            <Copy className="h-4 w-4" />
+            {t("invoices.duplicate")}
+          </Button>
+        ) : null}
       </div>
 
       <PaymentDialog
@@ -228,6 +259,18 @@ export function InvoiceActions({
         cancelLabel={t("common.cancel")}
         pending={pending}
         tone="danger"
+      />
+
+      <ConfirmDialog
+        open={confirmDuplicate}
+        onClose={() => setConfirmDuplicate(false)}
+        onConfirm={onDuplicate}
+        title={t("invoices.duplicate")}
+        message={t("invoices.duplicateConfirm")}
+        confirmLabel={t("invoices.duplicate")}
+        cancelLabel={t("common.cancel")}
+        pending={pending}
+        tone="primary"
       />
 
       <Dialog

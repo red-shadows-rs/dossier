@@ -31,6 +31,7 @@ export const AUDIT_ACTION_MAP: Record<string, { ar: string; en: string }> = {
 
   "contract.created": { ar: "إنشاء عقد", en: "Contract created" },
   "contract.updated": { ar: "تحديث عقد", en: "Contract updated" },
+  "contract.duplicated": { ar: "تكرار عقد", en: "Contract duplicated" },
   "contract.sent": { ar: "إرسال العقد", en: "Contract sent" },
   "contract.viewed": { ar: "معاينة العقد", en: "Contract viewed" },
   "contract.otp_sent": { ar: "إرسال رمز التحقق", en: "OTP code sent" },
@@ -52,6 +53,7 @@ export const AUDIT_ACTION_MAP: Record<string, { ar: string; en: string }> = {
 
   "invoice.created": { ar: "مسودة فاتورة", en: "Invoice draft created" },
   "invoice.updated": { ar: "تحديث فاتورة", en: "Invoice updated" },
+  "invoice.duplicated": { ar: "تكرار فاتورة", en: "Invoice duplicated" },
   "invoice.issued": { ar: "إصدار فاتورة", en: "Invoice issued" },
   "invoice.sent": { ar: "إرسال فاتورة", en: "Invoice sent" },
   "invoice.voided": { ar: "إبطال فاتورة", en: "Invoice voided" },
@@ -61,6 +63,14 @@ export const AUDIT_ACTION_MAP: Record<string, { ar: string; en: string }> = {
   "invoice.payment_recorded": { ar: "تسجيل دفعة سداد", en: "Payment recorded" },
   "invoice.payment_voided": { ar: "إلغاء دفعة سداد", en: "Payment voided" },
   "invoice.reminder_sent": { ar: "إرسال تذكير بالسداد", en: "Payment reminder sent" },
+
+  "subscription.created": { ar: "إنشاء اشتراك", en: "Subscription created" },
+  "subscription.updated": { ar: "تحديث اشتراك", en: "Subscription updated" },
+  "subscription.duplicated": { ar: "تكرار اشتراك", en: "Subscription duplicated" },
+  "subscription.paused": { ar: "إيقاف اشتراك", en: "Subscription paused" },
+  "subscription.resumed": { ar: "استئناف اشتراك", en: "Subscription resumed" },
+  "subscription.cancelled": { ar: "إلغاء اشتراك", en: "Subscription cancelled" },
+  "subscription.invoice_generated": { ar: "توليد فاتورة اشتراك", en: "Subscription invoice generated" },
 
   "payment.created": { ar: "تسجيل دفعة", en: "Payment created" },
   "payment.voided": { ar: "إلغاء دفعة", en: "Payment voided" },
@@ -82,6 +92,7 @@ export const AUDIT_ENTITY_MAP: Record<string, { ar: string; en: string }> = {
   project: { ar: "مشروع", en: "Project" },
   user: { ar: "مستخدم", en: "User" },
   template: { ar: "نموذج", en: "Template" },
+  subscription: { ar: "اشتراك", en: "Subscription" },
   backup: { ar: "نسخة احتياطية", en: "Backup" },
   settings: { ar: "إعدادات", en: "Settings" },
   file: { ar: "ملف", en: "File" },

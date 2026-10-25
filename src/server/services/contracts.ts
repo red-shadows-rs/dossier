@@ -758,3 +758,143 @@ export function clientNameForContract(contract: ContractRow): string {
     .get();
   return client?.nameAr ?? client?.nameEn ?? "";
 }
+
+export function duplicateContract(
+  user: SessionUser,
+  id: string,
+  meta: RequestMeta,
+): string {
+  const source = db.select().from(contracts).where(eq(contracts.id, id)).get();
+  if (!source) {
+    throw new AppError("NOT_FOUND", "Contract not found");
+  }
+
+  const items = db
+    .select()
+    .from(contractItems)
+    .where(eq(contractItems.contractId, id))
+    .orderBy(asc(contractItems.position))
+    .all();
+
+  const clauses = db
+    .select()
+    .from(contractClauses)
+    .where(eq(contractClauses.contractId, id))
+    .orderBy(asc(contractClauses.position))
+    .all();
+
+  const milestones = db
+    .select()
+    .from(paymentMilestones)
+    .where(eq(paymentMilestones.contractId, id))
+    .orderBy(asc(paymentMilestones.position))
+    .all();
+
+  const newContractId = newId();
+  const now = nowMs();
+
+  withTx((tx) => {
+    tx.insert(contracts)
+      .values({
+        id: newContractId,
+        kind: source.kind,
+        parentContractId: null,
+        clientId: source.clientId,
+        projectId: source.projectId,
+        templateId: source.templateId,
+        status: "draft",
+        languageMode: source.languageMode,
+        hasFees: source.hasFees,
+        titleAr: source.titleAr,
+        titleEn: source.titleEn,
+        scopeAr: source.scopeAr,
+        scopeEn: source.scopeEn,
+        currency: source.currency,
+        discountType: source.discountType,
+        discountValue: source.discountValue,
+        subtotalMinor: source.subtotalMinor,
+        discountMinor: source.discountMinor,
+        netMinor: source.netMinor,
+        taxRateBp: source.taxRateBp,
+        taxMinor: source.taxMinor,
+        totalMinor: source.totalMinor,
+        milestoneMode: source.milestoneMode,
+        startDate: null,
+        endDate: null,
+        paymentTermsDays: source.paymentTermsDays,
+        governingLawAr: source.governingLawAr,
+        governingLawEn: source.governingLawEn,
+        jurisdictionAr: source.jurisdictionAr,
+        jurisdictionEn: source.jurisdictionEn,
+        signingDeadline: null,
+        internalNotes: source.internalNotes,
+        versionNo: 1,
+        createdBy: user.id,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .run();
+
+    items.forEach((item, index) => {
+      tx.insert(contractItems)
+        .values({
+          id: newId(),
+          contractId: newContractId,
+          position: index + 1,
+          descriptionAr: item.descriptionAr,
+          descriptionEn: item.descriptionEn,
+          qtyMilli: item.qtyMilli,
+          unitPriceMinor: item.unitPriceMinor,
+          lineTotalMinor: item.lineTotalMinor,
+        })
+        .run();
+    });
+
+    clauses.forEach((clause, index) => {
+      tx.insert(contractClauses)
+        .values({
+          id: newId(),
+          contractId: newContractId,
+          position: index + 1,
+          key: clause.key,
+          titleAr: clause.titleAr,
+          titleEn: clause.titleEn,
+          bodyAr: clause.bodyAr,
+          bodyEn: clause.bodyEn,
+        })
+        .run();
+    });
+
+    milestones.forEach((m, index) => {
+      tx.insert(paymentMilestones)
+        .values({
+          id: newId(),
+          contractId: newContractId,
+          position: index + 1,
+          titleAr: m.titleAr,
+          titleEn: m.titleEn,
+          percentBp: m.percentBp,
+          amountMinor: m.amountMinor,
+          taxMinor: m.taxMinor,
+          totalMinor: m.totalMinor,
+          dueDate: null,
+          triggerNoteAr: m.triggerNoteAr,
+          triggerNoteEn: m.triggerNoteEn,
+        })
+        .run();
+    });
+
+    audit(tx, {
+      actorType: "user",
+      actorId: user.id,
+      action: "contract.duplicated",
+      entityType: "contract",
+      entityId: newContractId,
+      meta: { sourceId: id },
+      ip: meta.ip,
+      userAgent: meta.userAgent,
+    });
+  });
+
+  return newContractId;
+}

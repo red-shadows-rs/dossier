@@ -18,6 +18,7 @@ import {
   createInvoice,
   createInvoiceFromMilestone,
   deleteDraftInvoice,
+  duplicateInvoice,
   issueInvoice,
   saveInvoiceLines,
   sendInvoiceEmail,
@@ -228,5 +229,20 @@ export async function getReceiptPreviewHtmlAction(
     );
     const html = await buildReceiptHtml(id, lang);
     return { html };
+  });
+}
+
+export async function duplicateInvoiceAction(
+  raw: unknown,
+): Promise<ActionResult<{ id: string }>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "invoices.write");
+    const data = raw as { id?: unknown };
+    const id = String(data?.id ?? "");
+    const meta = await getRequestMeta();
+    const newId = duplicateInvoice(user, id, meta);
+    revalidatePath("/invoices");
+    return { id: newId };
   });
 }

@@ -18,7 +18,10 @@ import { Input, InputAdornment } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { ContractsTable } from "@/components/tables/ContractsTable";
 import { FilterDropdown } from "@/components/tables/FilterDropdown";
-import { deleteDraftContractAction } from "@/server/actions/contracts";
+import {
+  deleteDraftContractAction,
+  duplicateContractAction,
+} from "@/server/actions/contracts";
 import { CONTRACT_STATUSES } from "@/lib/constants";
 import { can } from "@/lib/permissions";
 import { withDbInstance } from "@/db";
@@ -104,6 +107,9 @@ export default async function ContractsPage({
     empty: t("empty"),
     emptyHint: t("emptyHint"),
     newContract: t("new"),
+    duplicate: t("duplicate"),
+    duplicateConfirm: t("duplicateConfirm"),
+    duplicatedToast: t("duplicatedToast"),
     statusValues: Object.fromEntries(
       CONTRACT_STATUSES.map((value) => [value, t(`status.${value}`)]),
     ),
@@ -337,6 +343,7 @@ export default async function ContractsPage({
           canWrite={canWrite}
           labels={labels}
           deleteAction={deleteDraftContractAction}
+          duplicateAction={duplicateContractAction}
         />
       </div>
     </div>

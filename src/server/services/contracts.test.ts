@@ -37,6 +37,7 @@ import {
   cancelContract,
   createContractFromTemplate,
   deleteDraftContract,
+  duplicateContract,
   getContractDetail,
   listContractVersions,
   listContracts,
@@ -786,6 +787,26 @@ describe("validateContractForSend (7.5)", () => {
     const issues = validateContractForSend(id, sendOptions());
     expect(issues.filter((i) => i.severity === "error")).toEqual([]);
     expect(issues.some((i) => i.code === "companyTaxNumberMissing")).toBe(false);
+  });
+});
+
+describe("duplicateContract", () => {
+  it("duplicates a contract, its items, clauses and milestones as a draft", () => {
+    const id = createValidContract();
+    const newId = duplicateContract(user, id, META);
+    expect(newId).not.toBe(id);
+
+    const dup = getContractDetail(newId);
+    expect(dup.contract.status).toBe("draft");
+    expect(dup.contract.number).toBeNull();
+    expect(dup.contract.versionNo).toBe(1);
+    expect(dup.items.length).toBeGreaterThan(0);
+    expect(dup.clauses.length).toBeGreaterThan(0);
+    expect(dup.milestones.length).toBeGreaterThan(0);
+  });
+
+  it("throws NOT_FOUND when duplicating non-existent contract", () => {
+    expect(() => duplicateContract(user, "missing-contract", META)).toThrow(AppError);
   });
 });
 

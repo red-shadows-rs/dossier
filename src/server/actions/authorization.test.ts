@@ -42,6 +42,7 @@ import {
   completeContractAction,
   createContractAction,
   deleteDraftContractAction,
+  duplicateContractAction,
   getContractCertificateHtmlAction,
   getContractPreviewHtmlAction,
   previewTotalsAction,
@@ -64,6 +65,7 @@ import {
   createInvoiceAction,
   createInvoiceFromMilestoneAction,
   deleteDraftInvoiceAction,
+  duplicateInvoiceAction,
   getInvoicePreviewHtmlAction,
   issueInvoiceAction,
   previewInvoiceTotalsAction,
@@ -102,6 +104,15 @@ import {
   setUserStatusAction,
   updateUserAction,
 } from "./users";
+import {
+  cancelSubscriptionAction,
+  createSubscriptionAction,
+  duplicateSubscriptionAction,
+  generateSubscriptionInvoiceAction,
+  pauseSubscriptionAction,
+  resumeSubscriptionAction,
+  updateSubscriptionAction,
+} from "./subscriptions";
 
 type Action = (raw?: unknown) => Promise<unknown>;
 type Entry = { name: string; action: Action; viewerForbidden: boolean };
@@ -125,6 +136,7 @@ const TABLE: Entry[] = [
   { name: "saveMilestonesAction", action: saveMilestonesAction, viewerForbidden: true },
   { name: "saveClausesAction", action: saveClausesAction, viewerForbidden: true },
   { name: "deleteDraftContractAction", action: deleteDraftContractAction, viewerForbidden: true },
+  { name: "duplicateContractAction", action: duplicateContractAction, viewerForbidden: true },
   { name: "previewTotalsAction", action: previewTotalsAction, viewerForbidden: true },
   { name: "retryFinalizeAction", action: retryFinalizeAction, viewerForbidden: true },
   { name: "reviseContractAction", action: reviseContractAction, viewerForbidden: true },
@@ -142,6 +154,7 @@ const TABLE: Entry[] = [
   { name: "updateInvoiceDraftAction", action: updateInvoiceDraftAction, viewerForbidden: true },
   { name: "saveInvoiceLinesAction", action: saveInvoiceLinesAction, viewerForbidden: true },
   { name: "deleteDraftInvoiceAction", action: deleteDraftInvoiceAction, viewerForbidden: true },
+  { name: "duplicateInvoiceAction", action: duplicateInvoiceAction, viewerForbidden: true },
   { name: "previewInvoiceTotalsAction", action: previewInvoiceTotalsAction, viewerForbidden: true },
   { name: "issueInvoiceAction", action: issueInvoiceAction, viewerForbidden: true },
   { name: "sendInvoiceEmailAction", action: sendInvoiceEmailAction, viewerForbidden: true },
@@ -175,6 +188,14 @@ const TABLE: Entry[] = [
 
   { name: "updateAccountAction", action: updateAccountAction, viewerForbidden: false },
   { name: "changePasswordAction", action: changePasswordAction, viewerForbidden: false },
+
+  { name: "createSubscriptionAction", action: createSubscriptionAction, viewerForbidden: true },
+  { name: "updateSubscriptionAction", action: (raw) => updateSubscriptionAction("dummy", raw), viewerForbidden: true },
+  { name: "duplicateSubscriptionAction", action: duplicateSubscriptionAction, viewerForbidden: true },
+  { name: "pauseSubscriptionAction", action: () => pauseSubscriptionAction("dummy"), viewerForbidden: true },
+  { name: "resumeSubscriptionAction", action: () => resumeSubscriptionAction("dummy"), viewerForbidden: true },
+  { name: "cancelSubscriptionAction", action: () => cancelSubscriptionAction("dummy"), viewerForbidden: true },
+  { name: "generateSubscriptionInvoiceAction", action: () => generateSubscriptionInvoiceAction("dummy"), viewerForbidden: true },
 ];
 
 type Result = { ok: boolean; error?: { code?: string } };

@@ -955,3 +955,88 @@ export function deleteDraftInvoice(
     tx.delete(invoices).where(eq(invoices.id, id)).run();
   });
 }
+
+export function duplicateInvoice(
+  user: SessionUser,
+  id: string,
+  meta: RequestMeta,
+): string {
+  const source = db.select().from(invoices).where(eq(invoices.id, id)).get();
+  if (!source) {
+    throw new AppError("NOT_FOUND", "Invoice not found");
+  }
+
+  const lines = db
+    .select()
+    .from(invoiceLines)
+    .where(eq(invoiceLines.invoiceId, id))
+    .orderBy(asc(invoiceLines.position))
+    .all();
+
+  const newInvoiceId = newId();
+  const now = nowMs();
+
+  withTx((tx) => {
+    tx.insert(invoices)
+      .values({
+        id: newInvoiceId,
+        clientId: source.clientId,
+        projectId: source.projectId,
+        contractId: source.contractId,
+        milestoneId: null,
+        subscriptionId: null,
+        status: "draft",
+        languageMode: source.languageMode,
+        currency: source.currency,
+        issueDate: null,
+        dueDate: null,
+        discountType: source.discountType,
+        discountValue: source.discountValue,
+        subtotalMinor: source.subtotalMinor,
+        discountMinor: source.discountMinor,
+        netMinor: source.netMinor,
+        taxRateBp: source.taxRateBp,
+        taxMinor: source.taxMinor,
+        totalMinor: source.totalMinor,
+        paidMinor: 0,
+        notesAr: source.notesAr,
+        notesEn: source.notesEn,
+        paymentInstructionsAr: source.paymentInstructionsAr,
+        paymentInstructionsEn: source.paymentInstructionsEn,
+        sellerSnapshotJson: null,
+        buyerSnapshotJson: null,
+        createdBy: user.id,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .run();
+
+    lines.forEach((line, index) => {
+      tx.insert(invoiceLines)
+        .values({
+          id: newId(),
+          invoiceId: newInvoiceId,
+          position: index + 1,
+          descriptionAr: line.descriptionAr,
+          descriptionEn: line.descriptionEn,
+          qtyMilli: line.qtyMilli,
+          unitPriceMinor: line.unitPriceMinor,
+          lineTotalMinor: line.lineTotalMinor,
+        })
+        .run();
+    });
+
+    audit(tx, {
+      actorType: "user",
+      actorId: user.id,
+      action: "invoice.duplicated",
+      entityType: "invoice",
+      entityId: newInvoiceId,
+      meta: { sourceId: id },
+      ip: meta.ip,
+      userAgent: meta.userAgent,
+    });
+  });
+
+  return newInvoiceId;
+}

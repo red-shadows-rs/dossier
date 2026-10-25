@@ -20,6 +20,7 @@ import {
   cancelContract,
   createContractFromTemplate,
   deleteDraftContract,
+  duplicateContract,
   previewTotals,
   saveClauses,
   saveContractItems,
@@ -321,5 +322,20 @@ export async function terminateContractAction(
     terminateContract(user, id, reason, meta);
     revalidateContract(id);
     return null;
+  });
+}
+
+export async function duplicateContractAction(
+  raw: unknown,
+): Promise<ActionResult<{ id: string }>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "contracts.write");
+    const data = raw as { id?: unknown };
+    const id = String(data?.id ?? "");
+    const meta = await getRequestMeta();
+    const newId = duplicateContract(user, id, meta);
+    revalidatePath("/contracts");
+    return { id: newId };
   });
 }

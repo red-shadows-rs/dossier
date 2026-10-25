@@ -13,6 +13,7 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
+    "duplicate": "Duplicate",
     "create": "Create",
     "search": "Search",
     "filter": "Filter",
@@ -797,6 +798,9 @@
     "revised": "Contract recalled to draft",
     "completedDone": "Contract completed",
     "terminatedDone": "Contract terminated",
+    "duplicate": "Duplicate",
+    "duplicateConfirm": "Duplicate this contract to create a new draft copy?",
+    "duplicatedToast": "Contract duplicated successfully",
     "actions": {
       "regenerateLink": "New signing link",
       "revise": "Revise",
@@ -1093,6 +1097,9 @@
   },
   "invoices": {
     "title": "Invoices",
+    "duplicate": "Duplicate",
+    "duplicateConfirm": "Duplicate this invoice to create a new draft copy?",
+    "duplicatedToast": "Invoice duplicated successfully",
     "new": "New invoice",
     "newTitle": "Create a draft invoice",
     "createDraft": "Create draft",
@@ -1243,6 +1250,9 @@
     "title": "Subscriptions",
     "new": "New Subscription",
     "edit": "Edit Subscription",
+    "duplicate": "Duplicate",
+    "duplicateConfirm": "Duplicate this subscription to create a new draft copy?",
+    "duplicatedToast": "Subscription duplicated successfully",
     "formSteps": {
       "basics": "Basic Info",
       "schedule": "Schedule",

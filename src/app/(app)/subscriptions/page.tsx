@@ -11,6 +11,7 @@ import { Input, InputAdornment } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { SubscriptionsTable } from "@/components/tables/SubscriptionsTable";
 import { FilterDropdown } from "@/components/tables/FilterDropdown";
+import { duplicateSubscriptionAction } from "@/server/actions/subscriptions";
 import { withDbInstance } from "@/db";
 import {
   SUBSCRIPTION_FREQUENCIES,
@@ -122,6 +123,9 @@ export default async function SubscriptionsPage({
       empty: t("empty"),
       emptyHint: t("emptyHint"),
       newSubscription: t("new"),
+      duplicate: t("duplicate"),
+      duplicateConfirm: t("duplicateConfirm"),
+      duplicatedToast: t("duplicatedToast"),
       clearFilters: tc("clearFilters"),
       statusValues: {
         active: t("statuses.active"),
@@ -288,6 +292,7 @@ export default async function SubscriptionsPage({
             query={query}
             canWrite={canWrite}
             labels={labels}
+            duplicateAction={duplicateSubscriptionAction}
           />
         </div>
       </div>

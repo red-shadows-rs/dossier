@@ -5,12 +5,13 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   Building2,
   Calendar,
   Clock,
+  Copy,
   FileEdit,
   FileSignature,
   FileText,
@@ -28,6 +29,9 @@ import { FinalizeRetryBanner } from "@/components/forms/FinalizeRetryBanner";
 import { formatAuditAction, formatAuditActor } from "@/lib/audit-format";
 import { Badge, contractStatusTone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { useToast } from "@/components/ui/Toast";
+import { duplicateContractAction } from "@/server/actions/contracts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import {
@@ -124,6 +128,23 @@ export function ContractDetailView({
 }: ContractDetailViewProps) {
   const t = useTranslations("contracts");
   const tc = useTranslations("common");
+  const router = useRouter();
+  const toast = useToast();
+  const [confirmDuplicate, setConfirmDuplicate] = useState(false);
+  const [duplicatePending, setDuplicatePending] = useState(false);
+
+  async function onDuplicate() {
+    setDuplicatePending(true);
+    const result = await duplicateContractAction({ id: contract.id });
+    setDuplicatePending(false);
+    setConfirmDuplicate(false);
+    if (result.ok) {
+      toast({ title: t("duplicatedToast"), tone: "success" });
+      router.push(`/contracts/${result.data.id}/edit`);
+      return;
+    }
+    toast({ title: t(`errors.${result.error.code}`), tone: "error" });
+  }
 
   const searchParams = useSearchParams();
   const currentTab = searchParams.get("tab") || "preview";
@@ -234,6 +255,15 @@ export function ContractDetailView({
                 contractId={contract.id}
                 canDelete={contract.number === null}
               />
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setConfirmDuplicate(true)}
+                className="gap-1.5 font-medium shadow-xs"
+              >
+                <Copy size={15} aria-hidden="true" />
+                <span>{t("duplicate")}</span>
+              </Button>
             </div>
           ) : (
             <div className="flex flex-wrap items-center gap-2">
@@ -245,6 +275,17 @@ export function ContractDetailView({
                 canCancel={canCancel}
                 canTerminate={canTerminate}
               />
+              {canWrite ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setConfirmDuplicate(true)}
+                  className="gap-1.5 font-medium shadow-xs"
+                >
+                  <Copy size={15} aria-hidden="true" />
+                  <span>{t("duplicate")}</span>
+                </Button>
+              ) : null}
             </div>
           )}
         </div>
@@ -773,6 +814,18 @@ export function ContractDetailView({
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmDuplicate}
+        onClose={() => setConfirmDuplicate(false)}
+        onConfirm={onDuplicate}
+        title={t("duplicate")}
+        message={t("duplicateConfirm")}
+        confirmLabel={t("duplicate")}
+        cancelLabel={tc("cancel")}
+        pending={duplicatePending}
+        tone="primary"
+      />
     </div>
   );
 }

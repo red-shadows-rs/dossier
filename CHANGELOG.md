@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.4.2] - 2026-10-25
+
+### Added
+- **Duplicate / Clone System for Invoices, Contracts, and Subscriptions:** Implemented full document cloning across contracts, invoices, and subscriptions with dedicated backend duplication services (`duplicateInvoice`, `duplicateContract`, `duplicateSubscription`), server actions, audit tracking (`contract.duplicated`, `invoice.duplicated`, `subscription.duplicated`), row-level quick duplication buttons in data tables (`RowDuplicateButton`), and toolbar action buttons with confirmation modals that redirect seamlessly to the newly generated editable draft.
+
+### Fixed
+- **Contract Project Name Snapshot Alignment:** Synchronized project name references in contract snapshots and regenerated sealed contract PDFs (both Arabic and English) to reflect project database updates accurately.
+
 ## [v1.4.1] - 2026-10-25
 
 ### Added

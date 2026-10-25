@@ -7,7 +7,9 @@ import Link from "next/link";
 import { CalendarClock } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge } from "@/components/ui/Badge";
+import { RowDuplicateButton } from "@/components/forms/RowDuplicateButton";
 import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
+import type { ActionResult } from "@/lib/result";
 import type { SubscriptionRow } from "@/server/services/subscriptions";
 import { subscriptionStatusTone } from "@/lib/subscriptions";
 
@@ -25,6 +27,9 @@ export type SubscriptionsTableLabels = {
   empty: string;
   emptyHint?: string;
   newSubscription?: string;
+  duplicate?: string;
+  duplicateConfirm?: string;
+  duplicatedToast?: string;
   clearFilters?: string;
   statusValues: Record<string, string>;
   frequencyValues: Record<string, string>;
@@ -38,6 +43,7 @@ export function SubscriptionsTable({
   query,
   canWrite,
   labels,
+  duplicateAction,
 }: {
   rows: SubscriptionRow[];
   total: number;
@@ -46,6 +52,7 @@ export function SubscriptionsTable({
   query: Record<string, string>;
   canWrite: boolean;
   labels: SubscriptionsTableLabels;
+  duplicateAction?: (raw: unknown) => Promise<ActionResult<{ id: string }>>;
 }) {
   const columns: ColumnDef<SubscriptionRow>[] = [
     {
@@ -145,6 +152,18 @@ export function SubscriptionsTable({
               href={`/subscriptions/${row.id}/edit`}
               action="edit"
               label={labels.edit}
+            />
+          ) : null}
+          {canWrite && duplicateAction ? (
+            <RowDuplicateButton
+              id={row.id}
+              action={duplicateAction}
+              editHrefPrefix="/subscriptions"
+              label={labels.duplicate ?? "تكرار"}
+              title={labels.duplicate ?? "تكرار"}
+              message={labels.duplicateConfirm ?? "تكرار هذا الاشتراك وإنشاء مسودة جديدة؟"}
+              confirmLabel={labels.duplicate ?? "تكرار"}
+              successTitle={labels.duplicatedToast ?? "تم تكرار الاشتراك بنجاح"}
             />
           ) : null}
         </div>

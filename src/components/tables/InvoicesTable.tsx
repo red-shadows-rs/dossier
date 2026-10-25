@@ -8,6 +8,7 @@ import { Receipt } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge, invoiceStatusTone } from "@/components/ui/Badge";
 import { RowActionButton } from "@/components/forms/RowActionButton";
+import { RowDuplicateButton } from "@/components/forms/RowDuplicateButton";
 import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
 import { formatMoney } from "@/lib/money";
 import type { CurrencyCode } from "@/lib/constants";
@@ -40,6 +41,9 @@ export type InvoiceTableLabels = {
   empty: string;
   emptyHint?: string;
   newInvoice?: string;
+  duplicate?: string;
+  duplicateConfirm?: string;
+  duplicatedToast?: string;
   statusValues: Record<string, string>;
 };
 
@@ -53,6 +57,7 @@ export function InvoicesTable({
   labels,
   projectNames,
   deleteAction,
+  duplicateAction,
 }: {
   rows: InvoiceTableRow[];
   total: number;
@@ -63,6 +68,7 @@ export function InvoicesTable({
   labels: InvoiceTableLabels;
   projectNames: Record<string, string>;
   deleteAction: (raw: unknown) => Promise<ActionResult<null>>;
+  duplicateAction?: (raw: unknown) => Promise<ActionResult<{ id: string }>>;
 }) {
   const canDelete = (status: string) => canWrite && status === "draft";
 
@@ -136,6 +142,18 @@ export function InvoicesTable({
             action="preview"
             label={labels.preview}
           />
+          {canWrite && duplicateAction ? (
+            <RowDuplicateButton
+              id={row.id}
+              action={duplicateAction}
+              editHrefPrefix="/invoices"
+              label={labels.duplicate ?? "تكرار"}
+              title={labels.duplicate ?? "تكرار"}
+              message={labels.duplicateConfirm ?? "تكرار هذه الفاتورة وإنشاء مسودة جديدة؟"}
+              confirmLabel={labels.duplicate ?? "تكرار"}
+              successTitle={labels.duplicatedToast ?? "تم تكرار الفاتورة بنجاح"}
+            />
+          ) : null}
           {canDelete(row.status) ? (
             <ActionLink
               href={`/invoices/${row.id}/edit`}
@@ -214,6 +232,18 @@ export function InvoicesTable({
                   action="preview"
                   label={labels.preview}
                 />
+                {canWrite && duplicateAction ? (
+                  <RowDuplicateButton
+                    id={row.id}
+                    action={duplicateAction}
+                    editHrefPrefix="/invoices"
+                    label={labels.duplicate ?? "تكرار"}
+                    title={labels.duplicate ?? "تكرار"}
+                    message={labels.duplicateConfirm ?? "تكرار هذه الفاتورة وإنشاء مسودة جديدة؟"}
+                    confirmLabel={labels.duplicate ?? "تكرار"}
+                    successTitle={labels.duplicatedToast ?? "تم تكرار الفاتورة بنجاح"}
+                  />
+                ) : null}
                 {canDelete(row.status) ? (
                   <ActionLink
                     href={`/invoices/${row.id}/edit`}

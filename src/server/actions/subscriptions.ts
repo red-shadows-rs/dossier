@@ -15,6 +15,7 @@ import { getRequestMeta } from "@/server/services/audit";
 import {
   cancelSubscription,
   createSubscription,
+  duplicateSubscription,
   generateInvoiceForSubscription,
   pauseSubscription,
   resumeSubscription,
@@ -109,6 +110,21 @@ export async function generateSubscriptionInvoiceAction(
     const invoiceId = generateInvoiceForSubscription(id, user, meta);
     revalidateSubscription(id);
     return { invoiceId };
+  });
+}
+
+export async function duplicateSubscriptionAction(
+  raw: unknown,
+): Promise<ActionResult<{ id: string }>> {
+  return runAction(async () => {
+    const user = await requireUser();
+    assertCan(user, "subscriptions.write");
+    const data = raw as { id?: unknown };
+    const id = String(data?.id ?? "");
+    const meta = await getRequestMeta();
+    const newId = duplicateSubscription(user, id, meta);
+    revalidateSubscription(newId);
+    return { id: newId };
   });
 }
 

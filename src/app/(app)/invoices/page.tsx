@@ -19,7 +19,10 @@ import { Input, InputAdornment } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { InvoicesTable } from "@/components/tables/InvoicesTable";
 import { FilterDropdown } from "@/components/tables/FilterDropdown";
-import { deleteDraftInvoiceAction } from "@/server/actions/invoices";
+import {
+  deleteDraftInvoiceAction,
+  duplicateInvoiceAction,
+} from "@/server/actions/invoices";
 import { INVOICE_STATUSES } from "@/lib/constants";
 import { todayInTz } from "@/lib/dates";
 import { can } from "@/lib/permissions";
@@ -128,6 +131,9 @@ export default async function InvoicesPage({
     empty: t("empty"),
     emptyHint: t("emptyHint"),
     newInvoice: t("new"),
+    duplicate: t("duplicate"),
+    duplicateConfirm: t("duplicateConfirm"),
+    duplicatedToast: t("duplicatedToast"),
     statusValues: Object.fromEntries(
       INVOICE_STATUSES.map((value) => [value, t(`status.${value}`)]),
     ),
@@ -381,6 +387,7 @@ export default async function InvoicesPage({
           labels={labels}
           projectNames={projectNames}
           deleteAction={deleteDraftInvoiceAction}
+          duplicateAction={duplicateInvoiceAction}
         />
       </div>
     </div>

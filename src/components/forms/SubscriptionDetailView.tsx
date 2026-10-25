@@ -14,6 +14,7 @@ import {
   CalendarClock,
   CheckCircle2,
   Clock,
+  Copy,
   CreditCard,
   ExternalLink,
   FolderKanban,
@@ -46,6 +47,7 @@ import { subscriptionStatusTone } from "@/lib/subscriptions";
 import type { BankAccount } from "@/lib/validation/settings";
 import {
   cancelSubscriptionAction,
+  duplicateSubscriptionAction,
   generateSubscriptionInvoiceAction,
   pauseSubscriptionAction,
   resumeSubscriptionAction,
@@ -109,7 +111,7 @@ export function SubscriptionDetailView({
 
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<
-    "generate" | "pause" | "resume" | "cancel" | null
+    "generate" | "pause" | "resume" | "cancel" | "duplicate" | null
   >(null);
 
   const currency = subscription.currency as CurrencyCode;
@@ -221,6 +223,26 @@ export function SubscriptionDetailView({
     }
   }
 
+  async function handleDuplicate() {
+    setPendingAction("duplicate");
+    const res = await duplicateSubscriptionAction({ id: subscription.id });
+    setPendingAction(null);
+    setConfirmDialog(null);
+
+    if (res.ok) {
+      toast({
+        title: t("duplicatedToast"),
+        tone: "success",
+      });
+      router.push(`/subscriptions/${res.data.id}/edit`);
+    } else {
+      toast({
+        title: tCommon(`errors.${res.error.code}`),
+        tone: "error",
+      });
+    }
+  }
+
   const frequencyLabel =
     subscription.frequency === "custom"
       ? `${subscription.intervalCount} ${t("frequencies.custom")}`
@@ -293,6 +315,18 @@ export function SubscriptionDetailView({
                   <span>{t("edit")}</span>
                 </Button>
               </Link>
+            ) : null}
+
+            {canWrite ? (
+              <Button
+                variant="secondary"
+                onClick={() => setConfirmDialog("duplicate")}
+                disabled={Boolean(pendingAction)}
+                className="gap-1.5"
+              >
+                <Copy className="h-4 w-4" />
+                <span>{t("duplicate")}</span>
+              </Button>
             ) : null}
 
             {canPause && subscription.status === "active" ? (
@@ -711,6 +745,18 @@ export function SubscriptionDetailView({
         cancelLabel={tCommon("cancel")}
         pending={pendingAction === "cancel"}
         tone="danger"
+      />
+
+      <ConfirmDialog
+        open={confirmDialog === "duplicate"}
+        onClose={() => setConfirmDialog(null)}
+        onConfirm={handleDuplicate}
+        title={t("duplicate")}
+        message={t("duplicateConfirm")}
+        confirmLabel={t("duplicate")}
+        cancelLabel={tCommon("cancel")}
+        pending={pendingAction === "duplicate"}
+        tone="primary"
       />
     </div>
   );

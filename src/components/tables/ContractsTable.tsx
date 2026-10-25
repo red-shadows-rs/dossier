@@ -9,6 +9,7 @@ import { FileText } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge, contractStatusTone } from "@/components/ui/Badge";
 import { RowActionButton } from "@/components/forms/RowActionButton";
+import { RowDuplicateButton } from "@/components/forms/RowDuplicateButton";
 import { ServerDataTable, type ColumnDef } from "@/components/tables/ServerDataTable";
 import type { ActionResult } from "@/lib/result";
 
@@ -33,6 +34,9 @@ export type ContractTableLabels = {
   empty: string;
   emptyHint?: string;
   newContract?: string;
+  duplicate?: string;
+  duplicateConfirm?: string;
+  duplicatedToast?: string;
   statusValues: Record<string, string>;
 };
 
@@ -45,6 +49,7 @@ export function ContractsTable({
   canWrite,
   labels,
   deleteAction,
+  duplicateAction,
 }: {
   rows: ContractTableRow[];
   total: number;
@@ -54,6 +59,7 @@ export function ContractsTable({
   canWrite: boolean;
   labels: ContractTableLabels;
   deleteAction: (raw: unknown) => Promise<ActionResult<null>>;
+  duplicateAction?: (raw: unknown) => Promise<ActionResult<{ id: string }>>;
 }) {
   const locale = useLocale();
   const canDelete = (status: string) => canWrite && status === "draft";
@@ -114,6 +120,18 @@ export function ContractsTable({
             action="preview"
             label={labels.preview}
           />
+          {canWrite && duplicateAction ? (
+            <RowDuplicateButton
+              id={row.id}
+              action={duplicateAction}
+              editHrefPrefix="/contracts"
+              label={labels.duplicate ?? "تكرار"}
+              title={labels.duplicate ?? "تكرار"}
+              message={labels.duplicateConfirm ?? "تكرار هذا العقد وإنشاء مسودة جديدة؟"}
+              confirmLabel={labels.duplicate ?? "تكرار"}
+              successTitle={labels.duplicatedToast ?? "تم تكرار العقد بنجاح"}
+            />
+          ) : null}
           {canDelete(row.status) ? (
             <ActionLink
               href={`/contracts/${row.id}/edit`}
@@ -183,6 +201,18 @@ export function ContractsTable({
                 action="preview"
                 label={labels.preview}
               />
+              {canWrite && duplicateAction ? (
+                <RowDuplicateButton
+                  id={row.id}
+                  action={duplicateAction}
+                  editHrefPrefix="/contracts"
+                  label={labels.duplicate ?? "تكرار"}
+                  title={labels.duplicate ?? "تكرار"}
+                  message={labels.duplicateConfirm ?? "تكرار هذا العقد وإنشاء مسودة جديدة؟"}
+                  confirmLabel={labels.duplicate ?? "تكرار"}
+                  successTitle={labels.duplicatedToast ?? "تم تكرار العقد بنجاح"}
+                />
+              ) : null}
               {canDelete(row.status) ? (
                 <ActionLink
                   href={`/contracts/${row.id}/edit`}

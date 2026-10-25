@@ -12,6 +12,7 @@ import { createTestUser } from "@/server/auth/test-utils";
 import {
   cancelSubscription,
   createSubscription,
+  duplicateSubscription,
   generateInvoiceForSubscription,
   getSubscription,
   listSubscriptions,
@@ -421,6 +422,59 @@ describe("subscriptions service", () => {
     expect(listAfter.total).toBe(1);
     expect(listAfter.rows[0].titleAr).toBe("اشتراك للبحث والتصفية");
     expect(listAfter.rows[0].frequency).toBe("weekly");
+  });
+});
+
+describe("duplicateSubscription", () => {
+  it("duplicates a subscription and its items as a new subscription", async () => {
+    const user = await ownerUser();
+    const createdId = createSubscription(
+      user,
+      {
+        clientId,
+        projectId,
+        contractId: null,
+        titleAr: "اشتراك أصلي",
+        titleEn: "Original Sub",
+        description: "وصف",
+        frequency: "monthly",
+        intervalCount: 1,
+        startDate: "2026-10-01",
+        nextRunDate: "2026-10-01",
+        endDate: null,
+        languageMode: "ar",
+        currency: "SAR",
+        taxRateBp: 0,
+        discountType: "none",
+        discountValue: 0,
+        paymentTermsDays: 14,
+        bankAccountIds: [],
+        autoIssueInvoice: true,
+        autoSendEmail: false,
+        notesAr: "ملاحظات",
+        notesEn: null,
+        items: [
+          {
+            descriptionAr: "بند اشتراك",
+            descriptionEn: null,
+            quantity: 2,
+            unitPriceMinor: 10000,
+            taxRateBp: 0,
+          },
+        ],
+      },
+      META,
+    );
+
+    const dupId = duplicateSubscription(user, createdId, META);
+    expect(dupId).not.toBe(createdId);
+
+    const dup = getSubscription(dupId);
+    expect(dup?.subscription.titleAr).toBe("اشتراك أصلي");
+    expect(dup?.subscription.number).toBeNull();
+    expect(dup?.items).toHaveLength(1);
+    expect(dup?.items[0].descriptionAr).toBe("بند اشتراك");
+    expect(dup?.items[0].quantity).toBe(2);
   });
 });
 

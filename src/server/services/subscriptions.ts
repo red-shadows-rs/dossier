@@ -959,3 +959,104 @@ export function processScheduledSubscriptions(
   return generated;
 }
 
+export function duplicateSubscription(
+  user: SessionUser,
+  id: string,
+  meta: RequestMeta,
+): string {
+  const source = db
+    .select()
+    .from(subscriptions)
+    .where(eq(subscriptions.id, id))
+    .get();
+  if (!source) {
+    throw new AppError("NOT_FOUND", "Subscription not found");
+  }
+
+  const items = db
+    .select()
+    .from(subscriptionItems)
+    .where(eq(subscriptionItems.subscriptionId, id))
+    .orderBy(asc(subscriptionItems.position))
+    .all();
+
+  const newSubId = newId();
+  const now = nowMs();
+
+  withTx((tx) => {
+    tx.insert(subscriptions)
+      .values({
+        id: newSubId,
+        number: null,
+        clientId: source.clientId,
+        projectId: source.projectId,
+        contractId: source.contractId,
+        titleAr: source.titleAr,
+        titleEn: source.titleEn,
+        description: source.description,
+        status: "active",
+        frequency: source.frequency,
+        intervalCount: source.intervalCount,
+        startDate: source.startDate,
+        nextRunDate: source.startDate,
+        endDate: source.endDate,
+        languageMode: source.languageMode,
+        currency: source.currency,
+        taxRateBp: source.taxRateBp,
+        discountType: source.discountType,
+        discountValue: source.discountValue,
+        subtotalMinor: source.subtotalMinor,
+        discountMinor: source.discountMinor,
+        netMinor: source.netMinor,
+        taxMinor: source.taxMinor,
+        totalMinor: source.totalMinor,
+        paymentInstructionsAr: source.paymentInstructionsAr,
+        paymentInstructionsEn: source.paymentInstructionsEn,
+        paymentTermsDays: source.paymentTermsDays,
+        autoIssueInvoice: source.autoIssueInvoice,
+        autoSendEmail: source.autoSendEmail,
+        lastRunDate: null,
+        lastInvoiceId: null,
+        invoicesCount: 0,
+        notesAr: source.notesAr,
+        notesEn: source.notesEn,
+        createdBy: user.id,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .run();
+
+    items.forEach((item, index) => {
+      tx.insert(subscriptionItems)
+        .values({
+          id: newId(),
+          subscriptionId: newSubId,
+          position: index + 1,
+          descriptionAr: item.descriptionAr,
+          descriptionEn: item.descriptionEn,
+          quantity: item.quantity,
+          unitPriceMinor: item.unitPriceMinor,
+          taxRateBp: item.taxRateBp,
+          subtotalMinor: item.subtotalMinor,
+          taxMinor: item.taxMinor,
+          totalMinor: item.totalMinor,
+          createdAt: now,
+        })
+        .run();
+    });
+
+    audit(tx, {
+      actorType: "user",
+      actorId: user.id,
+      action: "subscription.duplicated",
+      entityType: "subscription",
+      entityId: newSubId,
+      meta: { sourceId: id },
+      ip: meta.ip,
+      userAgent: meta.userAgent,
+    });
+  });
+
+  return newSubId;
+}
+

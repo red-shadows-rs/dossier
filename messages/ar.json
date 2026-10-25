@@ -13,6 +13,7 @@
     "cancel": "إلغاء",
     "delete": "حذف",
     "edit": "تعديل",
+    "duplicate": "تكرار",
     "create": "إنشاء",
     "search": "بحث",
     "filter": "تصفية",
@@ -797,6 +798,9 @@
     "revised": "تمت إعادة العقد إلى مسودة",
     "completedDone": "تم إكمال العقد",
     "terminatedDone": "تم إنهاء العقد",
+    "duplicate": "تكرار",
+    "duplicateConfirm": "تكرار هذا العقد وإنشاء مسودة جديدة؟",
+    "duplicatedToast": "تم تكرار العقد بنجاح",
     "actions": {
       "regenerateLink": "رابط توقيع جديد",
       "revise": "إعادة للتحرير",
@@ -1093,6 +1097,9 @@
   },
   "invoices": {
     "title": "الفواتير",
+    "duplicate": "تكرار",
+    "duplicateConfirm": "تكرار هذه الفاتورة وإنشاء مسودة جديدة؟",
+    "duplicatedToast": "تم تكرار الفاتورة بنجاح",
     "new": "فاتورة جديدة",
     "newTitle": "إنشاء مسودة فاتورة",
     "createDraft": "إنشاء المسودة",
@@ -1243,6 +1250,9 @@
     "title": "الاشتراكات",
     "new": "اشتراك جديد",
     "edit": "تعديل الاشتراك",
+    "duplicate": "تكرار",
+    "duplicateConfirm": "تكرار هذا الاشتراك وإنشاء مسودة جديدة؟",
+    "duplicatedToast": "تم تكرار الاشتراك بنجاح",
     "formSteps": {
       "basics": "البيانات الأساسية",
       "schedule": "الجدولة",
