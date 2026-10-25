@@ -25,6 +25,10 @@ export function PaymentCardItem({ card }: { card: PaymentCardData }) {
   const isBinance = card.provider === "binance";
   const isPaypal = card.provider === "paypal";
 
+  const walletLabel = card.network
+    ? `${t("wallet")} (${card.network})`
+    : card.identifierLabel || t("walletAddress");
+
   return (
     <div className="flex flex-col rounded-lg border border-border/70 bg-surface/50 p-3.5 gap-2.5 shadow-2xs transition-all hover:border-border">
       <div className="flex items-center justify-between gap-2.5">
@@ -56,7 +60,7 @@ export function PaymentCardItem({ card }: { card: PaymentCardData }) {
         </div>
 
         {card.currency ? (
-          <Badge tone="gray" className="text-[10px] px-2 py-0.5 font-mono shrink-0">
+          <Badge tone="gray" dot={false} className="text-[10px] px-2 py-0.5 font-mono shrink-0">
             {card.currency}
           </Badge>
         ) : null}
@@ -66,11 +70,11 @@ export function PaymentCardItem({ card }: { card: PaymentCardData }) {
         <div className="flex flex-col gap-1.5">
           {card.binanceUid ? (
             <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-background/50 px-2.5 py-1.5 text-xs">
-              <div className="flex flex-col min-w-0 flex-1">
+              <div className="flex flex-col items-start min-w-0 flex-1">
                 <span className="text-[10px] text-muted-foreground font-medium">
-                  Binance UID
+                  {t("binanceUid")}
                 </span>
-                <span className="font-mono font-semibold text-foreground truncate" dir="ltr">
+                <span className="font-mono font-semibold text-foreground truncate max-w-full" dir="ltr">
                   {card.binanceUid}
                 </span>
               </div>
@@ -91,11 +95,11 @@ export function PaymentCardItem({ card }: { card: PaymentCardData }) {
 
           {card.binancePayId ? (
             <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-background/50 px-2.5 py-1.5 text-xs">
-              <div className="flex flex-col min-w-0 flex-1">
+              <div className="flex flex-col items-start min-w-0 flex-1">
                 <span className="text-[10px] text-muted-foreground font-medium">
-                  Binance Pay ID
+                  {t("binancePayId")}
                 </span>
-                <span className="font-mono font-semibold text-foreground truncate" dir="ltr">
+                <span className="font-mono font-semibold text-foreground truncate max-w-full" dir="ltr">
                   {card.binancePayId}
                 </span>
               </div>
@@ -115,23 +119,37 @@ export function PaymentCardItem({ card }: { card: PaymentCardData }) {
           ) : null}
 
           {card.username ? (
-            <div className="flex items-center justify-between gap-2 rounded-md border border-border/40 bg-background/30 px-2.5 py-1 text-xs">
-              <span className="text-[10px] text-muted-foreground font-medium">
-                Handle:
-              </span>
-              <span className="font-mono text-xs font-semibold text-foreground" dir="ltr">
-                {card.username.startsWith("@") ? card.username : `@${card.username}`}
-              </span>
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-background/50 px-2.5 py-1.5 text-xs">
+              <div className="flex flex-col items-start min-w-0 flex-1">
+                <span className="text-[10px] text-muted-foreground font-medium">
+                  {t("username")}
+                </span>
+                <span className="font-mono font-semibold text-foreground truncate max-w-full" dir="ltr">
+                  {card.username.startsWith("@") ? card.username : `@${card.username}`}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => copy(card.username ?? "", "username")}
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-border/60 bg-card hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                title={copied === "username" ? t("copiedToClipboard") : t("copy")}
+              >
+                {copied === "username" ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+              </button>
             </div>
           ) : null}
 
           {card.identifierValue && card.identifierValue !== card.binanceUid && card.identifierValue !== card.binancePayId ? (
             <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-background/50 px-2.5 py-1.5 text-xs">
-              <div className="flex flex-col min-w-0 flex-1">
+              <div className="flex flex-col items-start min-w-0 flex-1">
                 <span className="text-[10px] text-muted-foreground font-medium">
-                  {card.network ? `Wallet (${card.network})` : card.identifierLabel}
+                  {walletLabel}
                 </span>
-                <span className="font-mono font-semibold text-foreground truncate" dir="ltr">
+                <span className="font-mono font-semibold text-foreground truncate max-w-full" dir="ltr">
                   {card.identifierValue}
                 </span>
               </div>
@@ -154,11 +172,11 @@ export function PaymentCardItem({ card }: { card: PaymentCardData }) {
         <div className="flex flex-col gap-1.5">
           {card.identifierValue ? (
             <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-background/50 px-2.5 py-1.5 text-xs">
-              <div className="flex flex-col min-w-0 flex-1">
+              <div className="flex flex-col items-start min-w-0 flex-1">
                 <span className="text-[10px] text-muted-foreground font-medium">
-                  PayPal Email
+                  {t("paypalEmail")}
                 </span>
-                <span className="font-mono font-semibold text-foreground truncate" dir="ltr">
+                <span className="font-mono font-semibold text-foreground truncate max-w-full" dir="ltr">
                   {card.identifierValue}
                 </span>
               </div>
@@ -178,47 +196,75 @@ export function PaymentCardItem({ card }: { card: PaymentCardData }) {
           ) : null}
 
           {card.username ? (
-            <div className="flex items-center justify-between gap-2 rounded-md border border-border/40 bg-background/30 px-2.5 py-1 text-xs">
-              <span className="text-[10px] text-muted-foreground font-medium">
-                Handle:
-              </span>
-              <span className="font-mono text-xs font-semibold text-foreground" dir="ltr">
-                {card.username.startsWith("@") ? card.username : `@${card.username}`}
-              </span>
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-background/50 px-2.5 py-1.5 text-xs">
+              <div className="flex flex-col items-start min-w-0 flex-1">
+                <span className="text-[10px] text-muted-foreground font-medium">
+                  {t("username")}
+                </span>
+                <span className="font-mono font-semibold text-foreground truncate max-w-full" dir="ltr">
+                  {card.username.startsWith("@") ? card.username : `@${card.username}`}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => copy(card.username ?? "", "username")}
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-border/60 bg-card hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                title={copied === "username" ? t("copiedToClipboard") : t("copy")}
+              >
+                {copied === "username" ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+              </button>
             </div>
           ) : null}
 
           {card.paymentUrl ? (
             <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-primary/5 px-2.5 py-1.5 text-xs">
-              <span className="text-[10px] text-primary font-medium">
-                PayPal.Me
-              </span>
-              <a
-                href={
-                  card.paymentUrl.startsWith("http://") || card.paymentUrl.startsWith("https://")
-                    ? card.paymentUrl
-                    : `https://${card.paymentUrl}`
-                }
-                target="_blank"
-                rel="noreferrer noopener"
-                className="inline-flex items-center gap-1 font-mono text-xs text-primary font-semibold hover:underline"
-                dir="ltr"
+              <div className="flex flex-col items-start min-w-0 flex-1">
+                <span className="text-[10px] text-primary font-medium">
+                  {t("paymentLink")}
+                </span>
+                <a
+                  href={
+                    card.paymentUrl.startsWith("http://") || card.paymentUrl.startsWith("https://")
+                      ? card.paymentUrl
+                      : `https://${card.paymentUrl}`
+                  }
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="inline-flex items-center gap-1 font-mono text-xs text-primary font-semibold hover:underline max-w-full truncate"
+                  dir="ltr"
+                >
+                  <span className="truncate">{card.paymentUrl}</span>
+                  <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                </a>
+              </div>
+              <button
+                type="button"
+                onClick={() => copy(card.paymentUrl ?? "", "payurl")}
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-border/60 bg-card hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                title={copied === "payurl" ? t("copiedToClipboard") : t("copy")}
               >
-                <span>{card.paymentUrl}</span>
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
+                {copied === "payurl" ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+              </button>
             </div>
           ) : null}
         </div>
       ) : (
-        <>
+        <div className="flex flex-col gap-1.5">
           {card.identifierValue ? (
             <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-background/50 px-2.5 py-1.5 text-xs">
-              <div className="flex flex-col min-w-0 flex-1">
+              <div className="flex flex-col items-start min-w-0 flex-1">
                 <span className="text-[10px] text-muted-foreground font-medium">
                   {card.identifierLabel}
                 </span>
-                <span className="font-mono font-semibold text-foreground truncate" dir="ltr">
+                <span className="font-mono font-semibold text-foreground truncate max-w-full" dir="ltr">
                   {card.identifierValue}
                 </span>
               </div>
@@ -238,12 +284,12 @@ export function PaymentCardItem({ card }: { card: PaymentCardData }) {
           ) : null}
 
           {card.swift ? (
-            <div className="flex items-center justify-between gap-2 rounded-md border border-border/40 bg-background/30 px-2.5 py-1 text-xs">
-              <div className="flex items-center gap-1.5">
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-background/50 px-2.5 py-1.5 text-xs">
+              <div className="flex flex-col items-start min-w-0 flex-1">
                 <span className="text-[10px] text-muted-foreground font-medium">
-                  {t("swiftLabel")}:
+                  {t("swiftLabel")}
                 </span>
-                <span className="font-mono text-xs font-semibold text-foreground" dir="ltr">
+                <span className="font-mono font-semibold text-foreground truncate max-w-full" dir="ltr">
                   {card.swift}
                 </span>
               </div>
@@ -252,20 +298,19 @@ export function PaymentCardItem({ card }: { card: PaymentCardData }) {
                 onClick={() => {
                   if (card.swift) copy(card.swift, "swift");
                 }}
-                className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-border/60 bg-card hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 title={copied === "swift" ? t("copiedToClipboard") : t("copy")}
               >
                 {copied === "swift" ? (
-                  <Check className="h-3 w-3 text-emerald-500" />
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
                 ) : (
-                  <Copy className="h-3 w-3" />
+                  <Copy className="h-3.5 w-3.5" />
                 )}
               </button>
             </div>
           ) : null}
-        </>
+        </div>
       )}
     </div>
   );
 }
-
