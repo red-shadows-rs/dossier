@@ -57,6 +57,10 @@ function heroHeader(input: ReceiptHtmlInput): string {
   const contact: string[] = [];
   if (s.phone) contact.push(`<span dir="ltr">${esc(s.phone)}</span>`);
   if (s.email) contact.push(`<span dir="ltr">${esc(s.email)}</span>`);
+  if (s.website) {
+    const cleanWeb = s.website.replace(/^https?:\/\//i, "").replace(/\/$/, "");
+    contact.push(`<span dir="ltr">${esc(cleanWeb)}</span>`);
+  }
   if (contact.length > 0) sellerLines.push(`<div>${contact.join(" · ")}</div>`);
   const crVat: string[] = [];
   if (s.crNumber) crVat.push(lang === "ar" ? `س.ت: ${esc(s.crNumber)}` : `CR: ${esc(s.crNumber)}`);
@@ -70,18 +74,37 @@ function heroHeader(input: ReceiptHtmlInput): string {
     ? esc(formatDateLong(receiptDateIso, ui))
     : "—";
 
+  const sellerLegal = pick(s.legalNameAr ?? null, s.legalNameEn ?? null, lang);
+  const brandSubHtml =
+    sellerLegal && sellerLegal !== sellerName
+      ? `<div class="brand-sub">${sellerLegal}</div>`
+      : "";
+
   const brandMarkSvg = input.logoDataUri
-    ? `<img class="brand-logo-img" src="${esc(input.logoDataUri)}" alt="" />`
+    ? `
+      <div class="brand-box">
+        <div class="brand-text-col">
+          <div class="brand-name">${sellerName}</div>
+          ${brandSubHtml}
+        </div>
+        <div class="brand-logo-frame">
+          <img class="brand-logo-img" src="${esc(input.logoDataUri)}" alt="${sellerName}" />
+        </div>
+      </div>
+    `
     : `
       <div class="brand-box">
-        <div>
+        <div class="brand-text-col">
           <div class="brand-name">${sellerName}</div>
+          ${brandSubHtml}
         </div>
-        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-          <polygon points="16,2 30,10 16,18 2,10" fill="#e11d48" />
-          <polygon points="2,10 16,18 16,30 2,22" fill="#9f1239" />
-          <polygon points="30,10 16,18 16,30 30,22" fill="#fb7185" />
-        </svg>
+        <div class="brand-logo-frame">
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+            <polygon points="16,2 30,10 16,18 2,10" fill="#e11d48" />
+            <polygon points="2,10 16,18 16,30 2,22" fill="#9f1239" />
+            <polygon points="30,10 16,18 16,30 30,22" fill="#fb7185" />
+          </svg>
+        </div>
       </div>
     `;
 
