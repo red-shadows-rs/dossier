@@ -316,5 +316,63 @@ describe("renderInvoiceHtml — multi-page pagination and branding", () => {
     expect(html).toContain("billing@alnoor.example.com");
     expect(html).toContain("+966512345678");
   });
+
+  it("renders full Binance payment card details in payment instructions", () => {
+    const html = renderInvoiceHtml(
+      input({
+        lang: "ar",
+        invoice: {
+          ...input().invoice,
+          paymentInstructionsAr:
+            "<!--dossier:accounts:acc_binance-->\nباينانس | UID: 859405357 | المستخدم: @SHADOW_x78 | معرف باينانس / المحفظة (BEP20): 0xb0dbaa61736fa70ae1580abdac77e460bd59904f",
+          paymentInstructionsEn: null,
+        },
+        companyAccounts: [
+          {
+            id: "acc_binance",
+            provider: "binance",
+            bankNameAr: "باينانس",
+            bankNameEn: "Binance",
+            accountHolder: "",
+            iban: "0xb0dbaa61736fa70ae1580abdac77e460bd59904f",
+            swift: "",
+            currency: "USDT",
+            isActive: true,
+            isPrimary: false,
+            username: "@SHADOW_x78",
+            paymentUrl: "",
+            binanceUid: "859405357",
+            binancePayId: "",
+            network: "BEP20",
+          },
+        ],
+      }),
+    );
+    expect(html).toContain("باينانس");
+    expect(html).toContain("USDT");
+    expect(html).toContain("859405357");
+    expect(html).toContain("@SHADOW_x78");
+    expect(html).toContain("0xb0dbaa61736fa70ae1580abdac77e460bd59904f");
+    expect(html).toContain("BEP20");
+  });
+
+  it("renders Binance details from raw string instructions without companyAccounts", () => {
+    const html = renderInvoiceHtml(
+      input({
+        lang: "ar",
+        invoice: {
+          ...input().invoice,
+          paymentInstructionsAr:
+            "باينانس | UID: 859405357 | المستخدم: @SHADOW_x78 | معرف باينانس / المحفظة (BEP20): 0xb0dbaa61736fa70ae1580abdac77e460bd59904f",
+          paymentInstructionsEn: null,
+        },
+      }),
+    );
+    expect(html).toContain("باينانس");
+    expect(html).toContain("859405357");
+    expect(html).toContain("@SHADOW_x78");
+    expect(html).toContain("0xb0dbaa61736fa70ae1580abdac77e460bd59904f");
+    expect(html).toContain("BEP20");
+  });
 });
 

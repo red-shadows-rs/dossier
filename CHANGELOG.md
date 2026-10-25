@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.3.8] - 2026-10-25
+
+### Fixed
+- **Complete Binance Payment Details in Invoices & PDF:** Resolved missing Binance transfer parameters (Binance UID, Pay ID, Username/Handle, Network, and Currency tag) in invoice payment instructions and rendered PDF vouchers by passing full company account metadata to the renderer and expanding string parsing heuristics to faithfully represent all crypto payment options.
+
 ## [v1.3.7] - 2026-10-24
 
 ### Changed

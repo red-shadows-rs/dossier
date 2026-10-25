@@ -799,6 +799,31 @@ function PaymentCardItem({ card }: { card: PaymentCardData }) {
             </div>
           ) : null}
 
+          {card.binancePayId ? (
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-background/50 px-2.5 py-1.5 text-xs">
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-[10px] text-muted-foreground font-medium">
+                  Binance Pay ID
+                </span>
+                <span className="font-mono font-semibold text-foreground truncate" dir="ltr">
+                  {card.binancePayId}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => copy(card.binancePayId ?? "", "payid")}
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-border/60 bg-card hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                title={copied === "payid" ? t("copiedToClipboard") : t("copy")}
+              >
+                {copied === "payid" ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+              </button>
+            </div>
+          ) : null}
+
           {card.username ? (
             <div className="flex items-center justify-between gap-2 rounded-md border border-border/40 bg-background/30 px-2.5 py-1 text-xs">
               <span className="text-[10px] text-muted-foreground font-medium">
@@ -810,7 +835,7 @@ function PaymentCardItem({ card }: { card: PaymentCardData }) {
             </div>
           ) : null}
 
-          {card.identifierValue && card.identifierValue !== card.binanceUid ? (
+          {card.identifierValue && card.identifierValue !== card.binanceUid && card.identifierValue !== card.binancePayId ? (
             <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-background/50 px-2.5 py-1.5 text-xs">
               <div className="flex flex-col min-w-0 flex-1">
                 <span className="text-[10px] text-muted-foreground font-medium">

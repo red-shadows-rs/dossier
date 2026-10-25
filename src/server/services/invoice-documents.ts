@@ -23,7 +23,11 @@ import {
 } from "@/server/pdf/html/invoice";
 import { renderReceiptHtml } from "@/server/pdf/html/receipt";
 import { getFileRow, readFile } from "@/server/services/files";
-import { getSettings, buildPaymentInstructions } from "@/server/services/settings";
+import {
+  getSettings,
+  buildPaymentInstructions,
+  getCompanyBankAccounts,
+} from "@/server/services/settings";
 import {
   getInvoiceDetail,
   isOverdue,
@@ -211,6 +215,7 @@ export async function buildInvoiceHtml(
       reference: payment.reference,
       voided: payment.voidedAt !== null,
     })),
+    companyAccounts: getCompanyBankAccounts(company),
     lang,
     isOverdue: overdue,
     fonts: getFontCss(),
@@ -338,6 +343,7 @@ export async function buildReceiptHtml(
       reference: payment.reference,
       voided: payment.voidedAt !== null,
     })),
+    companyAccounts: getCompanyBankAccounts(company),
     lang,
     isOverdue: overdue,
     fonts: getFontCss(),

@@ -65,14 +65,14 @@ export function formatAccountToCard(
     identifierLabel = lang === "ar" ? "البريد / المعرف" : "Email / Handle";
     identifierValue = acc.iban || acc.username || "";
   } else if (acc.provider === "binance") {
-    if (acc.binanceUid) {
-      identifierLabel = lang === "ar" ? "معرف باينانس (UID)" : "Binance UID";
-      identifierValue = acc.binanceUid;
-    } else if (acc.iban) {
+    if (acc.iban) {
       identifierLabel = acc.network
         ? (lang === "ar" ? `المحفظة (${acc.network})` : `Wallet (${acc.network})`)
         : (lang === "ar" ? "عنوان المحفظة" : "Wallet Address");
       identifierValue = acc.iban;
+    } else if (acc.binanceUid) {
+      identifierLabel = lang === "ar" ? "معرف باينانس (UID)" : "Binance UID";
+      identifierValue = acc.binanceUid;
     } else {
       identifierLabel = lang === "ar" ? "معرف باينانس" : "Binance ID";
     }
@@ -176,22 +176,18 @@ export function parsePaymentInstructionsToCards(
         accountHolder = seg.split(":")[1]?.trim() || "";
       } else if (
         seg.includes("معرف باينانس (UID):") ||
-        seg.includes("Binance UID:")
+        seg.includes("Binance UID:") ||
+        seg.startsWith("UID:") ||
+        seg.includes("UID:")
       ) {
         binanceUid = seg.split(":")[1]?.trim() || "";
-        if (!identifierValue) {
-          identifierLabel = lang === "ar" ? "معرف باينانس (UID)" : "Binance UID";
-          identifierValue = binanceUid;
-        }
       } else if (
         seg.includes("معرف الدفع (Pay ID):") ||
-        seg.includes("Pay ID:")
+        seg.includes("معرف باينانس باي") ||
+        seg.includes("Pay ID:") ||
+        seg.startsWith("Pay ID:")
       ) {
         binancePayId = seg.split(":")[1]?.trim() || "";
-        if (!identifierValue) {
-          identifierLabel = "Pay ID";
-          identifierValue = binancePayId;
-        }
       } else if (
         seg.includes("رابط الدفع:") ||
         seg.toLowerCase().includes("pay link:")
@@ -221,15 +217,23 @@ export function parsePaymentInstructionsToCards(
         identifierLabel = lang === "ar" ? "حساب PayPal" : "PayPal Email";
         identifierValue = seg.split(":")[1]?.trim() || "";
       } else if (
+        seg.includes("المحفظة") ||
+        seg.toLowerCase().includes("wallet") ||
         seg.includes("معرف باينانس") ||
         seg.toLowerCase().includes("binance")
       ) {
-        identifierLabel = lang === "ar" ? "معرف باينانس / المحفظة" : "Binance UID / Wallet";
-        identifierValue = seg.split(":")[1]?.trim() || "";
+        const netMatch = seg.match(/\(([^)]+)\)/);
+        if (netMatch) network = netMatch[1];
+        const val = seg.split(":")[1]?.trim() || "";
+        if (val) {
+          identifierValue = val;
+          identifierLabel = network
+            ? (lang === "ar" ? `المحفظة (${network})` : `Wallet (${network})`)
+            : (lang === "ar" ? "عنوان المحفظة" : "Wallet Address");
+        }
       } else if (
         seg.includes("رقم المحفظة") ||
         seg.includes("رقم الجوال") ||
-        seg.toLowerCase().includes("wallet") ||
         seg.toLowerCase().includes("mobile")
       ) {
         identifierLabel = lang === "ar" ? "رقم المحفظة / الجوال" : "Wallet / Mobile";
@@ -239,6 +243,11 @@ export function parsePaymentInstructionsToCards(
         identifierLabel = label.trim();
         identifierValue = valParts.join(":").trim();
       }
+    }
+
+    if (!identifierValue && binanceUid) {
+      identifierLabel = lang === "ar" ? "معرف باينانس (UID)" : "Binance UID";
+      identifierValue = binanceUid;
     }
 
     cards.push({

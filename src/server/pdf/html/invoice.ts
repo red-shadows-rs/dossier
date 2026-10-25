@@ -5,6 +5,7 @@ import { formatDateLong } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import type { CurrencyCode, Locale } from "@/lib/constants";
 import type { DocLang } from "@/lib/doc-lang";
+import type { BankAccount } from "@/lib/validation/settings";
 import type { InvoiceStatus } from "@/server/services/invoices";
 import { renderCode39Svg } from "@/server/pdf/qr";
 import { getBankLogoDataUri } from "@/server/services/settings";
@@ -93,6 +94,7 @@ export type InvoiceHtmlInput = {
   seller: SellerSnapshot;
   buyer: BuyerSnapshot;
   payments: InvoicePaymentHtml[];
+  companyAccounts?: BankAccount[];
   lang: DocLang;
   isOverdue: boolean;
   fonts: string;
@@ -667,6 +669,18 @@ table.inv-items-table tbody tr:last-child td {
   font-weight: 700;
   color: #0f172a;
   line-height: 1.2;
+}
+.payment-card-currency-tag {
+  display: inline-block;
+  font-size: 6pt;
+  font-weight: 700;
+  font-family: monospace;
+  background: #e2e8f0;
+  color: #334155;
+  border-radius: 1mm;
+  padding: 0.2mm 1.5mm;
+  margin-inline-start: 1.5mm;
+  vertical-align: middle;
 }
 .payment-card-holder {
   font-size: 6.8pt;
@@ -1260,7 +1274,7 @@ function instructionsBlock(input: InvoiceHtmlInput): string {
   if (!raw) return "";
 
   const langCode = input.lang === "en" ? "en" : "ar";
-  const cards = parsePaymentInstructionsToCards(raw, undefined, langCode);
+  const cards = parsePaymentInstructionsToCards(raw, input.companyAccounts, langCode);
 
   let contentHtml = "";
 
@@ -1280,7 +1294,10 @@ function instructionsBlock(input: InvoiceHtmlInput): string {
           <div class="payment-card-header">
             ${logoHtml}
             <div class="payment-card-title-wrap">
-              <div class="payment-card-title">${esc(card.bankName)}</div>
+              <div class="payment-card-title">
+                <span>${esc(card.bankName)}</span>
+                ${card.currency ? `<span class="payment-card-currency-tag">${esc(card.currency)}</span>` : ""}
+              </div>
               ${
                 card.accountHolder
                   ? `<div class="payment-card-holder">${esc(beneficiaryLabel)}: ${esc(card.accountHolder)}</div>`
@@ -1289,11 +1306,31 @@ function instructionsBlock(input: InvoiceHtmlInput): string {
             </div>
           </div>
           ${
-            card.binanceUid && card.binanceUid !== card.identifierValue
+            card.binanceUid
               ? `
             <div class="payment-card-id-row">
               <span class="payment-card-label">${esc(langCode === "ar" ? "معرف باينانس (UID)" : "Binance UID")}:</span>
               <span class="payment-card-mono" dir="ltr">${esc(card.binanceUid)}</span>
+            </div>
+          `
+              : ""
+          }
+          ${
+            card.binancePayId
+              ? `
+            <div class="payment-card-id-row">
+              <span class="payment-card-label">${esc(langCode === "ar" ? "معرف باينانس باي (Pay ID)" : "Binance Pay ID")}:</span>
+              <span class="payment-card-mono" dir="ltr">${esc(card.binancePayId)}</span>
+            </div>
+          `
+              : ""
+          }
+          ${
+            card.username
+              ? `
+            <div class="payment-card-id-row">
+              <span class="payment-card-label">${esc(langCode === "ar" ? "اسم المستخدم" : "Username")}:</span>
+              <span class="payment-card-mono" dir="ltr">${esc(card.username.startsWith("@") ? card.username : `@${card.username}`)}</span>
             </div>
           `
               : ""
@@ -1309,7 +1346,7 @@ function instructionsBlock(input: InvoiceHtmlInput): string {
               : ""
           }
           ${
-            card.identifierValue
+            card.identifierValue && card.identifierValue !== card.binanceUid && card.identifierValue !== card.binancePayId
               ? `
             <div class="payment-card-id-row">
               <span class="payment-card-label">${esc(card.identifierLabel)}:</span>
