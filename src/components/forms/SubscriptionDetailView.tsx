@@ -519,7 +519,7 @@ export function SubscriptionDetailView({
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader>
               <CardTitle className="inline-flex items-center gap-2">
                 <CalendarClock size={18} className="text-primary" aria-hidden="true" />
                 <span>{t("invoicesHistory")}</span>
@@ -527,36 +527,12 @@ export function SubscriptionDetailView({
                   ({invoices.length})
                 </span>
               </CardTitle>
-              {canGenerateInvoice && subscription.status === "active" ? (
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => setConfirmDialog("generate")}
-                  disabled={Boolean(pendingAction)}
-                  className="gap-1 text-xs"
-                >
-                  <Receipt className="h-3.5 w-3.5" />
-                  <span>{t("generateNow")}</span>
-                </Button>
-              ) : null}
             </CardHeader>
             <CardContent>
               {invoices.length === 0 ? (
                 <EmptyState
-                  title={t("empty")}
+                  title={tInv("empty")}
                   description={t("noInvoicesYet")}
-                  action={
-                    canGenerateInvoice && subscription.status === "active" ? (
-                      <Button
-                        variant="primary"
-                        onClick={() => setConfirmDialog("generate")}
-                        className="gap-1.5"
-                      >
-                        <Receipt className="h-4 w-4" />
-                        <span>{t("generateNow")}</span>
-                      </Button>
-                    ) : undefined
-                  }
                 />
               ) : (
                 <div className="overflow-x-auto rounded-lg border border-border">
