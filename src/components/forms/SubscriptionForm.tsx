@@ -857,7 +857,7 @@ export function SubscriptionForm({
                 disabled={pending}
               />
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 items-end">
                 <Field label={t("paymentTermsDays")} htmlFor="sub-terms">
                   <Input
                     id="sub-terms"
@@ -869,7 +869,7 @@ export function SubscriptionForm({
                   />
                 </Field>
 
-                <label className="flex h-11 cursor-pointer items-center justify-between rounded-lg border border-border/80 bg-muted/20 px-3.5 text-xs text-foreground transition-colors hover:bg-muted/30 select-none sm:col-span-1 mt-6">
+                <label className="flex h-10 cursor-pointer items-center justify-between rounded border border-border/80 bg-muted/20 px-3.5 text-xs text-foreground transition-colors hover:bg-muted/30 select-none">
                   <span className="font-medium">{t("autoIssue")}</span>
                   <Checkbox
                     checked={autoIssueInvoice}
@@ -878,7 +878,7 @@ export function SubscriptionForm({
                   />
                 </label>
 
-                <label className="flex h-11 cursor-pointer items-center justify-between rounded-lg border border-border/80 bg-muted/20 px-3.5 text-xs text-foreground transition-colors hover:bg-muted/30 select-none sm:col-span-1 mt-6">
+                <label className="flex h-10 cursor-pointer items-center justify-between rounded border border-border/80 bg-muted/20 px-3.5 text-xs text-foreground transition-colors hover:bg-muted/30 select-none">
                   <span className="font-medium">{t("autoSendEmail")}</span>
                   <Checkbox
                     checked={autoSendEmail}
