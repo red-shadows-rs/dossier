@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.4.3] - 2026-10-26
+
+### Added
+- **Payment Receipt Proof Upload & Attachment:** Supported uploading and attaching payment slips / proof of transfer files (PNG, JPEG, WEBP, PDF) directly within the "Record Payment" (`تسجيل دفعة`) modal. Attached payment proofs are stored via Dossier's secure file storage system and accessible via direct preview and download action buttons in the invoice Payments tab.
+- **Payment Receipt Header Brand Identity:** Integrated executive company branding, official support email, and website into payment receipt vouchers (`سند القبض`) to guarantee consistent presentation across all issued financial documents.
+
+### Changed
+- **Unified Subscription Page Design Language:** Fully standardized Subscription detail view layout, items table, financial summary card, tax rate input, payment terms, and status badges to match the exact design system, borders, and typography of Invoices and Contracts.
+- **Consolidated Receipt Delivery Workflow:** Removed redundant standalone "Send receipt by email" actions from the invoice toolbar and payments list, relying on the automated delivery of receipt voucher PDFs bundled with invoice settlement communications.
+- **Subtle Empty States for Missing Metadata:** Replaced blank spaces with elegant localized empty state indicators ("لا توجد ملاحظات" / "No notes") in invoice and client detail cards when notes or legal identifiers are absent.
+
+### Fixed
+- **System-Wide Header Inline Alignment & Droop Elimination:** Eliminated artificial vertical offset classes (`translate-y-0.5`) across all detail views (Contracts, Subscriptions, Invoices), edit pages, and list pages (Clients, Contracts, Invoices, Subscriptions, Projects, Templates, Users, Audit) to restore true vertical centering with heading elements.
+- **Logical RTL Header Hierarchy:** Reordered contract and subscription headers to group document number and document title contiguously inside `<h1>`, followed by status and frequency badges, achieving true vertical centering and natural RTL reading flow.
+- **Payment Methods BiDi Layout & Localized Card Labels:** Standardized payment method instructions, account cards, and cryptographic wallet references with proper BiDi isolation and Arabic localization.
+- **ESLint & CI Pipeline Hygiene:** Cleaned up unused variables and imports in invoice actions and detail views to guarantee zero warnings and a 100% green GitHub Actions CI pipeline.
+
 ## [v1.4.2] - 2026-10-25
 
 ### Added
