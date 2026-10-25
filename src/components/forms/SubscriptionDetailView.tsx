@@ -18,12 +18,14 @@ import {
   CreditCard,
   ExternalLink,
   FolderKanban,
+  ListOrdered,
   Mail,
   Pause,
   Pencil,
   Phone,
   Play,
   Receipt,
+  Wallet,
 } from "lucide-react";
 import { PaymentCardItem } from "@/components/forms/PaymentCardItem";
 import { Badge, invoiceStatusTone } from "@/components/ui/Badge";
@@ -88,6 +90,31 @@ interface SubscriptionDetailViewProps {
   canGenerateInvoice: boolean;
   companyAccounts?: BankAccount[];
   locale: "ar" | "en";
+}
+
+function Money({
+  label,
+  value,
+  strong,
+}: {
+  label: string;
+  value: string;
+  strong?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4 text-sm">
+      <dt className="text-muted-foreground">{label}</dt>
+      <dd
+        className={
+          strong
+            ? "font-semibold tabular-nums text-foreground font-mono"
+            : "tabular-nums text-foreground font-mono"
+        }
+      >
+        {value}
+      </dd>
+    </div>
+  );
 }
 
 export function SubscriptionDetailView({
@@ -442,90 +469,63 @@ export function SubscriptionDetailView({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 flex flex-col gap-6">
           <Card>
-            <CardHeader className="pb-3 border-b border-border/60">
-              <CardTitle className="inline-flex items-center gap-2 text-base font-semibold">
-                <Receipt className="h-4 w-4 text-primary" />
+            <CardHeader>
+              <CardTitle className="inline-flex items-center gap-2">
+                <ListOrdered size={18} className="text-primary" aria-hidden="true" />
                 <span>{t("items")}</span>
+                <span className="text-xs font-normal text-muted-foreground font-mono">
+                  ({items.length})
+                </span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
+            <CardContent>
+              <div className="overflow-x-auto rounded-lg border border-border">
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableHeaderCell className="w-12 text-center">#</TableHeaderCell>
                       <TableHeaderCell>{t("description")}</TableHeaderCell>
-                      <TableHeaderCell className="w-20 text-center">{t("quantity")}</TableHeaderCell>
-                      <TableHeaderCell className="w-28 text-end">{t("unitPrice")}</TableHeaderCell>
-                      <TableHeaderCell className="w-20 text-center">{t("taxRate")}</TableHeaderCell>
-                      <TableHeaderCell className="w-28 text-end">{t("total")}</TableHeaderCell>
+                      <TableHeaderCell className="text-end">{t("quantity")}</TableHeaderCell>
+                      <TableHeaderCell className="text-end">{t("unitPrice")}</TableHeaderCell>
+                      <TableHeaderCell className="text-end">{t("total")}</TableHeaderCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {items.map((item, index) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="text-center font-mono text-xs text-muted-foreground">
-                          {index + 1}
-                        </TableCell>
-                        <TableCell className="font-medium text-foreground">
-                          <span>{item.descriptionAr}</span>
-                        </TableCell>
-                        <TableCell className="text-center font-mono text-sm">
-                          {item.quantity}
-                        </TableCell>
-                        <TableCell className="text-end font-mono text-sm">
-                          {formatMoney(item.unitPriceMinor, currency, locale)}
-                        </TableCell>
-                        <TableCell className="text-center font-mono text-xs text-muted-foreground">
-                          {item.taxRateBp / 100}%
-                        </TableCell>
-                        <TableCell className="text-end font-mono font-semibold text-sm">
-                          {formatMoney(item.totalMinor, currency, locale)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {items.map((item) => {
+                      const desc =
+                        locale === "ar"
+                          ? (item.descriptionAr ?? item.descriptionEn ?? "-")
+                          : (item.descriptionEn ?? item.descriptionAr ?? "-");
+                      return (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium text-foreground">
+                            {desc}
+                          </TableCell>
+                          <TableCell className="text-end font-mono text-xs tabular-nums">
+                            {item.quantity}
+                          </TableCell>
+                          <TableCell className="text-end font-mono text-xs tabular-nums">
+                            {formatMoney(item.unitPriceMinor, currency, locale)}
+                          </TableCell>
+                          <TableCell className="text-end font-semibold tabular-nums font-mono">
+                            {formatMoney(item.totalMinor, currency, locale)}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
-              </div>
-
-              <div className="flex justify-end p-4 border-t border-border/60 bg-muted/20">
-                <div className="w-full max-w-xs space-y-2 text-sm">
-                  <div className="flex justify-between text-muted-foreground">
-                    <span>{t("subtotal")}</span>
-                    <span className="font-mono tabular-nums">
-                      {formatMoney(subscription.subtotalMinor, currency, locale)}
-                    </span>
-                  </div>
-                  {subscription.discountMinor > 0 ? (
-                    <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
-                      <span>{t("discount")}</span>
-                      <span className="font-mono tabular-nums">
-                        -{formatMoney(subscription.discountMinor, currency, locale)}
-                      </span>
-                    </div>
-                  ) : null}
-                  <div className="flex justify-between text-muted-foreground">
-                    <span>{t("tax")}</span>
-                    <span className="font-mono tabular-nums">
-                      {formatMoney(subscription.taxMinor, currency, locale)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between pt-2 border-t border-border/80 font-bold text-base text-foreground">
-                    <span>{t("total")}</span>
-                    <span className="font-mono tabular-nums">
-                      {formatMoney(subscription.totalMinor, currency, locale)}
-                    </span>
-                  </div>
-                </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border/60">
-              <CardTitle className="inline-flex items-center gap-2 text-base font-semibold">
-                <CalendarClock className="h-4 w-4 text-primary" />
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="inline-flex items-center gap-2">
+                <CalendarClock size={18} className="text-primary" aria-hidden="true" />
                 <span>{t("invoicesHistory")}</span>
+                <span className="text-xs font-normal text-muted-foreground font-mono">
+                  ({invoices.length})
+                </span>
               </CardTitle>
               {canGenerateInvoice && subscription.status === "active" ? (
                 <Button
@@ -540,28 +540,26 @@ export function SubscriptionDetailView({
                 </Button>
               ) : null}
             </CardHeader>
-            <CardContent className="p-0">
+            <CardContent>
               {invoices.length === 0 ? (
-                <div className="p-6">
-                  <EmptyState
-                    title={t("empty")}
-                    description={t("noInvoicesYet")}
-                    action={
-                      canGenerateInvoice && subscription.status === "active" ? (
-                        <Button
-                          variant="primary"
-                          onClick={() => setConfirmDialog("generate")}
-                          className="gap-1.5"
-                        >
-                          <Receipt className="h-4 w-4" />
-                          <span>{t("generateNow")}</span>
-                        </Button>
-                      ) : undefined
-                    }
-                  />
-                </div>
+                <EmptyState
+                  title={t("empty")}
+                  description={t("noInvoicesYet")}
+                  action={
+                    canGenerateInvoice && subscription.status === "active" ? (
+                      <Button
+                        variant="primary"
+                        onClick={() => setConfirmDialog("generate")}
+                        className="gap-1.5"
+                      >
+                        <Receipt className="h-4 w-4" />
+                        <span>{t("generateNow")}</span>
+                      </Button>
+                    ) : undefined
+                  }
+                />
               ) : (
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto rounded-lg border border-border">
                   <Table>
                     <TableHead>
                       <TableRow>
@@ -617,6 +615,43 @@ export function SubscriptionDetailView({
         </div>
 
         <div className="flex flex-col gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="inline-flex items-center gap-2">
+                <Wallet size={18} className="text-primary" aria-hidden="true" />
+                <span>{t("summary")}</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              <dl className="flex flex-col gap-2 text-sm">
+                <Money
+                  label={t("subtotal")}
+                  value={formatMoney(subscription.subtotalMinor, currency, locale)}
+                />
+                {subscription.discountMinor > 0 ? (
+                  <Money
+                    label={t("discount")}
+                    value={`-${formatMoney(subscription.discountMinor, currency, locale)}`}
+                  />
+                ) : null}
+                <Money
+                  label={t("net")}
+                  value={formatMoney(subscription.netMinor, currency, locale)}
+                />
+                <Money
+                  label={t("tax")}
+                  value={formatMoney(subscription.taxMinor, currency, locale)}
+                />
+                <div className="my-1 border-t border-border" />
+                <Money
+                  label={t("total")}
+                  value={formatMoney(subscription.totalMinor, currency, locale)}
+                  strong
+                />
+              </dl>
+            </CardContent>
+          </Card>
+
           {client ? (
             <Card>
               <CardHeader className="pb-3 border-b border-border/60">
