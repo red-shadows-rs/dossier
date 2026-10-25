@@ -4,6 +4,7 @@
 "use client";
 
 import Link from "next/link";
+import { useLocale } from "next-intl";
 import { CalendarClock } from "lucide-react";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { Badge } from "@/components/ui/Badge";
@@ -54,32 +55,39 @@ export function SubscriptionsTable({
   labels: SubscriptionsTableLabels;
   duplicateAction?: (raw: unknown) => Promise<ActionResult<{ id: string }>>;
 }) {
+  const locale = useLocale();
+
   const columns: ColumnDef<SubscriptionRow>[] = [
     {
       id: "number",
       header: labels.number,
-      className: "min-w-[180px]",
-      render: (row) => (
-        <div className="flex flex-col min-w-0">
-          <Link
-            href={`/subscriptions/${row.id}`}
-            className="text-foreground hover:text-primary transition-colors font-semibold text-xs font-mono inline-block"
-            dir="ltr"
-          >
-            {row.number ?? "-"}
-          </Link>
-          <span className="text-[11px] text-muted-foreground truncate font-medium">
-            {row.titleAr}
-          </span>
-        </div>
-      ),
+      className: "min-w-[160px]",
+      render: (row) => {
+        const title =
+          locale === "en"
+            ? (row.titleEn || row.titleAr || "-")
+            : (row.titleAr || row.titleEn || "-");
+        return (
+          <div className="flex flex-col items-start min-w-0">
+            <Link
+              href={`/subscriptions/${row.id}`}
+              className="text-foreground hover:text-primary transition-colors font-semibold text-xs font-mono inline-flex items-center text-start"
+            >
+              <span dir="ltr">{row.number ?? "-"}</span>
+            </Link>
+            <span className="text-[11px] text-muted-foreground truncate font-medium text-start">
+              {title}
+            </span>
+          </div>
+        );
+      },
     },
     {
       id: "client",
       header: labels.client,
-      className: "min-w-[160px] text-foreground/90 font-medium text-xs",
+      className: "min-w-[150px] text-foreground/90 font-medium text-xs",
       render: (row) => (
-        <div className="flex flex-col min-w-0">
+        <div className="flex flex-col items-start min-w-0">
           <Link
             href={`/clients/${row.clientId}`}
             className="hover:text-primary hover:underline transition-colors truncate"
@@ -87,11 +95,21 @@ export function SubscriptionsTable({
             {row.clientName}
           </Link>
           {row.projectCode ? (
-            <span className="text-[10px] text-muted-foreground font-mono">
+            <span className="text-[10px] text-muted-foreground font-mono" dir="ltr">
               {row.projectCode}
             </span>
           ) : null}
         </div>
+      ),
+    },
+    {
+      id: "status",
+      header: labels.statusLabel,
+      className: "whitespace-nowrap",
+      render: (row) => (
+        <Badge tone={subscriptionStatusTone(row.status)}>
+          {labels.statusValues[row.status] ?? row.status}
+        </Badge>
       ),
     },
     {
@@ -123,16 +141,6 @@ export function SubscriptionsTable({
         <span dir="ltr" className="tabular-nums font-semibold font-mono text-foreground">
           {row.totalFormatted}
         </span>
-      ),
-    },
-    {
-      id: "status",
-      header: labels.statusLabel,
-      className: "whitespace-nowrap",
-      render: (row) => (
-        <Badge tone={subscriptionStatusTone(row.status)}>
-          {labels.statusValues[row.status] ?? row.status}
-        </Badge>
       ),
     },
     {

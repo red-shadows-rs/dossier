@@ -110,7 +110,7 @@ export default async function SubscriptionsPage({
       (status ? 1 : 0) + (frequency ? 1 : 0) + (clientId ? 1 : 0);
 
     const labels = {
-      number: t("subscriptionNumber"),
+      number: t("number"),
       title: t("subscriptionTitle"),
       client: t("client"),
       frequency: t("frequency"),

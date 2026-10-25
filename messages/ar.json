@@ -1263,6 +1263,7 @@
     "empty": "لا توجد اشتراكات بعد",
     "emptyHint": "أنشئ اشتراكاً لأتمتة الفواتير المتكررة.",
     "searchPlaceholder": "بحث بالرقم أو العنوان أو العميل...",
+    "number": "الرقم",
     "subscriptionNumber": "رقم الاشتراك",
     "subscriptionTitle": "عنوان الاشتراك",
     "client": "العميل",

@@ -1263,6 +1263,7 @@
     "empty": "No subscriptions yet",
     "emptyHint": "Create a subscription to automate recurring invoices.",
     "searchPlaceholder": "Search by number, title, or client...",
+    "number": "Number",
     "subscriptionNumber": "Subscription #",
     "subscriptionTitle": "Subscription Title",
     "client": "Client",
