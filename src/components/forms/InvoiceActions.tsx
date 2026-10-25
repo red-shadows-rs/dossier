@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   Copy,
   CreditCard,
+  Paperclip,
   Pencil,
   Receipt,
   Send,
@@ -19,6 +20,7 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { cn } from "@/components/ui/cn";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Dialog } from "@/components/ui/Dialog";
 import { Field } from "@/components/ui/Field";
@@ -348,6 +350,12 @@ export function PaymentDialog({
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [statusError, setStatusError] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  function handleClose() {
+    setSelectedFile(null);
+    onClose();
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -367,17 +375,13 @@ export function PaymentDialog({
       setStatusError(t("errors.invalid"));
       return;
     }
-    const result = await recordPaymentAction({
-      invoiceId,
-      amountMinor,
-      paidOn: String(data.get("paidOn") ?? ""),
-      method: String(data.get("method") ?? "bank_transfer"),
-      reference: String(data.get("reference") ?? ""),
-      notes: String(data.get("notes") ?? ""),
-    });
+    data.set("invoiceId", invoiceId);
+    data.set("amountMinor", String(amountMinor));
+    const result = await recordPaymentAction(data);
     setPending(false);
     if (result.ok) {
       toast({ title: t("invoices.paymentRecorded"), tone: "success" });
+      setSelectedFile(null);
       onDone();
       return;
     }
@@ -395,7 +399,7 @@ export function PaymentDialog({
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       title={t("invoices.recordPayment")}
       footer={null}
     >
@@ -442,13 +446,56 @@ export function PaymentDialog({
           </Select>
         </Field>
         <Field label={t("invoices.reference")} htmlFor="pay-ref">
-          <Input
-            id="pay-ref"
-            name="reference"
-            dir="ltr"
-            placeholder={t("invoices.placeholders.paymentReference")}
-            className="text-start"
-          />
+          <div className="flex items-center gap-2">
+            <Input
+              id="pay-ref"
+              name="reference"
+              dir="ltr"
+              placeholder={t("invoices.placeholders.paymentReference")}
+              className="text-start flex-1"
+            />
+            <label
+              htmlFor="pay-receipt-file"
+              className={cn(
+                "inline-flex h-10 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded border border-border bg-card px-3 text-xs font-medium text-foreground shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground",
+                selectedFile && "border-primary/60 text-primary bg-primary/5",
+              )}
+              title={selectedFile ? selectedFile.name : t("invoices.attachReceipt")}
+            >
+              <Paperclip size={15} />
+              <span className="max-w-[120px] truncate">
+                {selectedFile ? selectedFile.name : t("invoices.attachReceipt")}
+              </span>
+            </label>
+            <input
+              id="pay-receipt-file"
+              name="receiptFile"
+              type="file"
+              accept="image/png,image/jpeg,image/webp,application/pdf"
+              className="sr-only"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                setSelectedFile(f ?? null);
+              }}
+            />
+            {selectedFile && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 shrink-0 text-muted-foreground hover:text-destructive"
+                onClick={() => {
+                  setSelectedFile(null);
+                  const input = document.getElementById(
+                    "pay-receipt-file",
+                  ) as HTMLInputElement | null;
+                  if (input) input.value = "";
+                }}
+              >
+                <X size={15} />
+              </Button>
+            )}
+          </div>
         </Field>
         <Field label={t("invoices.notes")} htmlFor="pay-notes">
           <Textarea
@@ -461,7 +508,7 @@ export function PaymentDialog({
           <Button
             type="button"
             variant="secondary"
-            onClick={onClose}
+            onClick={handleClose}
             disabled={pending}
             className="gap-2"
           >

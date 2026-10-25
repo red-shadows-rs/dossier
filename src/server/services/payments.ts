@@ -1,9 +1,9 @@
 // Dossier - Payments Service
 // https://github.com/red-shadows-rs/dossier
 
-import { and, asc, count, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { db, withTx, type DbTx } from "@/db";
-import { invoices, payments } from "@/db/schema";
+import { files, invoices, payments } from "@/db/schema";
 import { nowMs, todayInTz } from "@/lib/dates";
 import { AppError } from "@/lib/errors";
 import { newId } from "@/lib/ids";
@@ -15,6 +15,17 @@ import { getSettings } from "@/server/services/settings";
 export const PAYMENTS_PAGE_SIZE = 20;
 
 export type PaymentRow = typeof payments.$inferSelect;
+
+export type PaymentReceiptFile = {
+  id: string;
+  originalName: string | null;
+  mime: string;
+  sizeBytes: number;
+};
+
+export type PaymentWithReceipt = PaymentRow & {
+  receiptFile?: PaymentReceiptFile | null;
+};
 
 export type PaymentDetail = {
   payment: PaymentRow;
@@ -194,13 +205,52 @@ export function voidPayment(
   });
 }
 
-export function listPayments(invoiceId: string): PaymentRow[] {
-  return db
+export function listPayments(invoiceId: string): PaymentWithReceipt[] {
+  const rows = db
     .select()
     .from(payments)
     .where(eq(payments.invoiceId, invoiceId))
     .orderBy(asc(payments.paidOn), asc(payments.createdAt))
     .all();
+
+  if (rows.length === 0) return [];
+
+  const paymentIds = rows.map((p) => p.id);
+  const fileRows = db
+    .select({
+      id: files.id,
+      originalName: files.originalName,
+      mime: files.mime,
+      sizeBytes: files.sizeBytes,
+      ownerId: files.ownerId,
+    })
+    .from(files)
+    .where(
+      and(
+        eq(files.ownerType, "payment"),
+        inArray(files.ownerId, paymentIds),
+        eq(files.kind, "attachment"),
+      ),
+    )
+    .orderBy(desc(files.createdAt))
+    .all();
+
+  const fileMap = new Map<string, PaymentReceiptFile>();
+  for (const f of fileRows) {
+    if (f.ownerId && !fileMap.has(f.ownerId)) {
+      fileMap.set(f.ownerId, {
+        id: f.id,
+        originalName: f.originalName,
+        mime: f.mime,
+        sizeBytes: f.sizeBytes,
+      });
+    }
+  }
+
+  return rows.map((p) => ({
+    ...p,
+    receiptFile: fileMap.get(p.id) ?? null,
+  }));
 }
 
 export function listPaymentsPaged(

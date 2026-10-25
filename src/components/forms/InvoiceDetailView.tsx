@@ -17,6 +17,7 @@ import {
   FileText,
   FolderKanban,
   ListOrdered,
+  Paperclip,
   Receipt,
   Wallet,
 } from "lucide-react";
@@ -59,7 +60,15 @@ import type {
 
 type InvoiceRow = typeof invoices.$inferSelect;
 type LineRow = typeof invoiceLines.$inferSelect;
-type PaymentRow = typeof paymentsTable.$inferSelect;
+type PaymentReceiptFile = {
+  id: string;
+  originalName: string | null;
+  mime: string;
+  sizeBytes: number;
+};
+type PaymentRow = typeof paymentsTable.$inferSelect & {
+  receiptFile?: PaymentReceiptFile | null;
+};
 type ProjectRow = typeof projects.$inferSelect;
 type ClientRow = typeof clients.$inferSelect;
 
@@ -693,23 +702,44 @@ export function InvoiceDetailView({
                           <span className="font-mono">{payment.reference}</span>
                         )}
                       </div>
+                      {payment.notes && (
+                        <p className="text-xs text-muted-foreground/80 line-clamp-2 mt-0.5">
+                          {payment.notes}
+                        </p>
+                      )}
                     </div>
 
-                    <div className="flex justify-end pt-2 border-t border-border/40">
-                      {payment.voidedAt === null &&
-                      canVoidPayment &&
-                      (invoice.status === "issued" ||
-                        invoice.status === "partially_paid" ||
-                        invoice.status === "paid") ? (
-                        <VoidPaymentButton
-                          paymentId={payment.id}
-                          invoiceId={invoice.id}
-                          amountMinor={payment.amountMinor}
-                          currency={invoice.currency}
-                        />
-                      ) : payment.voidedAt !== null ? (
-                        <Badge tone="gray">{t("paymentVoidedBadge")}</Badge>
-                      ) : null}
+                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/40">
+                      {payment.receiptFile ? (
+                        <a
+                          href={`/api/files/${payment.receiptFile.id}?inline=1`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors truncate max-w-[170px]"
+                          title={payment.receiptFile.originalName ?? undefined}
+                        >
+                          <Paperclip size={13} className="shrink-0" />
+                          <span className="truncate">{t("viewReceiptAttachment")}</span>
+                        </a>
+                      ) : (
+                        <span />
+                      )}
+                      <div>
+                        {payment.voidedAt === null &&
+                        canVoidPayment &&
+                        (invoice.status === "issued" ||
+                          invoice.status === "partially_paid" ||
+                          invoice.status === "paid") ? (
+                          <VoidPaymentButton
+                            paymentId={payment.id}
+                            invoiceId={invoice.id}
+                            amountMinor={payment.amountMinor}
+                            currency={invoice.currency}
+                          />
+                        ) : payment.voidedAt !== null ? (
+                          <Badge tone="gray">{t("paymentVoidedBadge")}</Badge>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                 ))}

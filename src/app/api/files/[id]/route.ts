@@ -38,7 +38,14 @@ export async function GET(
       );
     }
 
-    if (!can(user, KIND_PERMISSION[row.kind])) {
+    if (row.ownerType === "payment") {
+      if (!can(user, "invoices.read")) {
+        return NextResponse.json(
+          { ok: false, error: { code: "FORBIDDEN" } },
+          { status: 403 },
+        );
+      }
+    } else if (!can(user, KIND_PERMISSION[row.kind])) {
       return NextResponse.json(
         { ok: false, error: { code: "FORBIDDEN" } },
         { status: 403 },
