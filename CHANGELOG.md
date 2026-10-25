@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.3.9] - 2026-10-25
+
+### Fixed
+- **Missing Project Milestones Empty State Translation:** Added missing `projects.noMilestones` i18n localization keys in Arabic and English, resolving browser console warning `MISSING_MESSAGE: projects.noMilestones (ar)` when viewing projects without contract payment milestones.
+
 ## [v1.3.8] - 2026-10-25
 
 ### Fixed

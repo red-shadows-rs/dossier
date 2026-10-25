@@ -578,6 +578,7 @@
     },
     "noContracts": "لا توجد عقود لهذا المشروع بعد",
     "noInvoices": "لا توجد فواتير لهذا المشروع بعد",
+    "noMilestones": "لا توجد دفعات لهذا المشروع بعد",
     "milestonesToInvoice": "دفعات بانتظار الفاتورة",
     "noMilestonesToInvoice": "لا توجد دفعات بانتظار الفوترة",
     "milestone": "الدفعة",

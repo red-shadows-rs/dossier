@@ -578,6 +578,7 @@
     },
     "noContracts": "No contracts for this project yet",
     "noInvoices": "No invoices for this project yet",
+    "noMilestones": "No milestones for this project yet",
     "milestonesToInvoice": "Milestones to invoice",
     "noMilestonesToInvoice": "No milestones waiting for an invoice",
     "milestone": "Milestone",
