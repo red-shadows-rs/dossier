@@ -4,6 +4,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Layers, FilePlus2, Plus, X } from "lucide-react";
@@ -122,16 +123,17 @@ export function NewMilestoneInvoiceForm({
       </Card>
 
       <div className="flex justify-end gap-2">
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={() => router.back()}
-          disabled={pending}
-          className="gap-2"
-        >
-          <X className="h-4 w-4" />
-          {t("common.cancel")}
-        </Button>
+        <Link href="/invoices">
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={pending}
+            className="gap-2"
+          >
+            <X className="h-4 w-4" />
+            {t("common.cancel")}
+          </Button>
+        </Link>
         <Button type="submit" loading={pending} className="gap-2">
           <FilePlus2 className="h-4 w-4" />
           {t("invoices.createDraft")}

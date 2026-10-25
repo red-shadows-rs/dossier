@@ -4,6 +4,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { FilePlus2, Receipt, X } from "lucide-react";
@@ -202,16 +203,17 @@ export function NewInvoiceForm({
       </Card>
 
       <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card p-3 shadow-sm">
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => router.back()}
-          disabled={pending}
-          className="gap-1.5 text-xs sm:text-sm"
-        >
-          <X className="h-4 w-4" />
-          <span>{t("common.cancel")}</span>
-        </Button>
+        <Link href="/invoices">
+          <Button
+            type="button"
+            variant="ghost"
+            disabled={pending}
+            className="gap-1.5 text-xs sm:text-sm"
+          >
+            <X className="h-4 w-4" />
+            <span>{t("common.cancel")}</span>
+          </Button>
+        </Link>
 
         <Button
           type="submit"
