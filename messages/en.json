@@ -1256,6 +1256,7 @@
   },
   "subscriptions": {
     "title": "Subscriptions",
+    "subscriptionData": "Subscription Details",
     "new": "New Subscription",
     "edit": "Edit Subscription",
     "duplicate": "Duplicate",

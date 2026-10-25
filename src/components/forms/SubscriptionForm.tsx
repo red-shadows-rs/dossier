@@ -870,23 +870,20 @@ export function SubscriptionForm({
                   />
                 </Field>
 
-                <label className="flex h-10 cursor-pointer items-center justify-between rounded border border-border/80 bg-muted/20 px-3.5 text-xs text-foreground transition-colors hover:bg-muted/30 select-none">
-                  <span className="font-medium">{t("autoIssue")}</span>
+                <div className="sm:col-span-2 flex flex-wrap items-center gap-6 pb-2">
                   <Checkbox
+                    id="sub-auto-issue"
                     checked={autoIssueInvoice}
                     onChange={(e) => setAutoIssueInvoice(e.target.checked)}
-                    sx={{ p: 0.5 }}
+                    label={t("autoIssue")}
                   />
-                </label>
-
-                <label className="flex h-10 cursor-pointer items-center justify-between rounded border border-border/80 bg-muted/20 px-3.5 text-xs text-foreground transition-colors hover:bg-muted/30 select-none">
-                  <span className="font-medium">{t("autoSendEmail")}</span>
                   <Checkbox
+                    id="sub-auto-send"
                     checked={autoSendEmail}
                     onChange={(e) => setAutoSendEmail(e.target.checked)}
-                    sx={{ p: 0.5 }}
+                    label={t("autoSendEmail")}
                   />
-                </label>
+                </div>
               </div>
             </CardContent>
           </Card>

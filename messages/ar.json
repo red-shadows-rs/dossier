@@ -1256,6 +1256,7 @@
   },
   "subscriptions": {
     "title": "الاشتراكات",
+    "subscriptionData": "بيانات الاشتراك",
     "new": "اشتراك جديد",
     "edit": "تعديل الاشتراك",
     "duplicate": "تكرار",

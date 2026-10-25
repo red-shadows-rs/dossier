@@ -19,12 +19,11 @@ import {
   ExternalLink,
   FolderKanban,
   ListOrdered,
-  Mail,
   Pause,
   Pencil,
-  Phone,
   Play,
   Receipt,
+  Repeat,
   Wallet,
 } from "lucide-react";
 import { PaymentCardItem } from "@/components/forms/PaymentCardItem";
@@ -33,6 +32,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { cn } from "@/components/ui/cn";
 import {
   Table,
   TableBody,
@@ -277,58 +277,105 @@ export function SubscriptionDetailView({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4 rounded-xl border border-border/80 bg-card p-5 sm:p-6 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex flex-col gap-1.5 min-w-0">
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <span className="font-mono text-sm font-bold text-muted-foreground">
-                {subscription.number}
-              </span>
-              <Badge tone={subscriptionStatusTone(subscription.status)}>
-                {t(`statuses.${subscription.status}`)}
-              </Badge>
-              <Badge tone="gray" className="font-mono text-xs">
-                {frequencyLabel}
-              </Badge>
+      <div className="flex flex-col gap-2">
+        <nav
+          aria-label="Breadcrumb"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground"
+        >
+          <Link
+            href="/subscriptions"
+            className="hover:text-foreground transition-colors"
+          >
+            {t("title")}
+          </Link>
+          <span className="text-border">/</span>
+          <span
+            className={cn(
+              "text-foreground font-medium",
+              subscription.number ? "font-mono" : "font-sans",
+            )}
+          >
+            {subscription.number ?? title}
+          </span>
+        </nav>
+
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-primary/20 bg-primary/10 text-primary">
+              <Repeat size={20} aria-hidden="true" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground truncate">
-              {title}
-            </h1>
-            <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
-              {client ? (
-                <Link
-                  href={`/clients/${client.id}`}
-                  className="inline-flex items-center gap-1.5 hover:text-foreground hover:underline transition-colors"
+            <div className="flex flex-col gap-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1
+                  className={cn(
+                    "text-xl sm:text-2xl font-bold tracking-tight text-foreground",
+                    subscription.number ? "font-mono" : "font-sans",
+                  )}
                 >
-                  <Building2 className="h-3.5 w-3.5 text-primary" />
-                  <span>{clientName}</span>
-                </Link>
-              ) : null}
-              {project ? (
-                <Link
-                  href={`/projects/${project.id}`}
-                  className="inline-flex items-center gap-1.5 hover:text-foreground hover:underline transition-colors"
+                  {subscription.number ?? title}
+                </h1>
+                <Badge
+                  tone={subscriptionStatusTone(subscription.status)}
+                  className="translate-y-0.5"
                 >
-                  <FolderKanban className="h-3.5 w-3.5 text-primary" />
-                  <span>{projectName}</span>
-                </Link>
-              ) : null}
-              <span className="inline-flex items-center gap-1.5 font-mono">
-                <Calendar className="h-3.5 w-3.5" />
-                <span>
-                  {t("startDate")}: {subscription.startDate}
+                  {t(`statuses.${subscription.status}`)}
+                </Badge>
+                <Badge
+                  tone="gray"
+                  className="font-mono text-xs translate-y-0.5"
+                >
+                  {frequencyLabel}
+                </Badge>
+                {subscription.number && title ? (
+                  <span className="text-sm font-medium text-muted-foreground translate-y-0.5">
+                    · <span>{title}</span>
+                  </span>
+                ) : null}
+              </div>
+              <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                {client ? (
+                  <Link
+                    href={`/clients/${client.id}`}
+                    className="inline-flex items-center gap-1 hover:text-foreground hover:underline transition-colors"
+                  >
+                    <Building2 className="h-3.5 w-3.5 text-primary" />
+                    <span>{clientName}</span>
+                  </Link>
+                ) : null}
+                {project ? (
+                  <Link
+                    href={`/projects/${project.id}`}
+                    className="inline-flex items-center gap-1 hover:text-foreground hover:underline transition-colors"
+                  >
+                    <FolderKanban className="h-3.5 w-3.5 text-primary" />
+                    <span>{projectName}</span>
+                  </Link>
+                ) : null}
+                <span className="inline-flex items-center gap-1 font-mono">
+                  <Calendar className="h-3.5 w-3.5" />
+                  <span>
+                    {t("startDate")}: {subscription.startDate}
+                  </span>
                 </span>
-              </span>
+                {subscription.nextRunDate && (
+                  <span className="inline-flex items-center gap-1 font-mono">
+                    <CalendarClock className="h-3.5 w-3.5" />
+                    <span>
+                      {t("nextRunDate")}: {subscription.nextRunDate}
+                    </span>
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap sm:justify-end">
+          <div className="flex flex-wrap items-center gap-2">
             {canGenerateInvoice && subscription.status === "active" ? (
               <Button
                 variant="primary"
                 onClick={() => setConfirmDialog("generate")}
                 disabled={Boolean(pendingAction)}
-                className="gap-1.5 shadow-sm"
+                className="gap-1.5 shadow-xs"
               >
                 <Receipt className="h-4 w-4" />
                 <span>{t("generateNow")}</span>
@@ -337,7 +384,7 @@ export function SubscriptionDetailView({
 
             {canWrite ? (
               <Link href={`/subscriptions/${subscription.id}/edit`}>
-                <Button variant="secondary" className="gap-1.5">
+                <Button variant="secondary" className="gap-1.5 shadow-xs">
                   <Pencil className="h-4 w-4" />
                   <span>{t("edit")}</span>
                 </Button>
@@ -349,7 +396,7 @@ export function SubscriptionDetailView({
                 variant="secondary"
                 onClick={() => setConfirmDialog("duplicate")}
                 disabled={Boolean(pendingAction)}
-                className="gap-1.5"
+                className="gap-1.5 shadow-xs"
               >
                 <Copy className="h-4 w-4" />
                 <span>{t("duplicate")}</span>
@@ -361,7 +408,7 @@ export function SubscriptionDetailView({
                 variant="secondary"
                 onClick={() => setConfirmDialog("pause")}
                 disabled={Boolean(pendingAction)}
-                className="gap-1.5 text-amber-600 dark:text-amber-400"
+                className="gap-1.5 shadow-xs"
               >
                 <Pause className="h-4 w-4" />
                 <span>{t("pause")}</span>
@@ -373,7 +420,7 @@ export function SubscriptionDetailView({
                 variant="secondary"
                 onClick={() => setConfirmDialog("resume")}
                 disabled={Boolean(pendingAction)}
-                className="gap-1.5 text-emerald-600 dark:text-emerald-400"
+                className="gap-1.5 shadow-xs"
               >
                 <Play className="h-4 w-4" />
                 <span>{t("resume")}</span>
@@ -387,7 +434,7 @@ export function SubscriptionDetailView({
                 variant="danger"
                 onClick={() => setConfirmDialog("cancel")}
                 disabled={Boolean(pendingAction)}
-                className="gap-1.5"
+                className="gap-1.5 shadow-xs"
               >
                 <Ban className="h-4 w-4" />
                 <span>{t("cancel")}</span>
@@ -398,80 +445,67 @@ export function SubscriptionDetailView({
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="flex flex-col gap-1 rounded-xl border border-border/70 bg-card p-4 shadow-xs">
+        <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <span className="text-xs font-medium text-muted-foreground">
             {t("total")}
           </span>
-          <span className="text-xl font-bold font-mono tabular-nums text-foreground truncate">
+          <span className="text-lg font-bold font-mono tabular-nums text-foreground truncate">
             {formatMoney(subscription.totalMinor, currency, locale)}
-          </span>
-          <span className="text-[11px] text-muted-foreground">
-            {frequencyLabel}
           </span>
         </div>
 
-        <div className="flex flex-col gap-1 rounded-xl border border-border/70 bg-card p-4 shadow-xs">
+        <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <span className="text-xs font-medium text-muted-foreground">
             {t("nextRunDate")}
           </span>
-          <span className="text-lg font-bold font-mono tabular-nums text-foreground truncate flex items-center gap-1.5">
-            <CalendarClock className="h-4 w-4 text-primary shrink-0" />
-            <span>{subscription.nextRunDate}</span>
-          </span>
-          <span className="text-[11px] text-muted-foreground">
-            {subscription.status === "active"
-              ? subscription.autoIssueInvoice
-                ? t("autoIssue")
-                : t("statuses.active")
-              : t(`statuses.${subscription.status}`)}
+          <span className="text-lg font-bold font-mono tabular-nums text-foreground truncate">
+            {subscription.nextRunDate ?? "-"}
           </span>
         </div>
 
-        <div className="flex flex-col gap-1 rounded-xl border border-border/70 bg-card p-4 shadow-xs">
+        <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <span className="text-xs font-medium text-muted-foreground">
             {t("invoicesCount")}
           </span>
-          <span className="text-xl font-bold font-mono tabular-nums text-foreground">
+          <span className="text-lg font-bold font-mono tabular-nums text-foreground">
             {subscription.invoicesCount}
-          </span>
-          <span className="text-[11px] text-muted-foreground">
-            {subscription.lastRunDate
-              ? `${t("lastRunDate")}: ${subscription.lastRunDate}`
-              : t("empty")}
           </span>
         </div>
 
-        <div className="flex flex-col gap-1 rounded-xl border border-border/70 bg-card p-4 shadow-xs">
+        <div className="flex flex-col gap-1 rounded border border-border bg-card p-3 shadow-xs">
           <span className="text-xs font-medium text-muted-foreground">
             {t("settingsTitle")}
           </span>
-          <div className="flex flex-col gap-0.5 text-xs text-foreground mt-0.5">
-            <span className="flex items-center gap-1.5 text-[11px]">
-              <CheckCircle2
-                className={`h-3.5 w-3.5 ${
-                  subscription.autoIssueInvoice ? "text-emerald-500" : "text-muted-foreground/40"
-                }`}
-              />
-              <span>{subscription.autoIssueInvoice ? t("autoIssue") : t("autoIssueDraft")}</span>
-            </span>
-            <span className="flex items-center gap-1.5 text-[11px]">
-              <Mail
-                className={`h-3.5 w-3.5 ${
-                  subscription.autoSendEmail ? "text-emerald-500" : "text-muted-foreground/40"
-                }`}
-              />
-              <span>{subscription.autoSendEmail ? t("emailEnabled") : t("emailDisabled")}</span>
+          <div className="flex items-center gap-2 text-xs text-foreground mt-0.5">
+            <span
+              className={cn(
+                "inline-flex items-center gap-1",
+                subscription.autoIssueInvoice
+                  ? "text-emerald-600 dark:text-emerald-400 font-medium"
+                  : "text-muted-foreground",
+              )}
+            >
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              <span>
+                {subscription.autoIssueInvoice
+                  ? t("autoIssue")
+                  : t("autoIssueDraft")}
+              </span>
             </span>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 flex flex-col gap-6">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+        <div className="flex flex-col gap-6 lg:col-span-8">
           <Card>
             <CardHeader>
               <CardTitle className="inline-flex items-center gap-2">
-                <ListOrdered size={18} className="text-primary" aria-hidden="true" />
+                <ListOrdered
+                  size={18}
+                  className="text-primary"
+                  aria-hidden="true"
+                />
                 <span>{t("items")}</span>
                 <span className="text-xs font-normal text-muted-foreground font-mono">
                   ({items.length})
@@ -484,9 +518,15 @@ export function SubscriptionDetailView({
                   <TableHead>
                     <TableRow>
                       <TableHeaderCell>{t("description")}</TableHeaderCell>
-                      <TableHeaderCell className="text-end">{t("quantity")}</TableHeaderCell>
-                      <TableHeaderCell className="text-end">{t("unitPrice")}</TableHeaderCell>
-                      <TableHeaderCell className="text-end">{t("total")}</TableHeaderCell>
+                      <TableHeaderCell className="text-end">
+                        {t("quantity")}
+                      </TableHeaderCell>
+                      <TableHeaderCell className="text-end">
+                        {t("unitPrice")}
+                      </TableHeaderCell>
+                      <TableHeaderCell className="text-end">
+                        {t("total")}
+                      </TableHeaderCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -521,7 +561,11 @@ export function SubscriptionDetailView({
           <Card>
             <CardHeader>
               <CardTitle className="inline-flex items-center gap-2">
-                <CalendarClock size={18} className="text-primary" aria-hidden="true" />
+                <CalendarClock
+                  size={18}
+                  className="text-primary"
+                  aria-hidden="true"
+                />
                 <span>{t("invoicesHistory")}</span>
                 <span className="text-xs font-normal text-muted-foreground font-mono">
                   ({invoices.length})
@@ -542,8 +586,12 @@ export function SubscriptionDetailView({
                         <TableHeaderCell>{tInv("number")}</TableHeaderCell>
                         <TableHeaderCell>{tInv("issueDate")}</TableHeaderCell>
                         <TableHeaderCell>{tInv("dueDate")}</TableHeaderCell>
-                        <TableHeaderCell className="text-end">{tInv("total")}</TableHeaderCell>
-                        <TableHeaderCell className="text-center">{tInv("status")}</TableHeaderCell>
+                        <TableHeaderCell className="text-end">
+                          {tInv("total")}
+                        </TableHeaderCell>
+                        <TableHeaderCell className="text-center">
+                          {tInv("status")}
+                        </TableHeaderCell>
                         <TableHeaderCell className="text-end"></TableHeaderCell>
                       </TableRow>
                     </TableHead>
@@ -565,7 +613,11 @@ export function SubscriptionDetailView({
                             {inv.dueDate || "-"}
                           </TableCell>
                           <TableCell className="text-end font-mono font-semibold text-sm">
-                            {formatMoney(inv.totalMinor, inv.currency as CurrencyCode, locale)}
+                            {formatMoney(
+                              inv.totalMinor,
+                              inv.currency as CurrencyCode,
+                              locale,
+                            )}
                           </TableCell>
                           <TableCell className="text-center">
                             <Badge tone={invoiceStatusTone(inv.status)}>
@@ -574,7 +626,11 @@ export function SubscriptionDetailView({
                           </TableCell>
                           <TableCell className="text-end">
                             <Link href={`/invoices/${inv.id}`}>
-                              <Button size="sm" variant="ghost" className="gap-1 text-xs">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="gap-1 text-xs"
+                              >
                                 <span>{t("viewInvoice")}</span>
                                 <ExternalLink className="h-3.5 w-3.5" />
                               </Button>
@@ -590,7 +646,7 @@ export function SubscriptionDetailView({
           </Card>
         </div>
 
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 lg:col-span-4">
           <Card>
             <CardHeader>
               <CardTitle className="inline-flex items-center gap-2">
@@ -602,12 +658,20 @@ export function SubscriptionDetailView({
               <dl className="flex flex-col gap-2 text-sm">
                 <Money
                   label={t("subtotal")}
-                  value={formatMoney(subscription.subtotalMinor, currency, locale)}
+                  value={formatMoney(
+                    subscription.subtotalMinor,
+                    currency,
+                    locale,
+                  )}
                 />
                 {subscription.discountMinor > 0 ? (
                   <Money
                     label={t("discount")}
-                    value={`-${formatMoney(subscription.discountMinor, currency, locale)}`}
+                    value={`-${formatMoney(
+                      subscription.discountMinor,
+                      currency,
+                      locale,
+                    )}`}
                   />
                 ) : null}
                 <Money
@@ -628,79 +692,132 @@ export function SubscriptionDetailView({
             </CardContent>
           </Card>
 
-          {client ? (
+          {client || project ? (
             <Card>
-              <CardHeader className="pb-3 border-b border-border/60">
-                <CardTitle className="inline-flex items-center gap-2 text-base font-semibold">
-                  <Building2 className="h-4 w-4 text-primary" />
-                  <span>{t("client")}</span>
+              <CardHeader>
+                <CardTitle className="inline-flex items-center gap-2">
+                  <FolderKanban
+                    size={18}
+                    className="text-primary"
+                    aria-hidden="true"
+                  />
+                  <span>{t("subscriptionData")}</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-4 space-y-3">
-                <div className="flex flex-col gap-1">
-                  <Link
-                    href={`/clients/${client.id}`}
-                    className="font-semibold text-foreground hover:text-primary hover:underline transition-colors"
-                  >
-                    {clientName}
-                  </Link>
-                  {client.email ? (
-                    <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Mail className="h-3.5 w-3.5" />
-                      <span>{client.email}</span>
+              <CardContent className="flex flex-col gap-3">
+                {project ? (
+                  <div className="flex flex-col gap-1 rounded-lg border border-border/70 bg-card p-3 transition-colors hover:border-primary/40">
+                    <span className="text-xs font-medium text-muted-foreground">
+                      {t("project")}
                     </span>
-                  ) : null}
-                  {client.phone ? (
-                    <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Phone className="h-3.5 w-3.5" />
-                      <span dir="ltr">{client.phone}</span>
+                    <Link
+                      href={`/projects/${project.id}`}
+                      className="inline-flex items-center gap-2 text-sm font-semibold text-foreground transition-colors hover:text-primary"
+                    >
+                      <FolderKanban
+                        className="h-4 w-4 text-primary/70 shrink-0"
+                        aria-hidden="true"
+                      />
+                      <span>{projectName}</span>
+                      {project.code && (project.nameAr || project.nameEn) ? (
+                        <span
+                          className="font-mono text-xs text-muted-foreground font-normal"
+                          dir="ltr"
+                        >
+                          ({project.code})
+                        </span>
+                      ) : null}
+                    </Link>
+                  </div>
+                ) : null}
+
+                {client ? (
+                  <div className="flex flex-col gap-1 rounded-lg border border-border/70 bg-card p-3 transition-colors hover:border-primary/40">
+                    <span className="text-xs font-medium text-muted-foreground">
+                      {t("client")}
                     </span>
-                  ) : null}
-                  {client.taxNumber ? (
-                    <span className="text-xs text-muted-foreground">
-                      {client.taxNumber}
-                    </span>
-                  ) : null}
-                </div>
+                    <Link
+                      href={`/clients/${client.id}`}
+                      className="inline-flex items-center gap-2 text-sm font-semibold text-foreground transition-colors hover:text-primary"
+                    >
+                      <Building2
+                        className="h-4 w-4 text-primary/70 shrink-0"
+                        aria-hidden="true"
+                      />
+                      <span>{clientName}</span>
+                    </Link>
+                    {client.email ? (
+                      <span className="text-xs text-muted-foreground">
+                        {client.email}
+                      </span>
+                    ) : null}
+                    {client.phone ? (
+                      <span
+                        dir="ltr"
+                        className="text-start text-xs text-muted-foreground font-mono"
+                      >
+                        {client.phone}
+                      </span>
+                    ) : null}
+                  </div>
+                ) : null}
               </CardContent>
             </Card>
           ) : null}
 
-          <Card>
-            <CardHeader className="pb-3 border-b border-border/60">
-              <CardTitle className="inline-flex items-center gap-2 text-base font-semibold">
-                <CreditCard className="h-4 w-4 text-primary" />
-                <span>{t("paymentMethods")}</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4 space-y-3">
-              {paymentCards.length > 0 ? (
+          {paymentCards.length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="inline-flex items-center gap-2">
+                  <CreditCard
+                    size={18}
+                    className="text-primary"
+                    aria-hidden="true"
+                  />
+                  <span>{t("paymentMethods")}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div className="flex flex-col gap-3">
                   {paymentCards.map((card, idx) => (
                     <PaymentCardItem key={idx} card={card} />
                   ))}
                 </div>
-              ) : subscription.paymentInstructionsAr ? (
+              </CardContent>
+            </Card>
+          ) : subscription.paymentInstructionsAr ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="inline-flex items-center gap-2">
+                  <CreditCard
+                    size={18}
+                    className="text-primary"
+                    aria-hidden="true"
+                  />
+                  <span>{t("paymentMethods")}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
                 <p className="rounded-lg border border-border/60 bg-muted/20 p-3 text-sm text-foreground whitespace-pre-wrap leading-relaxed">
                   {subscription.paymentInstructionsAr}
                 </p>
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  {t("noAccountsHint")}
-                </p>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          ) : null}
 
           {subscription.notesAr ? (
             <Card>
-              <CardHeader className="pb-3 border-b border-border/60">
-                <CardTitle className="inline-flex items-center gap-2 text-base font-semibold">
-                  <Clock className="h-4 w-4 text-primary" />
+              <CardHeader>
+                <CardTitle className="inline-flex items-center gap-2">
+                  <Clock
+                    size={18}
+                    className="text-primary"
+                    aria-hidden="true"
+                  />
                   <span>{t("notes")}</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-4">
+              <CardContent>
                 <p className="rounded-lg border border-border/60 bg-muted/20 p-3 text-sm text-foreground whitespace-pre-wrap leading-relaxed">
                   {subscription.notesAr}
                 </p>
