@@ -48,7 +48,7 @@ function Row({
   value: string | null | undefined;
   dir?: "ltr" | "rtl";
 }) {
-  if (!value) return null;
+  if (!value || !value.trim()) return null;
   return (
     <div className="flex flex-col gap-1 rounded border border-border/60 bg-muted/20 p-2.5 transition-colors hover:bg-muted/30">
       <dt className="text-xs font-medium text-muted-foreground">{label}</dt>
@@ -115,6 +115,26 @@ export function ClientDetailView({
     .reduce((acc, inv) => acc + (inv.totalMinor || 0), 0);
 
   const primaryCurrency = (invoices[0]?.currency || "SAR") as CurrencyCode;
+
+  const hasContactInfo = Boolean(
+    client.email?.trim() ||
+      client.phone?.trim() ||
+      client.country?.trim() ||
+      client.city?.trim() ||
+      client.addressAr?.trim() ||
+      client.addressEn?.trim(),
+  );
+
+  const hasLegalInfo = Boolean(
+    client.taxNumber?.trim() ||
+      client.crNumber?.trim() ||
+      client.repNameAr?.trim() ||
+      client.repNameEn?.trim() ||
+      client.repTitleAr?.trim() ||
+      client.repTitleEn?.trim(),
+  );
+
+  const hasNotes = Boolean(client.notes?.trim());
 
   const tabs = [
     {
@@ -326,26 +346,32 @@ export function ClientDetailView({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Row label={t("clients.email")} value={client.email} dir="ltr" />
-                <Row label={t("clients.phone")} value={client.phone} dir="ltr" />
-                <Row
-                  label={t("clients.country")}
-                  value={client.country}
-                  dir="ltr"
-                />
-                <Row label={t("clients.city")} value={client.city} />
-                <Row
-                  label={t("clients.addressAr")}
-                  value={client.addressAr}
-                  dir="rtl"
-                />
-                <Row
-                  label={t("clients.addressEn")}
-                  value={client.addressEn}
-                  dir="ltr"
-                />
-              </dl>
+              {hasContactInfo ? (
+                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <Row label={t("clients.email")} value={client.email} dir="ltr" />
+                  <Row label={t("clients.phone")} value={client.phone} dir="ltr" />
+                  <Row
+                    label={t("clients.country")}
+                    value={client.country}
+                    dir="ltr"
+                  />
+                  <Row label={t("clients.city")} value={client.city} />
+                  <Row
+                    label={t("clients.addressAr")}
+                    value={client.addressAr}
+                    dir="rtl"
+                  />
+                  <Row
+                    label={t("clients.addressEn")}
+                    value={client.addressEn}
+                    dir="ltr"
+                  />
+                </dl>
+              ) : (
+                <p className="text-xs text-muted-foreground italic">
+                  {t("common.noData")}
+                </p>
+              )}
             </CardContent>
           </Card>
 
@@ -357,38 +383,44 @@ export function ClientDetailView({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Row
-                  label={t("clients.taxNumber")}
-                  value={client.taxNumber}
-                  dir="ltr"
-                />
-                <Row
-                  label={t("clients.crNumber")}
-                  value={client.crNumber}
-                  dir="ltr"
-                />
-                <Row
-                  label={t("clients.repNameAr")}
-                  value={client.repNameAr}
-                  dir="rtl"
-                />
-                <Row
-                  label={t("clients.repNameEn")}
-                  value={client.repNameEn}
-                  dir="ltr"
-                />
-                <Row
-                  label={t("clients.repTitleAr")}
-                  value={client.repTitleAr}
-                  dir="rtl"
-                />
-                <Row
-                  label={t("clients.repTitleEn")}
-                  value={client.repTitleEn}
-                  dir="ltr"
-                />
-              </dl>
+              {hasLegalInfo ? (
+                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <Row
+                    label={t("clients.taxNumber")}
+                    value={client.taxNumber}
+                    dir="ltr"
+                  />
+                  <Row
+                    label={t("clients.crNumber")}
+                    value={client.crNumber}
+                    dir="ltr"
+                  />
+                  <Row
+                    label={t("clients.repNameAr")}
+                    value={client.repNameAr}
+                    dir="rtl"
+                  />
+                  <Row
+                    label={t("clients.repNameEn")}
+                    value={client.repNameEn}
+                    dir="ltr"
+                  />
+                  <Row
+                    label={t("clients.repTitleAr")}
+                    value={client.repTitleAr}
+                    dir="rtl"
+                  />
+                  <Row
+                    label={t("clients.repTitleEn")}
+                    value={client.repTitleEn}
+                    dir="ltr"
+                  />
+                </dl>
+              ) : (
+                <p className="text-xs text-muted-foreground italic">
+                  {t("common.noData")}
+                </p>
+              )}
             </CardContent>
           </Card>
 
@@ -400,13 +432,13 @@ export function ClientDetailView({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {client.notes ? (
+              {hasNotes ? (
                 <div className="rounded border border-border/60 bg-muted/20 p-3 text-sm text-foreground whitespace-pre-wrap leading-relaxed">
                   {client.notes}
                 </div>
               ) : (
                 <p className="text-xs text-muted-foreground italic">
-                  {t("common.noResults")}
+                  {t("common.noData")}
                 </p>
               )}
             </CardContent>
