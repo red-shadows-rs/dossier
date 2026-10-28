@@ -12,6 +12,7 @@ import { login } from "@/server/auth/login";
 import { getCurrentUser } from "@/server/auth/require-user";
 import {
   deleteSession,
+  DEMO_COOKIE,
   SESSION_COOKIE,
   sessionCookieOptions,
 } from "@/server/auth/session";
@@ -19,14 +20,18 @@ import { audit, getRequestMeta } from "@/server/services/audit";
 import { runAction } from "./_run";
 
 export async function loginAction(raw: unknown): Promise<ActionResult<null>> {
-  return runAction(async () => {
-    const input = loginSchema.parse(raw);
-    const meta = await getRequestMeta();
-    const { token } = await login(input.email, input.password, meta);
-    const store = await cookies();
-    store.set(SESSION_COOKIE, token, sessionCookieOptions());
-    return null;
-  });
+  return runAction(
+    async () => {
+      const input = loginSchema.parse(raw);
+      const meta = await getRequestMeta();
+      const { token } = await login(input.email, input.password, meta);
+      const store = await cookies();
+      store.set(SESSION_COOKIE, token, sessionCookieOptions());
+      store.delete(DEMO_COOKIE);
+      return null;
+    },
+    { forceMain: true },
+  );
 }
 
 export async function logoutAction(): Promise<void> {
@@ -53,5 +58,6 @@ export async function logoutAction(): Promise<void> {
   }
 
   store.delete(SESSION_COOKIE);
+  store.delete(DEMO_COOKIE);
   redirect("/login");
 }

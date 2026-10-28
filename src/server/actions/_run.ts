@@ -29,12 +29,15 @@ function safeErr(error: unknown): Record<string, unknown> {
 
 export async function runAction<T>(
   fn: () => Promise<T> | T,
+  options?: { forceMain?: boolean },
 ): Promise<ActionResult<T>> {
   let isDemo = false;
   try {
-    const store = await cookies();
-    const token = store.get(SESSION_COOKIE)?.value;
-    isDemo = isDemoToken(token) || store.get(DEMO_COOKIE)?.value === "1";
+    if (!options?.forceMain) {
+      const store = await cookies();
+      const token = store.get(SESSION_COOKIE)?.value;
+      isDemo = isDemoToken(token) || store.get(DEMO_COOKIE)?.value === "1";
+    }
     setDbMode(isDemo ? "demo" : "main");
   } catch {
     isDemo = false;
