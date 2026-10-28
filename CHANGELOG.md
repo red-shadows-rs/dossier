@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.4.4] - 2026-10-28
+
+### Added
+- **Production Demo Sanitization Shortcut:** Added `"clean:demo": "tsx scripts/clean-production-demo-data.ts"` in `package.json` to provide an immediate administrative command for purging demo seeds from production SQLite databases.
+
+### Changed
+- **Vitest Process-Level Isolation:** Configured `pool: "forks"` in `vitest.config.ts` to ensure stable, isolated child process execution across test suites, eliminating thread contention and worker RPC timeouts during concurrent headless browser PDF generation and SQLite database operations.
+
+### Fixed
+- **Codebase Audit & Hygiene Enforcement:** Completed full-scale codebase audit verifying zero source code comments (`bash scripts/check-comments.sh`), 100% RTL compliance, zero type errors, zero linter warnings, and a pristine 551-test suite execution.
+
 ## [v1.4.3] - 2026-10-26
 
 ### Added
