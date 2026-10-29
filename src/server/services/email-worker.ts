@@ -282,10 +282,10 @@ export function resolveSenderFrom(
     fromNameSetting?.trim() ||
     extractedName ||
     companyName?.trim() ||
-    "RED SHADOWS";
+    "Dossier";
 
   const cleanDisplayName =
-    displayName.replace(/["\r\n]/g, "").trim() || "RED SHADOWS";
+    displayName.replace(/["\r\n]/g, "").trim() || "Dossier";
 
   return `"${cleanDisplayName}" <${extractedEmail}>`;
 }
@@ -307,15 +307,14 @@ async function deliver(
     const company = getSettings("company");
     const emailSettings = getSettings("email");
     const companyName =
-      emailSettings.fromName?.trim() ||
       (row.locale === "ar"
         ? company.nameAr || company.nameEn
         : company.nameEn || company.nameAr) ||
-      "RED SHADOWS";
+      "Dossier";
     const from = resolveSenderFrom(
       env.SMTP_FROM,
       emailSettings.fromName,
-      companyName,
+      "Dossier",
     );
     const payload = parsePayload(row.payloadJson);
 

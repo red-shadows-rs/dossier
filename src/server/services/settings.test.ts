@@ -51,7 +51,7 @@ describe("getSettings", () => {
     expect(getSettings("numbering").prefix).toBe("DOS");
     expect(getSettings("signing").linkTtlDays).toBe(14);
     expect(getSettings("signing").requireEmailOtp).toBe(true);
-    expect(getSettings("email").fromName).toBe("RED SHADOWS");
+    expect(getSettings("email").fromName).toBe("Dossier");
     expect(getSettings("email").overdueReminderDays).toEqual([1, 7, 14]);
   });
 

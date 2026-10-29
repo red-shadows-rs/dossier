@@ -97,11 +97,11 @@ describe("renderEmail — contract_otp", () => {
 describe("renderEmail — test_email", () => {
   it("renders both languages with the fixed subjects", () => {
     const en = renderEmail("test_email", "en", {}, COMPANY);
-    expect(en.subject).toBe("RED SHADOWS test email");
+    expect(en.subject).toBe("Dossier test email");
     expect(en.html).toContain("Sent by RED SHADOWS");
 
     const ar = renderEmail("test_email", "ar", {}, COMPANY);
-    expect(ar.subject).toBe("رسالة اختبار من RED SHADOWS");
+    expect(ar.subject).toBe("رسالة اختبار من Dossier");
     expect(ar.html).toContain('dir="rtl"');
     expect(ar.html).toContain("أرسلت من RED SHADOWS");
   });

@@ -229,12 +229,12 @@ describe("resolveSenderFrom", () => {
     ).toBe('"Dossier" <billing@red-shadows-rs.com>');
   });
 
-  it("falls back to companyName and then RED SHADOWS", () => {
+  it("falls back to companyName and then Dossier", () => {
     expect(
       resolveSenderFrom("billing@red-shadows-rs.com", "", "Company Corp"),
     ).toBe('"Company Corp" <billing@red-shadows-rs.com>');
     expect(resolveSenderFrom(undefined, null, null)).toBe(
-      '"RED SHADOWS" <no-reply@localhost>',
+      '"Dossier" <no-reply@localhost>',
     );
   });
 });

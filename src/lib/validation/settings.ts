@@ -125,7 +125,7 @@ export const signingSchema = z.object({
 });
 
 export const emailSchema = z.object({
-  fromName: text(80).default("RED SHADOWS"),
+  fromName: text(80).default("Dossier"),
   overdueRemindersEnabled: z.boolean().default(false),
   overdueReminderDays: z
     .array(z.number().int().min(1).max(365))
