@@ -55,22 +55,24 @@ function shell(
       ? "'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans Arabic', 'Geeza Pro', Arial, sans-serif"
       : "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
 
+  const brandName = companyName || "RED SHADOWS";
+
   const footer =
     locale === "ar"
-      ? `أرسلت من ${escapeHtml(companyName)} عبر نظام Dossier`
-      : `Sent by ${escapeHtml(companyName)} via Dossier`;
+      ? `أرسلت من ${escapeHtml(brandName)} عبر نظام Dossier`
+      : `Sent by ${escapeHtml(brandName)} via Dossier`;
 
   const footerTagline =
     locale === "ar"
-      ? "نظام Dossier لإدارة الفواتير والعقود الرقمية"
-      : "Dossier — Digital Invoicing & Contracts Management";
+      ? "نظام إدارة الفواتير والعقود الرقمية"
+      : "Digital Invoicing & Contracts Management";
 
   return `<!doctype html>
 <html dir="${dir}" lang="${locale}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dossier</title>
+<title>${escapeHtml(brandName)}</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f4f4f5;font-family:${fontStack};-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f5;padding:32px 12px;">
@@ -81,10 +83,10 @@ function shell(
       <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;display:table;">
         <tr>
           <td style="vertical-align:middle;padding:0;line-height:0;">
-            <img src="${env.APP_URL}/apple-touch-icon.png" width="30" height="30" alt="Dossier" style="display:block;width:30px;height:30px;border-radius:6px;border:0;outline:0;text-decoration:none;" />
+            <img src="${env.APP_URL}/apple-touch-icon.png" width="30" height="30" alt="${escapeHtml(brandName)}" style="display:block;width:30px;height:30px;border-radius:6px;border:0;outline:0;text-decoration:none;" />
           </td>
           <td style="vertical-align:middle;padding-${locale === "ar" ? "right" : "left"}:10px;">
-            <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:18px;font-weight:700;color:#ffffff;letter-spacing:0.5px;line-height:1;">Dossier</span>
+            <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:18px;font-weight:700;color:#ffffff;letter-spacing:0.5px;line-height:1;">${escapeHtml(brandName)}</span>
           </td>
         </tr>
       </table>
@@ -779,15 +781,18 @@ function renderTestEmail(
 ): RenderedEmail {
   const ar = locale === "ar";
   const name = readText(payload, "recipientName");
+  const brandName = companyName || "RED SHADOWS";
 
-  const subject = ar ? "رسالة اختبار من Dossier" : "Dossier test email";
+  const subject = ar
+    ? `رسالة اختبار من ${brandName}`
+    : `${brandName} test email`;
   const greetingRaw = greeting(locale, name);
   const bodyRaw = ar
     ? "هذه رسالة اختبار للتأكد من أن إعداد البريد الإلكتروني (SMTP) يعمل بنجاح."
     : "This is a test email confirming that your email (SMTP) configuration works.";
   const noteRaw = ar
-    ? "إذا تلقيت هذه الرسالة، فهذا يعني أن نظام Dossier جاهز لإرسال الفواتير والعقود للعملاء."
-    : "If you received this email, the Dossier system is configured and ready to send invoices and contracts.";
+    ? `إذا تلقيت هذه الرسالة، فهذا يعني أن نظام ${brandName} جاهز لإرسال الفواتير والعقود للعملاء.`
+    : `If you received this email, the ${brandName} system is configured and ready to send invoices and contracts.`;
 
   const html = shell(
     locale,

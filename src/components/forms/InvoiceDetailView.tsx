@@ -26,7 +26,6 @@ import {
 import { InvoiceDocumentViewer } from "@/components/forms/InvoiceDocumentViewer";
 import { PaymentCardItem } from "@/components/forms/PaymentCardItem";
 import { Badge, invoiceStatusTone } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -657,20 +656,6 @@ export function InvoiceDetailView({
                 ({payments.length})
               </span>
             </CardTitle>
-            {payments.some((p) => p.voidedAt === null) && canRead && (
-              <div className="flex flex-wrap items-center gap-2">
-                <a
-                  href={`/api/invoices/${invoice.id}/receipt/pdf?inline=1`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <Button variant="secondary" className="gap-1.5 font-medium shadow-xs">
-                    <Receipt size={15} />
-                    <span>{t("viewReceiptPdf")}</span>
-                  </Button>
-                </a>
-              </div>
-            )}
           </CardHeader>
           <CardContent>
             {payments.length === 0 ? (
